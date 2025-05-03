@@ -2,30 +2,35 @@
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Online-blue)](https://dmaman86.github.io/shiftly/)
 
-A modern work-shift and salary calculator for hourly employees in Israel.
+**Shiftly** is an advanced work-hour tracking tool that calculates wages based on complex Israeli labor laws, including overtime, night bonuses, and special day rates (Shabbat, holidays, Friday evenings). Built with **React** and **TypeScript**, it provides a visual and editable breakdown for each workday.
 
 ## Features
 
-- Dynamic monthly workday generation with Hebrew calendar integration.
-- Calculation of:
-  - Regular hours
-  - Overtime (125%, 150%)
-  - Night and evening additions
-  - Shabbat and holiday pay (150%, 200%, 250%, 300%)
-  - Sick days and vacation
-- Monthly salary summary by hour type
-- Based on daily base hours and user-defined hourly wage
+- Track start and end time for each work shift
+- Automatically calculates:
+  - Base hours (100%)
+  - Overtime:
+    - 125% after 8 hours
+    - 150% after 10 hours
+  - Evening bonus (20%)
+  - Night bonus (50%)
+  - Special pay:
+    - Friday evenings and Shabbat (150% + 100%)
+    - Holidays and holiday evenings (up to 200% + 100%)
+- Distinction between normal, sick, and vacation days
+- Editable segments for manual adjustments
+- Visual breakdown table per day and summary per month
 
 ## Tech Stack
 
-- **React + TypeScript**
-- **Material UI (MUI)**
-- **Bootstrap**
-- **Vite**
-- **Custom hooks and modular logic separation**
-- **[Hebcal API](https://www.hebcal.com/home/developer-apis)** for holidays
+- **Frontend**: React + TypeScript + Vite
+- **UI**: Material UI (MUI) + Bootstrap
+- **State Management**: Custom React Hooks
+- **Date handling**: [Hebcal API](https://www.hebcal.com/home/developer-apis) for holidays
 
-## Installation
+## Getting Started
+
+To run the app locally:
 
 ```bash
 git clone https://github.com/dmaman86/shiftly.git
@@ -33,6 +38,8 @@ cd shiftly
 npm install
 npm run dev
 ```
+
+Visit `http://localhost:5173/shiftly` in your browser.
 
 ## Project Structure
 
@@ -114,4 +121,4 @@ src/
 
 ## License
 
-This project is for educational and demonstration purposes.
+This project is licensed under the [MIT License](LICENSE).
