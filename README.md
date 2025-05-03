@@ -1,5 +1,7 @@
 # Shiftly – Work Hours Tracking & Calculation System
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Online-blue)](https://dmaman86.github.io/shiftly/)
+
 A modern work-shift and salary calculator for hourly employees in Israel.
 
 ## Features
