@@ -26,7 +26,7 @@ A modern work-shift and salary calculator for hourly employees in Israel.
 ## Installation
 
 ```bash
-git clone
+git clone https://github.com/dmaman86/shiftly.git
 cd shiftly
 npm install
 npm run dev
@@ -91,41 +91,25 @@ src/
   ![Cross Day Checkbox](./public/cross-day-checkbox.png)
   ![Cross Day](./public/shift-save.png)
 
-## Custom Hooks
+- **Day types**:
 
-- `useWorkDays`:
+  - **Shabbat and holidays** are locked days: they cannot be marked as Sick or Vacation, but working hours **can** still be added.
+  - **Fridays and holiday eves** allow marking the day as **Sick** or **Vacation**, or adding working segments.
 
-  Dynamically generates the list of days in the selected month, with logic for:
+- **Sick/Vacation behavior**:
 
-  - Shabbat
-  - Holiday eve
-  - Paid holidays
-  - Marking the day before as specialNextDay
+  - When a day is marked as Sick or Vacation, you cannot add any work hours.
 
-  Uses [Hebcal API](https://www.hebcal.com/home/developer-apis) to fetch Hebrew calendar events.
+- **Working day behavior**:
 
-- `useSegments`
+  - If not marked as Sick or Vacation, you can add working segments with **start** and **end** times.
+  - if the end time crosses midnight (into the next day), a checkbox appears: **"חוצה יום"** (crosses to next day).
 
-  Manages work time segments for each day:
+- RTL layout for Hebrew.
+- Configurable salary inputs.
+- Daily work rows + sick/vacation toggles.
+- Monthly salary summary table.
 
-  - Add / update / remove segments (start and end times)
-  - Uses minute-based calculations for precise work time handling
+## License
 
-## User Interface
-
-- **Top Config Panel**: select year, month, hourly wage, and base daily hours.
-- **Work Table**: shows each day, with checkboxes for vacation/sick and option to add work segments.
-- **Monthly Summary**: final calculated salary broken down by hour types.
-
-## Calculation Logic Summary
-
-- Regular day:
-  - 06:00–14:00 → 100%
-  - 14:00–22:00 → 120%
-  - 22:00–06:00 → 150%
-- Friday / Holiday Eve:
-  - Until 17:00/18:00 → Regular
-  - After → 250% (150% + 100%)
-- Shabbat / Holiday:
-  - 06:00–22:00 → 250%
-  - 22:00–06:00 → 300%
+This project is for educational and demonstration purposes.
