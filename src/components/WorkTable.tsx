@@ -5,7 +5,6 @@ import {
   TableHead,
   TableRow,
   Typography,
-  CircularProgress,
   Box,
   Paper,
   TableContainer,
@@ -27,10 +26,11 @@ type ConfigValues = {
 
 type WorkMonthTableProps = {
   values: ConfigValues;
+  eventMap: Record<string, string[]>;
 };
 
-export const WorkTable = ({ values }: WorkMonthTableProps) => {
-  const { workDays, loading, error } = useWorkDays(values.year, values.month);
+export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
+  const { workDays } = useWorkDays(values.year, values.month, eventMap);
 
   const [globalBreakdown, setGlobalBreakdown] =
     useState<WorkDayPayMap>(emptyBreakdown());
@@ -85,89 +85,89 @@ export const WorkTable = ({ values }: WorkMonthTableProps) => {
         שעות חודש {values.month}/{values.year}
       </Typography>
 
-      {loading && <CircularProgress />}
-      {error && <Typography color="error">{error}</Typography>}
+      <div className="container" dir="rtl">
+        <div className="row mb-3">
+          <div className="col-12">
+            <Paper sx={{ direction: "rtl" }}>
+              <TableContainer sx={{ maxHeight: 600 }}>
+                <Table stickyHeader size="small">
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((label, i) => (
+                        <TableCell
+                          key={i}
+                          align="center"
+                          sx={{
+                            borderRight: "1px solid #ddd",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {label}
+                        </TableCell>
+                      ))}
+                      {values.baseRate > 0 && (
+                        <TableCell
+                          align="center"
+                          sx={{
+                            borderRight: "1px solid #ddd",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          שכר יומי
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  </TableHead>
 
-      {!loading && !error && (
-        <div className="container" dir="rtl">
-          <div className="row mb-3">
-            <div className="col-12">
-              <Paper sx={{ direction: "rtl" }}>
-                <TableContainer sx={{ maxHeight: 600 }}>
-                  <Table stickyHeader size="small">
-                    <TableHead>
+                  {groupByShabbat(workDays).map((group, index) => (
+                    <TableBody key={index}>
+                      {group.map((day) => (
+                        <WorkDayRow
+                          key={day.date}
+                          date={day.date}
+                          hebrewDay={day.hebrewDay}
+                          typeDay={day.typeDay}
+                          crossDayContinuation={day.crossDayContinuation}
+                          addToGlobalBreakdown={addToGlobalBreakdown}
+                          subtractFromGlobalBreakdown={
+                            subtractFromGlobalBreakdown
+                          }
+                          standardHours={values.standardHours}
+                          baseRate={values.baseRate}
+                        />
+                      ))}
                       <TableRow>
-                        {headers.map((label, i) => (
-                          <TableCell
-                            key={i}
-                            align="center"
-                            sx={{ borderRight: "1px solid #ddd" }}
-                          >
-                            {label}
-                          </TableCell>
-                        ))}
-                        {values.baseRate > 0 && (
-                          <TableCell
-                            align="center"
-                            sx={{ borderRight: "1px solid #ddd" }}
-                          >
-                            שכר יומי
-                          </TableCell>
-                        )}
+                        <TableCell
+                          colSpan={
+                            headers.length + (values.baseRate > 0 ? 1 : 0)
+                          }
+                          sx={{ p: 0 }}
+                        >
+                          <Box sx={{ height: 4, backgroundColor: "red" }} />
+                        </TableCell>
                       </TableRow>
-                    </TableHead>
-
-                    {groupByShabbat(workDays).map((group, index) => (
-                      <TableBody key={index}>
-                        {group.map((day) => (
-                          <WorkDayRow
-                            key={day.date}
-                            date={day.date}
-                            hebrewDay={day.hebrewDay}
-                            specialDay={day.specialDay}
-                            fullDay={day.fullDay}
-                            specialNextDay={day.specialNextDay}
-                            addToGlobalBreakdown={addToGlobalBreakdown}
-                            subtractFromGlobalBreakdown={
-                              subtractFromGlobalBreakdown
-                            }
-                            standardHours={values.standardHours}
-                            baseRate={values.baseRate}
-                          />
-                        ))}
-                        <TableRow>
-                          <TableCell
-                            colSpan={
-                              headers.length + (values.baseRate > 0 ? 1 : 0)
-                            }
-                            sx={{ p: 0 }}
-                          >
-                            <Box sx={{ height: 4, backgroundColor: "red" }} />
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    ))}
-                    <FooterSummary
-                      globalBreakdown={globalBreakdown}
-                      baseRate={values.baseRate}
-                    />
-                  </Table>
-                </TableContainer>
-              </Paper>
+                    </TableBody>
+                  ))}
+                  <FooterSummary
+                    globalBreakdown={globalBreakdown}
+                    baseRate={values.baseRate}
+                  />
+                </Table>
+              </TableContainer>
+            </Paper>
+          </div>
+        </div>
+        {values.baseRate > 0 && (
+          <div className="row">
+            <div className="col-12">
+              <MonthlySalarySummary
+                baseRate={values.baseRate}
+                globalBreakdown={globalBreakdown}
+              />
             </div>
           </div>
-          {values.baseRate > 0 && (
-            <div className="row">
-              <div className="col-12">
-                <MonthlySalarySummary
-                  baseRate={values.baseRate}
-                  globalBreakdown={globalBreakdown}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 };

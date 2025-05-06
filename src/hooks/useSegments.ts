@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { TimeFieldType } from "@/models";
 
@@ -9,7 +9,7 @@ type Segment = {
 
 export const useSegments = (day: string) => {
   const [segments, setSegments] = useState<Segment[]>([]);
-  const baseDate = new Date(`${day}T00:00:00`);
+  const baseDate = useMemo(() => new Date(`${day}T00:00:00`), [day]);
 
   const addSegment = useCallback(() => {
     const newSegment: Segment = {

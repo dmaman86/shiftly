@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { format } from "date-fns";
-import { WorkDayRowProps } from "@/models";
+import { WorkDayRowProps, WorkDayType } from "@/models";
 
 const hebrewDays = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
 
@@ -32,92 +32,105 @@ const fetchHolidayDates = async (
   return eventMap;
 };
 
-export const useWorkDays = (year: number, month: number) => {
+export const useWorkDays = (
+  year: number,
+  month: number,
+  eventMap: Record<string, string[]>,
+) => {
   const [workDays, setWorkDays] = useState<WorkDayRowProps[]>([]);
-  const [events, setEvents] = useState<Record<string, string[]>>({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
+  const FRIDAY = 5;
+  const SATURDAY = 6;
 
-  const formatDate = (date: Date): string => format(date, "yyyy-MM-dd");
+  const formatDate = useCallback(
+    (date: Date): string => format(date, "yyyy-MM-dd"),
+    [],
+  );
 
-  const getHebrewDayLetter = (date: Date): string => {
+  const getHebrewDayLetter = useCallback((date: Date): string => {
     return hebrewDays[date.getDay()];
-  };
+  }, []);
 
-  const isPaidHoliday = (eventTitles: string[]): boolean =>
-    eventTitles.some(
-      (e) =>
-        paidHolidays.includes(e) ||
-        (e.startsWith("Rosh Hashana") && !paidHolidays.includes(e)),
+  const isPaidHoliday = useCallback((eventTitles: string[]): boolean => {
+    return eventTitles.some(
+      (e) => paidHolidays.includes(e) || e.startsWith("Rosh Hashana"),
     );
+  }, []);
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const fetchedEvents = await fetchHolidayDates(year, month);
-        setEvents(fetchedEvents);
-      } catch (err) {
-        setError("Error fetching holiday dates");
-        setLoading(false);
+  const isPartialStart = useCallback((eventTitles: string[]): boolean => {
+    return (
+      eventTitles.some((e) => e.startsWith("Erev")) ||
+      eventTitles.includes("Yom HaZikaron") ||
+      eventTitles.includes("Sukkot VII (Hoshana Rabba)")
+    );
+  }, []);
+
+  const resolveDayType = useCallback(
+    (weekday: number, eventTitles: string[]): WorkDayType => {
+      if (weekday === SATURDAY || isPaidHoliday(eventTitles))
+        return WorkDayType.SpecialFull;
+
+      if (isPartialStart(eventTitles) || weekday === FRIDAY) {
+        return WorkDayType.SpecialPartialStart;
       }
-    };
-    load();
-  }, [year, month]);
+
+      return WorkDayType.Regular;
+    },
+    [isPaidHoliday, isPartialStart],
+  );
+
+  const generateWorkDays = useCallback(
+    (daysInMonth: number, year: number, month: number) => {
+      const days: WorkDayRowProps[] = [];
+      for (let day = 1; day <= daysInMonth; day++) {
+        const currentDate = new Date(year, month - 1, day);
+        const formattedDate = formatDate(currentDate);
+        const weekday = currentDate.getDay();
+        const hebrewDay = getHebrewDayLetter(currentDate);
+        const eventTitles = eventMap[formattedDate] || [];
+
+        const currentType = resolveDayType(weekday, eventTitles);
+
+        const row: WorkDayRowProps = {
+          date: formattedDate,
+          hebrewDay,
+          typeDay: currentType,
+          crossDayContinuation: false,
+        };
+
+        days[day - 1] = row;
+
+        if (day > 1) {
+          days[day - 2].crossDayContinuation =
+            currentType === WorkDayType.SpecialFull;
+        }
+      }
+      return days;
+    },
+    [eventMap],
+  );
+
+  const getNextMonthDay = useCallback((year: number, month: number): Date => {
+    const nextMonth = month === 12 ? 1 : month + 1;
+    const nextYear = month === 12 ? year + 1 : year;
+    const nextMonthDay = new Date(nextYear, nextMonth - 1, 1);
+
+    return nextMonthDay;
+  }, []);
 
   useEffect(() => {
-    if (Object.keys(events).length === 0) return;
+    if (Object.keys(eventMap).length === 0) return;
 
     const daysInMonth = new Date(year, month, 0).getDate();
-    const days: WorkDayRowProps[] = [];
+    const days: WorkDayRowProps[] = generateWorkDays(daysInMonth, year, month);
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const currentDate = new Date(year, month - 1, day);
-      const formattedDate = formatDate(currentDate);
-      const weekday = currentDate.getDay();
-      const hebrewDay = getHebrewDayLetter(currentDate);
-      const eventTitles = events[formattedDate] || [];
-
-      let specialDay = false;
-      let fullDay = false;
-
-      if (weekday === 6) {
-        specialDay = true;
-        fullDay = true;
-      } else if (
-        eventTitles.some((e) => e.startsWith("Erev")) ||
-        eventTitles.includes("Yom HaZikaron") ||
-        eventTitles.includes("Sukkot VII (Hoshana Raba)")
-      ) {
-        specialDay = true;
-        fullDay = false;
-      } else if (isPaidHoliday(eventTitles)) {
-        specialDay = true;
-        fullDay = true;
-      } else if (weekday === 5) {
-        specialDay = true;
-        fullDay = false;
-      }
-
-      const row: WorkDayRowProps = {
-        date: formattedDate,
-        hebrewDay,
-        specialDay,
-        fullDay,
-        specialNextDay: false,
-      };
-
-      if (day > 1) {
-        const prevRow = days[day - 2];
-        prevRow.specialNextDay = fullDay;
-        days[day - 2] = prevRow;
-      }
-      days[day - 1] = row;
-    }
+    const nextMonthDay = getNextMonthDay(year, month);
+    const nextDayEvents = eventMap[formatDate(nextMonthDay)] || [];
+    const nextDayType = resolveDayType(nextMonthDay.getDay(), nextDayEvents);
+    days[daysInMonth - 1].crossDayContinuation =
+      nextDayType === WorkDayType.SpecialFull;
 
     setWorkDays(days);
-    setLoading(false);
-  }, [events]);
+  }, [eventMap, year, month]);
 
-  return { workDays, loading, error, events };
+  return { workDays };
 };

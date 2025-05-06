@@ -15,6 +15,12 @@ export interface Segment {
 
 export type WorkDayStatus = "normal" | "sick" | "vacation";
 
+export enum WorkDayType {
+  Regular = "Regular", // special: false, fullDayPay: false
+  SpecialPartialStart = "SpecialPartialStart", // special: true, fullDayPay: false
+  SpecialFull = "SpecialFull", // special: true, fullDayPay: true
+}
+
 export interface WorkDayInput {
   date: string;
   shifts: WorkShift[];
@@ -86,9 +92,8 @@ export interface HourBreakdown {
 export interface WorkDayRowProps {
   date: string;
   hebrewDay: string;
-  specialDay: boolean;
-  fullDay: boolean;
-  specialNextDay: boolean;
+  typeDay: WorkDayType;
+  crossDayContinuation: boolean;
 }
 
 export interface WorkDayResult {
@@ -100,4 +105,9 @@ export interface WorkDayResult {
   shabbat200: number;
   extra100Shabbat: number;
   totalPay: number;
+}
+
+export interface ApiResponse {
+  data: Record<string, string[]> | null;
+  error: string | null;
 }

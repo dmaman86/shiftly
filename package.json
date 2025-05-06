@@ -21,6 +21,7 @@
     "@mui/styles": "^6.4.11",
     "@mui/x-date-pickers": "^8.1.0",
     "@mui/x-date-pickers-pro": "^8.1.0",
+    "axios": "^1.9.0",
     "bootstrap": "^5.3.5",
     "date-fns": "^4.1.0",
     "jss": "^10.10.0",

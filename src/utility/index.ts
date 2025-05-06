@@ -4,3 +4,4 @@ export {
   subtractBreakdowns,
   emptyBreakdown,
 } from "./breakdownUtil";
+export { service } from "./service";

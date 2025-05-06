@@ -9,6 +9,7 @@ import {
   TableRow,
   IconButton,
   Tooltip,
+  TextField,
 } from "@mui/material";
 import { TimeField } from "@mui/x-date-pickers/TimeField";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -17,10 +18,16 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import SaveIcon from "@mui/icons-material/Save";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import EditIcon from "@mui/icons-material/Edit";
 import { addMinutes } from "date-fns";
 
 import { useSegments } from "@/hooks";
-import { TimeFieldType, WorkDayPayMap, WorkDayStatus } from "@/models";
+import {
+  TimeFieldType,
+  WorkDayPayMap,
+  WorkDayStatus,
+  WorkDayType,
+} from "@/models";
 
 import { BreakdownSummary } from "@/components";
 import { emptyBreakdown, calculateWorkDayBreakdown } from "@/utility";
@@ -33,9 +40,8 @@ type Segment = {
 type WorkDayRowProps = {
   date: string;
   hebrewDay: string;
-  specialDay: boolean;
-  fullDay: boolean;
-  specialNextDay: boolean;
+  typeDay: WorkDayType;
+  crossDayContinuation: boolean;
   addToGlobalBreakdown: (b: WorkDayPayMap) => void;
   subtractFromGlobalBreakdown: (b: WorkDayPayMap) => void;
   standardHours: number;
@@ -46,9 +52,8 @@ const calculateBreakdown = (
   segments: Segment[],
   meta: {
     date: string;
-    specialDay: boolean;
-    fullDayPay: boolean;
-    specialNextDay: boolean;
+    typeDay: WorkDayType;
+    crossDayContinuation: boolean;
   },
   standardHours: number,
 ): WorkDayPayMap => {
@@ -70,12 +75,18 @@ const sortSegments = (segments: Segment[]) => {
   return [...segments].sort((a, b) => a.start.minutes - b.start.minutes);
 };
 
+const minutesToTimeStr = (minutes: number) => {
+  const clean = minutes % 1440;
+  const hh = String(Math.floor(clean / 60)).padStart(2, "0");
+  const mm = String(clean % 60).padStart(2, "0");
+  return `${hh}:${mm}`;
+};
+
 export const WorkDayRow = ({
   date,
   hebrewDay,
-  specialDay,
-  fullDay,
-  specialNextDay,
+  typeDay,
+  crossDayContinuation,
   addToGlobalBreakdown,
   subtractFromGlobalBreakdown,
   standardHours,
@@ -87,12 +98,11 @@ export const WorkDayRow = ({
   const [breakdown, setBreakdown] = useState<WorkDayPayMap | null>(null);
   const prevBreakdownRef = useRef<WorkDayPayMap | null>(null);
 
-  const meta = {
+  const metaRef = useRef({
     date,
-    specialDay,
-    fullDayPay: fullDay,
-    specialNextDay,
-  };
+    typeDay,
+    crossDayContinuation,
+  });
 
   const handleStatusChange = useCallback(
     (newStatus: WorkDayStatus) => {
@@ -124,7 +134,7 @@ export const WorkDayRow = ({
 
       const newBreakdown = calculateBreakdown(
         sortedSegments,
-        meta,
+        metaRef.current,
         standardHours,
       );
       setBreakdown(newBreakdown);
@@ -140,7 +150,7 @@ export const WorkDayRow = ({
 
       const newBreakdown =
         updatedSegments.length > 0
-          ? calculateBreakdown(updatedSegments, meta, standardHours)
+          ? calculateBreakdown(updatedSegments, metaRef.current, standardHours)
           : null;
       setBreakdown(newBreakdown);
     },
@@ -167,6 +177,7 @@ export const WorkDayRow = ({
   }, [breakdown]);
 
   const isEditable = status === "normal";
+  const isSpecialFullDay = typeDay === WorkDayType.SpecialFull;
 
   return (
     <TableRow key={date}>
@@ -183,7 +194,7 @@ export const WorkDayRow = ({
                   onChange={(e) =>
                     handleStatusChange(e.target.checked ? "sick" : "normal")
                   }
-                  disabled={specialDay && fullDay}
+                  disabled={isSpecialFullDay}
                 />
               }
               label="מחלה"
@@ -196,7 +207,7 @@ export const WorkDayRow = ({
                   onChange={(e) =>
                     handleStatusChange(e.target.checked ? "vacation" : "normal")
                   }
-                  disabled={specialDay && fullDay}
+                  disabled={isSpecialFullDay}
                 />
               }
               label="חופש"
@@ -256,6 +267,7 @@ const SegmentRow = ({
     start: segment.start,
     end: segment.end,
   });
+  const [isEditing, setIsEditing] = useState(true);
   const { start, end } = values;
 
   const handleChange = (field: "start" | "end", newValue: Date | null) => {
@@ -286,45 +298,88 @@ const SegmentRow = ({
     }));
   };
 
-  const handleSave = () => updateSegment(index, { start, end });
+  const handleSave = () => {
+    updateSegment(index, { start, end });
+    setIsEditing(false);
+  };
+
+  const crossDay = end.minutes >= 1440;
+  const hasError = !crossDay && end.minutes <= start.minutes;
 
   return (
     <Stack direction="row" alignItems="center" spacing={1}>
-      <TimeField
-        label="שעת כניסה"
-        value={start.date}
-        onChange={(newValue) => handleChange("start", newValue)}
-        format="HH:mm"
-        ampm={false}
-        size="small"
-        disabled={!isEditable}
-        sx={{ width: 100, flexShrink: 0 }}
-      />
-      <TimeField
-        label="שעת יציאה"
-        value={end.date}
-        onChange={(newValue) => handleChange("end", newValue)}
-        format="HH:mm"
-        ampm={false}
-        size="small"
-        disabled={!isEditable}
-        sx={{ width: 100, flexShrink: 0 }}
-        error={end.minutes <= start.minutes}
-      />
+      {isEditing ? (
+        <>
+          <TimeField
+            label="שעת כניסה"
+            value={start.date}
+            onChange={(newValue) => handleChange("start", newValue)}
+            format="HH:mm"
+            ampm={false}
+            size="small"
+            disabled={!isEditable}
+            sx={{ width: 100, flexShrink: 0 }}
+          />
+          <TimeField
+            label="שעת יציאה"
+            value={end.date}
+            onChange={(newValue) => handleChange("end", newValue)}
+            format="HH:mm"
+            ampm={false}
+            size="small"
+            disabled={!isEditable}
+            sx={{ width: 100, flexShrink: 0 }}
+            error={end.minutes <= start.minutes}
+          />
+        </>
+      ) : (
+        <>
+          <>
+            <TextField
+              label="שעת כניסה"
+              value={minutesToTimeStr(start.minutes)}
+              size="small"
+              slotProps={{ input: { readOnly: true } }}
+              sx={{ width: 100, flexShrink: 0 }}
+            />
+            <TextField
+              label="שעת יציאה"
+              value={minutesToTimeStr(end.minutes)}
+              size="small"
+              slotProps={{ input: { readOnly: true } }}
+              sx={{ width: 100, flexShrink: 0 }}
+            />
+          </>
+        </>
+      )}
       <Tooltip title="חוצה יום">
         <Checkbox
-          checked={end.minutes >= 1440}
+          checked={crossDay}
           onChange={(e) => handleToggleNextDay(e.target.checked)}
+          disabled={!isEditing}
         />
       </Tooltip>
-      {end.minutes <= start.minutes && (
+
+      {hasError && isEditing && (
         <Tooltip title="יש לסמן חוצה יום - שעת סיום לפני שעת התחלה">
           <WarningAmberIcon fontSize="small" color="warning" />
         </Tooltip>
       )}
-      <Tooltip title="שמור">
-        <IconButton size="small" onClick={handleSave} disabled={!isEditable}>
-          <SaveIcon fontSize="small" color="primary" />
+
+      <Tooltip title={isEditing ? "שמור" : "ערוך"}>
+        <IconButton
+          size="small"
+          onClick={() => {
+            if (isEditing) handleSave();
+            else setIsEditing(true);
+          }}
+          disabled={!isEditable}
+        >
+          {isEditing ? (
+            <SaveIcon fontSize="small" color="primary" />
+          ) : (
+            <EditIcon fontSize="small" color="info" />
+          )}
         </IconButton>
       </Tooltip>
 

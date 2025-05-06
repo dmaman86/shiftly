@@ -60,7 +60,7 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
                 value={values.year}
                 onChange={(e) => {
                   const parsedYear = parseInt(e.target.value, 10);
-                  if (!isNaN(parsedYear)) {
+                  if (!isNaN(parsedYear) && parsedYear <= currentYear) {
                     onChange("year", parsedYear);
                     onChange("month", 1); // reset month when year changes
                   }
