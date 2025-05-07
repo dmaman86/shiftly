@@ -13,6 +13,7 @@ type SalaryRow = {
   hours: number;
   percent: number;
   total: number;
+  rate: number;
 };
 
 type MonthlySalarySummaryProps = {
@@ -29,6 +30,7 @@ const calculateSalaryPerCategory = (
     hours: number;
     percent: number;
     total: number;
+    rate: number;
   }[] = [];
 
   const addRow = (
@@ -41,6 +43,7 @@ const calculateSalaryPerCategory = (
         hours,
         percent,
         total: hours * percent * baseRate,
+        rate: percent * baseRate,
       });
     }
   };
@@ -87,6 +90,7 @@ export const MonthlySalarySummary = ({
           <TableRow>
             <TableCell sx={{ fontWeight: "bold" }}>סוג</TableCell>
             <TableCell sx={{ fontWeight: "bold" }}>כמות</TableCell>
+            <TableCell sx={{ fontWeight: "bold" }}>תעריף</TableCell>
             <TableCell sx={{ fontWeight: "bold" }}>שכר</TableCell>
           </TableRow>
         </TableHead>
@@ -95,11 +99,13 @@ export const MonthlySalarySummary = ({
             <TableRow key={index}>
               <TableCell>{row.label}</TableCell>
               <TableCell>{formatHours(row.hours)}</TableCell>
+              <TableCell>₪{formatHours(row.rate)}</TableCell>
               <TableCell>₪{formatHours(row.total)}</TableCell>
             </TableRow>
           ))}
           <TableRow sx={{ fontWeight: "bold", backgroundColor: "#f5f5f5" }}>
             <TableCell>סה״כ</TableCell>
+            <TableCell />
             <TableCell />
             <TableCell>₪{formatHours(total)}</TableCell>
           </TableRow>

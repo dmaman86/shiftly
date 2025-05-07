@@ -28,38 +28,44 @@ export const FooterSummary = ({
         }}
       >
         <TableCell colSpan={3} align="center"></TableCell>
-        <TableCell>{formatHours(globalBreakdown.totalHours)}</TableCell>
-        <TableCell>
+        <TableCell align="center">
+          {formatHours(globalBreakdown.totalHours)}
+        </TableCell>
+        <TableCell align="center">
           {formatHours(globalBreakdown.regular.hours100.hours)}
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           {formatHours(globalBreakdown.regular.hours125.hours)}
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           {formatHours(globalBreakdown.regular.hours150.hours)}
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           {formatHours(globalBreakdown.special.shabbat150.hours)}
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           {formatHours(globalBreakdown.special.shabbat200.hours)}
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           {formatHours(globalBreakdown.special.extra100Shabbat.hours)}
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           {formatHours(globalBreakdown.regular.hours20.hours)}
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           {formatHours(globalBreakdown.regular.hours50.hours)}
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           {formatHours(globalBreakdown.hours100Sick?.hours)}
         </TableCell>
-        <TableCell>
+        <TableCell align="center">
           {formatHours(globalBreakdown.hours100Vacation?.hours)}
         </TableCell>
-        {baseRate > 0 && <TableCell></TableCell>}
+        {baseRate > 0 && (
+          <TableCell align="center">
+            ₪{globalBreakdown.totalPay.toFixed(2)}
+          </TableCell>
+        )}
       </TableRow>
     </TableFooter>
   );

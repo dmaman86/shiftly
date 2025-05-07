@@ -11,71 +11,57 @@ export const BreakdownSummary = ({
   breakdown,
   baseRate,
 }: BreakdownSummaryProps) => {
-  const formatHours = (hours: number | null | undefined) => {
+  const formatHours = (value: number | null | undefined) => {
     if (breakdown === null) return "";
-    if (hours === null || hours === undefined || hours === 0) return "";
-    return hours.toFixed(2);
-  };
-
-  const calculateDailySalary = (
-    breakdown: WorkDayPayMap | null,
-    baseRate: number,
-  ): number => {
-    if (!breakdown) return 0;
-
-    const { regular, special, hours100Sick, hours100Vacation } = breakdown;
-
-    const allSegments = [
-      ...Object.values(regular),
-      ...Object.values(special),
-      hours100Sick,
-      hours100Vacation,
-    ];
-
-    return allSegments.reduce(
-      (sum, seg) => sum + seg.hours * seg.percent * baseRate,
-      0,
-    );
+    if (value === null || value === undefined || value === 0) return "";
+    return value.toFixed(2);
   };
 
   return (
     <>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
         {formatHours(breakdown?.totalHours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+
+      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
         {formatHours(breakdown?.regular.hours100.hours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+      <TableCell align="center">
         {formatHours(breakdown?.regular.hours125.hours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+      <TableCell align="center">
         {formatHours(breakdown?.regular.hours150.hours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+
+      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
         {formatHours(breakdown?.special.shabbat150.hours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+      <TableCell align="center">
         {formatHours(breakdown?.special.shabbat200.hours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+
+      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
         {formatHours(breakdown?.special.extra100Shabbat.hours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+      <TableCell align="center">
         {formatHours(breakdown?.regular.hours20.hours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+      <TableCell align="center">
         {formatHours(breakdown?.regular.hours50.hours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+
+      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
         {formatHours(breakdown?.hours100Sick.hours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
         {formatHours(breakdown?.hours100Vacation.hours)}
       </TableCell>
+
       {baseRate > 0 && (
-        <TableCell sx={{ borderRight: "1px solid #ddd" }}>
-          {formatHours(calculateDailySalary(breakdown, baseRate))}
+        <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
+          {breakdown?.totalPay && breakdown.totalPay > 0
+            ? `₪${breakdown.totalPay.toFixed(2)}`
+            : ""}
         </TableCell>
       )}
     </>

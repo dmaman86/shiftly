@@ -49,6 +49,7 @@ export const sumBreakdowns = (
     hours: a.hours100Vacation.hours + b.hours100Vacation.hours,
   },
   totalHours: a.totalHours + b.totalHours,
+  totalPay: a.totalPay + b.totalPay,
 });
 
 export const subtractBreakdowns = (
@@ -100,6 +101,7 @@ export const subtractBreakdowns = (
     hours: a.hours100Vacation.hours - b.hours100Vacation.hours,
   },
   totalHours: a.totalHours - b.totalHours,
+  totalPay: a.totalPay - b.totalPay,
 });
 
 export const emptyBreakdown = (): WorkDayPayMap => ({
@@ -118,4 +120,5 @@ export const emptyBreakdown = (): WorkDayPayMap => ({
   hours100Sick: { percent: 1, hours: 0 },
   hours100Vacation: { percent: 1, hours: 0 },
   totalHours: 0,
+  totalPay: 0,
 });

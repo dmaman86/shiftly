@@ -33,6 +33,7 @@ import { BreakdownSummary } from "@/components";
 import { emptyBreakdown, calculateWorkDayBreakdown } from "@/utility";
 
 type Segment = {
+  id: string;
   start: TimeFieldType;
   end: TimeFieldType;
 };
@@ -48,6 +49,23 @@ type WorkDayRowProps = {
   baseRate: number;
 };
 
+const calculateDailySalary = (breakdown: WorkDayPayMap, baseRate: number) => {
+  if (baseRate === 0) return 0;
+
+  const { regular, special, hours100Sick, hours100Vacation } = breakdown;
+  const allSegments = [
+    ...Object.values(regular),
+    ...Object.values(special),
+    hours100Sick,
+    hours100Vacation,
+  ];
+
+  return allSegments.reduce(
+    (sum, seg) => sum + seg.hours * seg.percent * baseRate,
+    0,
+  );
+};
+
 const calculateBreakdown = (
   segments: Segment[],
   meta: {
@@ -56,6 +74,7 @@ const calculateBreakdown = (
     crossDayContinuation: boolean;
   },
   standardHours: number,
+  baseRate: number,
 ): WorkDayPayMap => {
   const breakdown: WorkDayPayMap = emptyBreakdown();
 
@@ -68,6 +87,7 @@ const calculateBreakdown = (
       meta,
     );
   });
+  breakdown.totalPay = calculateDailySalary(breakdown, baseRate);
   return breakdown;
 };
 
@@ -112,7 +132,7 @@ export const WorkDayRow = ({
 
       if (hours !== 0) {
         setSegments([]);
-        setBreakdown({
+        const baseBreakdown = {
           ...emptyBreakdown(),
           totalHours: hours,
           hours100Sick: { percent: 1, hours: newStatus === "sick" ? hours : 0 },
@@ -120,15 +140,17 @@ export const WorkDayRow = ({
             percent: 1,
             hours: newStatus === "vacation" ? hours : 0,
           },
-        });
+        };
+        const totalPay = calculateDailySalary(baseBreakdown, baseRate);
+        setBreakdown({ ...baseBreakdown, totalPay });
       } else setBreakdown(null);
     },
-    [setSegments, standardHours],
+    [setSegments, standardHours, baseRate],
   );
 
   const updateSegmentTime = useCallback(
-    (index: number, newSegment: Segment) => {
-      const updatedSegments = updateSegment(index, newSegment);
+    (id: string, start: TimeFieldType, end: TimeFieldType) => {
+      const updatedSegments = updateSegment(id, start, end);
       const sortedSegments = sortSegments(updatedSegments);
       setSegments(sortedSegments);
 
@@ -136,25 +158,31 @@ export const WorkDayRow = ({
         sortedSegments,
         metaRef.current,
         standardHours,
+        baseRate,
       );
       setBreakdown(newBreakdown);
     },
-    [updateSegment, setSegments, standardHours],
+    [updateSegment, setSegments, standardHours, baseRate],
   );
 
   const removeSegmentHandler = useCallback(
-    (index: number) => {
-      const updatedSegments = removeSegment(index);
+    (id: string) => {
+      const updatedSegments = removeSegment(id);
       const sortedSegments = sortSegments(updatedSegments);
       setSegments(sortedSegments);
 
       const newBreakdown =
         updatedSegments.length > 0
-          ? calculateBreakdown(updatedSegments, metaRef.current, standardHours)
+          ? calculateBreakdown(
+              updatedSegments,
+              metaRef.current,
+              standardHours,
+              baseRate,
+            )
           : null;
       setBreakdown(newBreakdown);
     },
-    [removeSegment, setSegments, standardHours],
+    [removeSegment, setSegments, standardHours, baseRate],
   );
 
   const dayOfMonth = (dateStr: string, hebrewDay: string) => {
@@ -229,10 +257,9 @@ export const WorkDayRow = ({
               )}
             </Box>
             <Stack spacing={1}>
-              {segments.map((segment, index) => (
+              {segments.map((segment) => (
                 <SegmentRow
-                  key={`${index}-${segment.start.date}`}
-                  index={index}
+                  key={segment.id}
                   segment={segment}
                   updateSegment={updateSegmentTime}
                   removeSegment={removeSegmentHandler}
@@ -249,15 +276,13 @@ export const WorkDayRow = ({
 };
 
 type SegmentRowProps = {
-  index: number;
   segment: Segment;
-  updateSegment: (index: number, newSegment: Segment) => void;
-  removeSegment: (index: number) => void;
+  updateSegment: (id: string, start: TimeFieldType, end: TimeFieldType) => void;
+  removeSegment: (id: string) => void;
   isEditable: boolean;
 };
 
 const SegmentRow = ({
-  index,
   segment,
   updateSegment,
   removeSegment,
@@ -267,7 +292,8 @@ const SegmentRow = ({
     start: segment.start,
     end: segment.end,
   });
-  const [isEditing, setIsEditing] = useState(true);
+  // const [isEditing, setIsEditing] = useState(true);
+  const [savedSegment, setSavedSegment] = useState<boolean>(false);
   const { start, end } = values;
 
   const handleChange = (field: "start" | "end", newValue: Date | null) => {
@@ -298,100 +324,108 @@ const SegmentRow = ({
     }));
   };
 
-  const handleSave = () => {
-    updateSegment(index, { start, end });
-    setIsEditing(false);
-  };
+  const handleClick = useCallback((saved: boolean) => {
+    setSavedSegment(saved);
+  }, []);
+
+  useEffect(() => {
+    if (savedSegment) updateSegment(segment.id, values.start, values.end);
+  }, [savedSegment, values]);
 
   const crossDay = end.minutes >= 1440;
   const hasError = !crossDay && end.minutes <= start.minutes;
 
   return (
-    <Stack direction="row" alignItems="center" spacing={1}>
-      {isEditing ? (
-        <>
-          <TimeField
-            label="שעת כניסה"
-            value={start.date}
-            onChange={(newValue) => handleChange("start", newValue)}
-            format="HH:mm"
-            ampm={false}
-            size="small"
-            disabled={!isEditable}
-            sx={{ width: 100, flexShrink: 0 }}
-          />
-          <TimeField
-            label="שעת יציאה"
-            value={end.date}
-            onChange={(newValue) => handleChange("end", newValue)}
-            format="HH:mm"
-            ampm={false}
-            size="small"
-            disabled={!isEditable}
-            sx={{ width: 100, flexShrink: 0 }}
-            error={end.minutes <= start.minutes}
-          />
-        </>
-      ) : (
-        <>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 1,
+        alignItems: "flex-start",
+      }}
+    >
+      <Stack direction="row" alignItems="center" spacing={1}>
+        {!savedSegment ? (
           <>
-            <TextField
+            <TimeField
               label="שעת כניסה"
-              value={minutesToTimeStr(start.minutes)}
+              value={start.date}
+              onChange={(newValue) => handleChange("start", newValue)}
+              format="HH:mm"
+              ampm={false}
               size="small"
-              slotProps={{ input: { readOnly: true } }}
+              disabled={!isEditable}
               sx={{ width: 100, flexShrink: 0 }}
             />
-            <TextField
+            <TimeField
               label="שעת יציאה"
-              value={minutesToTimeStr(end.minutes)}
+              value={end.date}
+              onChange={(newValue) => handleChange("end", newValue)}
+              format="HH:mm"
+              ampm={false}
               size="small"
-              slotProps={{ input: { readOnly: true } }}
+              disabled={!isEditable}
               sx={{ width: 100, flexShrink: 0 }}
+              error={end.minutes <= start.minutes}
             />
           </>
-        </>
-      )}
-      <Tooltip title="חוצה יום">
-        <Checkbox
-          checked={crossDay}
-          onChange={(e) => handleToggleNextDay(e.target.checked)}
-          disabled={!isEditing}
-        />
-      </Tooltip>
-
-      {hasError && isEditing && (
-        <Tooltip title="יש לסמן חוצה יום - שעת סיום לפני שעת התחלה">
-          <WarningAmberIcon fontSize="small" color="warning" />
+        ) : (
+          <>
+            <>
+              <TextField
+                label="שעת כניסה"
+                value={minutesToTimeStr(start.minutes)}
+                size="small"
+                slotProps={{ input: { readOnly: true } }}
+                sx={{ width: 100, flexShrink: 0 }}
+              />
+              <TextField
+                label="שעת יציאה"
+                value={minutesToTimeStr(end.minutes)}
+                size="small"
+                slotProps={{ input: { readOnly: true } }}
+                sx={{ width: 100, flexShrink: 0 }}
+              />
+            </>
+          </>
+        )}
+        <Tooltip title="חוצה יום">
+          <Checkbox
+            checked={crossDay}
+            onChange={(e) => handleToggleNextDay(e.target.checked)}
+            disabled={savedSegment}
+          />
         </Tooltip>
-      )}
 
-      <Tooltip title={isEditing ? "שמור" : "ערוך"}>
-        <IconButton
-          size="small"
-          onClick={() => {
-            if (isEditing) handleSave();
-            else setIsEditing(true);
-          }}
-          disabled={!isEditable}
-        >
-          {isEditing ? (
-            <SaveIcon fontSize="small" color="primary" />
-          ) : (
-            <EditIcon fontSize="small" color="info" />
-          )}
-        </IconButton>
-      </Tooltip>
+        {hasError && !savedSegment && (
+          <Tooltip title="יש לסמן חוצה יום - שעת סיום לפני שעת התחלה">
+            <WarningAmberIcon fontSize="small" color="warning" />
+          </Tooltip>
+        )}
+        <Tooltip title={!savedSegment ? "שמור" : "ערוך"}>
+          <IconButton
+            size="small"
+            onClick={() => handleClick(!savedSegment)}
+            disabled={!isEditable || hasError}
+          >
+            {!savedSegment ? (
+              <SaveIcon fontSize="small" color="primary" />
+            ) : (
+              <EditIcon fontSize="small" color="info" />
+            )}
+          </IconButton>
+        </Tooltip>
 
-      <Tooltip title="מחק">
-        <IconButton
-          size="small"
-          onClick={() => removeSegment(index)}
-          disabled={!isEditable}
-        >
-          <DeleteIcon fontSize="small" color="error" />
-        </IconButton>
-      </Tooltip>
-    </Stack>
+        <Tooltip title="מחק">
+          <IconButton
+            size="small"
+            onClick={() => removeSegment(segment.id)}
+            disabled={!isEditable}
+          >
+            <DeleteIcon fontSize="small" color="error" />
+          </IconButton>
+        </Tooltip>
+      </Stack>
+    </Box>
   );
 };

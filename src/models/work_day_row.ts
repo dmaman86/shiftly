@@ -67,6 +67,7 @@ export interface WorkDayPayMap {
   hours100Sick: PaySegment;
   hours100Vacation: PaySegment;
   totalHours: number;
+  totalPay: number;
 }
 
 export interface RegularPercent {

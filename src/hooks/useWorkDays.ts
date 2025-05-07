@@ -15,23 +15,6 @@ const paidHolidays = [
   "Shavuot",
 ];
 
-const fetchHolidayDates = async (
-  year: number,
-  month: number,
-): Promise<Record<string, string[]>> => {
-  const url = `https://www.hebcal.com/hebcal/?v=1&year=${year}&month=${month}&cfg=json&maj=on&mod=on&nx=on&s=on`;
-  const response = await fetch(url);
-  const data = await response.json();
-
-  const eventMap: Record<string, string[]> = {};
-  data.items.forEach((item: { date: string; title: string }) => {
-    const date = item.date.split("T")[0];
-    if (!eventMap[date]) eventMap[date] = [];
-    eventMap[date].push(item.title);
-  });
-  return eventMap;
-};
-
 export const useWorkDays = (
   year: number,
   month: number,

@@ -47,20 +47,26 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
   );
 
   const headers = [
-    "יום",
-    "מחלה או חופש",
-    "שעות",
-    "סה״כ",
-    "100%",
-    "125%",
-    "150%",
-    "שבת 150%",
-    "שבת 200%",
-    "שבת תוספת 100%",
-    "תוספת ערב",
-    "תוספת לילה",
-    "מחלה",
-    "חופש",
+    { label: "יום", rowSpan: 2 },
+    { label: "מחלה או חופש", rowSpan: 2 },
+    { label: "שעות", rowSpan: 2 },
+    { label: "סה״כ", rowSpan: 2 },
+    {
+      label: "ש״נ",
+      children: ["100%", "125%", "150%"],
+    },
+    {
+      label: "שבת",
+      children: ["150%", "200%"],
+    },
+    {
+      label: "תוספות",
+      children: ["ז. שבת ", "20%", "50%"],
+    },
+    {
+      label: "היעדרות",
+      children: ["מחלה", "חופש"],
+    },
   ];
 
   const groupByShabbat = (workDays: WorkDayRowProps[]): WorkDayRowProps[][] => {
@@ -79,6 +85,13 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
     return groups;
   };
 
+  const totalColumns =
+    headers.reduce((sum, header) => {
+      if ("children" in header && Array.isArray(header.children))
+        return sum + header.children.length;
+      return sum + 1;
+    }, 0) + (values.baseRate > 0 ? 1 : 0);
+
   return (
     <>
       <Typography variant="h5" gutterBottom>
@@ -93,29 +106,66 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
                 <Table stickyHeader size="small">
                   <TableHead>
                     <TableRow>
-                      {headers.map((label, i) => (
-                        <TableCell
-                          key={i}
-                          align="center"
-                          sx={{
-                            borderRight: "1px solid #ddd",
-                            fontWeight: "bold",
-                          }}
-                        >
-                          {label}
-                        </TableCell>
-                      ))}
+                      {headers.map((header, i) =>
+                        "children" in header ? (
+                          <TableCell
+                            key={`group-${i}`}
+                            align="center"
+                            colSpan={header.children!.length}
+                            sx={{
+                              borderRight: "1px solid #ddd",
+                              fontWeight: "bold",
+                              minWidth: `${header.children!.length * 90}px`,
+                            }}
+                          >
+                            <div className="row">
+                              <div className="col-12 fw-bold">
+                                {header.label}
+                              </div>
+                            </div>
+                            <div className="row text-center">
+                              {header.children!.map((child, j) => (
+                                <div className="col" key={`child-${i}-${j}`}>
+                                  {child}
+                                </div>
+                              ))}
+                            </div>
+                          </TableCell>
+                        ) : (
+                          <TableCell
+                            key={i}
+                            align="center"
+                            sx={{
+                              fontWeight: "bold",
+                              borderRight: "1px solid #ddd",
+                            }}
+                          >
+                            {header.label}
+                          </TableCell>
+                        ),
+                      )}
                       {values.baseRate > 0 && (
                         <TableCell
                           align="center"
                           sx={{
                             borderRight: "1px solid #ddd",
                             fontWeight: "bold",
+                            minWidth: "90px",
                           }}
                         >
                           שכר יומי
                         </TableCell>
                       )}
+                    </TableRow>
+                    <TableRow style={{ display: "none" }}>
+                      {headers.flatMap((header) =>
+                        "children" in header
+                          ? header.children!.map((_, j) => (
+                              <TableCell key={`invisible-${j}`} />
+                            ))
+                          : [<TableCell key={`col-flat-${header.label}`} />],
+                      )}
+                      {values.baseRate > 0 && <TableCell />}
                     </TableRow>
                   </TableHead>
 
@@ -137,12 +187,7 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
                         />
                       ))}
                       <TableRow>
-                        <TableCell
-                          colSpan={
-                            headers.length + (values.baseRate > 0 ? 1 : 0)
-                          }
-                          sx={{ p: 0 }}
-                        >
+                        <TableCell colSpan={totalColumns} sx={{ p: 0 }}>
                           <Box sx={{ height: 4, backgroundColor: "red" }} />
                         </TableCell>
                       </TableRow>

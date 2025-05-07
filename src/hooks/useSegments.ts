@@ -1,8 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
-
+import { v4 as uuidv4 } from "uuid";
 import { TimeFieldType } from "@/models";
 
 type Segment = {
+  id: string;
   start: TimeFieldType;
   end: TimeFieldType;
 };
@@ -13,6 +14,7 @@ export const useSegments = (day: string) => {
 
   const addSegment = useCallback(() => {
     const newSegment: Segment = {
+      id: uuidv4(),
       start: { date: baseDate, minutes: 0 },
       end: { date: baseDate, minutes: 0 },
     };
@@ -20,18 +22,19 @@ export const useSegments = (day: string) => {
   }, [baseDate]);
 
   const updateSegment = useCallback(
-    (index: number, newSegment: Segment): Segment[] => {
-      const updated = [...segments];
+    (id: string, start: TimeFieldType, end: TimeFieldType): Segment[] => {
+      const updated = segments.map((segment) =>
+        segment.id === id ? { ...segment, start, end } : segment,
+      );
 
-      updated[index] = newSegment;
       return updated;
     },
     [segments],
   );
 
   const removeSegment = useCallback(
-    (index: number): Segment[] => {
-      const updated = segments.filter((_, i) => i !== index);
+    (id: string): Segment[] => {
+      const updated = segments.filter((segment) => segment.id !== id);
       return updated;
     },
     [segments],

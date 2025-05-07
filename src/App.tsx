@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { WorkTable, ConfigPanel } from "@/components";
 import { useAsync, useFetch } from "@/hooks";
 import { service } from "@/utility";
-import { ApiResponse, UseAsyncResult } from "./models";
+import { ApiResponse } from "./models";
 
 export const App = () => {
   const [values, setValues] = useState({
