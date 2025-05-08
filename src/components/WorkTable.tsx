@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 
 import { useWorkDays } from "@/hooks";
-import { emptyBreakdown, subtractBreakdowns, sumBreakdowns } from "@/utility";
+import { BreakdownUtils, DateUtils } from "@/utility";
 
 import { WorkDayPayMap, WorkDayRowProps } from "@/models";
 import { WorkDayRow, FooterSummary, MonthlySalarySummary } from "@/components";
@@ -31,24 +31,30 @@ type WorkMonthTableProps = {
 
 export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
   const { workDays } = useWorkDays(values.year, values.month, eventMap);
+  const { getMonth } = DateUtils;
+
+  const { sumBreakdowns, subtractBreakdowns, initBreakdown } = BreakdownUtils;
 
   const [globalBreakdown, setGlobalBreakdown] =
-    useState<WorkDayPayMap>(emptyBreakdown());
+    useState<WorkDayPayMap>(initBreakdown);
 
-  const addToGlobalBreakdown = useCallback((breakdown: WorkDayPayMap) => {
-    setGlobalBreakdown((prev) => sumBreakdowns(prev, breakdown));
-  }, []);
+  const addToGlobalBreakdown = useCallback(
+    (breakdown: WorkDayPayMap) => {
+      setGlobalBreakdown((prev) => sumBreakdowns(prev, breakdown));
+    },
+    [sumBreakdowns],
+  );
 
   const subtractFromGlobalBreakdown = useCallback(
     (breakdown: WorkDayPayMap) => {
       setGlobalBreakdown((prev) => subtractBreakdowns(prev, breakdown));
     },
-    [],
+    [subtractBreakdowns],
   );
 
   const headers = [
     { label: "יום", rowSpan: 2 },
-    { label: "מחלה או חופש", rowSpan: 2 },
+    { label: "", children: ["מחלה", "חופש"] },
     { label: "שעות", rowSpan: 2 },
     { label: "סה״כ", rowSpan: 2 },
     {
@@ -95,7 +101,7 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
   return (
     <>
       <Typography variant="h5" gutterBottom>
-        שעות חודש {values.month}/{values.year}
+        שעות חודש {getMonth(values.month)} - {values.year}
       </Typography>
 
       <div className="container" dir="rtl">
@@ -158,12 +164,16 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
                       )}
                     </TableRow>
                     <TableRow style={{ display: "none" }}>
-                      {headers.flatMap((header) =>
+                      {headers.flatMap((header, i) =>
                         "children" in header
                           ? header.children!.map((_, j) => (
-                              <TableCell key={`invisible-${j}`} />
+                              <TableCell key={`invisible-${i}-${j}`} />
                             ))
-                          : [<TableCell key={`col-flat-${header.label}`} />],
+                          : [
+                              <TableCell
+                                key={`col-flat-${i}-${header.label}`}
+                              />,
+                            ],
                       )}
                       {values.baseRate > 0 && <TableCell />}
                     </TableRow>

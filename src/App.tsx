@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { CircularProgress, Container, Stack, Typography } from "@mui/material";
-import { format } from "date-fns";
 
 import { WorkTable, ConfigPanel } from "@/components";
 import { useAsync, useFetch } from "@/hooks";
-import { service } from "@/utility";
+import { service, DateUtils } from "@/utility";
 import { ApiResponse } from "./models";
 
 export const App = () => {
+  const { getDatesRange } = DateUtils;
   const [values, setValues] = useState({
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1, // 1-based
@@ -36,16 +36,12 @@ export const App = () => {
 
   useEffect(() => {
     const { year, month } = values;
-    const start = new Date(year, month - 1, 1);
-    const nextMonth = month === 12 ? 1 : month + 1;
-    const nextYear = month === 12 ? year + 1 : year;
-    const end = new Date(nextYear, nextMonth - 1, 1);
-
+    const { startDate, endDate } = getDatesRange(year, month);
     setDateRange({
-      startDate: format(start, "yyyy-MM-dd"),
-      endDate: format(end, "yyyy-MM-dd"),
+      startDate,
+      endDate,
     });
-  }, [values]);
+  }, [values, getDatesRange]);
 
   const getApiData = useCallback(async () => {
     const { startDate, endDate } = dateRange;
@@ -72,20 +68,6 @@ export const App = () => {
     dateRange.startDate,
     dateRange.endDate,
   ]);
-
-  // useEffect(() => {
-  //   const loadEvents = async () => {
-  //     const { startDate, endDate } = getDateRange(values.year, values.month);
-  //     const { data, error } = await callEndPoint(
-  //       service.getData(startDate, endDate),
-  //     );
-  //
-  //     setEventMap(data);
-  //     setError(error);
-  //   };
-  //
-  //   loadEvents();
-  // }, [values.year, values.month]);
 
   return (
     <Container sx={{ mt: 4 }}>

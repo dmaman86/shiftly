@@ -1,6 +1,7 @@
 import { TableCell } from "@mui/material";
 
 import { WorkDayPayMap } from "@/models";
+import { formatValue } from "@/utility";
 
 type BreakdownSummaryProps = {
   breakdown: WorkDayPayMap | null;
@@ -11,54 +12,70 @@ export const BreakdownSummary = ({
   breakdown,
   baseRate,
 }: BreakdownSummaryProps) => {
-  const formatHours = (value: number | null | undefined) => {
-    if (breakdown === null) return "";
-    if (value === null || value === undefined || value === 0) return "";
-    return value.toFixed(2);
-  };
-
   return (
     <>
       <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
-        {formatHours(breakdown?.totalHours)}
+        {formatValue(breakdown?.totalHours)}
       </TableCell>
 
-      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
-        {formatHours(breakdown?.regular.hours100.hours)}
+      <TableCell
+        sx={{ borderRight: "1px solid #ddd", minWidth: "90px" }}
+        align="center"
+      >
+        {formatValue(breakdown?.regular.hours100.hours)}
       </TableCell>
-      <TableCell align="center">
-        {formatHours(breakdown?.regular.hours125.hours)}
+      <TableCell align="center" sx={{ minWidth: "90px" }}>
+        {formatValue(breakdown?.regular.hours125.hours)}
       </TableCell>
-      <TableCell align="center">
-        {formatHours(breakdown?.regular.hours150.hours)}
-      </TableCell>
-
-      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
-        {formatHours(breakdown?.special.shabbat150.hours)}
-      </TableCell>
-      <TableCell align="center">
-        {formatHours(breakdown?.special.shabbat200.hours)}
+      <TableCell align="center" sx={{ minWidth: "90px" }}>
+        {formatValue(breakdown?.regular.hours150.hours)}
       </TableCell>
 
-      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
-        {formatHours(breakdown?.special.extra100Shabbat.hours)}
+      <TableCell
+        sx={{
+          borderRight: "1px solid #ddd",
+          minWidth: "90px",
+          textAlign: "center",
+        }}
+        align="center"
+      >
+        {formatValue(breakdown?.special.shabbat150.hours)}
       </TableCell>
-      <TableCell align="center">
-        {formatHours(breakdown?.regular.hours20.hours)}
-      </TableCell>
-      <TableCell align="center">
-        {formatHours(breakdown?.regular.hours50.hours)}
+      <TableCell align="center" sx={{ minWidth: "90px", textAlign: "center" }}>
+        {formatValue(breakdown?.special.shabbat200.hours)}
       </TableCell>
 
-      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
-        {formatHours(breakdown?.hours100Sick.hours)}
+      <TableCell
+        sx={{ borderRight: "1px solid #ddd", minWidth: "90px" }}
+        align="center"
+      >
+        {formatValue(breakdown?.special.extra100Shabbat.hours)}
       </TableCell>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
-        {formatHours(breakdown?.hours100Vacation.hours)}
+      <TableCell align="center" sx={{ minWidth: "90px" }}>
+        {formatValue(breakdown?.regular.hours20.hours)}
+      </TableCell>
+      <TableCell align="center" sx={{ minWidth: "90px" }}>
+        {formatValue(breakdown?.regular.hours50.hours)}
+      </TableCell>
+
+      <TableCell
+        sx={{ borderRight: "1px solid #ddd", minWidth: "90px" }}
+        align="center"
+      >
+        {formatValue(breakdown?.hours100Sick.hours)}
+      </TableCell>
+      <TableCell
+        sx={{ borderRight: "1px solid #ddd", minWidth: "90px" }}
+        align="center"
+      >
+        {formatValue(breakdown?.hours100Vacation.hours)}
       </TableCell>
 
       {baseRate > 0 && (
-        <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
+        <TableCell
+          sx={{ borderRight: "1px solid #ddd", minWidth: "90px" }}
+          align="center"
+        >
           {breakdown?.totalPay && breakdown.totalPay > 0
             ? `₪${breakdown.totalPay.toFixed(2)}`
             : ""}

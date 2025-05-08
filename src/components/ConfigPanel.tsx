@@ -6,6 +6,7 @@ import {
   Select,
   TextField,
 } from "@mui/material";
+import { DateUtils } from "@/utility";
 
 type ConfigValues = {
   year: number;
@@ -19,24 +20,10 @@ type ConfigPanelProps = {
   onChange: (field: keyof ConfigValues, value: number) => void;
 };
 
-const monthNames = [
-  "ינואר",
-  "פברואר",
-  "מרץ",
-  "אפריל",
-  "מאי",
-  "יוני",
-  "יולי",
-  "אוגוסט",
-  "ספטמבר",
-  "אוקטובר",
-  "נובמבר",
-  "דצמבר",
-];
-
 export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth(); // 0-based
+  const { monthNames } = DateUtils;
 
   const availableMonths = useMemo(() => {
     if (values.year < currentYear)

@@ -1,15 +1,14 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
   Box,
   Checkbox,
-  Divider,
-  FormControlLabel,
   Stack,
   TableCell,
   TableRow,
   IconButton,
   Tooltip,
   TextField,
+  Divider,
 } from "@mui/material";
 import { TimeField } from "@mui/x-date-pickers/TimeField";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -30,7 +29,14 @@ import {
 } from "@/models";
 
 import { BreakdownSummary } from "@/components";
-import { emptyBreakdown, calculateWorkDayBreakdown } from "@/utility";
+import {
+  BreakdownUtils,
+  calculateSalary,
+  sortSegments,
+  calculateBreakdown,
+  dayOfMonth,
+  minutesToTimeStr,
+} from "@/utility";
 
 type Segment = {
   id: string;
@@ -49,59 +55,6 @@ type WorkDayRowProps = {
   baseRate: number;
 };
 
-const calculateDailySalary = (breakdown: WorkDayPayMap, baseRate: number) => {
-  if (baseRate === 0) return 0;
-
-  const { regular, special, hours100Sick, hours100Vacation } = breakdown;
-  const allSegments = [
-    ...Object.values(regular),
-    ...Object.values(special),
-    hours100Sick,
-    hours100Vacation,
-  ];
-
-  return allSegments.reduce(
-    (sum, seg) => sum + seg.hours * seg.percent * baseRate,
-    0,
-  );
-};
-
-const calculateBreakdown = (
-  segments: Segment[],
-  meta: {
-    date: string;
-    typeDay: WorkDayType;
-    crossDayContinuation: boolean;
-  },
-  standardHours: number,
-  baseRate: number,
-): WorkDayPayMap => {
-  const breakdown: WorkDayPayMap = emptyBreakdown();
-
-  segments.forEach(({ start, end }) => {
-    calculateWorkDayBreakdown(
-      start.minutes,
-      end.minutes,
-      standardHours,
-      breakdown,
-      meta,
-    );
-  });
-  breakdown.totalPay = calculateDailySalary(breakdown, baseRate);
-  return breakdown;
-};
-
-const sortSegments = (segments: Segment[]) => {
-  return [...segments].sort((a, b) => a.start.minutes - b.start.minutes);
-};
-
-const minutesToTimeStr = (minutes: number) => {
-  const clean = minutes % 1440;
-  const hh = String(Math.floor(clean / 60)).padStart(2, "0");
-  const mm = String(clean % 60).padStart(2, "0");
-  return `${hh}:${mm}`;
-};
-
 export const WorkDayRow = ({
   date,
   hebrewDay,
@@ -118,6 +71,8 @@ export const WorkDayRow = ({
   const [breakdown, setBreakdown] = useState<WorkDayPayMap | null>(null);
   const prevBreakdownRef = useRef<WorkDayPayMap | null>(null);
 
+  const { initBreakdown } = BreakdownUtils;
+
   const metaRef = useRef({
     date,
     typeDay,
@@ -133,7 +88,7 @@ export const WorkDayRow = ({
       if (hours !== 0) {
         setSegments([]);
         const baseBreakdown = {
-          ...emptyBreakdown(),
+          ...initBreakdown(),
           totalHours: hours,
           hours100Sick: { percent: 1, hours: newStatus === "sick" ? hours : 0 },
           hours100Vacation: {
@@ -141,11 +96,11 @@ export const WorkDayRow = ({
             hours: newStatus === "vacation" ? hours : 0,
           },
         };
-        const totalPay = calculateDailySalary(baseBreakdown, baseRate);
+        const totalPay = calculateSalary(baseBreakdown, baseRate);
         setBreakdown({ ...baseBreakdown, totalPay });
       } else setBreakdown(null);
     },
-    [setSegments, standardHours, baseRate],
+    [setSegments, standardHours, baseRate, initBreakdown],
   );
 
   const updateSegmentTime = useCallback(
@@ -185,12 +140,6 @@ export const WorkDayRow = ({
     [removeSegment, setSegments, standardHours, baseRate],
   );
 
-  const dayOfMonth = (dateStr: string, hebrewDay: string) => {
-    const date = new Date(dateStr);
-    const day = date.toLocaleDateString("he-IL", { day: "2-digit" });
-    return `${hebrewDay}-${day}`;
-  };
-
   useEffect(() => {
     if (!breakdown && !prevBreakdownRef.current) return;
 
@@ -209,38 +158,29 @@ export const WorkDayRow = ({
 
   return (
     <TableRow key={date}>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
         {dayOfMonth(date, hebrewDay)}
       </TableCell>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <TableCell sx={{ borderRight: "1px solid #ddd" }}>
-          <Stack direction="column" alignItems="center" spacing={0.5}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={status === "sick"}
-                  onChange={(e) =>
-                    handleStatusChange(e.target.checked ? "sick" : "normal")
-                  }
-                  disabled={isSpecialFullDay}
-                />
+        <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
+          {!isSpecialFullDay && (
+            <Checkbox
+              checked={status === "sick"}
+              onChange={(e) =>
+                handleStatusChange(e.target.checked ? "sick" : "normal")
               }
-              label="מחלה"
             />
-            <Divider orientation="horizontal" flexItem />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={status === "vacation"}
-                  onChange={(e) =>
-                    handleStatusChange(e.target.checked ? "vacation" : "normal")
-                  }
-                  disabled={isSpecialFullDay}
-                />
+          )}
+        </TableCell>
+        <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
+          {!isSpecialFullDay && (
+            <Checkbox
+              checked={status === "vacation"}
+              onChange={(e) =>
+                handleStatusChange(e.target.checked ? "vacation" : "normal")
               }
-              label="חופש"
             />
-          </Stack>
+          )}
         </TableCell>
         <TableCell sx={{ borderRight: "1px solid #ddd" }}>
           <Stack direction="row" spacing={2} alignItems="flex-start">
@@ -256,15 +196,20 @@ export const WorkDayRow = ({
                 </IconButton>
               )}
             </Box>
+
             <Stack spacing={1}>
-              {segments.map((segment) => (
-                <SegmentRow
-                  key={segment.id}
-                  segment={segment}
-                  updateSegment={updateSegmentTime}
-                  removeSegment={removeSegmentHandler}
-                  isEditable={isEditable}
-                />
+              {segments.map((segment, index) => (
+                <React.Fragment key={segment.id}>
+                  <SegmentRow
+                    key={segment.id}
+                    segment={segment}
+                    updateSegment={updateSegmentTime}
+                    removeSegment={removeSegmentHandler}
+                    isEditable={isEditable}
+                  />
+
+                  {index < segments.length - 1 && <Divider />}
+                </React.Fragment>
               ))}
             </Stack>
           </Stack>
@@ -336,73 +281,67 @@ const SegmentRow = ({
   const hasError = !crossDay && end.minutes <= start.minutes;
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,
-        alignItems: "flex-start",
-      }}
-    >
-      <Stack direction="row" alignItems="center" spacing={1}>
-        {!savedSegment ? (
+    <Stack direction="row" alignItems="center" spacing={1}>
+      {!savedSegment ? (
+        <>
+          <TimeField
+            label="שעת כניסה"
+            value={start.date}
+            onChange={(newValue) => handleChange("start", newValue)}
+            format="HH:mm"
+            ampm={false}
+            size="small"
+            disabled={!isEditable}
+            sx={{ width: 100, flexShrink: 0 }}
+          />
+          <TimeField
+            label="שעת יציאה"
+            value={end.date}
+            onChange={(newValue) => handleChange("end", newValue)}
+            format="HH:mm"
+            ampm={false}
+            size="small"
+            disabled={!isEditable}
+            sx={{ width: 100, flexShrink: 0 }}
+            error={end.minutes <= start.minutes}
+          />
+        </>
+      ) : (
+        <>
           <>
-            <TimeField
+            <TextField
               label="שעת כניסה"
-              value={start.date}
-              onChange={(newValue) => handleChange("start", newValue)}
-              format="HH:mm"
-              ampm={false}
+              value={minutesToTimeStr(start.minutes)}
               size="small"
-              disabled={!isEditable}
+              slotProps={{ input: { readOnly: true } }}
               sx={{ width: 100, flexShrink: 0 }}
             />
-            <TimeField
+            <TextField
               label="שעת יציאה"
-              value={end.date}
-              onChange={(newValue) => handleChange("end", newValue)}
-              format="HH:mm"
-              ampm={false}
+              value={minutesToTimeStr(end.minutes)}
               size="small"
-              disabled={!isEditable}
+              slotProps={{ input: { readOnly: true } }}
               sx={{ width: 100, flexShrink: 0 }}
-              error={end.minutes <= start.minutes}
             />
           </>
-        ) : (
-          <>
-            <>
-              <TextField
-                label="שעת כניסה"
-                value={minutesToTimeStr(start.minutes)}
-                size="small"
-                slotProps={{ input: { readOnly: true } }}
-                sx={{ width: 100, flexShrink: 0 }}
-              />
-              <TextField
-                label="שעת יציאה"
-                value={minutesToTimeStr(end.minutes)}
-                size="small"
-                slotProps={{ input: { readOnly: true } }}
-                sx={{ width: 100, flexShrink: 0 }}
-              />
-            </>
-          </>
-        )}
+        </>
+      )}
+      {!savedSegment && (
         <Tooltip title="חוצה יום">
           <Checkbox
             checked={crossDay}
             onChange={(e) => handleToggleNextDay(e.target.checked)}
-            disabled={savedSegment}
           />
         </Tooltip>
+      )}
 
-        {hasError && !savedSegment && (
-          <Tooltip title="יש לסמן חוצה יום - שעת סיום לפני שעת התחלה">
-            <WarningAmberIcon fontSize="small" color="warning" />
-          </Tooltip>
-        )}
-        <Tooltip title={!savedSegment ? "שמור" : "ערוך"}>
+      {hasError && !savedSegment && (
+        <Tooltip title="יש לסמן חוצה יום - שעת סיום לפני שעת התחלה">
+          <WarningAmberIcon fontSize="small" color="warning" />
+        </Tooltip>
+      )}
+      <Tooltip title={!savedSegment ? "שמור" : "ערוך"}>
+        <span>
           <IconButton
             size="small"
             onClick={() => handleClick(!savedSegment)}
@@ -414,18 +353,18 @@ const SegmentRow = ({
               <EditIcon fontSize="small" color="info" />
             )}
           </IconButton>
-        </Tooltip>
+        </span>
+      </Tooltip>
 
-        <Tooltip title="מחק">
-          <IconButton
-            size="small"
-            onClick={() => removeSegment(segment.id)}
-            disabled={!isEditable}
-          >
-            <DeleteIcon fontSize="small" color="error" />
-          </IconButton>
-        </Tooltip>
-      </Stack>
-    </Box>
+      <Tooltip title="מחק">
+        <IconButton
+          size="small"
+          onClick={() => removeSegment(segment.id)}
+          disabled={!isEditable}
+        >
+          <DeleteIcon fontSize="small" color="error" />
+        </IconButton>
+      </Tooltip>
+    </Stack>
   );
 };
