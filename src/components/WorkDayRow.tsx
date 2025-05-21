@@ -20,169 +20,109 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import EditIcon from "@mui/icons-material/Edit";
 import { addMinutes } from "date-fns";
 
-import { useSegments } from "@/hooks";
+import { useBreakdownDay, useSegments } from "@/hooks";
 import {
   TimeFieldType,
   WorkDayPayMap,
-  WorkDayStatus,
-  WorkDayType,
-} from "@/models";
-
-import { BreakdownSummary } from "@/components";
-import {
-  BreakdownUtils,
-  calculateSalary,
-  sortSegments,
-  calculateBreakdown,
-  dayOfMonth,
-  minutesToTimeStr,
-} from "@/utility";
-
-type Segment = {
-  id: string;
-  start: TimeFieldType;
-  end: TimeFieldType;
-};
-
-type WorkDayRowProps = {
-  date: string;
-  hebrewDay: string;
-  typeDay: WorkDayType;
-  crossDayContinuation: boolean;
-  addToGlobalBreakdown: (b: WorkDayPayMap) => void;
-  subtractFromGlobalBreakdown: (b: WorkDayPayMap) => void;
-  standardHours: number;
-  baseRate: number;
-};
+  Segment,
+  WorkDayRowProps,
+} from "@/domain";
+import { WorkDayType, WorkDayStatus } from "@/constants";
+import { PayBreakdownRow } from "@/components";
+import { minutesToTimeStr, DateUtils } from "@/utils";
 
 export const WorkDayRow = ({
-  date,
+  meta,
   hebrewDay,
-  typeDay,
-  crossDayContinuation,
   addToGlobalBreakdown,
   subtractFromGlobalBreakdown,
   standardHours,
   baseRate,
 }: WorkDayRowProps) => {
-  const { segments, setSegments, addSegment, updateSegment, removeSegment } =
-    useSegments(date);
-  const [status, setStatus] = useState<WorkDayStatus>("normal");
-  const [breakdown, setBreakdown] = useState<WorkDayPayMap | null>(null);
-  const prevBreakdownRef = useRef<WorkDayPayMap | null>(null);
-
-  const { initBreakdown } = BreakdownUtils;
-
-  const metaRef = useRef({
-    date,
-    typeDay,
-    crossDayContinuation,
+  const {
+    breakdownDay,
+    updateBreakdown,
+    status,
+    setStatus,
+    updateBreakdownRate,
+  } = useBreakdownDay({
+    meta,
+    standardHours,
   });
+
+  const { segments, addSegment, updateSegment, removeSegment, clearSegments } =
+    useSegments({ day: meta.date, onChange: updateBreakdown });
+
+  const prevBreakdownRef = useRef<WorkDayPayMap | null>(null);
 
   const handleStatusChange = useCallback(
     (newStatus: WorkDayStatus) => {
+      clearSegments(newStatus);
+
+      if (
+        newStatus === WorkDayStatus.sick ||
+        newStatus === WorkDayStatus.vacation
+      ) {
+        const startMinutes = 6 * 60;
+        const endMinutes = Math.floor(startMinutes + standardHours * 60);
+        addSegment(newStatus, { start: startMinutes, end: endMinutes });
+      }
       setStatus(newStatus);
-      const hours =
-        newStatus === "sick" || newStatus === "vacation" ? standardHours : 0;
-
-      if (hours !== 0) {
-        setSegments([]);
-        const baseBreakdown = {
-          ...initBreakdown(),
-          totalHours: hours,
-          hours100Sick: { percent: 1, hours: newStatus === "sick" ? hours : 0 },
-          hours100Vacation: {
-            percent: 1,
-            hours: newStatus === "vacation" ? hours : 0,
-          },
-        };
-        const totalPay = calculateSalary(baseBreakdown, baseRate);
-        setBreakdown({ ...baseBreakdown, totalPay });
-      } else setBreakdown(null);
     },
-    [setSegments, standardHours, baseRate, initBreakdown],
-  );
-
-  const updateSegmentTime = useCallback(
-    (id: string, start: TimeFieldType, end: TimeFieldType) => {
-      const updatedSegments = updateSegment(id, start, end);
-      const sortedSegments = sortSegments(updatedSegments);
-      setSegments(sortedSegments);
-
-      const newBreakdown = calculateBreakdown(
-        sortedSegments,
-        metaRef.current,
-        standardHours,
-        baseRate,
-      );
-      setBreakdown(newBreakdown);
-    },
-    [updateSegment, setSegments, standardHours, baseRate],
-  );
-
-  const removeSegmentHandler = useCallback(
-    (id: string) => {
-      const updatedSegments = removeSegment(id);
-      const sortedSegments = sortSegments(updatedSegments);
-      setSegments(sortedSegments);
-
-      const newBreakdown =
-        updatedSegments.length > 0
-          ? calculateBreakdown(
-              updatedSegments,
-              metaRef.current,
-              standardHours,
-              baseRate,
-            )
-          : null;
-      setBreakdown(newBreakdown);
-    },
-    [removeSegment, setSegments, standardHours, baseRate],
+    [setStatus, addSegment, standardHours, clearSegments],
   );
 
   useEffect(() => {
-    if (!breakdown && !prevBreakdownRef.current) return;
+    if (!breakdownDay && !prevBreakdownRef.current) return;
 
     if (subtractFromGlobalBreakdown && prevBreakdownRef.current) {
       subtractFromGlobalBreakdown(prevBreakdownRef.current);
     }
-    if (addToGlobalBreakdown && breakdown) {
-      addToGlobalBreakdown(breakdown);
+    if (addToGlobalBreakdown && breakdownDay) {
+      addToGlobalBreakdown(breakdownDay);
     }
 
-    prevBreakdownRef.current = breakdown;
-  }, [breakdown]);
+    prevBreakdownRef.current = breakdownDay;
+  }, [breakdownDay]);
 
-  const isEditable = status === "normal";
-  const isSpecialFullDay = typeDay === WorkDayType.SpecialFull;
+  useEffect(() => {
+    if (breakdownDay?.baseRate !== baseRate) updateBreakdownRate(baseRate);
+  }, [baseRate, updateBreakdownRate, breakdownDay]);
+
+  const isEditable = status === WorkDayStatus.normal;
+  const isSpecialFullDay = meta.typeDay === WorkDayType.SpecialFull;
 
   return (
-    <TableRow key={date}>
-      <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
-        {dayOfMonth(date, hebrewDay)}
-      </TableCell>
+    <TableRow key={meta.date}>
+      <TableCell>{DateUtils.dayOfMonth(meta.date, hebrewDay)}</TableCell>
       <LocalizationProvider dateAdapter={AdapterDateFns}>
-        <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
+        <TableCell>
           {!isSpecialFullDay && (
             <Checkbox
-              checked={status === "sick"}
+              checked={status === WorkDayStatus.sick}
               onChange={(e) =>
-                handleStatusChange(e.target.checked ? "sick" : "normal")
+                handleStatusChange(
+                  e.target.checked ? WorkDayStatus.sick : WorkDayStatus.normal,
+                )
               }
             />
           )}
         </TableCell>
-        <TableCell sx={{ borderRight: "1px solid #ddd" }} align="center">
+        <TableCell>
           {!isSpecialFullDay && (
             <Checkbox
-              checked={status === "vacation"}
+              checked={status === WorkDayStatus.vacation}
               onChange={(e) =>
-                handleStatusChange(e.target.checked ? "vacation" : "normal")
+                handleStatusChange(
+                  e.target.checked
+                    ? WorkDayStatus.vacation
+                    : WorkDayStatus.normal,
+                )
               }
             />
           )}
         </TableCell>
-        <TableCell sx={{ borderRight: "1px solid #ddd" }}>
+        <TableCell>
           <Stack direction="row" spacing={2} alignItems="flex-start">
             <Box
               display="flex"
@@ -191,7 +131,7 @@ export const WorkDayRow = ({
               pt={1}
             >
               {isEditable && (
-                <IconButton size="small" onClick={addSegment}>
+                <IconButton size="small" onClick={() => addSegment(status)}>
                   <AddIcon fontSize="small" />
                 </IconButton>
               )}
@@ -203,8 +143,9 @@ export const WorkDayRow = ({
                   <SegmentRow
                     key={segment.id}
                     segment={segment}
-                    updateSegment={updateSegmentTime}
-                    removeSegment={removeSegmentHandler}
+                    status={status}
+                    updateSegment={updateSegment}
+                    removeSegment={removeSegment}
                     isEditable={isEditable}
                   />
 
@@ -215,20 +156,27 @@ export const WorkDayRow = ({
           </Stack>
         </TableCell>
       </LocalizationProvider>
-      <BreakdownSummary breakdown={breakdown} baseRate={baseRate} />
+      <PayBreakdownRow breakdown={breakdownDay} baseRate={baseRate} />
     </TableRow>
   );
 };
 
 type SegmentRowProps = {
   segment: Segment;
-  updateSegment: (id: string, start: TimeFieldType, end: TimeFieldType) => void;
-  removeSegment: (id: string) => void;
+  status: WorkDayStatus;
+  updateSegment: (
+    id: string,
+    start: TimeFieldType,
+    end: TimeFieldType,
+    status: WorkDayStatus,
+  ) => void;
+  removeSegment: (id: string, status: WorkDayStatus) => void;
   isEditable: boolean;
 };
 
 const SegmentRow = ({
   segment,
+  status,
   updateSegment,
   removeSegment,
   isEditable,
@@ -274,8 +222,9 @@ const SegmentRow = ({
   }, []);
 
   useEffect(() => {
-    if (savedSegment) updateSegment(segment.id, values.start, values.end);
-  }, [savedSegment, values]);
+    if (savedSegment)
+      updateSegment(segment.id, values.start, values.end, status);
+  }, [savedSegment, values, status]);
 
   const crossDay = end.minutes >= 1440;
   const hasError = !crossDay && end.minutes <= start.minutes;
@@ -326,45 +275,49 @@ const SegmentRow = ({
           </>
         </>
       )}
-      {!savedSegment && (
-        <Tooltip title="חוצה יום">
-          <Checkbox
-            checked={crossDay}
-            onChange={(e) => handleToggleNextDay(e.target.checked)}
-          />
-        </Tooltip>
-      )}
+      {isEditable && (
+        <>
+          {!savedSegment && (
+            <Tooltip title="חוצה יום">
+              <Checkbox
+                checked={crossDay}
+                onChange={(e) => handleToggleNextDay(e.target.checked)}
+              />
+            </Tooltip>
+          )}
 
-      {hasError && !savedSegment && (
-        <Tooltip title="יש לסמן חוצה יום - שעת סיום לפני שעת התחלה">
-          <WarningAmberIcon fontSize="small" color="warning" />
-        </Tooltip>
-      )}
-      <Tooltip title={!savedSegment ? "שמור" : "ערוך"}>
-        <span>
-          <IconButton
-            size="small"
-            onClick={() => handleClick(!savedSegment)}
-            disabled={!isEditable || hasError}
-          >
-            {!savedSegment ? (
-              <SaveIcon fontSize="small" color="primary" />
-            ) : (
-              <EditIcon fontSize="small" color="info" />
-            )}
-          </IconButton>
-        </span>
-      </Tooltip>
+          {hasError && !savedSegment && (
+            <Tooltip title="יש לסמן חוצה יום - שעת סיום לפני שעת התחלה">
+              <WarningAmberIcon fontSize="small" color="warning" />
+            </Tooltip>
+          )}
+          <Tooltip title={!savedSegment ? "שמור" : "ערוך"}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={() => handleClick(!savedSegment)}
+                disabled={!isEditable || hasError}
+              >
+                {!savedSegment ? (
+                  <SaveIcon fontSize="small" color="primary" />
+                ) : (
+                  <EditIcon fontSize="small" color="info" />
+                )}
+              </IconButton>
+            </span>
+          </Tooltip>
 
-      <Tooltip title="מחק">
-        <IconButton
-          size="small"
-          onClick={() => removeSegment(segment.id)}
-          disabled={!isEditable}
-        >
-          <DeleteIcon fontSize="small" color="error" />
-        </IconButton>
-      </Tooltip>
+          <Tooltip title="מחק">
+            <IconButton
+              size="small"
+              onClick={() => removeSegment(segment.id, status)}
+              disabled={!isEditable}
+            >
+              <DeleteIcon fontSize="small" color="error" />
+            </IconButton>
+          </Tooltip>
+        </>
+      )}
     </Stack>
   );
 };

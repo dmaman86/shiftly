@@ -7,30 +7,38 @@
 ## Features
 
 - Track start and end time for each work shift
-- Automatically calculates:
+- Auto-calculates:
   - Base hours (100%)
   - Overtime:
-    - 125% after 8 hours
-    - 150% after 10 hours
+    - First standard hours (default: 6.67h) at 100%
+    - Next 2 hours at 125%
+    - Any additional hours at 150%
+    - `standardHours` is configurable in the salary settings panel
   - Evening bonus (20%)
   - Night bonus (50%)
-  - Special pay:
-    - Friday evenings and Shabbat (150% + 100%)
-    - Holidays and holiday evenings (up to 200% + 100%)
-- Distinction between normal, sick, and vacation days
-- Editable segments for manual adjustments
-- Visual breakdown table per day and summary per month
+  - Shabbat and holiday pay:
+    - Friday/Holiday Eve night: 150% + 100%
+    - Saturday/Holiday: 150% + 100% or 200% + 100% depending on time
+- Manual adjustments to breakdown
+- Monthly summary based on base hourly rate
+- Support for:
+  - Sick/Vacation days (non-workable)
+  - Cross-day shifts
+  - Winter/Summer time cutoffs
+- Holiday support via [Hebcal API](https://www.hebcal.com/home/developer-apis)
+- RTL layout support for Hebrew
 
 ## Tech Stack
 
 - **Frontend**: React + TypeScript + Vite
 - **UI**: Material UI (MUI) + Bootstrap
-- **State Management**: Custom React Hooks
-- **Date handling**: [Hebcal API](https://www.hebcal.com/home/developer-apis) for holidays
+- **HTTP Client**: Axios
+- **State Management**: React Hooks
+- **Logic & Utilities**: Modularized business logic and segment breakdown utilities
 
 ## Getting Started
 
-To run the app locally:
+Clone the repository and install dependencies:
 
 ```bash
 git clone https://github.com/dmaman86/shiftly.git
@@ -45,33 +53,60 @@ Visit `http://localhost:5173/shiftly` in your browser.
 
 ```plaintext
 src/
-├── assets/
-├── components/
-│   ├── BreakdownSummary.tsx
-│   ├── ConfigPanel.tsx
-│   ├── FooterSummary.tsx
-│   ├── MonthlySalarySummary.tsx
-│   ├── WorkDayRow.tsx
-│   └── WorkTable.tsx
-├── hooks/
-│   ├── useSegments.ts
-│   └── useWorkDays.ts
-├── models/
-│   └── work_day_row.ts
-├── utility/
-│   ├── breakdownUtil.ts
-│   └── workDayBreakdown.ts
+├── adapters
+│   ├── event.adapter.ts
+│   └── index.ts
+├── assets
+│   └── react.svg
+├── components
+│   ├── ConfigPanel.tsx
+│   ├── index.ts
+│   ├── MonthlySalarySummary.tsx
+│   ├── PayBreakdownRow.tsx
+│   ├── WorkDayRow.tsx
+│   └── WorkTable.tsx
+├── constants
+│   ├── fields.constant.ts
+│   ├── hebrew.dates.constant.ts
+│   └── index.ts
+├── domain
+│   ├── index.ts
+│   ├── services
+│   │   ├── breakdown.service.ts
+│   │   ├── calculateBreakdown.service.ts
+│   │   ├── holiday.service.ts
+│   │   ├── paySegmentFactory.service.ts
+│   │   ├── segmentResolver.service.ts
+│   │   └── workDayBreakdown.service.ts
+│   └── types
+│       └── types.ts
+├── hooks
+│   ├── index.ts
+│   ├── useBreakdownDay.ts
+│   ├── useFetch.ts
+│   ├── useSegments.ts
+│   └── useWorkDays.ts
+├── utils
+│   ├── date.util.ts
+│   ├── helpers.util.ts
+│   ├── index.ts
+│   └── service.util.ts
+├── App.css
 ├── App.tsx
+├── index.css
 ├── main.tsx
 └── vite-env.d.ts
 ```
 
-## Interface Preview
+## UI Behavior Overview
 
 ### Workday Overview
 
-- If `baseRate` is **not set**: only worked hours are displayed per day in the monthly summary. No daily wage (שכר יומי) or salary table is shown.
-- If `baseRate` is **set**: each day includes a daily wage (שכר יומי) and a monthly summary appears below the table.
+- If `baseRate` is **not set**: only displays worked hours per day.
+- If `baseRate` is **set**: shows per-day salary and monthly total.
+- **Sick/Vacation days**: disables work segments.
+- **Shabbat/holiday**: only allows work, not absence.
+- **Cross-day shifts**: user must confirm with a checkbox.
 
 ### Day Configuration Logic
 
@@ -79,13 +114,6 @@ src/
 
 - Cannot mark as Sick/Vacation, but work segments are allowed.
   ![Shabbat Sick Vacation Example](./public/shabbat-sick-vacation.png)
-  ![Shabbat Hours Example](./public/shabbat-hours.png)
-
-**Friday or Holiday Eve - Sick/Vacation or Work**
-
-- Can mark as Sick/Vacation, or add work hours.
-  ![Friday Sick Vacation Example](./public/friday-sick-vacation.png)
-  ![Friday Hours Example](./public/friday-hours.png)
 
 **Sick Day Or Vacation Day - Not Work Segments**
 
@@ -100,24 +128,12 @@ src/
   ![Cross Day Checkbox](./public/cross-day-checkbox.png)
   ![Cross Day](./public/shift-save.png)
 
-- **Day types**:
+**Breakdown Day Summary**
+![Breakdown Day 1](./public/breakdown-summary-1.png)
+![Breakdown Day 2](./public/breakdown-summary-2.png)
 
-  - **Shabbat and holidays** are locked days: they cannot be marked as Sick or Vacation, but working hours **can** still be added.
-  - **Fridays and holiday eves** allow marking the day as **Sick** or **Vacation**, or adding working segments.
-
-- **Sick/Vacation behavior**:
-
-  - When a day is marked as Sick or Vacation, you cannot add any work hours.
-
-- **Working day behavior**:
-
-  - If not marked as Sick or Vacation, you can add working segments with **start** and **end** times.
-  - if the end time crosses midnight (into the next day), a checkbox appears: **"חוצה יום"** (crosses to next day).
-
-- RTL layout for Hebrew.
-- Configurable salary inputs.
-- Daily work rows + sick/vacation toggles.
-- Monthly salary summary table.
+**Monthly Summary**
+![Monthly Summary](./public/monthly-summary.png)
 
 ## License
 

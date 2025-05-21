@@ -1,25 +1,9 @@
-import { WorkDayRowProps, WorkDayType } from "@/models";
 import { format } from "date-fns";
-import { HolidayUtils } from "./holiday.utils";
+
+import { hebrewDays, monthNames, WorkDayType } from "@/constants";
+import { WorkDayInfo, resolveHolidayType } from "@/domain";
 
 export const DateUtils = (() => {
-  const hebrewDays = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
-
-  const monthNames = [
-    "ינואר",
-    "פברואר",
-    "מרץ",
-    "אפריל",
-    "מאי",
-    "יוני",
-    "יולי",
-    "אוגוסט",
-    "ספטמבר",
-    "אוקטובר",
-    "נובמבר",
-    "דצמבר",
-  ];
-
   const formatDate = (date: Date): string => format(date, "yyyy-MM-dd");
 
   const getHebrewDayLetter = (date: Date): string => hebrewDays[date.getDay()];
@@ -48,9 +32,9 @@ export const DateUtils = (() => {
     year: number,
     month: number,
     eventMap: Record<string, string[]>,
-  ): WorkDayRowProps[] => {
+  ): WorkDayInfo[] => {
     const daysInMonth = getDaysInMonth(year, month);
-    const days: WorkDayRowProps[] = [];
+    const days: WorkDayInfo[] = [];
 
     for (let day = 1; day <= daysInMonth; day++) {
       const currentDate = new Date(year, month - 1, day);
@@ -59,33 +43,60 @@ export const DateUtils = (() => {
       const hebrewDay = getHebrewDayLetter(currentDate);
       const eventTitles = eventMap[formattedDate] || [];
 
-      const currentType = HolidayUtils.resolveDayType(weekday, eventTitles);
+      const currentType = resolveHolidayType(weekday, eventTitles);
 
-      const row: WorkDayRowProps = {
-        date: formattedDate,
+      const row: WorkDayInfo = {
+        meta: {
+          date: formattedDate,
+          typeDay: currentType,
+          crossDayContinuation: false,
+        },
         hebrewDay,
-        typeDay: currentType,
-        crossDayContinuation: false,
       };
 
       days[day - 1] = row;
 
       if (day > 1) {
-        days[day - 2].crossDayContinuation =
+        days[day - 2].meta.crossDayContinuation =
           currentType === WorkDayType.SpecialFull;
       }
     }
     return days;
   };
 
+  const getSpecialStartMinutes = (date: string): number => {
+    const offsetMinutes = new Date(date).getTimezoneOffset();
+    const specialStart = -offsetMinutes / 60 === 3 ? 18 : 19;
+    return specialStart * 60;
+  };
+
+  const dayOfMonth = (dateStr: string, hebrewDay: string): string => {
+    const date = new Date(dateStr);
+    const day = date.toLocaleDateString("he-IL", { day: "2-digit" });
+    return `${hebrewDay}-${day}`;
+  };
+
+  const createDateWithTime = (
+    day: string,
+    hours: number = 0,
+    minutes: number = 0,
+  ): Date => {
+    const [year, month, dayOfMonth] = day.split("-").map(Number);
+    return new Date(year, month - 1, dayOfMonth, hours, minutes, 0, 0);
+  };
+
   return {
+    hebrewDays,
+    monthNames,
     formatDate,
     getHebrewDayLetter,
     getNextMonthDay,
-    getDatesRange,
-    monthNames,
     getDaysInMonth,
     getMonth,
+    getDatesRange,
     generateWorkDays,
+    getSpecialStartMinutes,
+    dayOfMonth,
+    createDateWithTime,
   };
 })();

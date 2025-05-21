@@ -1,50 +1,99 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { TimeFieldType } from "@/models";
+import { DateUtils } from "@/utils";
+import { TimeFieldType, Segment } from "@/domain";
+import { WorkDayStatus } from "@/constants";
 
-type Segment = {
-  id: string;
-  start: TimeFieldType;
-  end: TimeFieldType;
-};
+interface UseSegmentsProps {
+  day: string;
+  onChange?: (segments: Segment[], status: WorkDayStatus) => void;
+  initialSegments?: Segment[];
+}
 
-export const useSegments = (day: string) => {
-  const [segments, setSegments] = useState<Segment[]>([]);
-  const baseDate = useMemo(() => new Date(`${day}T00:00:00`), [day]);
+type Shift = { start: number; end: number };
 
-  const addSegment = useCallback(() => {
-    const newSegment: Segment = {
-      id: uuidv4(),
-      start: { date: baseDate, minutes: 0 },
-      end: { date: baseDate, minutes: 0 },
-    };
-    setSegments((prev) => [...prev, newSegment]);
-  }, [baseDate]);
+export const useSegments = ({
+  day,
+  onChange,
+  initialSegments = [],
+}: UseSegmentsProps) => {
+  const [segments, setSegments] = useState<Segment[]>(initialSegments);
+
+  const notifyChange = useCallback(
+    (updated: Segment[], status: WorkDayStatus) => {
+      setSegments(updated);
+      if (onChange) onChange(updated, status);
+    },
+    [onChange],
+  );
+
+  const sortSegments = useCallback((segments: Segment[]) => {
+    return [...segments].sort((a, b) => a.start.minutes - b.start.minutes);
+  }, []);
+
+  const addSegment = useCallback(
+    (status: WorkDayStatus, shift?: Shift) => {
+      const start = shift?.start ?? 0;
+      const end = shift?.end ?? 0;
+      const startDate = DateUtils.createDateWithTime(day, start / 60);
+      const endDate = DateUtils.createDateWithTime(
+        day,
+        Math.floor(end / 60),
+        end % 60,
+      );
+
+      const newSegment: Segment = {
+        id: uuidv4(),
+        start: { date: startDate, minutes: start },
+        end: { date: endDate, minutes: end },
+      };
+
+      const updated =
+        status === WorkDayStatus.normal
+          ? [...segments, newSegment]
+          : [newSegment];
+      if (status === WorkDayStatus.normal) setSegments(updated);
+      else notifyChange(updated, status);
+    },
+    [day, segments, notifyChange],
+  );
 
   const updateSegment = useCallback(
-    (id: string, start: TimeFieldType, end: TimeFieldType): Segment[] => {
+    (
+      id: string,
+      start: TimeFieldType,
+      end: TimeFieldType,
+      status: WorkDayStatus,
+    ) => {
       const updated = segments.map((segment) =>
         segment.id === id ? { ...segment, start, end } : segment,
       );
 
-      return updated;
+      notifyChange(sortSegments(updated), status);
     },
-    [segments],
+    [segments, notifyChange, sortSegments],
   );
 
   const removeSegment = useCallback(
-    (id: string): Segment[] => {
+    (id: string, status: WorkDayStatus) => {
       const updated = segments.filter((segment) => segment.id !== id);
-      return updated;
+      notifyChange(updated, status);
     },
-    [segments],
+    [segments, notifyChange],
+  );
+
+  const clearSegments = useCallback(
+    (status: WorkDayStatus) => {
+      notifyChange(initialSegments, status);
+    },
+    [notifyChange, initialSegments],
   );
 
   return {
     segments,
-    setSegments,
     addSegment,
     updateSegment,
     removeSegment,
+    clearSegments,
   };
 };

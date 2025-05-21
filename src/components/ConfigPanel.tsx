@@ -6,7 +6,7 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import { DateUtils } from "@/utility";
+import { DateUtils } from "@/utils";
 
 type ConfigValues = {
   year: number;
@@ -23,7 +23,6 @@ type ConfigPanelProps = {
 export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth(); // 0-based
-  const { monthNames } = DateUtils;
 
   const availableMonths = useMemo(() => {
     if (values.year < currentYear)
@@ -34,7 +33,7 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
   }, [values.year, currentYear, currentMonth]);
 
   return (
-    <div className="container" dir="rtl">
+    <div className="container">
       <div className="row mb-2">
         <div className="col-12 col-lg-6 mb-2">
           <div className="row gx-2">
@@ -46,7 +45,7 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
                 type="number"
                 value={values.year}
                 onChange={(e) => {
-                  const parsedYear = parseInt(e.target.value, 10);
+                  const parsedYear = Number(e.target.value);
                   if (!isNaN(parsedYear) && parsedYear <= currentYear) {
                     onChange("year", parsedYear);
                     onChange("month", 1); // reset month when year changes
@@ -62,12 +61,12 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
                   label="חודש"
                   value={(values.month - 1).toString()}
                   onChange={(e) =>
-                    onChange("month", parseInt(e.target.value, 10) + 1)
+                    onChange("month", Number(e.target.value) + 1)
                   } // convert to 1-based
                 >
                   {availableMonths.map((m) => (
                     <MenuItem key={m} value={m}>
-                      {monthNames[m]}
+                      {DateUtils.monthNames[m]}
                     </MenuItem>
                   ))}
                 </Select>

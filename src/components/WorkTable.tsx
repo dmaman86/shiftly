@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   Table,
   TableCell,
@@ -12,10 +12,14 @@ import {
 } from "@mui/material";
 
 import { useWorkDays } from "@/hooks";
-import { BreakdownUtils, DateUtils } from "@/utility";
-
-import { WorkDayPayMap, WorkDayRowProps } from "@/models";
-import { WorkDayRow, FooterSummary, MonthlySalarySummary } from "@/components";
+import { DateUtils } from "@/utils";
+import { headersTable } from "@/constants";
+import { WorkDayInfo, WorkDayPayMap, breakdownService } from "@/domain";
+import {
+  WorkDayRow,
+  MonthlySalarySummary,
+  PayBreakdownRow,
+} from "@/components";
 
 type ConfigValues = {
   year: number;
@@ -31,57 +35,51 @@ type WorkMonthTableProps = {
 
 export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
   const { workDays } = useWorkDays(values.year, values.month, eventMap);
-  const { getMonth } = DateUtils;
 
-  const { sumBreakdowns, subtractBreakdowns, initBreakdown } = BreakdownUtils;
-
-  const [globalBreakdown, setGlobalBreakdown] =
-    useState<WorkDayPayMap>(initBreakdown);
-
-  const addToGlobalBreakdown = useCallback(
-    (breakdown: WorkDayPayMap) => {
-      setGlobalBreakdown((prev) => sumBreakdowns(prev, breakdown));
-    },
-    [sumBreakdowns],
+  const [globalBreakdown, setGlobalBreakdown] = useState<WorkDayPayMap>(
+    breakdownService.initBreakdown(),
   );
+
+  const addToGlobalBreakdown = useCallback((breakdown: WorkDayPayMap) => {
+    setGlobalBreakdown((prev) =>
+      breakdownService.mergeBreakdowns(
+        prev,
+        breakdown,
+        breakdownService.sumSegments,
+      ),
+    );
+  }, []);
 
   const subtractFromGlobalBreakdown = useCallback(
     (breakdown: WorkDayPayMap) => {
-      setGlobalBreakdown((prev) => subtractBreakdowns(prev, breakdown));
+      setGlobalBreakdown((prev) =>
+        breakdownService.mergeBreakdowns(
+          prev,
+          breakdown,
+          breakdownService.subtractSegments,
+        ),
+      );
     },
-    [subtractBreakdowns],
+    [],
   );
 
-  const headers = [
-    { label: "יום", rowSpan: 2 },
-    { label: "", children: ["מחלה", "חופש"] },
-    { label: "שעות", rowSpan: 2 },
-    { label: "סה״כ", rowSpan: 2 },
-    {
-      label: "ש״נ",
-      children: ["100%", "125%", "150%"],
-    },
-    {
-      label: "שבת",
-      children: ["150%", "200%"],
-    },
-    {
-      label: "תוספות",
-      children: ["ז. שבת ", "20%", "50%"],
-    },
-    {
-      label: "היעדרות",
-      children: ["מחלה", "חופש"],
-    },
-  ];
+  useEffect(() => {
+    if (globalBreakdown.baseRate !== values.baseRate) {
+      const newGlobalBreakdown = breakdownService.updateBaseRate(
+        values.baseRate,
+        globalBreakdown,
+      );
+      setGlobalBreakdown(newGlobalBreakdown);
+    }
+  }, [values.baseRate, globalBreakdown]);
 
-  const groupByShabbat = (workDays: WorkDayRowProps[]): WorkDayRowProps[][] => {
-    const groups: WorkDayRowProps[][] = [];
-    let current: WorkDayRowProps[] = [];
+  const groupByShabbat = (workDays: WorkDayInfo[]): WorkDayInfo[][] => {
+    const groups: WorkDayInfo[][] = [];
+    let current: WorkDayInfo[] = [];
 
     for (const day of workDays) {
       current.push(day);
-      const date = new Date(day.date);
+      const date = new Date(day.meta.date);
       if (date.getDay() === 6) {
         groups.push(current);
         current = [];
@@ -91,44 +89,67 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
     return groups;
   };
 
-  const totalColumns =
-    headers.reduce((sum, header) => {
-      if ("children" in header && Array.isArray(header.children))
-        return sum + header.children.length;
-      return sum + 1;
-    }, 0) + (values.baseRate > 0 ? 1 : 0);
+  const totalColumns = useCallback(() => {
+    return (
+      headersTable.reduce((sum, header) => {
+        if ("children" in header && Array.isArray(header.children))
+          return sum + header.children.length;
+        return sum + 1;
+      }, 0) + (globalBreakdown.baseRate > 0 ? 1 : 0)
+    );
+  }, [globalBreakdown.baseRate]);
+
+  // const totalColumns =
+  //   headersTable.reduce((sum, header) => {
+  //     if ("children" in header && Array.isArray(header.children))
+  //       return sum + header.children.length;
+  //     return sum + 1;
+  //   }, 0) + (globalBreakdown.baseRate > 0 ? 1 : 0);
 
   return (
     <>
-      <Typography variant="h5" gutterBottom>
-        שעות חודש {getMonth(values.month)} - {values.year}
-      </Typography>
-
-      <div className="container" dir="rtl">
+      <div className="container">
+        <div className="row mb-3">
+          <Typography variant="h5" textAlign="center" gutterBottom>
+            שעות חודש {DateUtils.getMonth(values.month)} - {values.year}
+          </Typography>
+        </div>
         <div className="row mb-3">
           <div className="col-12">
-            <Paper sx={{ direction: "rtl" }}>
+            <Paper>
               <TableContainer sx={{ maxHeight: 600 }}>
-                <Table stickyHeader size="small">
+                <Table
+                  stickyHeader
+                  size="small"
+                  sx={{
+                    borderCollapse: "collapse",
+                    "& td, & th": {
+                      border: "1px solid #ddd",
+                      textAlign: "center",
+                    },
+                  }}
+                >
                   <TableHead>
                     <TableRow>
-                      {headers.map((header, i) =>
-                        "children" in header ? (
-                          <TableCell
-                            key={`group-${i}`}
-                            align="center"
-                            colSpan={header.children!.length}
-                            sx={{
-                              borderRight: "1px solid #ddd",
-                              fontWeight: "bold",
-                              minWidth: `${header.children!.length * 90}px`,
-                            }}
-                          >
-                            <div className="row">
-                              <div className="col-12 fw-bold">
-                                {header.label}
-                              </div>
-                            </div>
+                      {headersTable.map((header, i) => (
+                        <TableCell
+                          key={`group-${i}`}
+                          align="center"
+                          colSpan={
+                            "children" in header ? header.children!.length : 1
+                          }
+                          rowSpan={
+                            "children" in header ? 1 : (header.rowSpan ?? 2)
+                          }
+                          sx={{
+                            fontWeight: "bold",
+                            minWidth: `${"children" in header ? header.children!.length : 1 * 90}px`,
+                          }}
+                        >
+                          <div className="row">
+                            <div className="col-12 fw-bold">{header.label}</div>
+                          </div>
+                          {"children" in header && (
                             <div className="row text-center">
                               {header.children!.map((child, j) => (
                                 <div className="col" key={`child-${i}-${j}`}>
@@ -136,25 +157,13 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
                                 </div>
                               ))}
                             </div>
-                          </TableCell>
-                        ) : (
-                          <TableCell
-                            key={i}
-                            align="center"
-                            sx={{
-                              fontWeight: "bold",
-                              borderRight: "1px solid #ddd",
-                            }}
-                          >
-                            {header.label}
-                          </TableCell>
-                        ),
-                      )}
-                      {values.baseRate > 0 && (
+                          )}
+                        </TableCell>
+                      ))}
+
+                      {globalBreakdown.baseRate > 0 && (
                         <TableCell
-                          align="center"
                           sx={{
-                            borderRight: "1px solid #ddd",
                             fontWeight: "bold",
                             minWidth: "90px",
                           }}
@@ -164,7 +173,7 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
                       )}
                     </TableRow>
                     <TableRow style={{ display: "none" }}>
-                      {headers.flatMap((header, i) =>
+                      {headersTable.flatMap((header, i) =>
                         "children" in header
                           ? header.children!.map((_, j) => (
                               <TableCell key={`invisible-${i}-${j}`} />
@@ -175,7 +184,7 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
                               />,
                             ],
                       )}
-                      {values.baseRate > 0 && <TableCell />}
+                      {globalBreakdown.baseRate > 0 && <TableCell />}
                     </TableRow>
                   </TableHead>
 
@@ -183,11 +192,9 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
                     <TableBody key={index}>
                       {group.map((day) => (
                         <WorkDayRow
-                          key={day.date}
-                          date={day.date}
+                          key={day.meta.date}
+                          meta={day.meta}
                           hebrewDay={day.hebrewDay}
-                          typeDay={day.typeDay}
-                          crossDayContinuation={day.crossDayContinuation}
                           addToGlobalBreakdown={addToGlobalBreakdown}
                           subtractFromGlobalBreakdown={
                             subtractFromGlobalBreakdown
@@ -197,28 +204,27 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
                         />
                       ))}
                       <TableRow>
-                        <TableCell colSpan={totalColumns} sx={{ p: 0 }}>
-                          <Box sx={{ height: 4, backgroundColor: "red" }} />
+                        <TableCell colSpan={totalColumns()} sx={{ p: 0 }}>
+                          <Box sx={{ height: 2, backgroundColor: "red" }} />
                         </TableCell>
                       </TableRow>
                     </TableBody>
                   ))}
-                  <FooterSummary
-                    globalBreakdown={globalBreakdown}
-                    baseRate={values.baseRate}
+                  <PayBreakdownRow
+                    breakdown={globalBreakdown}
+                    baseRate={globalBreakdown.baseRate}
+                    isFooter
+                    emptyStartCells={4}
                   />
                 </Table>
               </TableContainer>
             </Paper>
           </div>
         </div>
-        {values.baseRate > 0 && (
+        {globalBreakdown.baseRate > 0 && (
           <div className="row">
             <div className="col-12">
-              <MonthlySalarySummary
-                baseRate={values.baseRate}
-                globalBreakdown={globalBreakdown}
-              />
+              <MonthlySalarySummary globalBreakdown={globalBreakdown} />
             </div>
           </div>
         )}
