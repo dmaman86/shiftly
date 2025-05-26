@@ -26,6 +26,8 @@ import {
   WorkDayPayMap,
   Segment,
   WorkDayRowProps,
+  breakdownResolveService,
+  breakdownService,
 } from "@/domain";
 import { WorkDayType, WorkDayStatus } from "@/constants";
 import { PayBreakdownRow } from "@/components";
@@ -48,6 +50,8 @@ export const WorkDayRow = ({
   } = useBreakdownDay({
     meta,
     standardHours,
+    breakdownService: breakdownService(),
+    breakdownResolveService: breakdownResolveService(),
   });
 
   const { segments, addSegment, updateSegment, removeSegment, clearSegments } =

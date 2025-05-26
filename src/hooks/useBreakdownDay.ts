@@ -4,18 +4,23 @@ import {
   WorkDayPayMap,
   breakdownService,
   Segment,
-  calculateBreakdown,
+  breakdownResolveService,
+  WorkDayMeta,
 } from "@/domain";
-import { WorkDayStatus, WorkDayType } from "@/constants";
+import { WorkDayStatus } from "@/constants";
 
 type UseBreakdownDayProps = {
-  meta: { date: string; typeDay: WorkDayType; crossDayContinuation: boolean };
+  meta: WorkDayMeta;
   standardHours: number;
+  breakdownService: ReturnType<typeof breakdownService>;
+  breakdownResolveService: ReturnType<typeof breakdownResolveService>;
 };
 
 export const useBreakdownDay = ({
   meta,
   standardHours,
+  breakdownService,
+  breakdownResolveService,
 }: UseBreakdownDayProps) => {
   const [breakdownDay, setBreakdownDay] = useState<WorkDayPayMap | null>(null);
 
@@ -27,7 +32,7 @@ export const useBreakdownDay = ({
         setBreakdownDay(null);
         return;
       }
-      const newBreakdown = calculateBreakdown(
+      const newBreakdown = breakdownResolveService.calculateBreakdown(
         updatedSegments,
         meta,
         standardHours,
@@ -35,7 +40,7 @@ export const useBreakdownDay = ({
       );
       setBreakdownDay(newBreakdown);
     },
-    [meta, standardHours],
+    [meta, standardHours, breakdownResolveService],
   );
 
   const updateBreakdownRate = useCallback(
@@ -48,7 +53,7 @@ export const useBreakdownDay = ({
         setBreakdownDay(newBreakdown);
       }
     },
-    [breakdownDay],
+    [breakdownDay, breakdownService],
   );
 
   return {

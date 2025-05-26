@@ -1,8 +1,15 @@
 import { LabeledSegmentRange, Point, WorkDayMeta } from "../types/types";
-import { fieldMinutes, fieldShiftPercent, WorkDayType } from "@/constants";
+import {
+  fieldMinutes as defaultFieldMinutes,
+  fieldShiftPercent as defaultFieldShiftPercent,
+  WorkDayType,
+} from "@/constants";
 import { DateUtils } from "@/utils";
 
-export const segmentResolver = (() => {
+export const segmentResolver = (
+  fieldMinutes: Record<string, number> = defaultFieldMinutes,
+  fieldShiftPercent: Record<string, number> = defaultFieldShiftPercent,
+) => {
   const { min06, min14, min17, min22, fullDay } = fieldMinutes;
   const { hours50, hours20, hours100, hours150, hours200 } = fieldShiftPercent;
 
@@ -218,4 +225,4 @@ export const segmentResolver = (() => {
         return [];
     }
   };
-})();
+};

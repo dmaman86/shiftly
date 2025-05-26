@@ -5,7 +5,7 @@ export const paySegmentFactory = ({
   hours = 0,
 }: {
   percent: number;
-  hours?: number;
+  hours: number;
 }): PaySegment => ({
   percent,
   hours,

@@ -35,43 +35,39 @@ type WorkMonthTableProps = {
 
 export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
   const { workDays } = useWorkDays(values.year, values.month, eventMap);
+  const service = breakdownService();
 
   const [globalBreakdown, setGlobalBreakdown] = useState<WorkDayPayMap>(
-    breakdownService.initBreakdown(),
+    service.initBreakdown({}),
   );
 
-  const addToGlobalBreakdown = useCallback((breakdown: WorkDayPayMap) => {
-    setGlobalBreakdown((prev) =>
-      breakdownService.mergeBreakdowns(
-        prev,
-        breakdown,
-        breakdownService.sumSegments,
-      ),
-    );
-  }, []);
+  const addToGlobalBreakdown = useCallback(
+    (breakdown: WorkDayPayMap) => {
+      setGlobalBreakdown((prev) =>
+        service.mergeBreakdowns(prev, breakdown, service.sumSegments),
+      );
+    },
+    [service],
+  );
 
   const subtractFromGlobalBreakdown = useCallback(
     (breakdown: WorkDayPayMap) => {
       setGlobalBreakdown((prev) =>
-        breakdownService.mergeBreakdowns(
-          prev,
-          breakdown,
-          breakdownService.subtractSegments,
-        ),
+        service.mergeBreakdowns(prev, breakdown, service.subtractSegments),
       );
     },
-    [],
+    [service],
   );
 
   useEffect(() => {
     if (globalBreakdown.baseRate !== values.baseRate) {
-      const newGlobalBreakdown = breakdownService.updateBaseRate(
+      const newGlobalBreakdown = service.updateBaseRate(
         values.baseRate,
         globalBreakdown,
       );
       setGlobalBreakdown(newGlobalBreakdown);
     }
-  }, [values.baseRate, globalBreakdown]);
+  }, [values.baseRate, globalBreakdown, service]);
 
   const groupByShabbat = (workDays: WorkDayInfo[]): WorkDayInfo[][] => {
     const groups: WorkDayInfo[][] = [];
@@ -98,13 +94,6 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
       }, 0) + (globalBreakdown.baseRate > 0 ? 1 : 0)
     );
   }, [globalBreakdown.baseRate]);
-
-  // const totalColumns =
-  //   headersTable.reduce((sum, header) => {
-  //     if ("children" in header && Array.isArray(header.children))
-  //       return sum + header.children.length;
-  //     return sum + 1;
-  //   }, 0) + (globalBreakdown.baseRate > 0 ? 1 : 0);
 
   return (
     <>
