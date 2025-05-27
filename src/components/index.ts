@@ -4,3 +4,4 @@ export { ConfigPanel } from "./ConfigPanel";
 
 export { WorkDayRow } from "./WorkDayRow";
 export { PayBreakdownRow } from "./PayBreakdownRow";
+export { Footer } from "./Footer";

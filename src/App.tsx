@@ -1,8 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { CircularProgress, Container, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Stack,
+  Typography,
+} from "@mui/material";
 
-import { WorkTable, ConfigPanel } from "@/components";
+import { WorkTable, ConfigPanel, Footer } from "@/components";
 import { useFetch } from "@/hooks";
 import { service, DateUtils } from "@/utils";
 import { ApiResponse } from "@/domain";
@@ -52,24 +58,27 @@ export const App = () => {
   }, [values.year, values.month]);
 
   return (
-    <Container sx={{ mt: 4, direction: "rtl" }}>
-      <Stack spacing={2} alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h5" gutterBottom>
-          סיכום שעות עבודה
-        </Typography>
-
-        <ConfigPanel values={values} onChange={handleChange} />
-        {error && (
-          <Typography variant="body1" color="error">
-            {error}
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <Container sx={{ mt: 4, direction: "rtl" }}>
+        <Stack spacing={2} alignItems="center" sx={{ mb: 3 }}>
+          <Typography variant="h5" gutterBottom>
+            סיכום שעות עבודה
           </Typography>
-        )}
-        {!eventMap || loading ? (
-          <CircularProgress sx={{ mt: 4 }} />
-        ) : (
-          <WorkTable values={values} eventMap={eventMap} />
-        )}
-      </Stack>
-    </Container>
+
+          <ConfigPanel values={values} onChange={handleChange} />
+          {error && (
+            <Typography variant="body1" color="error">
+              {error}
+            </Typography>
+          )}
+          {!eventMap || loading ? (
+            <CircularProgress sx={{ mt: 4 }} />
+          ) : (
+            <WorkTable values={values} eventMap={eventMap} />
+          )}
+        </Stack>
+      </Container>
+      <Footer />
+    </Box>
   );
 };

@@ -60,6 +60,7 @@ src/
 │   └── react.svg
 ├── components
 │   ├── ConfigPanel.tsx
+│   ├── Footer.tsx
 │   ├── index.ts
 │   ├── MonthlySalarySummary.tsx
 │   ├── PayBreakdownRow.tsx
@@ -73,11 +74,11 @@ src/
 │   ├── index.ts
 │   ├── services
 │   │   ├── breakdown.service.ts
-│   │   ├── calculateBreakdown.service.ts
+│   │   ├── breakdownResolve.service.ts
 │   │   ├── holiday.service.ts
 │   │   ├── paySegmentFactory.service.ts
 │   │   ├── segmentResolver.service.ts
-│   │   └── workDayBreakdown.service.ts
+│   │   └── segments.service.ts
 │   └── types
 │       └── types.ts
 ├── hooks
