@@ -21,6 +21,8 @@ type ConfigPanelProps = {
 };
 
 export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
+  const { year, month, standardHours, baseRate } = values;
+
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth(); // 0-based
 
@@ -39,11 +41,13 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
           <div className="row gx-2">
             <div className="col-6">
               <TextField
+                id="year"
+                name="year"
                 label="שנה"
                 variant="outlined"
                 size="small"
                 type="number"
-                value={values.year}
+                value={year}
                 onChange={(e) => {
                   const parsedYear = Number(e.target.value);
                   if (!isNaN(parsedYear) && parsedYear <= currentYear) {
@@ -55,11 +59,18 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
               />
             </div>
             <div className="col-6">
-              <FormControl size="small" disabled={availableMonths.length === 0}>
-                <InputLabel>חודש</InputLabel>
+              <FormControl
+                size="small"
+                disabled={availableMonths.length === 0}
+                fullWidth
+              >
+                <InputLabel id="month-label-select">חודש</InputLabel>
                 <Select
+                  labelId="month-label-select"
+                  id="month"
+                  name="month"
                   label="חודש"
-                  value={(values.month - 1).toString()}
+                  value={(month - 1).toString()}
                   onChange={(e) =>
                     onChange("month", Number(e.target.value) + 1)
                   } // convert to 1-based
@@ -78,25 +89,35 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
           <div className="row gx-2">
             <div className="col-6">
               <TextField
+                id="standardHours"
+                name="standardHours"
                 label="שעות תקן"
                 variant="outlined"
                 size="small"
                 type="number"
-                value={values.standardHours}
+                value={standardHours}
                 onChange={(e) =>
                   onChange("standardHours", Number(e.target.value))
                 }
+                helperText="ברירת מחדל: 6.67 שעות. מעבר לכך נחשב כשעות נוספות"
                 fullWidth
               />
             </div>
             <div className="col-6">
               <TextField
+                id="baseRate"
+                name="baseRate"
                 label="שכר שעתי"
                 variant="outlined"
                 size="small"
                 type="number"
-                value={values.baseRate}
+                value={baseRate}
                 onChange={(e) => onChange("baseRate", Number(e.target.value))} // use Number to convert to number
+                helperText={
+                  baseRate === 0
+                    ? "יש להזין שכר שעתי להצגת שכר יומי או חודשי"
+                    : " "
+                }
                 fullWidth
               />
             </div>

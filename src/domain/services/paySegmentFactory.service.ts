@@ -2,13 +2,15 @@ import { PaySegment } from "../types/types";
 
 export const paySegmentFactory = ({
   percent,
-  hours = 0,
+  hours,
+  baseRate,
 }: {
   percent: number;
   hours: number;
+  baseRate: number;
 }): PaySegment => ({
   percent,
   hours,
-  getRate: (baseRate: number) => baseRate * percent,
-  getTotal: (baseRate: number) => baseRate * percent * hours,
+  rate: baseRate * percent,
+  total: baseRate * percent * hours,
 });

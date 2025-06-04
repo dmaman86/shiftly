@@ -6,7 +6,7 @@ import { WorkDayStatus } from "@/constants";
 
 interface UseSegmentsProps {
   day: string;
-  onChange?: (segments: Segment[], status: WorkDayStatus) => void;
+  onChange?: (segments: Segment[]) => void;
   initialSegments?: Segment[];
 }
 
@@ -20,9 +20,9 @@ export const useSegments = ({
   const [segments, setSegments] = useState<Segment[]>(initialSegments);
 
   const notifyChange = useCallback(
-    (updated: Segment[], status: WorkDayStatus) => {
+    (updated: Segment[]) => {
       setSegments(updated);
-      if (onChange) onChange(updated, status);
+      if (onChange) onChange(updated);
     },
     [onChange],
   );
@@ -53,41 +53,33 @@ export const useSegments = ({
           ? [...segments, newSegment]
           : [newSegment];
       if (status === WorkDayStatus.normal) setSegments(updated);
-      else notifyChange(updated, status);
+      else notifyChange(updated);
     },
     [day, segments, notifyChange],
   );
 
   const updateSegment = useCallback(
-    (
-      id: string,
-      start: TimeFieldType,
-      end: TimeFieldType,
-      status: WorkDayStatus,
-    ) => {
+    (id: string, start: TimeFieldType, end: TimeFieldType) => {
       const updated = segments.map((segment) =>
         segment.id === id ? { ...segment, start, end } : segment,
       );
 
-      notifyChange(sortSegments(updated), status);
+      notifyChange(sortSegments(updated));
     },
     [segments, notifyChange, sortSegments],
   );
 
   const removeSegment = useCallback(
-    (id: string, status: WorkDayStatus) => {
+    (id: string) => {
       const updated = segments.filter((segment) => segment.id !== id);
-      notifyChange(updated, status);
+      notifyChange(updated);
     },
     [segments, notifyChange],
   );
 
-  const clearSegments = useCallback(
-    (status: WorkDayStatus) => {
-      notifyChange(initialSegments, status);
-    },
-    [notifyChange, initialSegments],
-  );
+  const clearSegments = useCallback(() => {
+    notifyChange(initialSegments);
+  }, [notifyChange, initialSegments]);
 
   return {
     segments,

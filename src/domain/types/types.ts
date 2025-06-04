@@ -14,8 +14,8 @@ export type Segment = {
 export type PaySegment = {
   percent: number;
   hours: number;
-  getRate: (baseRate: number) => number;
-  getTotal: (baseRate: number) => number;
+  rate: number;
+  total: number;
 };
 
 export interface SpecialBreakdown {

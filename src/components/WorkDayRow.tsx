@@ -41,15 +41,10 @@ export const WorkDayRow = ({
   standardHours,
   baseRate,
 }: WorkDayRowProps) => {
-  const {
-    breakdownDay,
-    updateBreakdown,
-    status,
-    setStatus,
-    updateBreakdownRate,
-  } = useBreakdownDay({
+  const { breakdownDay, updateBreakdown, status, setStatus } = useBreakdownDay({
     meta,
     standardHours,
+    baseRate,
     breakdownService: breakdownService(),
     breakdownResolveService: breakdownResolveService(),
   });
@@ -61,7 +56,7 @@ export const WorkDayRow = ({
 
   const handleStatusChange = useCallback(
     (newStatus: WorkDayStatus) => {
-      clearSegments(newStatus);
+      clearSegments();
 
       if (
         newStatus === WorkDayStatus.sick ||
@@ -88,10 +83,6 @@ export const WorkDayRow = ({
 
     prevBreakdownRef.current = breakdownDay;
   }, [breakdownDay]);
-
-  useEffect(() => {
-    if (breakdownDay?.baseRate !== baseRate) updateBreakdownRate(baseRate);
-  }, [baseRate, updateBreakdownRate, breakdownDay]);
 
   const isEditable = status === WorkDayStatus.normal;
   const isSpecialFullDay = meta.typeDay === WorkDayType.SpecialFull;
@@ -168,19 +159,13 @@ export const WorkDayRow = ({
 type SegmentRowProps = {
   segment: Segment;
   status: WorkDayStatus;
-  updateSegment: (
-    id: string,
-    start: TimeFieldType,
-    end: TimeFieldType,
-    status: WorkDayStatus,
-  ) => void;
-  removeSegment: (id: string, status: WorkDayStatus) => void;
+  updateSegment: (id: string, start: TimeFieldType, end: TimeFieldType) => void;
+  removeSegment: (id: string) => void;
   isEditable: boolean;
 };
 
 const SegmentRow = ({
   segment,
-  status,
   updateSegment,
   removeSegment,
   isEditable,
@@ -226,9 +211,8 @@ const SegmentRow = ({
   }, []);
 
   useEffect(() => {
-    if (savedSegment)
-      updateSegment(segment.id, values.start, values.end, status);
-  }, [savedSegment, values, status]);
+    if (savedSegment) updateSegment(segment.id, values.start, values.end);
+  }, [savedSegment, values]);
 
   const crossDay = end.minutes >= 1440;
   const hasError = !crossDay && end.minutes <= start.minutes;
@@ -314,7 +298,7 @@ const SegmentRow = ({
           <Tooltip title="מחק">
             <IconButton
               size="small"
-              onClick={() => removeSegment(segment.id, status)}
+              onClick={() => removeSegment(segment.id)}
               disabled={!isEditable}
             >
               <DeleteIcon fontSize="small" color="error" />

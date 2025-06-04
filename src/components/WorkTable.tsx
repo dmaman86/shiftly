@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import {
   Table,
   TableCell,
@@ -14,12 +14,8 @@ import {
 import { useWorkDays } from "@/hooks";
 import { DateUtils } from "@/utils";
 import { headersTable } from "@/constants";
-import { WorkDayInfo, WorkDayPayMap, breakdownService } from "@/domain";
-import {
-  WorkDayRow,
-  MonthlySalarySummary,
-  PayBreakdownRow,
-} from "@/components";
+import { WorkDayInfo, WorkDayPayMap } from "@/domain";
+import { WorkDayRow, PayBreakdownRow } from "@/components";
 
 type ConfigValues = {
   year: number;
@@ -31,43 +27,19 @@ type ConfigValues = {
 type WorkMonthTableProps = {
   values: ConfigValues;
   eventMap: Record<string, string[]>;
+  globalBreakdown: WorkDayPayMap;
+  addToGlobalBreakdown: (breakdown: WorkDayPayMap) => void;
+  subtractFromGlobalBreakdown: (breakdown: WorkDayPayMap) => void;
 };
 
-export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
+export const WorkTable = ({
+  values,
+  eventMap,
+  globalBreakdown,
+  addToGlobalBreakdown,
+  subtractFromGlobalBreakdown,
+}: WorkMonthTableProps) => {
   const { workDays } = useWorkDays(values.year, values.month, eventMap);
-  const service = breakdownService();
-
-  const [globalBreakdown, setGlobalBreakdown] = useState<WorkDayPayMap>(
-    service.initBreakdown({}),
-  );
-
-  const addToGlobalBreakdown = useCallback(
-    (breakdown: WorkDayPayMap) => {
-      setGlobalBreakdown((prev) =>
-        service.mergeBreakdowns(prev, breakdown, service.sumSegments),
-      );
-    },
-    [service],
-  );
-
-  const subtractFromGlobalBreakdown = useCallback(
-    (breakdown: WorkDayPayMap) => {
-      setGlobalBreakdown((prev) =>
-        service.mergeBreakdowns(prev, breakdown, service.subtractSegments),
-      );
-    },
-    [service],
-  );
-
-  useEffect(() => {
-    if (globalBreakdown.baseRate !== values.baseRate) {
-      const newGlobalBreakdown = service.updateBaseRate(
-        values.baseRate,
-        globalBreakdown,
-      );
-      setGlobalBreakdown(newGlobalBreakdown);
-    }
-  }, [values.baseRate, globalBreakdown, service]);
 
   const groupByShabbat = (workDays: WorkDayInfo[]): WorkDayInfo[][] => {
     const groups: WorkDayInfo[][] = [];
@@ -91,9 +63,9 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
         if ("children" in header && Array.isArray(header.children))
           return sum + header.children.length;
         return sum + 1;
-      }, 0) + (globalBreakdown.baseRate > 0 ? 1 : 0)
+      }, 0) + (values.baseRate > 0 ? 1 : 0)
     );
-  }, [globalBreakdown.baseRate]);
+  }, [values.baseRate]);
 
   return (
     <>
@@ -210,13 +182,6 @@ export const WorkTable = ({ values, eventMap }: WorkMonthTableProps) => {
             </Paper>
           </div>
         </div>
-        {globalBreakdown.baseRate > 0 && (
-          <div className="row">
-            <div className="col-12">
-              <MonthlySalarySummary globalBreakdown={globalBreakdown} />
-            </div>
-          </div>
-        )}
       </div>
     </>
   );
