@@ -37,7 +37,7 @@ export const headersTable = [
   { label: "יום", rowSpan: 2 },
   { label: "", children: ["מחלה", "חופש"] },
   { label: "שעות", rowSpan: 2 },
-  { label: "סה״כ", rowSpan: 2 },
+  { label: "סך שעות", rowSpan: 2 },
   {
     label: "ש״נ",
     children: ["100%", "125%", "150%"],

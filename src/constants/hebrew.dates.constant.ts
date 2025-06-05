@@ -23,7 +23,7 @@ export const PAID_HOLIDAYS = [
   "Shmini Atzeret",
   "Pesach I",
   "Yom HaAtzma’ut",
-  "Shavuot",
+  "Shavuot I",
 ];
 
 export enum Weekend {
