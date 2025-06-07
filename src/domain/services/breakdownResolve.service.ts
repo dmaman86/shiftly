@@ -47,7 +47,7 @@ export const breakdownResolveService = (
     breakdown.regular.hours125.hours = overflow125;
     remaining -= overflow125;
 
-    breakdown.regular.hours100.hours = remaining;
+    if (remaining >= 0) breakdown.regular.hours100.hours = remaining;
     return breakdown;
   };
 
@@ -101,7 +101,8 @@ export const breakdownResolveService = (
       breakdown.totalHours - breakdown.extra100Shabbat.hours;
 
     if (isSpecial) {
-      breakdown.regular.hours150.hours = regularHoursToCalculate;
+      breakdown.regular.hours150.hours =
+        regularHoursToCalculate > 0.02 ? regularHoursToCalculate : 0;
     } else {
       const partialRegular = distributeRegularHours(
         regularHoursToCalculate,

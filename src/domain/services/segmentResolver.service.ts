@@ -24,7 +24,7 @@ export const segmentResolver = (
           key: "hours50",
         },
         {
-          point: { start: min06, end: min17 },
+          point: { start: min06, end: min17 - 1 },
           percent: hours100,
           key: "hours100",
         },
@@ -49,7 +49,7 @@ export const segmentResolver = (
           key: "hours50",
         },
         {
-          point: { start: min06, end: min17 },
+          point: { start: min06, end: min17 - 1 },
           percent: hours100,
           key: "hours100",
         },
