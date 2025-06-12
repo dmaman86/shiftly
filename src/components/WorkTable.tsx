@@ -9,6 +9,7 @@ import {
   Paper,
   TableContainer,
   TableBody,
+  TableFooter,
 } from "@mui/material";
 
 import { useWorkDays } from "@/hooks";
@@ -171,12 +172,24 @@ export const WorkTable = ({
                       </TableRow>
                     </TableBody>
                   ))}
-                  <PayBreakdownRow
-                    breakdown={globalBreakdown}
-                    baseRate={globalBreakdown.baseRate}
-                    isFooter
-                    emptyStartCells={4}
-                  />
+                  <TableFooter>
+                    <TableRow
+                      sx={{
+                        position: "sticky",
+                        bottom: 0,
+                        backgroundColor: "#f0f0f0",
+                        zIndex: 2,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      <PayBreakdownRow
+                        breakdown={globalBreakdown}
+                        baseRate={globalBreakdown.baseRate}
+                        isFooter
+                        emptyStartCells={4}
+                      />
+                    </TableRow>
+                  </TableFooter>
                 </Table>
               </TableContainer>
             </Paper>

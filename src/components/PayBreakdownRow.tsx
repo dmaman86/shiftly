@@ -1,4 +1,4 @@
-import { TableCell, TableFooter, TableRow } from "@mui/material";
+import { TableCell } from "@mui/material";
 
 import { WorkDayPayMap } from "@/domain";
 import { formatValue } from "@/utils";
@@ -20,7 +20,7 @@ export const PayBreakdownRow = ({
 
   const cellSx = isFooter ? undefined : { minWidth: "90px" };
 
-  const cells = (
+  return (
     <>
       {[...Array(emptyStartCells)].map((_, i) => (
         <TableCell key={`empty-${i}`} align="center" />
@@ -64,28 +64,6 @@ export const PayBreakdownRow = ({
         <TableCell sx={cellSx}>
           {salary > 0 ? `₪${formatValue(salary)}` : ""}
         </TableCell>
-      )}
-    </>
-  );
-
-  return (
-    <>
-      {isFooter ? (
-        <TableFooter>
-          <TableRow
-            sx={{
-              position: "sticky",
-              bottom: 0,
-              backgroundColor: "#f0f0f0",
-              zIndex: 2,
-              fontWeight: "bold",
-            }}
-          >
-            {cells}
-          </TableRow>
-        </TableFooter>
-      ) : (
-        cells
       )}
     </>
   );

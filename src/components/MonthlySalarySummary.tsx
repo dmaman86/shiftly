@@ -34,7 +34,6 @@ const buildSalaryRow = (map: Record<string, PaySegment>): SalaryRow[] => {
     total: segment.total,
     rate: segment.rate,
   }));
-  // .filter((row) => row.hours > 0);
 };
 
 export const MonthlySalarySummary = ({

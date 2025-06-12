@@ -59,11 +59,19 @@ src/
 ├── assets
 │   └── react.svg
 ├── components
+|   ├── __tests__
+│   │   ├── ConfigPanel.test.tsx
+│   │   ├── MonthlySalarySummary.test.tsx
+│   │   ├── PayBreakdownRow.test.tsx
+│   │   ├── WorkDayRow.test.tsx
+│   │   ├── SegmentRow.test.tsx
+│   │   └── WorkTable.test.tsx
 │   ├── ConfigPanel.tsx
 │   ├── Footer.tsx
 │   ├── index.ts
 │   ├── MonthlySalarySummary.tsx
 │   ├── PayBreakdownRow.tsx
+│   ├── SegmentRow.tsx
 │   ├── WorkDayRow.tsx
 │   └── WorkTable.tsx
 ├── constants
@@ -73,6 +81,10 @@ src/
 ├── domain
 │   ├── index.ts
 │   ├── services
+│   │   ├── __tests__
+│   │   │   ├── breakdown.service.test.ts
+│   │   │   ├── breakdownResolve.service.test.ts
+│   │   │   └── segmentResolver.service.test.ts
 │   │   ├── breakdown.service.ts
 │   │   ├── breakdownResolve.service.ts
 │   │   ├── holiday.service.ts
