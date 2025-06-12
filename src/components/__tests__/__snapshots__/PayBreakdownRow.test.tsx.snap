@@ -1,0 +1,70 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PayBreakdownRow > matches snapshot 1`] = `
+<div>
+  <table>
+    <tbody>
+      <tr>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-141kssz-MuiTableCell-root"
+        >
+          14.00
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        >
+          5.00
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        >
+          2.00
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        >
+          1.00
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        >
+          1.00
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        >
+          1.00
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        />
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        >
+          1.00
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        >
+          2.00
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        >
+          1.00
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        >
+          1.00
+        </td>
+        <td
+          class="MuiTableCell-root MuiTableCell-sizeMedium css-1tkmip4-MuiTableCell-root"
+        >
+          ₪785.00
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;
