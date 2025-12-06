@@ -5,45 +5,71 @@ export interface TimeFieldType {
   minutes: number;
 }
 
-export type Segment = {
+export type Shift = {
   id: string;
   start: TimeFieldType;
   end: TimeFieldType;
 };
 
-export type PaySegment = {
+export type Segment = {
   percent: number;
   hours: number;
-  rate: number;
-  total: number;
 };
 
-export interface SpecialBreakdown {
-  shabbat150: PaySegment;
-  shabbat200: PaySegment;
-}
-
 export interface RegularBreakdown {
-  hours100: PaySegment;
-  hours125: PaySegment;
-  hours150: PaySegment;
+  hours100: Segment;
+  hours125: Segment;
+  hours150: Segment;
 }
 
 export interface ExtraBreakdown {
-  hours20: PaySegment;
-  hours50: PaySegment;
+  hours20: Segment;
+  hours50: Segment;
 }
 
-export interface WorkDayPayMap {
+export interface SpecialBreakdown {
+  shabbat150: Segment;
+  shabbat200: Segment;
+}
+
+export interface WorkDayMapByShift {
+  id: string;
+  regular: RegularBreakdown,
+  extra: ExtraBreakdown,
+  special: SpecialBreakdown,
+  totalHours: number,
+}
+
+export interface PerDiemInfo {
+  tier: "A" | "B" | "C" | null;
+  points: number;
+  amount: number;
+}
+
+export interface DailyPerDiemInfo {
+  isFieldDutyDay: boolean;
+  diemInfo: PerDiemInfo;
+}
+
+export interface DayShift {
+  id: string;
+  shift: Shift;
+  breakdown: WorkDayMapByShift;
+  perDiemShift: DailyPerDiemInfo;
+}
+
+export interface WorkPayMap {
   regular: RegularBreakdown;
   extra: ExtraBreakdown;
   special: SpecialBreakdown;
-  hours100Sick: PaySegment;
-  hours100Vacation: PaySegment;
-  extra100Shabbat: PaySegment;
+  hours100Sick: Segment;
+  hours100Vacation: Segment;
+  extra100Shabbat: Segment;
   totalHours: number;
   baseRate: number;
-  getTotalPay: () => number;
+  rateDiem: number;
+
+  perDiem: DailyPerDiemInfo;
 }
 
 export interface WorkDayMeta {
@@ -65,7 +91,7 @@ export type SegmentKey =
 export interface LabeledSegmentRange {
   point: Point;
   percent: number;
-  key: SegmentKey;
+  key: string;
 }
 
 export interface WorkDayInfo {
@@ -74,10 +100,9 @@ export interface WorkDayInfo {
 }
 
 export interface WorkDayRowProps {
-  meta: WorkDayMeta;
-  hebrewDay: string;
-  addToGlobalBreakdown: (b: WorkDayPayMap) => void;
-  subtractFromGlobalBreakdown: (b: WorkDayPayMap) => void;
+  date: string;
+  addToGlobalBreakdown: (b: WorkPayMap) => void;
+  subtractFromGlobalBreakdown: (b: WorkPayMap) => void;
   standardHours: number;
   baseRate: number;
 }
@@ -85,4 +110,15 @@ export interface WorkDayRowProps {
 export interface ApiResponse<T = any> {
   data: T | null;
   error: string | null;
+}
+
+export interface WorkDaysState {
+  year: number | null;
+  month: number | null;
+  workDays: WorkDayInfo[];
+}
+
+export interface GlobalBreakdownState {
+  globalBreakdown: WorkPayMap;
+  baseRate: number;
 }

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useMemo } from "react";
 import {
   Table,
   TableCell,
@@ -12,68 +12,31 @@ import {
   TableFooter,
 } from "@mui/material";
 
-import { useWorkDays } from "@/hooks";
-import { DateUtils } from "@/utils";
+import { useGlobalState, useWorkDays } from "@/hooks";
+import { DateUtils, getTotalColumns, groupByShabbat } from "@/utils";
 import { headersTable } from "@/constants";
-import { WorkDayInfo, WorkDayPayMap } from "@/domain";
-import { WorkDayRow, PayBreakdownRow } from "@/components";
+import { PayBreakdownRow, DayRow } from "@/components";
 
-type ConfigValues = {
-  year: number;
-  month: number;
-  baseRate: number;
-  standardHours: number;
-};
+export const WorkTable = () => {
+  const { year, month, baseRate, globalBreakdown } = useGlobalState();
+  const { workDays } = useWorkDays();
 
-type WorkMonthTableProps = {
-  values: ConfigValues;
-  eventMap: Record<string, string[]>;
-  globalBreakdown: WorkDayPayMap;
-  addToGlobalBreakdown: (breakdown: WorkDayPayMap) => void;
-  subtractFromGlobalBreakdown: (breakdown: WorkDayPayMap) => void;
-};
+  const groupByWeeks = useMemo(
+    () => groupByShabbat(workDays),
+    [workDays],
+  );
 
-export const WorkTable = ({
-  values,
-  eventMap,
-  globalBreakdown,
-  addToGlobalBreakdown,
-  subtractFromGlobalBreakdown,
-}: WorkMonthTableProps) => {
-  const { workDays } = useWorkDays(values.year, values.month, eventMap);
-
-  const groupByShabbat = (workDays: WorkDayInfo[]): WorkDayInfo[][] => {
-    const groups: WorkDayInfo[][] = [];
-    let current: WorkDayInfo[] = [];
-
-    for (const day of workDays) {
-      current.push(day);
-      const date = new Date(day.meta.date);
-      if (date.getDay() === 6) {
-        groups.push(current);
-        current = [];
-      }
-    }
-    if (current.length) groups.push(current);
-    return groups;
-  };
-
-  const totalColumns = useCallback(() => {
-    return (
-      headersTable.reduce((sum, header) => {
-        if ("children" in header && Array.isArray(header.children))
-          return sum + header.children.length;
-        return sum + 1;
-      }, 0) + (values.baseRate > 0 ? 1 : 0)
-    );
-  }, [values.baseRate]);
+  const totalColumns = useMemo(
+    () => getTotalColumns(headersTable, baseRate),
+    [baseRate],
+  );
 
   return (
     <>
       <div className="container">
         <div className="row mb-3">
           <Typography variant="h5" textAlign="center" gutterBottom>
-            שעות חודש {DateUtils.getMonth(values.month)} - {values.year}
+            שעות חודש {DateUtils.getMonth(month)} - {year}
           </Typography>
         </div>
         <div className="row mb-3">
@@ -123,7 +86,7 @@ export const WorkTable = ({
                         </TableCell>
                       ))}
 
-                      {globalBreakdown.baseRate > 0 && (
+                      {baseRate > 0 && (
                         <TableCell
                           sx={{
                             fontWeight: "bold",
@@ -146,27 +109,20 @@ export const WorkTable = ({
                               />,
                             ],
                       )}
-                      {globalBreakdown.baseRate > 0 && <TableCell />}
+                      {baseRate > 0 && <TableCell />}
                     </TableRow>
                   </TableHead>
 
-                  {groupByShabbat(workDays).map((group, index) => (
+                  {groupByWeeks.map((group, index) => (
                     <TableBody key={index}>
                       {group.map((day) => (
-                        <WorkDayRow
+                        <DayRow
                           key={day.meta.date}
                           meta={day.meta}
-                          hebrewDay={day.hebrewDay}
-                          addToGlobalBreakdown={addToGlobalBreakdown}
-                          subtractFromGlobalBreakdown={
-                            subtractFromGlobalBreakdown
-                          }
-                          standardHours={values.standardHours}
-                          baseRate={values.baseRate}
                         />
                       ))}
                       <TableRow>
-                        <TableCell colSpan={totalColumns()} sx={{ p: 0 }}>
+                        <TableCell colSpan={totalColumns} sx={{ p: 0 }}>
                           <Box sx={{ height: 2, backgroundColor: "red" }} />
                         </TableCell>
                       </TableRow>
@@ -184,7 +140,6 @@ export const WorkTable = ({
                     >
                       <PayBreakdownRow
                         breakdown={globalBreakdown}
-                        baseRate={globalBreakdown.baseRate}
                         isFooter
                         emptyStartCells={4}
                       />

@@ -15,8 +15,9 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 
-import { PaySegment, WorkDayPayMap } from "@/domain";
 import { formatValue } from "@/utils";
+import { Segment } from "@/domain";
+import { useGlobalState } from "@/hooks";
 
 type SalaryRow = {
   label: string;
@@ -26,35 +27,39 @@ type SalaryRow = {
   rate: number;
 };
 
-const buildSalaryRow = (map: Record<string, PaySegment>): SalaryRow[] => {
-  return Object.entries(map).map(([label, segment]) => ({
-    label,
-    hours: Number(segment.hours.toFixed(2)),
-    percent: segment.percent,
-    total: segment.total,
-    rate: segment.rate,
-  }));
+const buildSalaryRow = (baseRate: number, map: Record<string, Segment>): SalaryRow[] => {
+  return Object.entries(map).map(([label, segment]) => {
+    const rate = baseRate * segment.percent;
+    const total = segment.hours * rate;
+
+    return {
+      label,
+      hours: Number(segment.hours.toFixed(2)),
+      percent: segment.percent,
+      rate,
+      total
+    }
+  })
 };
 
-export const MonthlySalarySummary = ({
-  globalBreakdown,
-}: {
-  globalBreakdown: WorkDayPayMap;
-}) => {
+export const MonthlySalarySummary = () => {
+  const { globalBreakdown, baseRate } = useGlobalState
+  ();
   const [editMode, setEditMode] = useState<boolean>(false);
 
   const [baseRows, setBaseRows] = useState<SalaryRow[]>([]);
   const [extraRows, setExtraRows] = useState<SalaryRow[]>([]);
+  const [perDiemRow, setPerDiemRow] = useState<SalaryRow | null>(null);
 
   useEffect(() => {
-    const baseMap: Record<string, PaySegment> = {
+    const baseMap: Record<string, Segment> = {
       "100%": globalBreakdown.regular.hours100,
       "שבת תוספת 100%": globalBreakdown.extra100Shabbat,
       מחלה: globalBreakdown.hours100Sick,
       חופש: globalBreakdown.hours100Vacation,
     };
 
-    const extraMap: Record<string, PaySegment> = {
+    const extraMap: Record<string, Segment> = {
       "תוספת לילה (50%)": globalBreakdown.extra.hours50,
       "150%": globalBreakdown.regular.hours150,
       "125%": globalBreakdown.regular.hours125,
@@ -63,14 +68,22 @@ export const MonthlySalarySummary = ({
       "תוספת ערב (20%)": globalBreakdown.extra.hours20,
     };
 
-    setBaseRows(buildSalaryRow(baseMap));
-    setExtraRows(buildSalaryRow(extraMap));
+    setPerDiemRow({
+      label: "אש״ל",
+      hours: 0,
+      percent: 0,
+      rate: globalBreakdown.rateDiem,
+      total: globalBreakdown.perDiem?.diemInfo?.amount || 0,
+    })
+
+    setBaseRows(buildSalaryRow(baseRate, baseMap));
+    setExtraRows(buildSalaryRow(baseRate, extraMap));
   }, [globalBreakdown]);
 
   const calculateTotal = (rows: SalaryRow[]): number =>
     rows.reduce((sum, row) => sum + row.total, 0);
 
-  const monthlySalary = calculateTotal(baseRows) + calculateTotal(extraRows);
+  const monthlySalary = calculateTotal(baseRows) + calculateTotal(extraRows) + (perDiemRow?.total || 0);
 
   const toggleEditMode = () => setEditMode((prev) => !prev);
 
@@ -101,16 +114,9 @@ export const MonthlySalarySummary = ({
                   }}
                   onChange={(e) => {
                     const newHours = Number(e.target.value);
-                    if (!isNaN(newHours)) {
-                      const updateRow = {
-                        ...row,
-                        hours: newHours,
-                        total: newHours * row.rate,
-                      };
-                      setter((prev) =>
-                        prev.map((r, i) => (i === index ? updateRow : r)),
-                      );
-                    }
+                    if(isNaN(newHours) || newHours < 0) return;
+                    const newTotal = newHours * row.rate;
+                    setter(prev => prev.map((r, i) => i === index ? { ...r, hours: newHours, total: newTotal } : r));
                   }}
                 />
               ) : (
@@ -180,6 +186,28 @@ export const MonthlySalarySummary = ({
                   <TableBody>
                     {renderSection(baseRows, "סה״כ 100%", setBaseRows)}
                     {renderSection(extraRows, "סה״כ תוספות", setExtraRows)}
+
+                    <TableRow>
+                      <TableCell>{perDiemRow?.label}</TableCell>
+                      <TableCell>{globalBreakdown.perDiem?.diemInfo?.points}</TableCell>
+                      <TableCell>₪{formatValue(perDiemRow?.rate || 0)}</TableCell>
+                      <TableCell>
+                        {perDiemRow && perDiemRow.total > 0
+                          ? `₪${formatValue(perDiemRow.total)}`
+                          : ""}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
+                      <TableCell />
+                      <TableCell />
+                      <TableCell />
+                      <TableCell>סה״כ אש״ל</TableCell>
+                      <TableCell>
+                        {perDiemRow && perDiemRow.total > 0
+                          ? `₪${formatValue(perDiemRow.total)}`
+                          : ""}
+                      </TableCell>
+                    </TableRow>
 
                     <TableRow
                       sx={{ backgroundColor: "#e0e0e0", fontWeight: "bold" }}

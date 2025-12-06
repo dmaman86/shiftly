@@ -7,32 +7,32 @@ import {
   TextField,
 } from "@mui/material";
 import { DateUtils } from "@/utils";
+import { useGlobalState } from "@/hooks";
 
-type ConfigValues = {
-  year: number;
-  month: number;
-  baseRate: number;
-  standardHours: number;
-};
 
-type ConfigPanelProps = {
-  values: ConfigValues;
-  onChange: (field: keyof ConfigValues, value: number) => void;
-};
-
-export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
-  const { year, month, standardHours, baseRate } = values;
+export const ConfigPanel = () => {
+  
+  const {
+    year,
+    month,
+    standardHours,
+    baseRate,
+    updateYear,
+    updateMonth,
+    updateStandardHours,
+    updateBaseRate,
+  } = useGlobalState();
 
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth(); // 0-based
 
   const availableMonths = useMemo(() => {
-    if (values.year < currentYear)
+    if (year < currentYear)
       return Array.from({ length: 12 }, (_, i) => i);
-    if (values.year === currentYear)
+    if (year === currentYear)
       return Array.from({ length: currentMonth + 1 }, (_, i) => i);
     return [];
-  }, [values.year, currentYear, currentMonth]);
+  }, [year, currentYear, currentMonth]);
 
   return (
     <div className="container">
@@ -51,8 +51,8 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
                 onChange={(e) => {
                   const parsedYear = Number(e.target.value);
                   if (!isNaN(parsedYear) && parsedYear <= currentYear) {
-                    onChange("year", parsedYear);
-                    onChange("month", 1); // reset month when year changes
+                    updateYear(parsedYear);
+                    updateMonth(1); // reset month to January
                   }
                 }}
                 fullWidth
@@ -72,7 +72,7 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
                   label="חודש"
                   value={(month - 1).toString()}
                   onChange={(e) =>
-                    onChange("month", Number(e.target.value) + 1)
+                    updateMonth(Number(e.target.value) + 1)
                   } // convert to 1-based
                 >
                   {availableMonths.map((m) => (
@@ -97,7 +97,7 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
                 type="number"
                 value={standardHours}
                 onChange={(e) =>
-                  onChange("standardHours", Number(e.target.value))
+                  updateStandardHours(Number(e.target.value))
                 }
                 helperText="ברירת מחדל: 6.67 שעות. מעבר לכך נחשב כשעות נוספות"
                 fullWidth
@@ -112,7 +112,7 @@ export const ConfigPanel = ({ values, onChange }: ConfigPanelProps) => {
                 size="small"
                 type="number"
                 value={baseRate}
-                onChange={(e) => onChange("baseRate", Number(e.target.value))} // use Number to convert to number
+                onChange={(e) => updateBaseRate(Number(e.target.value))} // use Number to convert to number
                 helperText={
                   baseRate === 0
                     ? "יש להזין שכר שעתי להצגת שכר יומי או חודשי"

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 
@@ -8,94 +8,44 @@ import {
   Footer,
   MonthlySalarySummary,
 } from "@/components";
-import { useFetch } from "@/hooks";
+import { useFetch, useGlobalState, useWorkDays } from "@/hooks";
 import { service, DateUtils } from "@/utils";
-import { ApiResponse, breakdownService, WorkDayPayMap } from "@/domain";
+import { ApiResponse } from "@/domain";
 import { buildEventMap } from "@/adapters";
 
 export const App = () => {
-  const {
-    initBreakdown,
-    mergeBreakdowns,
-    sumSegments,
-    subtractSegments,
-    updateBaseRate,
-  } = breakdownService();
+  const { 
+    year,
+    month,
+    globalBreakdown,
+    reset
+  } = useGlobalState();
 
-  const [values, setValues] = useState({
-    year: new Date().getFullYear(),
-    month: new Date().getMonth() + 1, // 1-based
-    baseRate: 0,
-    standardHours: 6.67,
-  });
+  const { workDays, generate } = useWorkDays();
 
-  const [globalBreakdown, setGlobalBreakdown] = useState<WorkDayPayMap>(
-    initBreakdown({}),
-  );
-
-  const [eventMap, setEventMap] = useState<Record<string, string[]> | null>(
-    null,
-  );
   const [error, setError] = useState<string | null>(null);
 
   const { loading, callEndPoint } = useFetch();
 
-  const handleChange = useCallback(
-    (field: keyof typeof values, value: number) => {
-      setValues((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
-    },
-    [],
-  );
-
-  const addToGlobalBreakdown = useCallback(
-    (breakdown: WorkDayPayMap) => {
-      setGlobalBreakdown((prev) =>
-        mergeBreakdowns(prev, breakdown, sumSegments),
-      );
-    },
-    [mergeBreakdowns, sumSegments],
-  );
-
-  const subtractFromGlobalBreakdown = useCallback(
-    (breakdown: WorkDayPayMap) => {
-      setGlobalBreakdown((prev) =>
-        mergeBreakdowns(prev, breakdown, subtractSegments),
-      );
-    },
-    [mergeBreakdowns, subtractSegments],
-  );
-
-  useEffect(() => {
-    if (globalBreakdown.baseRate !== values.baseRate) {
-      const newGlobalBreakdown = updateBaseRate(
-        values.baseRate,
-        globalBreakdown,
-      );
-      setGlobalBreakdown(newGlobalBreakdown);
-    }
-  }, [values.baseRate, globalBreakdown, updateBaseRate]);
-
   useEffect(() => {
     const loadEvents = async () => {
-      const { startDate, endDate } = DateUtils.getDatesRange(
-        values.year,
-        values.month,
-      );
+      const { startDate, endDate } = DateUtils.getDatesRange(year, month);
+
       const { data, error }: ApiResponse<Record<string, string[]>> =
         await callEndPoint<Record<string, string[]>>(
           service.getData(startDate, endDate),
           buildEventMap,
         );
-      setEventMap(data);
+      // setEventMap(data);
+      if(data) {
+        generate(year, month, data);
+        reset();
+      }
       setError(error);
-      setGlobalBreakdown(initBreakdown({}));
     };
 
     loadEvents();
-  }, [values.year, values.month]);
+  }, [year, month]);
 
   return (
     <Box
@@ -113,7 +63,7 @@ export const App = () => {
         </Box>
 
         <Box>
-          <ConfigPanel values={values} onChange={handleChange} />
+          <ConfigPanel />
           {error && (
             <Typography variant="body1" color="error">
               {error}
@@ -122,22 +72,16 @@ export const App = () => {
         </Box>
 
         <Box>
-          {!eventMap || loading ? (
+          { !workDays.length || loading ? (
             <CircularProgress sx={{ mt: 4 }} />
           ) : (
-            <WorkTable
-              values={values}
-              eventMap={eventMap}
-              globalBreakdown={globalBreakdown}
-              addToGlobalBreakdown={addToGlobalBreakdown}
-              subtractFromGlobalBreakdown={subtractFromGlobalBreakdown}
-            />
+            <WorkTable />
           )}
         </Box>
 
         {globalBreakdown.baseRate > 0 && (
           <Box>
-            <MonthlySalarySummary globalBreakdown={globalBreakdown} />
+            <MonthlySalarySummary />
           </Box>
         )}
       </Stack>

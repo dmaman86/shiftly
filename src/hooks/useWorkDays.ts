@@ -1,39 +1,50 @@
-import { useEffect, useState } from "react";
-import { WorkDayInfo, resolveHolidayType } from "@/domain";
+import { useDispatch, useSelector } from "react-redux";
+
+import { generateWorkDays } from "@/redux/states/workDaysSlice";
+import { AppDispatch, RootState } from "@/redux/store";
 import { WorkDayType } from "@/constants";
-import { DateUtils } from "@/utils";
 
-export const useWorkDays = (
-  year: number,
-  month: number,
-  eventMap: Record<string, string[]>,
-) => {
-  const [workDays, setWorkDays] = useState<WorkDayInfo[]>([]);
+export const useWorkDays = () => {
+  const dispatch = useDispatch<AppDispatch>();
 
-  useEffect(() => {
-    setWorkDays([]); // Reset work days when year or month changes
-  }, [year, month]);
+  // core array of WorkDayInfo
+  const workDays = useSelector((state: RootState) => state.workDays.workDays);
 
-  useEffect(() => {
-    if (!Object.keys(eventMap).length || workDays.length) return;
+  const generate = (year: number, month: number, eventMap: Record<string, string[]>) => {
+    dispatch(generateWorkDays({ year, month, eventMap }));
+  }
 
-    const days: WorkDayInfo[] = DateUtils.generateWorkDays(
-      year,
-      month,
-      eventMap,
-    );
+  const getDayInfo = (date: string) => workDays.find(d => d.meta.date === date);
+  
+  const isSpecialFullDay = (date: string) => {
+    const day = getDayInfo(date);
+    return day ? day.meta.typeDay === WorkDayType.SpecialFull : false;
+  }
 
-    const nextMonthDay = DateUtils.getNextMonthDay(year, month);
-    const nextDayEvents = eventMap[DateUtils.formatDate(nextMonthDay)] || [];
-    const nextDayType = resolveHolidayType(
-      nextMonthDay.getDay(),
-      nextDayEvents,
-    );
-    days[days.length - 1].meta.crossDayContinuation =
-      nextDayType === WorkDayType.SpecialFull;
+  const isPartialHolidayDay = (date: string) => {
+    const day = getDayInfo(date);
+    return day ? day.meta.typeDay === WorkDayType.SpecialPartialStart : false;
+  }
 
-    setWorkDays(days);
-  }, [eventMap, year, month, workDays]);
+  const isCrossDaySpecial = (date: string) => {
+    const day = getDayInfo(date);
+    return day ? day.meta.crossDayContinuation === true : false;
+  }
 
-  return { workDays };
-};
+  const getHebrewDay = (date: string) => {
+    const day = getDayInfo(date);
+    const hebrewDay = day?.hebrewDay || "";
+    const day_number = new Date(date).toLocaleDateString("he-IL", { day: "2-digit" });
+    return `${hebrewDay}-${day_number}`;
+  }
+
+  return {
+    workDays,
+    generate,
+    getDayInfo,
+    isSpecialFullDay,
+    isPartialHolidayDay,
+    isCrossDaySpecial,
+    getHebrewDay,
+  };
+}
