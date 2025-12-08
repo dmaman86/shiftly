@@ -27,6 +27,13 @@ type SalaryRow = {
   rate: number;
 };
 
+type PerDiemRow = {
+  label: string;
+  points: number;
+  rate: number;
+  total: number;
+}
+
 const buildSalaryRow = (baseRate: number, map: Record<string, Segment>): SalaryRow[] => {
   return Object.entries(map).map(([label, segment]) => {
     const rate = baseRate * segment.percent;
@@ -49,7 +56,7 @@ export const MonthlySalarySummary = () => {
 
   const [baseRows, setBaseRows] = useState<SalaryRow[]>([]);
   const [extraRows, setExtraRows] = useState<SalaryRow[]>([]);
-  const [perDiemRow, setPerDiemRow] = useState<SalaryRow | null>(null);
+  const [perDiemRow, setPerDiemRow] = useState<PerDiemRow | null>(null);
 
   useEffect(() => {
     const baseMap: Record<string, Segment> = {
@@ -70,8 +77,7 @@ export const MonthlySalarySummary = () => {
 
     setPerDiemRow({
       label: "אש״ל",
-      hours: 0,
-      percent: 0,
+      points: globalBreakdown.perDiem?.diemInfo?.points || 0,
       rate: globalBreakdown.rateDiem,
       total: globalBreakdown.perDiem?.diemInfo?.amount || 0,
     })
@@ -189,7 +195,29 @@ export const MonthlySalarySummary = () => {
 
                     <TableRow>
                       <TableCell>{perDiemRow?.label}</TableCell>
-                      <TableCell>{globalBreakdown.perDiem?.diemInfo?.points}</TableCell>
+                      <TableCell>
+                        {editMode ? (
+                          <TextField 
+                            type="number"
+                            size="small"
+                            value={perDiemRow?.points || 0}
+                            variant="standard"
+                            onChange={(e) => {
+                              const newPoints = Number(e.target.value);
+                              if(isNaN(newPoints) || newPoints < 0) return;
+                              setPerDiemRow(prev => prev ? {
+                                ...prev,
+                                points: newPoints,
+                                total: newPoints * prev.rate
+                              }
+                              : prev
+                              )
+                            }}
+                          />
+                        ): (
+                          formatValue(perDiemRow?.points || 0)
+                        )}
+                      </TableCell>
                       <TableCell>₪{formatValue(perDiemRow?.rate || 0)}</TableCell>
                       <TableCell>
                         {perDiemRow && perDiemRow.total > 0

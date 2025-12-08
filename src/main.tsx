@@ -12,6 +12,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import { App } from "./App.tsx";
 import store from './redux/store';
+import { DomainProvider } from "@/context";
 
 const jss = create({ plugins: [...jssPreset().plugins, rtl()] });
 
@@ -23,12 +24,14 @@ const root = createRoot(divRoot!);
 root.render(
   <StrictMode>
     <Provider store={store}>
-      <StylesProvider jss={jss}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <App />
-        </ThemeProvider>
-      </StylesProvider>
+      <DomainProvider>
+        <StylesProvider jss={jss}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <App />
+          </ThemeProvider>
+        </StylesProvider>
+      </DomainProvider>
     </Provider>
   </StrictMode>,
 );

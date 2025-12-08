@@ -6,7 +6,7 @@ export const store = configureStore({
     reducer: {
         workDays: workDaysReducer,
         global: globalReducer,
-    },
+    }
 });
 
 export type RootState = ReturnType<typeof store.getState>;

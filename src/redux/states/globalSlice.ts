@@ -1,5 +1,7 @@
-import { WorkPayMap, workPayMapService, PerDiemService } from "@/domain";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+import { WorkPayMap } from "@/domain";
+import { domain } from "@/context/domain.singleton";
 
 interface GlobalState {
     year: number;
@@ -11,11 +13,15 @@ interface GlobalState {
     globalBreakdown: WorkPayMap;
 }
 
+const { factories, builders } = domain;
+const { perDiemService } = factories;
+const workPayMapService = builders.workPayMapBuilderService;
+
 const now = new Date();
 const initialYear = now.getFullYear();
 const initialMonth = now.getMonth() + 1;
 
-const initialRateDiem = PerDiemService.getRateForDate(initialYear, initialMonth);
+const initialRateDiem = perDiemService.getRateForDate(initialYear, initialMonth);
 
 const initialState: GlobalState = {
     year: initialYear,
@@ -24,7 +30,7 @@ const initialState: GlobalState = {
     baseRate: 0,
     rateDiem: initialRateDiem,
     dailyBreakdowns: {},
-    globalBreakdown: workPayMapService.init(0, initialRateDiem),
+    globalBreakdown: workPayMapService.create(0, initialRateDiem).build(),
 };
 
 const recalcAllDays = (
@@ -47,15 +53,17 @@ const recalcAllDays = (
 };
 
 const recalcGlobal = (daily: Record<string, WorkPayMap>, baseRate: number, rateDiem: number): WorkPayMap => {
-  return Object.values(daily).reduce(
-    (acc, d) => workPayMapService.accumulateDaily(acc, d),
-    workPayMapService.init(baseRate, rateDiem)
-  );
+  const builder = workPayMapService.create(baseRate, rateDiem);
+
+  Object.values(daily).forEach(day => {
+    builder.addDay(day);
+  });
+  return builder.build();
 };
 
 const resetMonthData = (state: GlobalState) => {
   state.dailyBreakdowns = {};
-  state.globalBreakdown = workPayMapService.init(state.baseRate, state.rateDiem);
+  state.globalBreakdown = workPayMapService.create(state.baseRate, state.rateDiem).build();
 };
 
 export const globalSlice = createSlice({
@@ -67,14 +75,14 @@ export const globalSlice = createSlice({
 
       // reset month to 1 if needed
       if (state.month > 12) state.month = 1;
-      state.rateDiem = PerDiemService.getRateForDate(state.year, state.month);
+      state.rateDiem = perDiemService.getRateForDate(state.year, state.month);
 
       resetMonthData(state);
     },
 
     setMonth: (state, action: PayloadAction<number>) => {
       state.month = action.payload;
-      state.rateDiem = PerDiemService.getRateForDate(state.year, state.month);
+      state.rateDiem = perDiemService.getRateForDate(state.year, state.month);
 
       resetMonthData(state);
     },

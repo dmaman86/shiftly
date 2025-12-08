@@ -20,14 +20,17 @@ import { WorkDayStatus } from "@/constants";
 import { PayBreakdownRow } from "./PayBreakdownRow";
 import { ShiftRow } from "./ShiftRow";
 import { DateUtils } from "@/utils";
+import { DomainContextType } from "@/context";
 
 type DayRowProps = {
+    domain: DomainContextType;
     meta: WorkDayMeta;
 };
 
-export const DayRow = ({ meta }: DayRowProps) => {
+export const DayRow = ({ domain, meta }: DayRowProps) => {
     const { standardHours, baseRate, updateBreakdownForDay, globalBreakdown } = useGlobalState();
     const { isSpecialFullDay, getHebrewDay } = useWorkDays();
+    const { createDateWithTime } = DateUtils();
     
     const { status,
         setStatus,
@@ -37,7 +40,7 @@ export const DayRow = ({ meta }: DayRowProps) => {
         addShift,
         updateShift,
         removeShift,
-     } = useDay({ meta, standardHours, baseRate, rateDiem: globalBreakdown.rateDiem });
+     } = useDay({ domain, meta, standardHours, baseRate, rateDiem: globalBreakdown.rateDiem });
 
     const specialFullDay = isSpecialFullDay(meta.date);
     const isEditable = status === WorkDayStatus.normal;
@@ -50,11 +53,11 @@ export const DayRow = ({ meta }: DayRowProps) => {
     const handleAddShift = useCallback(() => {
         if(status !== WorkDayStatus.normal) return;
         const id = uuidv4();
-        const time = DateUtils.createDateWithTime(meta.date);
+        const time = createDateWithTime(meta.date);
         const start: TimeFieldType = { date: time, minutes: 0 };
         const end: TimeFieldType = { date: time, minutes: 0 };
         addShift({ id, start, end });
-    }, [status, meta.date, addShift]);
+    }, [status, meta.date, addShift, createDateWithTime]);
 
     useEffect(() => {
         updateBreakdownForDay(meta.date, payMap);
@@ -108,6 +111,7 @@ export const DayRow = ({ meta }: DayRowProps) => {
                                                     {shiftList.map((item, index) => (
                                                         <React.Fragment key={item.id}>
                                                             <ShiftRow
+                                                                domain={domain}
                                                                 shift={item.shift}
                                                                 meta={meta}
                                                                 standardHours={standardHours}

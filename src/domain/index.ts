@@ -1,11 +1,13 @@
 export * from "./types/types";
 
-export { resolveHolidayType } from "./services/holiday.service";
-export { shiftResolver } from "./services/shiftResolver.service";
+export { createGenericBreakdownFactory } from "./services/factories/genericBreakdown.service";
+export { createRegularService } from "./services/factories/regular.service";
+export { createPerDiemService } from "./services/factories/perDiem.service";
 
-export { workPayMapService } from "./services/workPayMap.service";
+export { createShiftResolverService } from "./services/resolvers/shiftResolver.service";
+export { createHolidayResolverService } from "./services/resolvers/holidayResolver.service";
 
-export { distributeRegularHours } from "./services/distributeRegularHours.service";
-export { buildShiftMap } from "./services/buildShiftMap.service";
+export { createShiftMapBuilderService } from "./services/builders/shiftMapBuilder.service";
+export { createWorkPayMapBuilderService } from "./services/builders/workPayMapBuilder.service";
 
-export { PerDiemService } from "./services/perDiem.service";
+

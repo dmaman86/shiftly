@@ -3,7 +3,7 @@ import { AxiosResponse } from "axios";
 import { ApiResponse } from "@/domain";
 
 interface AxiosCall {
-  call: Promise<AxiosResponse>;
+  call: () => Promise<AxiosResponse>;
   controller?: AbortController;
 }
 
@@ -20,9 +20,11 @@ export const useFetch = () => {
     if (axiosCall.controller) controller = axiosCall.controller;
     setLoading(true);
     try {
-      const result = await axiosCall.call;
+      const result = await axiosCall.call();
       const rawItems: { date: string; title: string }[] = result.data.items;
+      
       response.data = adapter ? adapter(rawItems) : (rawItems as T);
+    
     } catch (err: any) {
       response.error = err?.message ?? "שגיאה לא צפויה. אנא נסה שוב";
     } finally {

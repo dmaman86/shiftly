@@ -3,68 +3,77 @@ import { useCallback, useEffect, useState } from "react";
 import { WorkDayStatus } from "@/constants";
 import { DayShift, 
         Shift, 
-        buildShiftMap, 
         WorkDayMeta, 
         WorkPayMap, 
-        workPayMapService  
     } from "@/domain";
+import { useList } from "./useList";
+import { DomainContextType } from "@/context/DomainProvider";
 
 
 type UseDayProps = {
+    domain: DomainContextType;
     meta: WorkDayMeta;
     standardHours: number;
     baseRate: number;
     rateDiem: number;
 };
 
-export const useDay = ({ meta, standardHours, baseRate, rateDiem }: UseDayProps) => {
-    const [shiftList, setShiftList] = useState<DayShift[]>([]);
+export const useDay = ({ domain, meta, standardHours, baseRate, rateDiem }: UseDayProps) => {
+    
+    const builders = domain.builders;
+    const { shiftMapBuilderService, workPayMapBuilderService } = builders;
+
+    const { 
+        items: shiftList,
+        setItems: setShiftList,
+        addItem,
+        updateItem,
+        removeItem
+     } = useList<DayShift>();
+    
     const [status, setStatus] = useState<WorkDayStatus>(WorkDayStatus.normal);
 
-    const [payMap, setPayMap] = useState<WorkPayMap>(() => 
-        workPayMapService.init(baseRate, rateDiem)
-);
+    const [payMap, setPayMap] = useState<WorkPayMap>(() =>
+        workPayMapBuilderService.create(baseRate, rateDiem).build()
+    );
 
     const addShift = useCallback((shift: Shift) => {
-        const dayShift = buildShiftMap.buildDayShift(
-            shift,
+        const dayShift = shiftMapBuilderService.create(
             meta,
             standardHours,
-            false,
             rateDiem
-        );
-        setShiftList((prev) => [...prev, dayShift]);
-    }, [meta, standardHours, rateDiem]);
+        ).withShift(shift)
+        .buildDayShift(false, rateDiem);
+
+        addItem(dayShift);
+    }, [meta, standardHours, rateDiem, addItem, shiftMapBuilderService]);
 
     const updateShift = useCallback((id: string, fullShift: DayShift) => {
-        setShiftList(prev =>
-            prev.map(s => (s.id === id ? fullShift : s))
-        );
-    }, []);
+        updateItem(id, fullShift);
+    }, [updateItem]);
 
     const removeShift = useCallback((id: string) => {
-        setShiftList(prev => prev.filter(s => s.id !== id));
-    }, []);
+        removeItem(id);
+    }, [removeItem]);
 
-    useEffect(() => {
+    useEffect(() => {        
         setShiftList(prev =>
             prev.map(s =>
-                buildShiftMap.buildDayShift(
-                    s.shift,
+                shiftMapBuilderService.create(
                     meta,
                     standardHours,
-                    s.perDiemShift.isFieldDutyDay, // keep duty per shift
                     rateDiem
-                )
+                ).withShift(s.shift)
+                .buildDayShift(s.perDiemShift.isFieldDutyDay, rateDiem)
             )
         );
-    }, [standardHours, rateDiem, meta]);
+    }, [standardHours, rateDiem, meta, setShiftList, shiftMapBuilderService]);
 
     useEffect(() => {
         // Sick / vacation override shifts
         if (status !== WorkDayStatus.normal) {
 
-            const dayMap = workPayMapService.init(baseRate, rateDiem);
+            const dayMap = workPayMapBuilderService.create(baseRate, rateDiem).build();
 
             setPayMap({
                 ...dayMap,
@@ -86,7 +95,7 @@ export const useDay = ({ meta, standardHours, baseRate, rateDiem }: UseDayProps)
             return;
         }
 
-        let dayMap = workPayMapService.buildFromShifts(
+        let dayMap = workPayMapBuilderService.buildFromShifts(
             shiftList,
             standardHours,
             baseRate,
@@ -94,7 +103,7 @@ export const useDay = ({ meta, standardHours, baseRate, rateDiem }: UseDayProps)
         );
 
         // Recalculate day-level Ashlam (per diem)
-        dayMap = workPayMapService.recalculateDay(
+        dayMap = workPayMapBuilderService.recalculateDay(
             dayMap,
             standardHours,
             baseRate,
@@ -107,6 +116,7 @@ export const useDay = ({ meta, standardHours, baseRate, rateDiem }: UseDayProps)
         standardHours,
         baseRate,
         rateDiem,
+        workPayMapBuilderService,
   ]);
 
     return {

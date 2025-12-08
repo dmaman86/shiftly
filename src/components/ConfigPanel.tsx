@@ -26,6 +26,8 @@ export const ConfigPanel = () => {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth(); // 0-based
 
+  const { monthNames } = DateUtils();
+
   const availableMonths = useMemo(() => {
     if (year < currentYear)
       return Array.from({ length: 12 }, (_, i) => i);
@@ -77,7 +79,7 @@ export const ConfigPanel = () => {
                 >
                   {availableMonths.map((m) => (
                     <MenuItem key={m} value={m}>
-                      {DateUtils.monthNames[m]}
+                      {monthNames[m]}
                     </MenuItem>
                   ))}
                 </Select>

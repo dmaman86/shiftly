@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { generateWorkDays } from "@/redux/states/workDaysSlice";
 import { AppDispatch, RootState } from "@/redux/store";
+import { buildWorkDays } from "@/redux/states/workDaysSlice";
 import { WorkDayType } from "@/constants";
 
 export const useWorkDays = () => {
@@ -11,7 +11,7 @@ export const useWorkDays = () => {
   const workDays = useSelector((state: RootState) => state.workDays.workDays);
 
   const generate = (year: number, month: number, eventMap: Record<string, string[]>) => {
-    dispatch(generateWorkDays({ year, month, eventMap }));
+    dispatch(buildWorkDays({ year, month, eventMap }));
   }
 
   const getDayInfo = (date: string) => workDays.find(d => d.meta.date === date);

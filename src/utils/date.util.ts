@@ -1,9 +1,8 @@
 import { format } from "date-fns";
 
-import { hebrewDays, monthNames, WorkDayType } from "@/constants";
-import { WorkDayInfo, resolveHolidayType } from "@/domain";
+import { hebrewDays, monthNames } from "@/constants";
 
-export const DateUtils = (() => {
+export const DateUtils = () => {
   const formatDate = (date: Date): string => format(date, "yyyy-MM-dd");
 
   const getHebrewDayLetter = (date: Date): string => hebrewDays[date.getDay()];
@@ -26,42 +25,6 @@ export const DateUtils = (() => {
     const start = new Date(year, month - 1, 1);
     const end = getNextMonthDay(year, month);
     return { startDate: formatDate(start), endDate: formatDate(end) };
-  };
-
-  const generateWorkDays = (
-    year: number,
-    month: number,
-    eventMap: Record<string, string[]>,
-  ): WorkDayInfo[] => {
-    const daysInMonth = getDaysInMonth(year, month);
-    const days: WorkDayInfo[] = [];
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      const currentDate = new Date(year, month - 1, day);
-      const formattedDate = formatDate(currentDate);
-      const weekday = currentDate.getDay();
-      const hebrewDay = getHebrewDayLetter(currentDate);
-      const eventTitles = eventMap[formattedDate] || [];
-
-      const currentType = resolveHolidayType(weekday, eventTitles);
-
-      const row: WorkDayInfo = {
-        meta: {
-          date: formattedDate,
-          typeDay: currentType,
-          crossDayContinuation: false,
-        },
-        hebrewDay,
-      };
-
-      days[day - 1] = row;
-
-      if (day > 1) {
-        days[day - 2].meta.crossDayContinuation =
-          currentType === WorkDayType.SpecialFull;
-      }
-    }
-    return days;
   };
 
   const getSpecialStartMinutes = (date: string): number => {
@@ -94,9 +57,8 @@ export const DateUtils = (() => {
     getDaysInMonth,
     getMonth,
     getDatesRange,
-    generateWorkDays,
     getSpecialStartMinutes,
     dayOfMonth,
     createDateWithTime,
   };
-})();
+};

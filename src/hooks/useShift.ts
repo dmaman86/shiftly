@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Shift, 
         TimeFieldType, 
-        buildShiftMap,
         WorkDayMeta, 
         DayShift,
  } from "@/domain";
+import { DomainContextType } from "@/context";
 
 
 type ShiftProps = {
+    domain: DomainContextType;
     id: string;
     shift: Shift;
     meta: WorkDayMeta;
@@ -18,7 +19,9 @@ type ShiftProps = {
     onShiftUpdate: (id: string, fullShift: DayShift) => void;
 };
 
-export const useShift = ({ id, shift, meta, standardHours, rateDiem, isDuty, onShiftUpdate }: ShiftProps) => {
+export const useShift = ({ domain, id, shift, meta, standardHours, rateDiem, isDuty, onShiftUpdate }: ShiftProps) => {
+    const { shiftMapBuilderService } = domain.builders;
+    
     const [localShift, setLocalShift] = useState<Shift>(shift);
 
     const [fullShift, setFullShift] = useState<DayShift | null>(null);
@@ -29,15 +32,13 @@ export const useShift = ({ id, shift, meta, standardHours, rateDiem, isDuty, onS
 
     
     useEffect(() => {
-        const built = buildShiftMap.buildDayShift(
-            localShift,
-            meta,
-            standardHours,
-            isDuty,
-            rateDiem
-        );
+
+        const built = shiftMapBuilderService.create(meta, standardHours, rateDiem)
+            .withShift(localShift)
+            .buildDayShift(isDuty, rateDiem);
+
         setFullShift(built);
-    }, [localShift, meta, standardHours, isDuty, rateDiem]);
+    }, [localShift, meta, standardHours, isDuty, rateDiem, shiftMapBuilderService]);
 
 
     const commit = useCallback(() => {

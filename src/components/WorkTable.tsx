@@ -16,10 +16,12 @@ import { useGlobalState, useWorkDays } from "@/hooks";
 import { DateUtils, getTotalColumns, groupByShabbat } from "@/utils";
 import { headersTable } from "@/constants";
 import { PayBreakdownRow, DayRow } from "@/components";
+import { DomainContextType } from "@/context";
 
-export const WorkTable = () => {
+export const WorkTable = ({ domain }: { domain: DomainContextType }) => {
   const { year, month, baseRate, globalBreakdown } = useGlobalState();
   const { workDays } = useWorkDays();
+  const { getMonth } = DateUtils();
 
   const groupByWeeks = useMemo(
     () => groupByShabbat(workDays),
@@ -36,7 +38,7 @@ export const WorkTable = () => {
       <div className="container">
         <div className="row mb-3">
           <Typography variant="h5" textAlign="center" gutterBottom>
-            שעות חודש {DateUtils.getMonth(month)} - {year}
+            שעות חודש {getMonth(month)} - {year}
           </Typography>
         </div>
         <div className="row mb-3">
@@ -117,6 +119,7 @@ export const WorkTable = () => {
                     <TableBody key={index}>
                       {group.map((day) => (
                         <DayRow
+                          domain={domain}
                           key={day.meta.date}
                           meta={day.meta}
                         />

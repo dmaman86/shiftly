@@ -1,91 +1,18 @@
-import { useEffect, useState } from "react";
+import { Box, CircularProgress } from "@mui/material";
 
-import { Box, CircularProgress, Stack, Typography } from "@mui/material";
-
-import {
-  WorkTable,
-  ConfigPanel,
-  Footer,
-  MonthlySalarySummary,
-} from "@/components";
-import { useFetch, useGlobalState, useWorkDays } from "@/hooks";
-import { service, DateUtils } from "@/utils";
-import { ApiResponse } from "@/domain";
-import { buildEventMap } from "@/adapters";
+import { AppContent } from "@/components";
+import { useDomain } from "./context";
 
 export const App = () => {
-  const { 
-    year,
-    month,
-    globalBreakdown,
-    reset
-  } = useGlobalState();
+  const domain = useDomain();
 
-  const { workDays, generate } = useWorkDays();
+  if(!domain) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+        <CircularProgress />
+      </Box>
+    )
+  }
 
-  const [error, setError] = useState<string | null>(null);
-
-  const { loading, callEndPoint } = useFetch();
-
-  useEffect(() => {
-    const loadEvents = async () => {
-      const { startDate, endDate } = DateUtils.getDatesRange(year, month);
-
-      const { data, error }: ApiResponse<Record<string, string[]>> =
-        await callEndPoint<Record<string, string[]>>(
-          service.getData(startDate, endDate),
-          buildEventMap,
-        );
-      // setEventMap(data);
-      if(data) {
-        generate(year, month, data);
-        reset();
-      }
-      setError(error);
-    };
-
-    loadEvents();
-  }, [year, month]);
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-      }}
-    >
-      <Stack spacing={3} sx={{ direction: "rtl" }}>
-        <Box>
-          <Typography variant="h5" textAlign="center">
-            סיכום שעות עבודה
-          </Typography>
-        </Box>
-
-        <Box>
-          <ConfigPanel />
-          {error && (
-            <Typography variant="body1" color="error">
-              {error}
-            </Typography>
-          )}
-        </Box>
-
-        <Box>
-          { !workDays.length || loading ? (
-            <CircularProgress sx={{ mt: 4 }} />
-          ) : (
-            <WorkTable />
-          )}
-        </Box>
-
-        {globalBreakdown.baseRate > 0 && (
-          <Box>
-            <MonthlySalarySummary />
-          </Box>
-        )}
-      </Stack>
-      <Footer />
-    </Box>
-  );
+  return <AppContent domain={domain} />;
 };

@@ -11,8 +11,10 @@ import { addMinutes } from "date-fns";
 import { minutesToTimeStr } from "@/utils";
 import { DayShift, Shift, TimeFieldType, WorkDayMeta } from "@/domain";
 import { useShift } from "@/hooks";
+import { DomainContextType } from "@/context";
 
 type ShiftRowProps = {
+    domain: DomainContextType;
     shift: Shift;
     meta: WorkDayMeta;
     standardHours: number;
@@ -23,12 +25,13 @@ type ShiftRowProps = {
     onRemove: (id: string) => void;
 };
 
-export const ShiftRow = ({ shift, meta, standardHours, rateDiem, isEditable, onShiftUpdate, onRemove }: ShiftRowProps) => {
+export const ShiftRow = ({ domain, shift, meta, standardHours, rateDiem, isEditable, onShiftUpdate, onRemove }: ShiftRowProps) => {
   
     const [isDuty, setIsDuty] = useState<boolean>(false);
     const [saved, setSaved] = useState<boolean>(false);
 
     const { localShift, update, commit } = useShift({
+        domain,
         id: shift.id,
         shift,
         meta,

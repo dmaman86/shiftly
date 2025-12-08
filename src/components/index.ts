@@ -1,3 +1,5 @@
+export { AppContent } from "./AppContent";
+
 export { WorkTable } from "./WorkTable";
 export { MonthlySalarySummary } from "./MonthlySalarySummary";
 export { ConfigPanel } from "./ConfigPanel";

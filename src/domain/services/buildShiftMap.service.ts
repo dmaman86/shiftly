@@ -3,9 +3,9 @@ import {
   fieldShiftPercent as defaultFieldShiftPercent,
   WorkDayType,
 } from "@/constants";
-import { shiftResolver } from "./shiftResolver.service";
+import { shiftResolver } from "./resolvers/shiftResolver.service";
 import { distributeRegularHours } from "./distributeRegularHours.service";
-import { PerDiemService } from "./perDiem.service";
+import { createPerDiemService } from "./factories/perDiem.service";
 
 export const buildShiftMap = ((resolver, fieldShiftPercent, distributor, perDiemService) => {
     const sumHours = (key: string, shiftRaw: LabeledSegmentRange[]) => 
@@ -89,4 +89,4 @@ export const buildShiftMap = ((resolver, fieldShiftPercent, distributor, perDiem
         buildDayShift,
     }
     
-})(shiftResolver, defaultFieldShiftPercent, distributeRegularHours, PerDiemService);
+})(shiftResolver, defaultFieldShiftPercent, distributeRegularHours, createPerDiemService());
