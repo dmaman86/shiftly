@@ -2,39 +2,113 @@
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Online-blue)](https://dmaman86.github.io/shiftly/)
 
-**Shiftly** is an advanced work-hour tracking tool that calculates wages based on complex Israeli labor laws, including overtime, night bonuses, and special day rates (Shabbat, holidays, Friday evenings). Built with **React** and **TypeScript**, it provides a visual and editable breakdown for each workday.
+**Shiftly** is a salary and shift calculation application built with **React + TypeScript**, designed to accurately compute monthly pay based on daily shifts, special days, per-diem rules, and complex labor regulations.
+
+The project focuses not only on correctness, but on **clear domain modeling, clean architecture, and long-term maintainability**.
+
+---
 
 ## Features
 
-- Track start and end time for each work shift
-- Auto-calculates:
-  - Base hours (100%)
-  - Overtime:
-    - First standard hours (default: 6.67h) at 100%
-    - Next 2 hours at 125%
-    - Any additional hours at 150%
-    - `standardHours` is configurable in the salary settings panel
-  - Evening bonus (20%)
-  - Night bonus (50%)
-  - Shabbat and holiday pay:
-    - Friday/Holiday Eve night: 150% + 100%
-    - Saturday/Holiday: 150% + 100% or 200% + 100% depending on time
-- Manual adjustments to breakdown
-- Monthly summary based on base hourly rate
+- Shift-based salary calculation
 - Support for:
-  - Sick/Vacation days (non-workable)
-  - Cross-day shifts
-  - Winter/Summer time cutoffs
-- Holiday support via [Hebcal API](https://www.hebcal.com/home/developer-apis)
-- RTL layout support for Hebrew
+  - Regular workdays
+  - Partial special days (e.g. Fridays, holiday eves)
+  - Full special days (Shabbat, holidays)
+- **Holiday detection via Hebcal API**
+  - Automatic resolution of Jewish holidays
+  - Differentiation between full and partial special days
+- Sick days & vacation days
+- Cross-day shifts
+- Per-diem calculation with historical rate timeline
+- Monthly aggregated breakdown
+- Incremental recalculation (add / update / remove shifts)
+- Fully reactive UI
+
+---
+
+## Architecture Overview
+
+Shiftly follows a **Clean Architecture–inspired design**, separating business logic from UI and state management.
+
+### Layers
+
+- **Domain**
+  - Builders
+  - Calculators
+  - Reducers
+  - Resolvers
+  - Factories
+- **Adapters**
+  - Convert domain objects to UI-friendly view models
+- **Redux**
+  - Global and monthly state aggregation
+- **Hooks**
+  - Thin orchestration layer between UI and domain
+- **UI Components**
+  - Pure presentation logic
+
+---
 
 ## Tech Stack
 
-- **Frontend**: React + TypeScript + Vite
-- **UI**: Material UI (MUI) + Bootstrap
-- **HTTP Client**: Axios
-- **State Management**: React Hooks
-- **Logic & Utilities**: Modularized business logic and segment breakdown utilities
+- React
+- TypeScript
+- Redux Toolkit
+- MUI (Material UI)
+- Vite
+- Hebcal API
+
+---
+
+## Domain Concepts
+
+### Builders
+
+Responsible for constructing complex structures:
+
+- `ShiftMapBuilder`
+- `DayPayMapBuilder`
+- `WorkDaysForMonthBuilder`
+
+### Calculators
+
+Pure calculation logic:
+
+- Regular hours calculators (by shift / by day)
+- Extra & special segment calculators
+- Per-diem calculators (shift, day, month)
+
+### Reducers
+
+Accumulate and subtract breakdowns:
+
+- Monthly pay map reducer
+- Regular hours accumulator
+
+### Resolvers
+
+Decision logic based on time, date, and rules:
+
+- Holiday resolver (Hebcal)
+- Shift segment resolver
+- Per-diem rate resolver (timeline-based)
+
+---
+
+## State Management
+
+- **Redux Toolkit** manages global state
+- Monthly totals are updated incrementally
+- No full recomputation on every change
+- Deterministic add / subtract logic
+
+Key slices:
+
+- `workDaysSlice`
+- `globalSlice`
+
+---
 
 ## Getting Started
 
@@ -49,67 +123,48 @@ npm run dev
 
 Visit `http://localhost:5173/shiftly` in your browser.
 
-## Project Structure
+---
+
+## Project Structure (Simplified)
 
 ```plaintext
 src/
-├── adapters
-│   ├── event.adapter.ts
-│   └── index.ts
-├── assets
-│   └── react.svg
-├── components
-|   ├── __tests__
-│   │   ├── ConfigPanel.test.tsx
-│   │   ├── MonthlySalarySummary.test.tsx
-│   │   ├── PayBreakdownRow.test.tsx
-│   │   ├── WorkDayRow.test.tsx
-│   │   ├── SegmentRow.test.tsx
-│   │   └── WorkTable.test.tsx
-│   ├── ConfigPanel.tsx
-│   ├── Footer.tsx
-│   ├── index.ts
-│   ├── MonthlySalarySummary.tsx
-│   ├── PayBreakdownRow.tsx
-│   ├── SegmentRow.tsx
-│   ├── WorkDayRow.tsx
-│   └── WorkTable.tsx
-├── constants
-│   ├── fields.constant.ts
-│   ├── hebrew.dates.constant.ts
-│   └── index.ts
-├── domain
-│   ├── index.ts
-│   ├── services
-│   │   ├── __tests__
-│   │   │   ├── breakdown.service.test.ts
-│   │   │   ├── breakdownResolve.service.test.ts
-│   │   │   └── segmentResolver.service.test.ts
-│   │   ├── breakdown.service.ts
-│   │   ├── breakdownResolve.service.ts
-│   │   ├── holiday.service.ts
-│   │   ├── paySegmentFactory.service.ts
-│   │   ├── segmentResolver.service.ts
-│   │   └── segments.service.ts
-│   └── types
-│       └── types.ts
-├── hooks
-│   ├── index.ts
-│   ├── useBreakdownDay.ts
-│   ├── useFetch.ts
-│   ├── useSegments.ts
-│   └── useWorkDays.ts
-├── utils
-│   ├── date.util.ts
-│   ├── helpers.util.ts
-│   ├── index.ts
-│   └── service.util.ts
-├── App.css
-├── App.tsx
-├── index.css
-├── main.tsx
-└── vite-env.d.ts
+├── domain/
+│ ├── builder/
+│ ├── calculator/
+│ ├── reducer/
+│ ├── resolver/
+│ ├── factory/
+│ └── types/
+├── adapters/
+├── hooks/
+├── redux/
+├── components/
+└── utils/
 ```
+
+---
+
+## Why This Architecture?
+
+This architecture was chosen to handle:
+
+- Complex salary rules
+- Cross-day logic
+- Multiple aggregation levels (shift → day → month)
+- Clear separation between calculation and presentation
+
+It allows the project to scale **without turning into a “logic soup”** inside React components or Redux reducers.
+
+---
+
+## Notes
+
+- All percentages are normalized (e.g. `1`, `1.5`, `2`, `0.2`)
+- Domain logic is framework-agnostic
+- UI reacts to data, not business rules
+
+---
 
 ## UI Behavior Overview
 
@@ -147,6 +202,8 @@ src/
 
 **Monthly Summary**
 ![Monthly Summary](./public/monthly-summary.png)
+
+---
 
 ## License
 

@@ -1,4 +1,4 @@
-import { WorkDayInfo, WorkPayMap } from "@/domain";
+import { PayBreakdownViewModel, WorkDayInfo } from "@/domain";
 
 export const minutesToTimeStr = (minutes: number): string => {
   const clean = minutes % (24 * 60);
@@ -43,7 +43,10 @@ export const getTotalColumns = (headers: any[], baseRate: number) => {
   return base + (baseRate > 0 ? 1 : 0);
 };
 
-export const computeTotalPay = (workPayMap: WorkPayMap): number => {
+export const computeTotalPay = (
+  workPayMap: PayBreakdownViewModel,
+  baseRate: number,
+): number => {
   const all = [
     ...Object.values(workPayMap.regular),
     ...Object.values(workPayMap.extra),
@@ -53,13 +56,10 @@ export const computeTotalPay = (workPayMap: WorkPayMap): number => {
     workPayMap.extra100Shabbat,
   ];
 
-  const basePay = workPayMap.baseRate > 0
-    ? all.reduce(
-        (sum, seg) => sum + seg.hours * seg.percent * workPayMap.baseRate,
-        0,
-      )
-    : 0;
-
-  const perDiemAmount = workPayMap.perDiem?.diemInfo?.amount ?? 0;
+  const basePay =
+    baseRate > 0
+      ? all.reduce((sum, seg) => sum + seg.hours * seg.percent * baseRate, 0)
+      : 0;
+  const perDiemAmount = workPayMap.perDiemAmount;
   return basePay + perDiemAmount;
 };

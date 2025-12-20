@@ -12,21 +12,24 @@ import {
   TableFooter,
 } from "@mui/material";
 
-import { useGlobalState, useWorkDays } from "@/hooks";
-import { DateUtils, getTotalColumns, groupByShabbat } from "@/utils";
+import { useGlobalState } from "@/hooks";
+import { getTotalColumns, groupByShabbat } from "@/utils";
 import { headersTable } from "@/constants";
 import { PayBreakdownRow, DayRow } from "@/components";
 import { DomainContextType } from "@/context";
+import { monthToPayBreakdownVM } from "@/adapters";
+import { WorkDayInfo } from "@/domain";
 
-export const WorkTable = ({ domain }: { domain: DomainContextType }) => {
+type WorkTableProps = {
+  domain: DomainContextType;
+  workDays: WorkDayInfo[];
+};
+
+export const WorkTable = ({ domain, workDays }: WorkTableProps) => {
   const { year, month, baseRate, globalBreakdown } = useGlobalState();
-  const { workDays } = useWorkDays();
-  const { getMonth } = DateUtils();
+  const { monthResolver } = domain.resolvers;
 
-  const groupByWeeks = useMemo(
-    () => groupByShabbat(workDays),
-    [workDays],
-  );
+  const groupByWeeks = useMemo(() => groupByShabbat(workDays), [workDays]);
 
   const totalColumns = useMemo(
     () => getTotalColumns(headersTable, baseRate),
@@ -38,7 +41,7 @@ export const WorkTable = ({ domain }: { domain: DomainContextType }) => {
       <div className="container">
         <div className="row mb-3">
           <Typography variant="h5" textAlign="center" gutterBottom>
-            שעות חודש {getMonth(month)} - {year}
+            שעות חודש {monthResolver.getMonthName(month - 1)} - {year}
           </Typography>
         </div>
         <div className="row mb-3">
@@ -121,7 +124,7 @@ export const WorkTable = ({ domain }: { domain: DomainContextType }) => {
                         <DayRow
                           domain={domain}
                           key={day.meta.date}
-                          meta={day.meta}
+                          workDay={day}
                         />
                       ))}
                       <TableRow>
@@ -142,7 +145,8 @@ export const WorkTable = ({ domain }: { domain: DomainContextType }) => {
                       }}
                     >
                       <PayBreakdownRow
-                        breakdown={globalBreakdown}
+                        breakdown={monthToPayBreakdownVM(globalBreakdown)}
+                        baseRate={baseRate}
                         isFooter
                         emptyStartCells={4}
                       />

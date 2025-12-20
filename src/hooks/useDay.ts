@@ -1,134 +1,93 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { WorkDayStatus } from "@/constants";
-import { DayShift, 
-        Shift, 
-        WorkDayMeta, 
-        WorkPayMap, 
-    } from "@/domain";
-import { useList } from "./useList";
+import { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
 import { DomainContextType } from "@/context/DomainProvider";
 
-
 type UseDayProps = {
-    domain: DomainContextType;
-    meta: WorkDayMeta;
-    standardHours: number;
-    baseRate: number;
-    rateDiem: number;
+  domain: DomainContextType;
+  meta: WorkDayMeta;
+  standardHours: number;
+  year: number;
+  month: number;
 };
 
-export const useDay = ({ domain, meta, standardHours, baseRate, rateDiem }: UseDayProps) => {
-    
-    const builders = domain.builders;
-    const { shiftMapBuilderService, workPayMapBuilderService } = builders;
+type ShiftEntry = {
+  shift: Shift;
+  payMap: ShiftPayMap | null;
+};
 
-    const { 
-        items: shiftList,
-        setItems: setShiftList,
-        addItem,
-        updateItem,
-        removeItem
-     } = useList<DayShift>();
-    
-    const [status, setStatus] = useState<WorkDayStatus>(WorkDayStatus.normal);
+type ShiftEntries = Record<string, ShiftEntry>;
 
-    const [payMap, setPayMap] = useState<WorkPayMap>(() =>
-        workPayMapBuilderService.create(baseRate, rateDiem).build()
-    );
+export const useDay = ({
+  domain,
+  meta,
+  standardHours,
+  year,
+  month,
+}: UseDayProps) => {
+  const daymapBuilder = domain.payMap.dayPayMapBuilder;
 
-    const addShift = useCallback((shift: Shift) => {
-        const dayShift = shiftMapBuilderService.create(
-            meta,
-            standardHours,
-            rateDiem
-        ).withShift(shift)
-        .buildDayShift(false, rateDiem);
+  const [shiftEntries, setShiftEntries] = useState<ShiftEntries>({});
 
-        addItem(dayShift);
-    }, [meta, standardHours, rateDiem, addItem, shiftMapBuilderService]);
+  const [status, setStatus] = useState<WorkDayStatus>(WorkDayStatus.normal);
 
-    const updateShift = useCallback((id: string, fullShift: DayShift) => {
-        updateItem(id, fullShift);
-    }, [updateItem]);
+  const addShift = useCallback(
+    (shift: Shift) => {
+      setShiftEntries((prev) => ({
+        ...prev,
+        [shift.id]: { shift, payMap: null },
+      }));
+    },
+    [setShiftEntries],
+  );
 
-    const removeShift = useCallback((id: string) => {
-        removeItem(id);
-    }, [removeItem]);
+  const updateShift = useCallback(
+    (shift: Shift, payMap: ShiftPayMap) => {
+      setShiftEntries((prev) => ({
+        ...prev,
+        [shift.id]: { shift, payMap },
+      }));
+    },
+    [setShiftEntries],
+  );
 
-    useEffect(() => {        
-        setShiftList(prev =>
-            prev.map(s =>
-                shiftMapBuilderService.create(
-                    meta,
-                    standardHours,
-                    rateDiem
-                ).withShift(s.shift)
-                .buildDayShift(s.perDiemShift.isFieldDutyDay, rateDiem)
-            )
-        );
-    }, [standardHours, rateDiem, meta, setShiftList, shiftMapBuilderService]);
+  const removeShift = useCallback(
+    (id: string) => {
+      setShiftEntries((prev) => {
+        const copy = { ...prev };
+        delete copy[id];
+        return copy;
+      });
+    },
+    [setShiftEntries],
+  );
 
-    useEffect(() => {
-        // Sick / vacation override shifts
-        if (status !== WorkDayStatus.normal) {
+  const dayPayMap = useMemo(() => {
+    const payMaps = Object.values(shiftEntries)
+      .map((entry) => entry.payMap)
+      .filter((pm): pm is ShiftPayMap => pm !== null);
 
-            const dayMap = workPayMapBuilderService.create(baseRate, rateDiem).build();
+    return daymapBuilder.build({
+      shifts: payMaps,
+      status,
+      meta,
+      standardHours,
+      year,
+      month,
+    });
+  }, [shiftEntries, status, meta, standardHours, year, month, daymapBuilder]);
 
-            setPayMap({
-                ...dayMap,
-                totalHours: standardHours,
-                hours100Sick: {
-                    ...dayMap.hours100Sick,
-                    hours: status === WorkDayStatus.sick ? standardHours : 0,
-                },
-                hours100Vacation: {
-                    ...dayMap.hours100Vacation,
-                    hours: status === WorkDayStatus.vacation ? standardHours : 0,
-                },
-                perDiem: {
-                    isFieldDutyDay: false,
-                    diemInfo: { tier: null, points: 0, amount: 0 },
-                },
-            });
+  return {
+    status,
+    setStatus,
 
-            return;
-        }
+    dayPayMap,
+    shiftEntries,
+    setShiftEntries,
 
-        let dayMap = workPayMapBuilderService.buildFromShifts(
-            shiftList,
-            standardHours,
-            baseRate,
-            rateDiem
-        );
-
-        // Recalculate day-level Ashlam (per diem)
-        dayMap = workPayMapBuilderService.recalculateDay(
-            dayMap,
-            standardHours,
-            baseRate,
-        );
-
-        setPayMap(dayMap);
-    }, [
-        shiftList,
-        status,
-        standardHours,
-        baseRate,
-        rateDiem,
-        workPayMapBuilderService,
-  ]);
-
-    return {
-        status,
-        setStatus,
-
-        payMap,
-        shiftList,
-        setShiftList,
-
-        addShift,
-        updateShift,
-        removeShift
-    }
+    addShift,
+    updateShift,
+    removeShift,
+  };
 };

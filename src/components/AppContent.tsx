@@ -14,15 +14,9 @@ import { ApiResponse } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/context";
 
-
 export const AppContent = ({ domain }: { domain: DomainContextType }) => {
-
-    const { 
-    year,
-    month,
-    globalBreakdown,
-    reset
-  } = useGlobalState();
+  const call = service();
+  const { year, month, baseRate, reset } = useGlobalState();
 
   const { getDatesRange } = DateUtils();
   const { workDays, generate } = useWorkDays();
@@ -37,11 +31,11 @@ export const AppContent = ({ domain }: { domain: DomainContextType }) => {
 
       const { data, error }: ApiResponse<Record<string, string[]>> =
         await callEndPoint<Record<string, string[]>>(
-          service().getData(startDate, endDate),
+          call.getData(startDate, endDate),
           buildEventMap,
         );
       // setEventMap(data);
-      if(data) {
+      if (data) {
         generate(year, month, data);
         reset();
       }
@@ -49,7 +43,7 @@ export const AppContent = ({ domain }: { domain: DomainContextType }) => {
     };
 
     loadEvents();
-  }, [year, month, domain]);
+  }, [year, month]);
 
   return (
     <Box
@@ -67,7 +61,7 @@ export const AppContent = ({ domain }: { domain: DomainContextType }) => {
         </Box>
 
         <Box>
-          <ConfigPanel />
+          <ConfigPanel domain={domain} />
           {error && (
             <Typography variant="body1" color="error">
               {error}
@@ -76,20 +70,20 @@ export const AppContent = ({ domain }: { domain: DomainContextType }) => {
         </Box>
 
         <Box>
-          { !workDays.length || loading ? (
+          {!workDays.length || loading ? (
             <CircularProgress sx={{ mt: 4 }} />
           ) : (
-            <WorkTable domain={domain} />
+            <WorkTable domain={domain} workDays={workDays} />
           )}
         </Box>
 
-        {globalBreakdown.baseRate > 0 && (
+        {baseRate > 0 && (
           <Box>
-            <MonthlySalarySummary />
+            <MonthlySalarySummary domain={domain} />
           </Box>
         )}
       </Stack>
       <Footer />
     </Box>
   );
-}
+};

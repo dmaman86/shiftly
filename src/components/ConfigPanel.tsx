@@ -6,12 +6,10 @@ import {
   Select,
   TextField,
 } from "@mui/material";
-import { DateUtils } from "@/utils";
 import { useGlobalState } from "@/hooks";
+import { DomainContextType } from "@/context";
 
-
-export const ConfigPanel = () => {
-  
+export const ConfigPanel = ({ domain }: { domain: DomainContextType }) => {
   const {
     year,
     month,
@@ -23,18 +21,11 @@ export const ConfigPanel = () => {
     updateBaseRate,
   } = useGlobalState();
 
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth(); // 0-based
+  const { monthResolver } = domain.resolvers;
 
-  const { monthNames } = DateUtils();
-
-  const availableMonths = useMemo(() => {
-    if (year < currentYear)
-      return Array.from({ length: 12 }, (_, i) => i);
-    if (year === currentYear)
-      return Array.from({ length: currentMonth + 1 }, (_, i) => i);
-    return [];
-  }, [year, currentYear, currentMonth]);
+  const availableMonths: { value: number; label: string }[] = useMemo(() => {
+    return monthResolver.getAvailableMonthOptions(year);
+  }, [year, monthResolver]);
 
   return (
     <div className="container">
@@ -52,7 +43,10 @@ export const ConfigPanel = () => {
                 value={year}
                 onChange={(e) => {
                   const parsedYear = Number(e.target.value);
-                  if (!isNaN(parsedYear) && parsedYear <= currentYear) {
+                  if (
+                    !isNaN(parsedYear) &&
+                    parsedYear <= monthResolver.getCurrentYear()
+                  ) {
                     updateYear(parsedYear);
                     updateMonth(1); // reset month to January
                   }
@@ -73,15 +67,15 @@ export const ConfigPanel = () => {
                   name="month"
                   label="חודש"
                   value={(month - 1).toString()}
-                  onChange={(e) =>
-                    updateMonth(Number(e.target.value) + 1)
-                  } // convert to 1-based
+                  onChange={(e) => updateMonth(Number(e.target.value) + 1)} // convert to 1-based
                 >
-                  {availableMonths.map((m) => (
-                    <MenuItem key={m} value={m}>
-                      {monthNames[m]}
-                    </MenuItem>
-                  ))}
+                  {availableMonths.map(
+                    (m: { value: number; label: string }) => (
+                      <MenuItem key={m.value} value={m.value}>
+                        {m.label}
+                      </MenuItem>
+                    ),
+                  )}
                 </Select>
               </FormControl>
             </div>
@@ -98,9 +92,7 @@ export const ConfigPanel = () => {
                 size="small"
                 type="number"
                 value={standardHours}
-                onChange={(e) =>
-                  updateStandardHours(Number(e.target.value))
-                }
+                onChange={(e) => updateStandardHours(Number(e.target.value))}
                 helperText="ברירת מחדל: 6.67 שעות. מעבר לכך נחשב כשעות נוספות"
                 fullWidth
               />

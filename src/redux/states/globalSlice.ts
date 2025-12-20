@@ -1,69 +1,38 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { WorkPayMap } from "@/domain";
-import { domain } from "@/context/domain.singleton";
+import { MonthPayMap, WorkDayMap } from "@/domain";
+import { domain } from "@/context";
 
 interface GlobalState {
-    year: number;
-    month: number;
+  config: {
     standardHours: number;
     baseRate: number;
-    rateDiem: number;
-    dailyBreakdowns: Record<string, WorkPayMap>;
-    globalBreakdown: WorkPayMap;
+    year: number;
+    month: number;
+  };
+  dailyPayMaps: Record<string, WorkDayMap>;
+  globalBreakdown: MonthPayMap;
 }
 
-const { factories, builders } = domain;
-const { perDiemService } = factories;
-const workPayMapService = builders.workPayMapBuilderService;
-
+const { payMap } = domain;
 const now = new Date();
 const initialYear = now.getFullYear();
 const initialMonth = now.getMonth() + 1;
 
-const initialRateDiem = perDiemService.getRateForDate(initialYear, initialMonth);
-
 const initialState: GlobalState = {
-    year: initialYear,
-    month: initialMonth,
+  config: {
     standardHours: 6.67,
     baseRate: 0,
-    rateDiem: initialRateDiem,
-    dailyBreakdowns: {},
-    globalBreakdown: workPayMapService.create(0, initialRateDiem).build(),
-};
-
-const recalcAllDays = (
-  daily: Record<string, WorkPayMap>, 
-  standardHours: number, 
-  baseRate: number
-): Record<string, WorkPayMap> => {
-  const updated: Record<string, WorkPayMap> = {};
-
-  Object.entries(daily).forEach(([dateKey, map]) => {
-
-    updated[dateKey] = workPayMapService.recalculateDay(
-      map, 
-      standardHours, 
-      baseRate, 
-    );
-  });
-  
-  return updated;
-};
-
-const recalcGlobal = (daily: Record<string, WorkPayMap>, baseRate: number, rateDiem: number): WorkPayMap => {
-  const builder = workPayMapService.create(baseRate, rateDiem);
-
-  Object.values(daily).forEach(day => {
-    builder.addDay(day);
-  });
-  return builder.build();
+    year: initialYear,
+    month: initialMonth,
+  },
+  dailyPayMaps: {},
+  globalBreakdown: payMap.monthPayMapCalculator.createEmpty(),
 };
 
 const resetMonthData = (state: GlobalState) => {
-  state.dailyBreakdowns = {};
-  state.globalBreakdown = workPayMapService.create(state.baseRate, state.rateDiem).build();
+  state.globalBreakdown = payMap.monthPayMapCalculator.createEmpty();
+  state.dailyPayMaps = {};
 };
 
 export const globalSlice = createSlice({
@@ -71,71 +40,70 @@ export const globalSlice = createSlice({
   initialState,
   reducers: {
     setYear: (state, action: PayloadAction<number>) => {
-      state.year = action.payload;
-
-      // reset month to 1 if needed
-      if (state.month > 12) state.month = 1;
-      state.rateDiem = perDiemService.getRateForDate(state.year, state.month);
-
+      state.config.year = action.payload;
+      if (state.config.month > 12) state.config.month = 1;
       resetMonthData(state);
     },
-
     setMonth: (state, action: PayloadAction<number>) => {
-      state.month = action.payload;
-      state.rateDiem = perDiemService.getRateForDate(state.year, state.month);
-
+      state.config.month = action.payload;
       resetMonthData(state);
     },
-
     setStandardHours: (state, action: PayloadAction<number>) => {
-      state.standardHours = action.payload;
-
-      state.dailyBreakdowns = recalcAllDays(state.dailyBreakdowns, state.standardHours, state.baseRate);
-      state.globalBreakdown = recalcGlobal(state.dailyBreakdowns, state.baseRate, state.rateDiem);
+      state.config.standardHours = action.payload;
     },
 
     setBaseRate: (state, action: PayloadAction<number>) => {
-      state.baseRate = action.payload;
-
-      state.dailyBreakdowns = recalcAllDays(state.dailyBreakdowns, state.standardHours, state.baseRate);
-      state.globalBreakdown = recalcGlobal(state.dailyBreakdowns, state.baseRate, state.rateDiem);
+      state.config.baseRate = action.payload;
     },
 
-    updateDayBreakdown: (
+    addDayPayMap: (
       state,
-      action: PayloadAction<{ date: string; map: WorkPayMap }>
+      action: PayloadAction<{ dateKey: string; dayPayMap: WorkDayMap }>,
     ) => {
-      const { date, map } = action.payload;
+      const { dateKey, dayPayMap } = action.payload;
+      const prev = state.dailyPayMaps[dateKey];
 
-      state.dailyBreakdowns[date] = {
-        ...map,
-        baseRate: state.baseRate,
-        perDiem: {
-          ...map.perDiem,
-          isFieldDutyDay: map.perDiem.isFieldDutyDay,
-        }
-      };
+      if (prev) {
+        state.globalBreakdown = payMap.monthPayMapCalculator.subtract(
+          state.globalBreakdown,
+          prev,
+        );
+      }
 
-      state.globalBreakdown = recalcGlobal(state.dailyBreakdowns, state.baseRate, state.rateDiem);
+      state.globalBreakdown = payMap.monthPayMapCalculator.accumulate(
+        state.globalBreakdown,
+        dayPayMap,
+      );
+
+      state.dailyPayMaps[dateKey] = dayPayMap;
     },
 
-    updateBreakdown: (state, action: PayloadAction<WorkPayMap>) => {
-        state.globalBreakdown = action.payload;
+    removeDayPayMap: (state, action: PayloadAction<string>) => {
+      const dateKey = action.payload;
+      const prev = state.dailyPayMaps[dateKey];
+
+      if (!prev) return;
+
+      state.globalBreakdown = payMap.monthPayMapCalculator.subtract(
+        state.globalBreakdown,
+        prev,
+      );
+      delete state.dailyPayMaps[dateKey];
     },
 
     resetGlobal: (state) => {
-        resetMonthData(state);
+      resetMonthData(state);
     },
   },
 });
 
-export const { 
-    setYear,
-    setMonth,
-    setStandardHours,
-    setBaseRate,
-    updateDayBreakdown,
-    updateBreakdown,
-    resetGlobal,
+export const {
+  setYear,
+  setMonth,
+  setStandardHours,
+  setBaseRate,
+  addDayPayMap,
+  removeDayPayMap,
+  resetGlobal,
 } = globalSlice.actions;
 export default globalSlice.reducer;

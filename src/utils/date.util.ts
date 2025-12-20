@@ -1,11 +1,9 @@
 import { format } from "date-fns";
 
-import { hebrewDays, monthNames } from "@/constants";
-
 export const DateUtils = () => {
-  const formatDate = (date: Date): string => format(date, "yyyy-MM-dd");
-
-  const getHebrewDayLetter = (date: Date): string => hebrewDays[date.getDay()];
+  const formatDate = (date: Date): string => {
+    return format(date, "yyyy-MM-dd");
+  };
 
   const getNextMonthDay = (year: number, month: number): Date => {
     const nextMonth = month === 12 ? 1 : month + 1;
@@ -13,10 +11,9 @@ export const DateUtils = () => {
     return new Date(nextYear, nextMonth - 1, 1);
   };
 
-  const getDaysInMonth = (year: number, month: number): number =>
-    new Date(year, month, 0).getDate();
-
-  const getMonth = (month: number): string => monthNames[month - 1];
+  const getDaysInMonth = (year: number, month: number): number => {
+    return new Date(year, month, 0).getDate();
+  };
 
   const getDatesRange = (
     year: number,
@@ -33,12 +30,6 @@ export const DateUtils = () => {
     return specialStart * 60;
   };
 
-  const dayOfMonth = (dateStr: string, hebrewDay: string): string => {
-    const date = new Date(dateStr);
-    const day = date.toLocaleDateString("he-IL", { day: "2-digit" });
-    return `${hebrewDay}-${day}`;
-  };
-
   const createDateWithTime = (
     day: string,
     hours: number = 0,
@@ -49,16 +40,11 @@ export const DateUtils = () => {
   };
 
   return {
-    hebrewDays,
-    monthNames,
     formatDate,
-    getHebrewDayLetter,
     getNextMonthDay,
     getDaysInMonth,
-    getMonth,
     getDatesRange,
     getSpecialStartMinutes,
-    dayOfMonth,
     createDateWithTime,
   };
 };

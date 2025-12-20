@@ -1,55 +1,60 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
-import { Shift, 
-        TimeFieldType, 
-        WorkDayMeta, 
-        DayShift,
- } from "@/domain";
+import { Shift, ShiftPayMap, TimeFieldType, WorkDayMeta } from "@/domain";
 import { DomainContextType } from "@/context";
 
-
 type ShiftProps = {
-    domain: DomainContextType;
-    id: string;
-    shift: Shift;
-    meta: WorkDayMeta;
-    standardHours: number;
-    rateDiem: number;
-    isDuty: boolean;
-    onShiftUpdate: (id: string, fullShift: DayShift) => void;
+  domain: DomainContextType;
+  id: string;
+  shift: Shift;
+  meta: WorkDayMeta;
+  standardHours: number;
+  isDuty: boolean;
 };
 
-export const useShift = ({ domain, id, shift, meta, standardHours, rateDiem, isDuty, onShiftUpdate }: ShiftProps) => {
-    const { shiftMapBuilderService } = domain.builders;
-    
-    const [localShift, setLocalShift] = useState<Shift>(shift);
+type ShiftEntry = {
+  shift: Shift;
+  payMap: ShiftPayMap | null;
+};
 
-    const [fullShift, setFullShift] = useState<DayShift | null>(null);
-    
-    const update = useCallback((newStart: TimeFieldType, newEnd: TimeFieldType) => {
-        setLocalShift({ id, start: newStart, end: newEnd });
-    }, [id]);
+export const useShift = ({
+  domain,
+  id,
+  shift,
+  meta,
+  standardHours,
+  isDuty,
+}: ShiftProps) => {
+  const { shiftMapBuilder } = domain.payMap;
 
-    
-    useEffect(() => {
+  const [localShift, setLocalShift] = useState<Shift>(shift);
+  const [saved, setSaved] = useState<boolean>(false);
 
-        const built = shiftMapBuilderService.create(meta, standardHours, rateDiem)
-            .withShift(localShift)
-            .buildDayShift(isDuty, rateDiem);
+  const update = useCallback(
+    (newStart: TimeFieldType, newEnd: TimeFieldType) => {
+      setLocalShift({ id, start: newStart, end: newEnd });
+    },
+    [id],
+  );
 
-        setFullShift(built);
-    }, [localShift, meta, standardHours, isDuty, rateDiem, shiftMapBuilderService]);
+  const shiftEntry: ShiftEntry = useMemo(() => {
+    if (saved) {
+      const shiftPayMap = shiftMapBuilder.build({
+        shift: localShift,
+        meta,
+        standardHours,
+        isFieldDutyShift: isDuty,
+      });
+      return { shift: localShift, payMap: shiftPayMap };
+    }
+    return { shift: localShift, payMap: null };
+  }, [shiftMapBuilder, localShift, meta, standardHours, isDuty, saved]);
 
-
-    const commit = useCallback(() => {
-        if (fullShift) {
-            onShiftUpdate(id, fullShift);
-        }
-    }, [id, fullShift, onShiftUpdate]);
-
-    return {
-        localShift,
-        update,
-        commit,
-    };
+  return {
+    localShift,
+    update,
+    saved,
+    setSaved,
+    shiftEntry,
+  };
 };

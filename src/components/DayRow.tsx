@@ -13,128 +13,153 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import AddIcon from "@mui/icons-material/Add";
 
-
 import { useDay, useGlobalState, useWorkDays } from "@/hooks";
-import { TimeFieldType, WorkDayMeta } from "@/domain";
+import { TimeFieldType, WorkDayInfo } from "@/domain";
 import { WorkDayStatus } from "@/constants";
 import { PayBreakdownRow } from "./PayBreakdownRow";
 import { ShiftRow } from "./ShiftRow";
 import { DateUtils } from "@/utils";
 import { DomainContextType } from "@/context";
+import { dayToPayBreakdownVM } from "@/adapters";
 
 type DayRowProps = {
-    domain: DomainContextType;
-    meta: WorkDayMeta;
+  domain: DomainContextType;
+  workDay: WorkDayInfo;
 };
 
-export const DayRow = ({ domain, meta }: DayRowProps) => {
-    const { standardHours, baseRate, updateBreakdownForDay, globalBreakdown } = useGlobalState();
-    const { isSpecialFullDay, getHebrewDay } = useWorkDays();
-    const { createDateWithTime } = DateUtils();
-    
-    const { status,
-        setStatus,
-        payMap,
-        shiftList,
-        setShiftList,
-        addShift,
-        updateShift,
-        removeShift,
-     } = useDay({ domain, meta, standardHours, baseRate, rateDiem: globalBreakdown.rateDiem });
+export const DayRow = ({ domain, workDay }: DayRowProps) => {
+  const { dayInfoResolver } = domain.resolvers;
+  const {
+    baseRate,
+    standardHours,
+    year,
+    month,
+    dailyPayMaps,
+    addDay,
+    removeDay,
+  } = useGlobalState();
+  const { isSpecialFullDay } = useWorkDays();
 
-    const specialFullDay = isSpecialFullDay(meta.date);
-    const isEditable = status === WorkDayStatus.normal;
+  const { createDateWithTime } = DateUtils();
 
-    const handleStatusChanged = useCallback((newStatus: WorkDayStatus) => {
-        setStatus(newStatus);
-        setShiftList([]);
-    }, [setStatus, setShiftList]);
+  const {
+    status,
+    setStatus,
+    dayPayMap,
+    shiftEntries,
+    setShiftEntries,
+    addShift,
+    updateShift,
+    removeShift,
+  } = useDay({ domain, meta: workDay.meta, standardHours, year, month });
 
-    const handleAddShift = useCallback(() => {
-        if(status !== WorkDayStatus.normal) return;
-        const id = uuidv4();
-        const time = createDateWithTime(meta.date);
-        const start: TimeFieldType = { date: time, minutes: 0 };
-        const end: TimeFieldType = { date: time, minutes: 0 };
-        addShift({ id, start, end });
-    }, [status, meta.date, addShift, createDateWithTime]);
+  const specialFullDay = isSpecialFullDay(workDay.meta.date);
+  const isEditable = status === WorkDayStatus.normal;
 
-    useEffect(() => {
-        updateBreakdownForDay(meta.date, payMap);
-    }, [payMap, meta.date]);
+  const handleStatusChanged = useCallback(
+    (newStatus: WorkDayStatus) => {
+      setStatus(newStatus);
+      setShiftEntries({});
+    },
+    [setStatus, setShiftEntries],
+  );
 
-    return (
-        <TableRow key={meta.date}>
-            <TableCell>{getHebrewDay(meta.date)}</TableCell>
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <TableCell>
-                {!specialFullDay && (
-                    <Checkbox
-                        checked={status === WorkDayStatus.sick}
-                        onChange={(e) =>
-                            handleStatusChanged(
-                            e.target.checked ? WorkDayStatus.sick : WorkDayStatus.normal,
-                            )
-                        }
-                    />
-                )}
-                </TableCell>
-                <TableCell>
-                {!specialFullDay && (
-                    <Checkbox
-                        checked={status === WorkDayStatus.vacation}
-                        onChange={(e) =>
-                            handleStatusChanged(
-                            e.target.checked
-                                ? WorkDayStatus.vacation
-                                : WorkDayStatus.normal,
-                            )
-                        }
-                    />
-                )}
-                </TableCell>
-                <TableCell>
-                    <Stack direction="row" spacing={2} alignItems="flex-start">
-                        {
-                            isEditable && (
-                                <>
-                                    <Box display="flex" flexDirection="column" alignItems="center" pt={1}>
-                                        <IconButton size="small" onClick={() => handleAddShift()}>
-                                            <AddIcon fontSize="small" />
-                                        </IconButton>
-                                    </Box>
-                                    {
-                                        shiftList.length > 0 && (
-                                            <>
-                                                <Divider orientation="vertical" flexItem />
-                                                <Stack spacing={1}>
-                                                    {shiftList.map((item, index) => (
-                                                        <React.Fragment key={item.id}>
-                                                            <ShiftRow
-                                                                domain={domain}
-                                                                shift={item.shift}
-                                                                meta={meta}
-                                                                standardHours={standardHours}
-                                                                rateDiem={globalBreakdown.rateDiem}
+  const handleAddShift = useCallback(() => {
+    const id = uuidv4();
+    const time = createDateWithTime(workDay.meta.date);
+    const start: TimeFieldType = { date: time, minutes: 0 };
+    const end: TimeFieldType = { date: time, minutes: 0 };
+    addShift({ id, start, end });
+  }, [workDay.meta.date, addShift, createDateWithTime]);
 
-                                                                isEditable={isEditable}
-                                                                onShiftUpdate={updateShift}
-                                                                onRemove={removeShift}
-                                                            />
-                                                            {index < shiftList.length - 1 && <Divider />}
-                                                        </React.Fragment>
-                                                    ))}
-                                                </Stack>
-                                            </>
-                                        )
-                                    }
-                                </>
-                            )
-                        }                        
+  useEffect(() => {
+    const prev = dailyPayMaps[workDay.meta.date];
+    if (!prev && dayPayMap.totalHours > 0) {
+      addDay(workDay.meta.date, dayPayMap);
+      return;
+    }
+    if (prev && dayPayMap.totalHours === 0) {
+      removeDay(workDay.meta.date);
+      return;
+    }
+  }, [dayPayMap, workDay.meta.date, addDay, removeDay]);
+
+  return (
+    <TableRow key={workDay.meta.date}>
+      <TableCell>{dayInfoResolver.formatHebrewWorkDay(workDay)}</TableCell>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
+        <TableCell>
+          {!specialFullDay && (
+            <Checkbox
+              checked={status === WorkDayStatus.sick}
+              onChange={(e) =>
+                handleStatusChanged(
+                  e.target.checked ? WorkDayStatus.sick : WorkDayStatus.normal,
+                )
+              }
+            />
+          )}
+        </TableCell>
+        <TableCell>
+          {!specialFullDay && (
+            <Checkbox
+              checked={status === WorkDayStatus.vacation}
+              onChange={(e) =>
+                handleStatusChanged(
+                  e.target.checked
+                    ? WorkDayStatus.vacation
+                    : WorkDayStatus.normal,
+                )
+              }
+            />
+          )}
+        </TableCell>
+        <TableCell>
+          <Stack direction="row" spacing={2} alignItems="flex-start">
+            {isEditable && (
+              <>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  alignItems="center"
+                  pt={1}
+                >
+                  <IconButton size="small" onClick={() => handleAddShift()}>
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+                {Object.values(shiftEntries).length > 0 && (
+                  <>
+                    <Divider orientation="vertical" flexItem />
+                    <Stack spacing={1}>
+                      {Object.values(shiftEntries).map((item, index) => (
+                        <React.Fragment key={item.shift.id}>
+                          <ShiftRow
+                            domain={domain}
+                            shift={item.shift}
+                            meta={workDay.meta}
+                            standardHours={standardHours}
+                            isEditable={isEditable}
+                            onShiftUpdate={updateShift}
+                            onRemove={removeShift}
+                          />
+                          {index < Object.values(shiftEntries).length - 1 && (
+                            <Divider />
+                          )}
+                        </React.Fragment>
+                      ))}
                     </Stack>
-                </TableCell>
-            </LocalizationProvider>
-            <PayBreakdownRow breakdown={payMap} />
-        </TableRow>
+                  </>
+                )}
+              </>
+            )}
+          </Stack>
+        </TableCell>
+      </LocalizationProvider>
+      <PayBreakdownRow
+        breakdown={dayToPayBreakdownVM(dayPayMap)}
+        baseRate={baseRate}
+      />
+    </TableRow>
   );
 };

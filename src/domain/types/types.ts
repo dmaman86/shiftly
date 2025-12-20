@@ -1,4 +1,4 @@
-import { WorkDayType } from "@/constants";
+import { WorkDayStatus, WorkDayType } from "@/constants";
 
 export interface TimeFieldType {
   date: Date;
@@ -34,10 +34,15 @@ export interface SpecialBreakdown {
 
 export interface WorkDayMapByShift {
   id: string;
-  regular: RegularBreakdown,
-  extra: ExtraBreakdown,
-  special: SpecialBreakdown,
-  totalHours: number,
+  regular: RegularBreakdown;
+  extra: ExtraBreakdown;
+  special: SpecialBreakdown;
+  totalHours: number;
+}
+
+export interface PerDiemShiftInfo {
+  isFieldDutyShift: boolean;
+  hours: number;
 }
 
 export interface PerDiemInfo {
@@ -58,18 +63,18 @@ export interface DayShift {
   perDiemShift: DailyPerDiemInfo;
 }
 
-export interface WorkPayMap {
-  regular: RegularBreakdown;
-  extra: ExtraBreakdown;
-  special: SpecialBreakdown;
+export interface WorkDayMap {
+  workMap: {
+    regular: RegularBreakdown;
+    extra: ExtraBreakdown;
+    special: SpecialBreakdown;
+    totalHours: number;
+  };
   hours100Sick: Segment;
   hours100Vacation: Segment;
   extra100Shabbat: Segment;
-  totalHours: number;
-  baseRate: number;
-  rateDiem: number;
-
   perDiem: DailyPerDiemInfo;
+  totalHours: number;
 }
 
 export interface WorkDayMeta {
@@ -99,26 +104,158 @@ export interface WorkDayInfo {
   hebrewDay: string;
 }
 
-export interface WorkDayRowProps {
-  date: string;
-  addToGlobalBreakdown: (b: WorkPayMap) => void;
-  subtractFromGlobalBreakdown: (b: WorkPayMap) => void;
-  standardHours: number;
-  baseRate: number;
-}
-
 export interface ApiResponse<T = any> {
   data: T | null;
   error: string | null;
 }
 
-export interface WorkDaysState {
-  year: number | null;
-  month: number | null;
-  workDays: WorkDayInfo[];
+// ------------------
+export interface RegularCalculator {
+  createEmpty(): RegularBreakdown;
+  calculate(
+    totalHours: number,
+    standardHours: number,
+    meta: WorkDayMeta,
+  ): RegularBreakdown;
 }
 
-export interface GlobalBreakdownState {
-  globalBreakdown: WorkPayMap;
-  baseRate: number;
+export interface RegularReducer {
+  createEmpty(): RegularBreakdown;
+  add(base: RegularBreakdown, add: RegularBreakdown): RegularBreakdown;
+  sub(base: RegularBreakdown, sub: RegularBreakdown): RegularBreakdown;
+}
+
+export interface RegularAccumulator {
+  createEmpty(): RegularBreakdown;
+  accumulateRegular(
+    base: RegularBreakdown,
+    add: RegularBreakdown,
+  ): RegularBreakdown;
+  subtractRegular(
+    base: RegularBreakdown,
+    sub: RegularBreakdown,
+  ): RegularBreakdown;
+}
+
+export interface SegmentBasedCalculator<T> {
+  createEmpty(): T;
+  calculate(labelSegments: LabeledSegmentRange[]): T;
+  accumulate(base: T, add: T): T;
+  subtract(base: T, sub: T): T;
+}
+
+export interface DayInfoResolver {
+  isSpecialFullDay(day: WorkDayInfo): boolean;
+  isPartialHolidayStart(day: WorkDayInfo): boolean;
+  hasCrossDayContinuation(day: WorkDayInfo): boolean;
+  formatHebrewWorkDay(day: WorkDayInfo): string;
+}
+
+export interface PerDiemRateResolver {
+  getRateForRate(year: number, month: number): number;
+}
+
+export interface PerDiemShiftCalculator {
+  createEmpty(): PerDiemShiftInfo;
+  calculate(shift: Shift, isFieldDutyShift: boolean): PerDiemShiftInfo;
+}
+
+export interface PerDiemDayCalculator {
+  calculate(params: {
+    shifts: PerDiemShiftInfo[];
+    rate: number;
+  }): DailyPerDiemInfo;
+}
+
+export interface PerDiemMonthCalculator {
+  createEmpty(): PerDiemInfo;
+  accumulate(base: PerDiemInfo, add: PerDiemInfo): PerDiemInfo;
+  subtract(base: PerDiemInfo, sub: PerDiemInfo): PerDiemInfo;
+}
+
+export interface ShiftPayMap {
+  regular: RegularBreakdown;
+  extra: ExtraBreakdown;
+  special: SpecialBreakdown;
+  totalHours: number;
+  perDiemShift: PerDiemShiftInfo;
+}
+
+export interface WorkDaysForMonthBuilder {
+  build(params: {
+    year: number;
+    month: number;
+    eventMap: Record<string, string[]>;
+  }): WorkDayInfo[];
+}
+
+export interface ShiftMapBuilder {
+  build(params: {
+    shift: Shift;
+    meta: WorkDayMeta;
+    standardHours: number;
+    isFieldDutyShift: boolean;
+  }): ShiftPayMap;
+}
+
+export interface DayPayMapBuilder {
+  build(params: {
+    shifts: ShiftPayMap[];
+    status: WorkDayStatus;
+    meta: WorkDayMeta;
+    standardHours: number;
+    year: number;
+    month: number;
+  }): WorkDayMap;
+}
+
+export interface MonthPayMap {
+  regular: RegularBreakdown;
+  extra: ExtraBreakdown;
+  special: SpecialBreakdown;
+  hours100Sick: Segment;
+  hours100Vacation: Segment;
+  extra100Shabbat: Segment;
+  perDiem: PerDiemInfo;
+  totalHours: number;
+}
+
+export interface MonthPayMapCalculator {
+  createEmpty(): MonthPayMap;
+  accumulate(base: MonthPayMap, add: WorkDayMap): MonthPayMap;
+  subtract(base: MonthPayMap, sub: WorkDayMap): MonthPayMap;
+}
+
+export interface HolidayResolver {
+  resolve(params: { weekday: number; eventTitles: string[] }): WorkDayType;
+}
+
+export enum Mode {
+  BY_SHIFT,
+  BY_DAY,
+  BY_MONTH,
+}
+
+export type PayBreakdownViewModel = {
+  totalHours: number;
+
+  regular: RegularBreakdown;
+  extra: ExtraBreakdown;
+  special: SpecialBreakdown;
+
+  hours100Sick: Segment;
+  hours100Vacation: Segment;
+  extra100Shabbat: Segment;
+
+  perDiemPoints: number;
+  perDiemAmount: number;
+};
+
+export interface MonthResolver {
+  getAvailableMonthOptions(year: number): { value: number; label: string }[];
+  getAvailableMonths(year: number): number[];
+  resolveDefaultMonth(year: number): number;
+  getMonthName(monthIndex: number): string;
+  getAllMonthNames(): string[];
+  getCurrentYear(): number;
 }

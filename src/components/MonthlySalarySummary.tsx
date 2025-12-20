@@ -18,6 +18,7 @@ import DoneIcon from "@mui/icons-material/Done";
 import { formatValue } from "@/utils";
 import { Segment } from "@/domain";
 import { useGlobalState } from "@/hooks";
+import { DomainContextType } from "@/context";
 
 type SalaryRow = {
   label: string;
@@ -32,9 +33,12 @@ type PerDiemRow = {
   points: number;
   rate: number;
   total: number;
-}
+};
 
-const buildSalaryRow = (baseRate: number, map: Record<string, Segment>): SalaryRow[] => {
+const buildSalaryRow = (
+  baseRate: number,
+  map: Record<string, Segment>,
+): SalaryRow[] => {
   return Object.entries(map).map(([label, segment]) => {
     const rate = baseRate * segment.percent;
     const total = segment.hours * rate;
@@ -44,19 +48,24 @@ const buildSalaryRow = (baseRate: number, map: Record<string, Segment>): SalaryR
       hours: Number(segment.hours.toFixed(2)),
       percent: segment.percent,
       rate,
-      total
-    }
-  })
+      total,
+    };
+  });
 };
 
-export const MonthlySalarySummary = () => {
-  const { globalBreakdown, baseRate } = useGlobalState
-  ();
+export const MonthlySalarySummary = ({
+  domain,
+}: {
+  domain: DomainContextType;
+}) => {
+  const { globalBreakdown, baseRate, year, month } = useGlobalState();
   const [editMode, setEditMode] = useState<boolean>(false);
 
   const [baseRows, setBaseRows] = useState<SalaryRow[]>([]);
   const [extraRows, setExtraRows] = useState<SalaryRow[]>([]);
   const [perDiemRow, setPerDiemRow] = useState<PerDiemRow | null>(null);
+
+  const rateDiem = domain.resolvers.perDiemResolver.getRateForRate(year, month);
 
   useEffect(() => {
     const baseMap: Record<string, Segment> = {
@@ -77,19 +86,22 @@ export const MonthlySalarySummary = () => {
 
     setPerDiemRow({
       label: "אש״ל",
-      points: globalBreakdown.perDiem?.diemInfo?.points || 0,
-      rate: globalBreakdown.rateDiem,
-      total: globalBreakdown.perDiem?.diemInfo?.amount || 0,
-    })
+      points: globalBreakdown.perDiem.points || 0,
+      rate: rateDiem,
+      total: globalBreakdown.perDiem.amount || 0,
+    });
 
     setBaseRows(buildSalaryRow(baseRate, baseMap));
     setExtraRows(buildSalaryRow(baseRate, extraMap));
-  }, [globalBreakdown]);
+  }, [globalBreakdown, baseRate, rateDiem]);
 
   const calculateTotal = (rows: SalaryRow[]): number =>
     rows.reduce((sum, row) => sum + row.total, 0);
 
-  const monthlySalary = calculateTotal(baseRows) + calculateTotal(extraRows) + (perDiemRow?.total || 0);
+  const monthlySalary =
+    calculateTotal(baseRows) +
+    calculateTotal(extraRows) +
+    (perDiemRow?.total || 0);
 
   const toggleEditMode = () => setEditMode((prev) => !prev);
 
@@ -120,9 +132,15 @@ export const MonthlySalarySummary = () => {
                   }}
                   onChange={(e) => {
                     const newHours = Number(e.target.value);
-                    if(isNaN(newHours) || newHours < 0) return;
+                    if (isNaN(newHours) || newHours < 0) return;
                     const newTotal = newHours * row.rate;
-                    setter(prev => prev.map((r, i) => i === index ? { ...r, hours: newHours, total: newTotal } : r));
+                    setter((prev) =>
+                      prev.map((r, i) =>
+                        i === index
+                          ? { ...r, hours: newHours, total: newTotal }
+                          : r,
+                      ),
+                    );
                   }}
                 />
               ) : (
@@ -197,28 +215,32 @@ export const MonthlySalarySummary = () => {
                       <TableCell>{perDiemRow?.label}</TableCell>
                       <TableCell>
                         {editMode ? (
-                          <TextField 
+                          <TextField
                             type="number"
                             size="small"
                             value={perDiemRow?.points || 0}
                             variant="standard"
                             onChange={(e) => {
                               const newPoints = Number(e.target.value);
-                              if(isNaN(newPoints) || newPoints < 0) return;
-                              setPerDiemRow(prev => prev ? {
-                                ...prev,
-                                points: newPoints,
-                                total: newPoints * prev.rate
-                              }
-                              : prev
-                              )
+                              if (isNaN(newPoints) || newPoints < 0) return;
+                              setPerDiemRow((prev) =>
+                                prev
+                                  ? {
+                                      ...prev,
+                                      points: newPoints,
+                                      total: newPoints * prev.rate,
+                                    }
+                                  : prev,
+                              );
                             }}
                           />
-                        ): (
+                        ) : (
                           formatValue(perDiemRow?.points || 0)
                         )}
                       </TableCell>
-                      <TableCell>₪{formatValue(perDiemRow?.rate || 0)}</TableCell>
+                      <TableCell>
+                        ₪{formatValue(perDiemRow?.rate || 0)}
+                      </TableCell>
                       <TableCell>
                         {perDiemRow && perDiemRow.total > 0
                           ? `₪${formatValue(perDiemRow.total)}`

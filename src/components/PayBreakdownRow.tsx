@@ -1,20 +1,25 @@
 import { TableCell } from "@mui/material";
 
-import { WorkPayMap } from "@/domain";
+import { PayBreakdownViewModel } from "@/domain";
 import { computeTotalPay, formatValue } from "@/utils";
+import { useMemo } from "react";
 
 type PayBreakdownRowProps = {
-  breakdown: WorkPayMap;
+  breakdown: PayBreakdownViewModel;
+  baseRate: number;
   isFooter?: boolean;
   emptyStartCells?: number;
 };
 
 export const PayBreakdownRow = ({
   breakdown,
+  baseRate,
   isFooter = false,
   emptyStartCells = 0,
 }: PayBreakdownRowProps) => {
-  const salary = computeTotalPay(breakdown);
+  const salary = useMemo(() => {
+    return computeTotalPay(breakdown, baseRate);
+  }, [baseRate, breakdown]);
 
   const cellSx = isFooter ? undefined : { minWidth: "90px" };
 
@@ -57,11 +62,9 @@ export const PayBreakdownRow = ({
       <TableCell sx={cellSx}>
         {formatValue(breakdown.hours100Vacation.hours)}
       </TableCell>
-      <TableCell sx={cellSx}>
-        {formatValue(breakdown.perDiem?.diemInfo?.points ?? 0)}
-      </TableCell>
+      <TableCell sx={cellSx}>{formatValue(breakdown.perDiemPoints)}</TableCell>
 
-      {breakdown.baseRate > 0 && (
+      {baseRate > 0 && (
         <TableCell sx={cellSx}>
           {salary > 0 ? `₪${formatValue(salary)}` : ""}
         </TableCell>
