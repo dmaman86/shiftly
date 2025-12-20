@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { WorkDayStatus } from "@/constants";
 import { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
-import { DomainContextType } from "@/context/DomainProvider";
+import { DomainContextType } from "@/context";
 
 type UseDayProps = {
   domain: DomainContextType;

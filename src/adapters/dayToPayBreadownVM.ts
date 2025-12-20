@@ -1,7 +1,7 @@
-import { NewWorkDayMap, PayBreakdownViewModel } from "@/domain";
+import { WorkDayMap, PayBreakdownViewModel } from "@/domain";
 
 export const dayToPayBreakdownVM = (
-  day: NewWorkDayMap,
+  day: WorkDayMap,
 ): PayBreakdownViewModel => ({
   totalHours: day.totalHours,
 
