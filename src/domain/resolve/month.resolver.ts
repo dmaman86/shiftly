@@ -1,8 +1,6 @@
 import { MonthResolver } from "@/domain";
 
 export class DefaultMonthResolver implements MonthResolver {
-  private readonly currentYear: number;
-  private readonly currentMonth: number; // 0-based
   private readonly monthNames = [
     "ינואר",
     "פברואר",
@@ -18,9 +16,18 @@ export class DefaultMonthResolver implements MonthResolver {
     "דצמבר",
   ];
 
-  constructor(now: Date) {
-    this.currentYear = now.getFullYear();
-    this.currentMonth = now.getMonth();
+  constructor(private readonly dateProvider: () => Date = () => new Date()) {}
+
+  private get now(): Date {
+    return this.dateProvider();
+  }
+
+  private get currentYear(): number {
+    return this.now.getFullYear();
+  }
+
+  private get currentMonth(): number {
+    return this.now.getMonth();
   }
 
   getAvailableMonths(year: number): number[] {

@@ -57,7 +57,7 @@ export const headersTable = [
   {
     label: "אש״ל",
     rowSpan: 2,
-  }
+  },
 ];
 
 export const baseLabels = ["100%", "שבת תוספת 100%", "מחלה", "חופש"];

@@ -53,7 +53,7 @@ export const AppContent = ({ domain }: { domain: DomainContextType }) => {
         minHeight: "100vh",
       }}
     >
-      <Stack spacing={3} sx={{ direction: "rtl" }}>
+      <Stack spacing={3} sx={{ direction: "ltr" }}>
         <Box>
           <Typography variant="h5" textAlign="center">
             סיכום שעות עבודה

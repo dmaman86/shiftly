@@ -38,7 +38,7 @@ export const buildPayMapPipeline = () => {
   const holidayResolver = new HolidayResolverService();
 
   const workDayInfoResolver = new WorkDayInfoResolver();
-  const monthResolver = new DefaultMonthResolver(new Date());
+  const monthResolver = new DefaultMonthResolver();
 
   const workDaysForMonthBuilder = new DefaultWorkDaysForMonthBuilder(
     holidayResolver,

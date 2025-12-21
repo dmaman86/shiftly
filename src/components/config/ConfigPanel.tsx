@@ -1,13 +1,8 @@
 import { useMemo } from "react";
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-} from "@mui/material";
+import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/context";
+import { ConfigInput } from "./ConfigInput";
 
 export const ConfigPanel = ({ domain }: { domain: DomainContextType }) => {
   const {
@@ -33,25 +28,16 @@ export const ConfigPanel = ({ domain }: { domain: DomainContextType }) => {
         <div className="col-12 col-lg-6 mb-2">
           <div className="row gx-2">
             <div className="col-6">
-              <TextField
-                id="year"
+              <ConfigInput
                 name="year"
-                label="שנה"
-                variant="outlined"
-                size="small"
-                type="number"
                 value={year}
-                onChange={(e) => {
-                  const parsedYear = Number(e.target.value);
-                  if (
-                    !isNaN(parsedYear) &&
-                    parsedYear <= monthResolver.getCurrentYear()
-                  ) {
+                label="שנה"
+                onChange={(parsedYear) => {
+                  if (parsedYear <= monthResolver.getCurrentYear()) {
                     updateYear(parsedYear);
                     updateMonth(1); // reset month to January
                   }
                 }}
-                fullWidth
               />
             </div>
             <div className="col-6">
@@ -84,35 +70,25 @@ export const ConfigPanel = ({ domain }: { domain: DomainContextType }) => {
         <div className="col-12 col-lg-6 mb-2">
           <div className="row gx-2">
             <div className="col-6">
-              <TextField
-                id="standardHours"
+              <ConfigInput
                 name="standardHours"
-                label="שעות תקן"
-                variant="outlined"
-                size="small"
-                type="number"
                 value={standardHours}
-                onChange={(e) => updateStandardHours(Number(e.target.value))}
+                label="שעות תקן"
                 helperText="ברירת מחדל: 6.67 שעות. מעבר לכך נחשב כשעות נוספות"
-                fullWidth
+                onChange={(hours) => updateStandardHours(hours)}
               />
             </div>
             <div className="col-6">
-              <TextField
-                id="baseRate"
+              <ConfigInput
                 name="baseRate"
-                label="שכר שעתי"
-                variant="outlined"
-                size="small"
-                type="number"
                 value={baseRate}
-                onChange={(e) => updateBaseRate(Number(e.target.value))} // use Number to convert to number
+                label="שכר שעתי"
                 helperText={
                   baseRate === 0
                     ? "יש להזין שכר שעתי להצגת שכר יומי או חודשי"
                     : " "
                 }
-                fullWidth
+                onChange={(rate) => updateBaseRate(rate)}
               />
             </div>
           </div>

@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
-import { Checkbox, IconButton, Stack, TextField, Tooltip } from "@mui/material";
+import { Checkbox, IconButton, Stack, Tooltip } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import { TimeField } from "@mui/x-date-pickers";
 import { addMinutes } from "date-fns";
-import { minutesToTimeStr } from "@/utils";
 import { Shift, ShiftPayMap, TimeFieldType, WorkDayMeta } from "@/domain";
 import { useShift } from "@/hooks";
 import { DomainContextType } from "@/context";
+import { ShiftTimeInput, ShiftTimeReadonly } from "@/components/ui";
 
 type ShiftRowProps = {
   domain: DomainContextType;
@@ -92,44 +91,29 @@ export const ShiftRow = ({
     <Stack direction="row" alignItems="center" spacing={1}>
       {!saved ? (
         <>
-          <TimeField
+          <ShiftTimeInput
             label="שעת כניסה"
             value={localShift.start.date}
             onChange={(newVal) => handleChange("start", newVal)}
-            format="HH:mm"
-            ampm={false}
-            size="small"
-            sx={{ width: 100 }}
             disabled={!isEditable}
           />
-
-          <TimeField
+          <ShiftTimeInput
             label="שעת יציאה"
             value={localShift.end.date}
             onChange={(newVal) => handleChange("end", newVal)}
-            error={hasError}
-            format="HH:mm"
-            ampm={false}
-            size="small"
-            sx={{ width: 100 }}
             disabled={!isEditable}
+            error={hasError}
           />
         </>
       ) : (
         <>
-          <TextField
+          <ShiftTimeReadonly
             label="שעת כניסה"
-            value={minutesToTimeStr(localShift.start.minutes)}
-            size="small"
-            slotProps={{ input: { readOnly: true } }}
-            sx={{ width: 100 }}
+            minutes={localShift.start.minutes}
           />
-          <TextField
+          <ShiftTimeReadonly
             label="שעת יציאה"
-            value={minutesToTimeStr(localShift.end.minutes)}
-            size="small"
-            slotProps={{ input: { readOnly: true } }}
-            sx={{ width: 100 }}
+            minutes={localShift.end.minutes}
           />
         </>
       )}

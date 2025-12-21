@@ -32,7 +32,7 @@ export const workDaysSlice = createSlice({
       state.year = year;
       state.month = month;
 
-      state.workDays = payMap.workDaysForMonthBuilder.build({
+      state.workDays = payMap.workDaysMonthBuilder.build({
         year,
         month,
         eventMap,

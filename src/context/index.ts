@@ -1,3 +1,3 @@
 export * from "./DomainProvider";
-
-export { domain } from "./domain.singleton";
+export * from "./instance";
+// export { domain } from "./domain.singleton";
