@@ -53,7 +53,7 @@ export class ShiftSegmentMapBuilder {
           key: "hours100",
         },
         {
-          point: { start: min14, end: specialStart },
+          point: { start: min14, end: specialStart - 1 },
           percent: hours20,
           key: "hours20",
         },

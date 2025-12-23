@@ -1,13 +1,11 @@
 import {
   LabeledSegmentRange,
   PerDiemShiftCalculator,
-  RegularCalculator,
   Shift,
   ShiftMapBuilder,
   ShiftPayMap,
   WorkDayMeta,
-  ExtraCalculator,
-  SpecialCalculator,
+  PayCalculationBundle,
 } from "@/domain";
 
 export class DefaultShiftMapBuilder implements ShiftMapBuilder {
@@ -15,9 +13,7 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     private readonly segmentResolver: {
       resolve(shift: Shift, meta: WorkDayMeta): LabeledSegmentRange[];
     },
-    private readonly regularCalculator: RegularCalculator,
-    private readonly extraCalculator: ExtraCalculator,
-    private readonly specialCalculator: SpecialCalculator,
+    private readonly shiftsCalculators: PayCalculationBundle,
     private readonly perDiemShiftCalculator: PerDiemShiftCalculator,
   ) {}
 
@@ -27,19 +23,24 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     standardHours: number;
     isFieldDutyShift: boolean;
   }): ShiftPayMap {
+    const {
+      regular: regularCalculator,
+      extra: extraCalculator,
+      special: specialCalculator,
+    } = this.shiftsCalculators;
     const { shift, meta, standardHours, isFieldDutyShift } = params;
 
     const labeledSegments = this.segmentResolver.resolve(shift, meta);
 
     const totalHours = (shift.end.minutes - shift.start.minutes) / 60;
 
-    const extra = this.extraCalculator.calculate(labeledSegments);
-    const special = this.specialCalculator.calculate(labeledSegments);
+    const extra = extraCalculator.calculate(labeledSegments);
+    const special = specialCalculator.calculate(labeledSegments);
 
     const specialHours = special.shabbat150.hours + special.shabbat200.hours;
     const regularHours = totalHours - specialHours;
 
-    const regular = this.regularCalculator.calculate(
+    const regular = regularCalculator.calculate(
       regularHours,
       standardHours,
       meta,

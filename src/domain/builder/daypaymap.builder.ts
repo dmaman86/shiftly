@@ -1,29 +1,120 @@
 import { WorkDayStatus } from "@/constants";
 import {
   DayPayMapBuilder,
-  ExtraCalculator,
-  FixedSegmentFactory,
   WorkDayMap,
-  PerDiemDayCalculator,
   PerDiemShiftInfo,
-  RegularCalculator,
   ShiftPayMap,
-  SpecialCalculator,
-  TimelinePerDiemRateResolver,
   WorkDayMeta,
+  PayCalculationBundle,
+  FixedSegmentBundle,
+  PerDiemBundle,
+  MealAllowanceBundle,
+  ExtraBreakdown,
+  SpecialBreakdown,
 } from "@/domain";
 
 export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
   constructor(
-    private readonly regularCalculator: RegularCalculator,
-    private readonly extraCalculator: ExtraCalculator,
-    private readonly specialCalculator: SpecialCalculator,
-    private readonly sickCalculator: FixedSegmentFactory,
-    private readonly vacationCalculator: FixedSegmentFactory,
-    private readonly extraShabbatCalculator: FixedSegmentFactory,
-    private readonly perDiemDayCalculator: PerDiemDayCalculator,
-    private readonly perDiemRateResolver: TimelinePerDiemRateResolver,
+    private readonly payCalculators: PayCalculationBundle,
+    private readonly fixedSegments: FixedSegmentBundle,
+    private readonly perDiem: PerDiemBundle,
+    private readonly mealAllowance: MealAllowanceBundle,
   ) {}
+
+  private initBreakdown() {
+    const { regular, extra, special } = this.payCalculators;
+    const { resolver } = this.mealAllowance;
+
+    return {
+      regular: regular.createEmpty(),
+      extra: extra.createEmpty(),
+      special: special.createEmpty(),
+      mealAllowance: resolver.create(),
+    };
+  }
+
+  private buildNonWorkingDay(params: {
+    status: WorkDayStatus;
+    standardHours: number;
+  }): WorkDayMap {
+    const { sick, vacation, extraShabbat } = this.fixedSegments;
+    const { calculator } = this.perDiem;
+
+    const hoursSick =
+      params.status === WorkDayStatus.sick ? params.standardHours : 0;
+    const hoursVacation =
+      params.status === WorkDayStatus.vacation ? params.standardHours : 0;
+
+    const init = this.initBreakdown();
+
+    return {
+      workMap: {
+        regular: init.regular,
+        extra: init.extra,
+        special: init.special,
+        totalHours: params.standardHours,
+      },
+      hours100Sick: sick.create(hoursSick),
+      hours100Vacation: vacation.create(hoursVacation),
+      extra100Shabbat: extraShabbat.create(0),
+      perDiem: calculator.calculate({ shifts: [], rate: 0 }),
+      totalHours: params.standardHours,
+      mealAllowance: init.mealAllowance,
+    };
+  }
+
+  private accumulateShifts(shifts: ShiftPayMap[]) {
+    let extra = this.payCalculators.extra.createEmpty();
+    let special = this.payCalculators.special.createEmpty();
+    let totalHours = 0;
+    const perDiemShifts: PerDiemShiftInfo[] = [];
+
+    for (const shift of shifts) {
+      extra = this.payCalculators.extra.accumulate(extra, shift.extra);
+      special = this.payCalculators.special.accumulate(special, shift.special);
+      perDiemShifts.push(shift.perDiemShift);
+      totalHours += shift.totalHours;
+    }
+
+    return { extra, special, totalHours, perDiemShifts };
+  }
+
+  private calculatePerDiem(
+    shifts: PerDiemShiftInfo[],
+    year: number,
+    month: number,
+  ) {
+    const rate = this.perDiem.rateResolver.getRateForRate(year, month);
+    return this.perDiem.calculator.calculate({
+      shifts,
+      rate,
+    });
+  }
+
+  private buildMealAllowanceDayInfo(params: {
+    totalHours: number;
+    extra: ExtraBreakdown;
+    special: SpecialBreakdown;
+    isFieldDutyDay: boolean;
+  }) {
+    const hasNight =
+      params.extra.hours50.hours >= 2 || params.special.shabbat200.hours >= 2;
+
+    const nonMorningHours =
+      params.extra.hours20.hours +
+      params.extra.hours50.hours +
+      params.special.shabbat150.hours +
+      params.special.shabbat200.hours;
+
+    const hasMorning = params.totalHours - nonMorningHours > 0;
+
+    return {
+      totalHours: params.totalHours,
+      hasMorning,
+      hasNight,
+      isFieldDutyDay: params.isFieldDutyDay,
+    };
+  }
 
   build(params: {
     shifts: ShiftPayMap[];
@@ -35,59 +126,43 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
   }): WorkDayMap {
     const { shifts, status, meta, standardHours, year, month } = params;
 
-    let regular = this.regularCalculator.createEmpty();
-    let extra = this.extraCalculator.createEmpty();
-    let special = this.specialCalculator.createEmpty();
-
     if (status !== WorkDayStatus.normal) {
-      const hoursSick = status === WorkDayStatus.sick ? standardHours : 0;
-      const hoursVacation =
-        status === WorkDayStatus.vacation ? standardHours : 0;
-
-      const sick = this.sickCalculator.create(hoursSick);
-      const vacation = this.vacationCalculator.create(hoursVacation);
-      return {
-        workMap: { regular, extra, special, totalHours: standardHours },
-        hours100Sick: sick,
-        hours100Vacation: vacation,
-        extra100Shabbat: this.extraShabbatCalculator.create(0),
-        perDiem: this.perDiemDayCalculator.calculate({ shifts: [], rate: 0 }),
-        totalHours: standardHours,
-      };
+      return this.buildNonWorkingDay({ status, standardHours });
     }
 
-    const perDiemShifts: PerDiemShiftInfo[] = [];
-    let totalHours = 0;
-
-    for (const shift of shifts) {
-      extra = this.extraCalculator.accumulate(extra, shift.extra);
-      special = this.specialCalculator.accumulate(special, shift.special);
-      perDiemShifts.push(shift.perDiemShift);
-      totalHours += shift.totalHours;
-    }
+    const { extra, special, totalHours, perDiemShifts } =
+      this.accumulateShifts(shifts);
 
     const totalExtraShabbat =
       special.shabbat150.hours + special.shabbat200.hours;
-    const totalRegularHours = totalHours - totalExtraShabbat;
-
-    regular = this.regularCalculator.calculate(
-      totalRegularHours,
+    const regular = this.payCalculators.regular.calculate(
+      totalHours - totalExtraShabbat,
       standardHours,
       meta,
     );
-    const rate = this.perDiemRateResolver.getRateForRate(year, month);
-    const dailyPerDiem = this.perDiemDayCalculator.calculate({
-      shifts: perDiemShifts,
-      rate,
+    const perDiem = this.calculatePerDiem(perDiemShifts, year, month);
+
+    const dayInfo = this.buildMealAllowanceDayInfo({
+      totalHours,
+      extra,
+      special,
+      isFieldDutyDay: perDiem.isFieldDutyDay,
+    });
+
+    const mealAllowance = this.mealAllowance.resolver.resolve({
+      day: dayInfo,
+      rates: this.mealAllowance.rateResolver.getRates(year, month),
     });
 
     return {
       workMap: { regular, extra, special, totalHours },
-      hours100Sick: this.sickCalculator.create(0),
-      hours100Vacation: this.vacationCalculator.create(0),
-      extra100Shabbat: this.extraShabbatCalculator.create(totalExtraShabbat),
-      perDiem: dailyPerDiem,
+      hours100Sick: this.fixedSegments.sick.create(0),
+      hours100Vacation: this.fixedSegments.vacation.create(0),
+      extra100Shabbat:
+        this.fixedSegments.extraShabbat.create(totalExtraShabbat),
+      perDiem,
       totalHours,
+      mealAllowance,
     };
   }
 }

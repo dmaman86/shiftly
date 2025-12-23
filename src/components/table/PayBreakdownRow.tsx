@@ -64,6 +64,10 @@ export const PayBreakdownRow = ({
       </TableCell>
       <TableCell sx={cellSx}>{formatValue(breakdown.perDiemPoints)}</TableCell>
 
+      <TableCell sx={cellSx}>{formatValue(breakdown.largePoints)}</TableCell>
+
+      <TableCell sx={cellSx}>{formatValue(breakdown.smallPoints)}</TableCell>
+
       {baseRate > 0 && (
         <TableCell sx={cellSx}>
           {salary > 0 ? `₪${formatValue(salary)}` : ""}

@@ -15,4 +15,10 @@ export const monthToPayBreakdownVM = (
 
   perDiemPoints: month.perDiem.points,
   perDiemAmount: month.perDiem.amount,
+
+  largePoints: month.mealAllowance.large.points,
+  largeAmount: month.mealAllowance.large.amount,
+
+  smallPoints: month.mealAllowance.small.points,
+  smallAmount: month.mealAllowance.small.amount,
 });

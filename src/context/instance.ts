@@ -7,6 +7,7 @@ import {
   MonthResolver,
   PerDiemRateResolver,
   ShiftMapBuilder,
+  TimelineMealAllowanceRateResolver,
   WorkDaysForMonthBuilder,
 } from "@/domain";
 
@@ -22,6 +23,7 @@ export type DomainContextType = {
     perDiemResolver: PerDiemRateResolver;
     dayInfoResolver: DayInfoResolver;
     monthResolver: MonthResolver;
+    mealAllowanceRateResolver: TimelineMealAllowanceRateResolver;
   };
 };
 
@@ -39,5 +41,7 @@ export const domain: DomainContextType = {
     perDiemResolver: pipelineInstance.resolvers.perDiemRateResolver,
     dayInfoResolver: pipelineInstance.resolvers.workDayInfoResolver,
     monthResolver: pipelineInstance.resolvers.monthResolver,
+    mealAllowanceRateResolver:
+      pipelineInstance.resolvers.mealAllowanceRateResolver,
   },
 };

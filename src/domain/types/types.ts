@@ -1,4 +1,11 @@
 import { WorkDayStatus, WorkDayType } from "@/constants";
+import { ExtraCalculator } from "../calculator/extra/extra.calculator";
+import { SpecialCalculator } from "../calculator/special/special.calculator";
+import { FixedSegmentFactory } from "../factory/fixed-segment.factory";
+import { TimelinePerDiemRateResolver } from "../resolve/timeline-per-diem-rate.resolver";
+import { MealAllowanceResolver } from "../resolve/meal-allowance.resolver";
+import { TimelineMealAllowanceRateResolver } from "../resolve/timeline-meal-allowance-rate.resolver";
+import { MealAllowanceMonthReducer } from "../reducer";
 
 export interface TimeFieldType {
   date: Date;
@@ -63,6 +70,16 @@ export interface DayShift {
   perDiemShift: DailyPerDiemInfo;
 }
 
+export interface MealAllowanceEntry {
+  points: number;
+  amount: number;
+}
+
+export interface MealAllowance {
+  small: MealAllowanceEntry;
+  large: MealAllowanceEntry;
+}
+
 export interface WorkDayMap {
   workMap: {
     regular: RegularBreakdown;
@@ -75,6 +92,8 @@ export interface WorkDayMap {
   extra100Shabbat: Segment;
   perDiem: DailyPerDiemInfo;
   totalHours: number;
+
+  mealAllowance: MealAllowance;
 }
 
 export interface WorkDayMeta {
@@ -218,6 +237,7 @@ export interface MonthPayMap {
   extra100Shabbat: Segment;
   perDiem: PerDiemInfo;
   totalHours: number;
+  mealAllowance: MealAllowance;
 }
 
 export interface MonthPayMapCalculator {
@@ -249,6 +269,12 @@ export type PayBreakdownViewModel = {
 
   perDiemPoints: number;
   perDiemAmount: number;
+
+  largePoints: number;
+  largeAmount: number;
+
+  smallPoints: number;
+  smallAmount: number;
 };
 
 export interface MonthResolver {
@@ -259,3 +285,50 @@ export interface MonthResolver {
   getAllMonthNames(): string[];
   getCurrentYear(): number;
 }
+
+export type MealAllowanceKind = "SMALL" | "LARGE";
+
+export interface MealAllowanceRates {
+  small: number;
+  large: number;
+}
+
+export type PayCalculationBundle = {
+  regular: RegularCalculator;
+  extra: ExtraCalculator;
+  special: SpecialCalculator;
+};
+
+export type WorkDayReducerBundle = {
+  regular: RegularReducer;
+  extra: ExtraCalculator;
+  special: SpecialCalculator;
+};
+
+export type FixedSegmentBundle = {
+  sick: FixedSegmentFactory;
+  vacation: FixedSegmentFactory;
+  extraShabbat: FixedSegmentFactory;
+};
+
+export type PerDiemBundle = {
+  calculator: PerDiemDayCalculator;
+  rateResolver: TimelinePerDiemRateResolver;
+};
+
+export type MealAllowanceBundle = {
+  resolver: MealAllowanceResolver;
+  rateResolver: TimelineMealAllowanceRateResolver;
+};
+
+export type MealAllowanceMonthBundle = {
+  perDiem: PerDiemMonthCalculator;
+  mealAllowance: MealAllowanceMonthReducer;
+};
+
+export type MealAllowanceDayInfo = {
+  totalHours: number;
+  hasMorning: boolean;
+  hasNight: boolean;
+  isFieldDutyDay: boolean;
+};

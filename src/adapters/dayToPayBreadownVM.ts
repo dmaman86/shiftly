@@ -15,4 +15,10 @@ export const dayToPayBreakdownVM = (
 
   perDiemPoints: day.perDiem.diemInfo.points,
   perDiemAmount: day.perDiem.diemInfo.amount,
+
+  largePoints: day.mealAllowance.large.points,
+  largeAmount: day.mealAllowance.large.amount,
+
+  smallPoints: day.mealAllowance.small.points,
+  smallAmount: day.mealAllowance.small.amount,
 });

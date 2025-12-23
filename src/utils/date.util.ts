@@ -26,7 +26,7 @@ export const DateUtils = () => {
 
   const getSpecialStartMinutes = (date: string): number => {
     const offsetMinutes = new Date(date).getTimezoneOffset();
-    const specialStart = -offsetMinutes / 60 === 3 ? 18 : 19;
+    const specialStart = -offsetMinutes / 60 === 3 ? 18 : 17;
     return specialStart * 60;
   };
 

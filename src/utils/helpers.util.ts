@@ -61,5 +61,6 @@ export const computeTotalPay = (
       ? all.reduce((sum, seg) => sum + seg.hours * seg.percent * baseRate, 0)
       : 0;
   const perDiemAmount = workPayMap.perDiemAmount;
-  return basePay + perDiemAmount;
+  const mealAllowanceAmount = workPayMap.largeAmount + workPayMap.smallAmount;
+  return basePay + perDiemAmount + mealAllowanceAmount;
 };

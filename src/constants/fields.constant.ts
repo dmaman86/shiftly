@@ -58,6 +58,10 @@ export const headersTable = [
     label: "אש״ל",
     rowSpan: 2,
   },
+  {
+    label: "כלכלה",
+    children: ["גדולה", "קטנה"],
+  },
 ];
 
 export const baseLabels = ["100%", "שבת תוספת 100%", "מחלה", "חופש"];
