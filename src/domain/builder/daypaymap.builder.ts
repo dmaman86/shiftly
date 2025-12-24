@@ -29,7 +29,7 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
       regular: regular.createEmpty(),
       extra: extra.createEmpty(),
       special: special.createEmpty(),
-      mealAllowance: resolver.create(),
+      mealAllowance: resolver.createEmpty(),
     };
   }
 
@@ -84,7 +84,7 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
     year: number,
     month: number,
   ) {
-    const rate = this.perDiem.rateResolver.getRateForRate(year, month);
+    const rate = this.perDiem.rateResolver.resolve({ year, month });
     return this.perDiem.calculator.calculate({
       shifts,
       rate,
@@ -135,11 +135,11 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
 
     const totalExtraShabbat =
       special.shabbat150.hours + special.shabbat200.hours;
-    const regular = this.payCalculators.regular.calculate(
-      totalHours - totalExtraShabbat,
+    const regular = this.payCalculators.regular.calculate({
+      totalHours: totalHours - totalExtraShabbat,
       standardHours,
       meta,
-    );
+    });
     const perDiem = this.calculatePerDiem(perDiemShifts, year, month);
 
     const dayInfo = this.buildMealAllowanceDayInfo({
@@ -151,7 +151,7 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
 
     const mealAllowance = this.mealAllowance.resolver.resolve({
       day: dayInfo,
-      rates: this.mealAllowance.rateResolver.getRates(year, month),
+      rates: this.mealAllowance.rateResolver.resolve({ year, month }),
     });
 
     return {

@@ -3,7 +3,7 @@ import {
   DayInfoResolver,
   DayPayMapBuilder,
   HolidayResolver,
-  MonthPayMapCalculator,
+  MonthPayMapReducer,
   MonthResolver,
   PerDiemRateResolver,
   ShiftMapBuilder,
@@ -15,7 +15,7 @@ export type DomainContextType = {
   payMap: {
     shiftMapBuilder: ShiftMapBuilder;
     dayPayMapBuilder: DayPayMapBuilder;
-    monthPayMapCalculator: MonthPayMapCalculator;
+    monthPayMapCalculator: MonthPayMapReducer;
     workDaysMonthBuilder: WorkDaysForMonthBuilder;
   };
   resolvers: {

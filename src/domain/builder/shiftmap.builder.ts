@@ -40,16 +40,16 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     const specialHours = special.shabbat150.hours + special.shabbat200.hours;
     const regularHours = totalHours - specialHours;
 
-    const regular = regularCalculator.calculate(
-      regularHours,
+    const regular = regularCalculator.calculate({
+      totalHours: regularHours,
       standardHours,
       meta,
-    );
+    });
 
-    const perDiemShift = this.perDiemShiftCalculator.calculate(
+    const perDiemShift = this.perDiemShiftCalculator.calculate({
       shift,
       isFieldDutyShift,
-    );
+    });
 
     return {
       regular,

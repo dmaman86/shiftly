@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AxiosResponse } from "axios";
 import { ApiResponse } from "@/domain";
+import { resolveErrorMessage } from "@/utils";
 
 interface AxiosCall {
   call: () => Promise<AxiosResponse>;
@@ -15,22 +16,24 @@ export const useFetch = () => {
     axiosCall: AxiosCall,
     adapter?: (raw: { date: string; title: string }[]) => T,
   ): Promise<ApiResponse<T>> => {
-    const response: ApiResponse<T> = { data: null, error: null };
-
     if (axiosCall.controller) controller = axiosCall.controller;
+
     setLoading(true);
+
     try {
       const result = await axiosCall.call();
       const rawItems: { date: string; title: string }[] = result.data.items;
-      
-      response.data = adapter ? adapter(rawItems) : (rawItems as T);
-    
-    } catch (err: any) {
-      response.error = err?.message ?? "שגיאה לא צפויה. אנא נסה שוב";
+
+      const data = adapter ? adapter(rawItems) : (rawItems as T);
+      return { data };
+    } catch (err: unknown) {
+      return {
+        data: undefined as T,
+        error: resolveErrorMessage(err),
+      };
     } finally {
       setLoading(false);
     }
-    return response;
   };
 
   const cancelEndPoint = () => {

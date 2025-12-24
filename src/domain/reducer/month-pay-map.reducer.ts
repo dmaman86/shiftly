@@ -1,19 +1,19 @@
 import {
   MonthPayMap,
-  MonthPayMapCalculator,
   WorkDayMap,
-  PerDiemMonthCalculator,
   MealAllowanceMonthReducer,
   FixedSegmentMonthReducer,
+  PerDiemMonthReducer,
+  Reducer,
 } from "@/domain";
 import { WorkDayMonthReducer } from "./workday-month.reducer";
 
-export class MonthPayMapReducer implements MonthPayMapCalculator {
+export class MonthPayMapReducer implements Reducer<MonthPayMap, WorkDayMap> {
   constructor(
     private readonly workPay: WorkDayMonthReducer,
     private readonly fixed: FixedSegmentMonthReducer,
     private readonly allowances: MealAllowanceMonthReducer,
-    private readonly perDiem: PerDiemMonthCalculator,
+    private readonly perDiem: PerDiemMonthReducer,
   ) {}
 
   createEmpty(): MonthPayMap {
@@ -44,7 +44,7 @@ export class MonthPayMapReducer implements MonthPayMapCalculator {
       ...this.workPay.subtract(base, sub),
       ...this.fixed.subtract(base, sub),
       perDiem: this.perDiem.subtract(base.perDiem, sub.perDiem.diemInfo),
-      totalHours: base.totalHours - sub.totalHours,
+      totalHours: Math.max(base.totalHours - sub.totalHours, 0),
       mealAllowance: this.allowances.subtract(
         base.mealAllowance,
         sub.mealAllowance,

@@ -2,11 +2,22 @@ import { WorkDayType } from "@/constants";
 import {
   LabeledSegmentRange,
   Point,
+  Resolver,
   Shift,
   WorkDayMeta,
-} from "@/domain/types/types";
+} from "@/domain";
 
-export class ShiftSegmentResolver {
+export class ShiftSegmentResolver
+  implements
+    Resolver<
+      {
+        shift: Shift;
+        meta: WorkDayMeta;
+        segmentMap: Record<WorkDayType, LabeledSegmentRange[]>;
+      },
+      LabeledSegmentRange[]
+    >
+{
   private readonly fieldMinutes: Record<string, number> = {
     fullDay: 1440,
     minutes: 60,
@@ -18,11 +29,12 @@ export class ShiftSegmentResolver {
   };
   constructor() {}
 
-  resolve(
-    shift: Shift,
-    meta: WorkDayMeta,
-    segmentMap: Record<WorkDayType, LabeledSegmentRange[]>,
-  ): LabeledSegmentRange[] {
+  resolve(params: {
+    shift: Shift;
+    meta: WorkDayMeta;
+    segmentMap: Record<WorkDayType, LabeledSegmentRange[]>;
+  }): LabeledSegmentRange[] {
+    const { shift, meta, segmentMap } = params;
     const start = shift.start.minutes;
     const end = shift.end.minutes;
 

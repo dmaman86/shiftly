@@ -1,36 +1,49 @@
-import { RegularBreakdown } from "@/domain/types/types";
+import { RegularBreakdown, Reducer, RegularConfig } from "@/domain";
 
-export abstract class BaseRegularCalculator {
-  protected readonly MID_TIER = 2; // 2 hours
+export abstract class BaseRegularCalculator
+  implements Reducer<RegularBreakdown>
+{
+  /*protected readonly MID_TIER = 2; // 2 hours
 
   protected readonly fieldShiftPercent: Record<string, number> = {
     hours100: 1,
     hours125: 1.25,
     hours150: 1.5,
-  };
+  };*/
 
-  constructor() {}
+  protected readonly config: RegularConfig;
+
+  constructor(config?: Partial<RegularConfig>) {
+    this.config = {
+      midTierThreshold: config?.midTierThreshold ?? 2,
+      percentages: {
+        hours100: config?.percentages?.hours100 ?? 1,
+        hours125: config?.percentages?.hours125 ?? 1.25,
+        hours150: config?.percentages?.hours150 ?? 1.5,
+      },
+    };
+  }
 
   createEmpty(): RegularBreakdown {
     return {
-      hours100: { percent: this.fieldShiftPercent.hours100, hours: 0 },
-      hours125: { percent: this.fieldShiftPercent.hours125, hours: 0 },
-      hours150: { percent: this.fieldShiftPercent.hours150, hours: 0 },
+      hours100: { percent: this.config.percentages.hours100, hours: 0 },
+      hours125: { percent: this.config.percentages.hours125, hours: 0 },
+      hours150: { percent: this.config.percentages.hours150, hours: 0 },
     };
   }
 
-  protected handleSpecial(totalHours: number): RegularBreakdown {
+  handleSpecial(totalHours: number): RegularBreakdown {
     return {
-      hours100: { percent: this.fieldShiftPercent.hours100, hours: 0 },
-      hours125: { percent: this.fieldShiftPercent.hours125, hours: 0 },
-      hours150: { percent: this.fieldShiftPercent.hours150, hours: totalHours },
+      hours100: { percent: this.config.percentages.hours100, hours: 0 },
+      hours125: { percent: this.config.percentages.hours125, hours: 0 },
+      hours150: {
+        percent: this.config.percentages.hours150,
+        hours: totalHours,
+      },
     };
   }
 
-  protected accumulate(
-    base: RegularBreakdown,
-    add: RegularBreakdown,
-  ): RegularBreakdown {
+  accumulate(base: RegularBreakdown, add: RegularBreakdown): RegularBreakdown {
     return {
       hours100: {
         percent: base.hours100.percent,
@@ -47,22 +60,19 @@ export abstract class BaseRegularCalculator {
     };
   }
 
-  protected subtract(
-    base: RegularBreakdown,
-    sub: RegularBreakdown,
-  ): RegularBreakdown {
+  subtract(base: RegularBreakdown, sub: RegularBreakdown): RegularBreakdown {
     return {
       hours100: {
         percent: base.hours100.percent,
-        hours: base.hours100.hours - sub.hours100.hours,
+        hours: Math.max(base.hours100.hours - sub.hours100.hours, 0),
       },
       hours125: {
         percent: base.hours125.percent,
-        hours: base.hours125.hours - sub.hours125.hours,
+        hours: Math.max(base.hours125.hours - sub.hours125.hours, 0),
       },
       hours150: {
         percent: base.hours150.percent,
-        hours: base.hours150.hours - sub.hours150.hours,
+        hours: Math.max(base.hours150.hours - sub.hours150.hours, 0),
       },
     };
   }

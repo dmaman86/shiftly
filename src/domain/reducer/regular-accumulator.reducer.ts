@@ -1,14 +1,7 @@
-import {
-  RegularBreakdown,
-  BaseRegularCalculator,
-  RegularReducer,
-} from "@/domain";
+import { BaseRegularCalculator } from "@/domain";
 
-export class RegularByMonthAccumulator
-  extends BaseRegularCalculator
-  implements RegularReducer
-{
-  createEmpty(): RegularBreakdown {
+export class RegularByMonthAccumulator extends BaseRegularCalculator {
+  /*createEmpty(): RegularBreakdown {
     return super.createEmpty();
   }
 
@@ -18,5 +11,5 @@ export class RegularByMonthAccumulator
 
   sub(base: RegularBreakdown, sub: RegularBreakdown): RegularBreakdown {
     return this.subtract(base, sub);
-  }
+  }*/
 }

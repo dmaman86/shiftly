@@ -1,5 +1,5 @@
 import { WorkDayType } from "@/constants";
-import { DayInfoResolver, WorkDayInfo } from "../types/types";
+import { DayInfoResolver, WorkDayInfo } from "@/domain";
 
 export class WorkDayInfoResolver implements DayInfoResolver {
   isSpecialFullDay(day: WorkDayInfo): boolean {

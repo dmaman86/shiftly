@@ -1,6 +1,6 @@
-import { PerDiemMonthCalculator, PerDiemInfo } from "@/domain";
+import { PerDiemInfo, PerDiemMonthReducer } from "@/domain";
 
-export class DefaultPerDiemMonthCalculator implements PerDiemMonthCalculator {
+export class DefaultPerDiemMonthCalculator implements PerDiemMonthReducer {
   createEmpty() {
     return { tier: null, points: 0, amount: 0 };
   }
@@ -16,8 +16,8 @@ export class DefaultPerDiemMonthCalculator implements PerDiemMonthCalculator {
   subtract(base: PerDiemInfo, sub: PerDiemInfo): PerDiemInfo {
     return {
       tier: null,
-      points: base.points - sub.points,
-      amount: base.amount - sub.amount,
+      points: Math.max(base.points - sub.points, 0),
+      amount: Math.max(base.amount - sub.amount, 0),
     };
   }
 }

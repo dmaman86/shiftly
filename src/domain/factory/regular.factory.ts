@@ -3,7 +3,8 @@ import {
   RegularByDayCalculator,
   RegularByMonthAccumulator,
   RegularCalculator,
-  RegularReducer,
+  RegularBreakdown,
+  Reducer,
 } from "@/domain";
 
 export class RegularFactory {
@@ -15,7 +16,7 @@ export class RegularFactory {
     return new RegularByDayCalculator();
   }
 
-  static monthReducer(): RegularReducer {
+  static monthReducer(): Reducer<RegularBreakdown> {
     return new RegularByMonthAccumulator();
   }
 }

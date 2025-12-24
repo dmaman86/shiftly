@@ -1,6 +1,6 @@
-import { MealAllowance } from "../types/types";
+import { MealAllowance, Reducer } from "@/domain";
 
-export class MealAllowanceMonthReducer {
+export class MealAllowanceMonthReducer implements Reducer<MealAllowance> {
   createEmpty(): MealAllowance {
     return {
       large: { points: 0, amount: 0 },

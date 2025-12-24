@@ -38,6 +38,7 @@ export const buildPayMapPipeline = () => {
 
   const extraCalculator = new ExtraCalculator();
   const specialCalculator = new SpecialCalculator();
+
   const sickCalculator = new FixedSegmentFactory();
   const vacationCalculator = new FixedSegmentFactory();
   const extraShabbatCalculator = new FixedSegmentFactory();
@@ -116,11 +117,9 @@ export const buildPayMapPipeline = () => {
 
   const workPayMonthReducer = new WorkDayMonthReducer(workPay);
 
-  const fixed: FixedSegmentMonthReducer = new FixedSegmentMonthReducer(
-    fixedSegmentBundle,
-  );
+  const fixed = new FixedSegmentMonthReducer(fixedSegmentBundle);
 
-  const allowances: MealAllowanceMonthReducer = new MealAllowanceMonthReducer();
+  const allowances = new MealAllowanceMonthReducer();
 
   const monthPayMapCalculator = new MonthPayMapReducer(
     workPayMonthReducer,

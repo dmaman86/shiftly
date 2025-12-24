@@ -1,18 +1,28 @@
-import { LargeMealAllowanceCalculator } from "../calculator/mealallowance/large-mealallowance.calculator";
-import { SmallMealAllowanceCalculator } from "../calculator/mealallowance/small-mealallowance.calculator";
 import {
   MealAllowance,
   MealAllowanceDayInfo,
   MealAllowanceRates,
-} from "../types/types";
+  LargeMealAllowanceCalculator,
+  SmallMealAllowanceCalculator,
+  Resolver,
+} from "@/domain";
 
-export class MealAllowanceResolver {
+export class MealAllowanceResolver
+  implements
+    Resolver<
+      {
+        day: MealAllowanceDayInfo;
+        rates: MealAllowanceRates;
+      },
+      MealAllowance
+    >
+{
   constructor(
     private readonly largeCalculator: LargeMealAllowanceCalculator,
     private readonly smallCalculator: SmallMealAllowanceCalculator,
   ) {}
 
-  create(): MealAllowance {
+  createEmpty(): MealAllowance {
     return {
       large: { points: 0, amount: 0 },
       small: { points: 0, amount: 0 },

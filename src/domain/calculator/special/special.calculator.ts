@@ -1,11 +1,14 @@
 import {
+  Calculator,
   LabeledSegmentRange,
-  SegmentBasedCalculator,
+  Reducer,
   SpecialBreakdown,
 } from "@/domain";
 
 export class SpecialCalculator
-  implements SegmentBasedCalculator<SpecialBreakdown>
+  implements
+    Calculator<LabeledSegmentRange[], SpecialBreakdown>,
+    Reducer<SpecialBreakdown>
 {
   private readonly fieldShiftPercent: Record<string, number> = {
     hours150: 1.5,
@@ -56,11 +59,11 @@ export class SpecialCalculator
     return {
       shabbat150: {
         percent: base.shabbat150.percent,
-        hours: base.shabbat150.hours - sub.shabbat150.hours,
+        hours: Math.max(base.shabbat150.hours - sub.shabbat150.hours, 0),
       },
       shabbat200: {
         percent: base.shabbat200.percent,
-        hours: base.shabbat200.hours - sub.shabbat200.hours,
+        hours: Math.max(base.shabbat200.hours - sub.shabbat200.hours, 0),
       },
     };
   }

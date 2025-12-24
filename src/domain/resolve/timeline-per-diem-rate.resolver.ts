@@ -1,12 +1,15 @@
-import { PerDiemRateResolver } from "@/domain/types/types";
+import { Resolver } from "@/domain";
 
-export class TimelinePerDiemRateResolver implements PerDiemRateResolver {
+export class TimelinePerDiemRateResolver
+  implements Resolver<{ year: number; month: number }, number>
+{
   private readonly timeline = [
     { year: 2000, month: 1, rateA: 33.9 },
     { year: 2024, month: 9, rateA: 36.3 },
   ];
 
-  getRateForRate(year: number, month: number): number {
+  resolve(params: { year: number; month: number }): number {
+    const { year, month } = params;
     const applicable = this.timeline
       .filter(
         (entry) =>

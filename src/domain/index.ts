@@ -1,4 +1,8 @@
 export * from "./types/types";
+export * from "./types/bundles";
+export * from "./types/core-behaviors";
+export * from "./types/data-shapes";
+export * from "./types/services";
 
 export * from "./builder";
 

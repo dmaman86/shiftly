@@ -19,7 +19,7 @@ export class ShiftResolverFactory {
       resolve(shift: Shift, meta: WorkDayMeta): LabeledSegmentRange[] {
         const specialStart = getSpecialStartMinutes(meta.date);
         const segmentMap = segmentBuilder.build(specialStart);
-        return resolver.resolve(shift, meta, segmentMap);
+        return resolver.resolve({ shift, meta, segmentMap });
       },
     };
   }

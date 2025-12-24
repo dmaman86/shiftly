@@ -34,12 +34,12 @@ export const MonthlySalarySummary = ({
   const [extraRows, setExtraRows] = useState<PayRowVM[]>([]);
   const [allowanceRows, setAllowanceRows] = useState<PayRowVM[]>([]);
 
-  const rateDiem = domain.resolvers.perDiemResolver.getRateForRate(year, month);
+  const rateDiem = domain.resolvers.perDiemResolver.resolve({ year, month });
 
-  const allowanceRate = domain.resolvers.mealAllowanceRateResolver.getRates(
+  const allowanceRate = domain.resolvers.mealAllowanceRateResolver.resolve({
     year,
     month,
-  );
+  });
 
   const payVM = useMemo(() => {
     return monthToPayBreakdownVM(globalBreakdown);

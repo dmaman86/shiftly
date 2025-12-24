@@ -1,4 +1,4 @@
-import { Segment } from "@/domain/types/types";
+import { Segment } from "@/domain";
 
 export class FixedSegmentFactory {
   private readonly fieldShiftPercent: Record<string, number> = {

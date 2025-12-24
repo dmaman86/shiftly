@@ -1,10 +1,15 @@
 import {
-  SegmentBasedCalculator,
   ExtraBreakdown,
   LabeledSegmentRange,
+  Calculator,
+  Reducer,
 } from "@/domain";
 
-export class ExtraCalculator implements SegmentBasedCalculator<ExtraBreakdown> {
+export class ExtraCalculator
+  implements
+    Calculator<LabeledSegmentRange[], ExtraBreakdown>,
+    Reducer<ExtraBreakdown>
+{
   private readonly fieldShiftPercent: Record<string, number> = {
     hours20: 0.2,
     hours50: 0.5,
@@ -53,11 +58,11 @@ export class ExtraCalculator implements SegmentBasedCalculator<ExtraBreakdown> {
     return {
       hours20: {
         percent: base.hours20.percent,
-        hours: base.hours20.hours - sub.hours20.hours,
+        hours: Math.max(base.hours20.hours - sub.hours20.hours, 0),
       },
       hours50: {
         percent: base.hours50.percent,
-        hours: base.hours50.hours - sub.hours50.hours,
+        hours: Math.max(base.hours50.hours - sub.hours50.hours, 0),
       },
     };
   }
