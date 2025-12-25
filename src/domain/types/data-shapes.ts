@@ -1,6 +1,20 @@
 import { MealAllowanceDayInfo } from "./bundles";
 import { WorkDayMeta } from "./types";
 
+export type HeaderWithChildren = {
+  label: string;
+  children: string[];
+  rowSpan?: never;
+};
+
+export type HeaderSingle = {
+  label: string;
+  rowSpan?: number;
+  children?: never;
+};
+
+export type TableHeader = HeaderWithChildren | HeaderSingle;
+
 // --- Primitives ---
 export interface Segment {
   percent: number;

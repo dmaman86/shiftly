@@ -1,11 +1,8 @@
 import { useMemo } from "react";
 import {
   Table,
-  TableCell,
-  TableHead,
   TableRow,
   Typography,
-  Box,
   Paper,
   TableContainer,
   TableBody,
@@ -13,9 +10,9 @@ import {
 } from "@mui/material";
 
 import { useGlobalState } from "@/hooks";
-import { getTotalColumns, groupByShabbat } from "@/utils";
+import { groupByShabbat } from "@/utils";
 import { headersTable } from "@/constants";
-import { PayBreakdownRow, DayRow } from "@/components";
+import { PayBreakdownRow, DayRow, WorkTableHeader } from "@/components";
 import { DomainContextType } from "@/context";
 import { monthToPayBreakdownVM } from "@/adapters";
 import { WorkDayInfo } from "@/domain";
@@ -30,11 +27,6 @@ export const WorkTable = ({ domain, workDays }: WorkTableProps) => {
   const { monthResolver } = domain.resolvers;
 
   const groupByWeeks = useMemo(() => groupByShabbat(workDays), [workDays]);
-
-  const totalColumns = useMemo(
-    () => getTotalColumns(headersTable, baseRate),
-    [baseRate],
-  );
 
   return (
     <>
@@ -53,85 +45,27 @@ export const WorkTable = ({ domain, workDays }: WorkTableProps) => {
                   size="small"
                   sx={{
                     borderCollapse: "collapse",
-                    "& td, & th": {
-                      border: "1px solid #ddd",
+                    "& th": {
                       textAlign: "center",
                     },
                   }}
                 >
-                  <TableHead>
-                    <TableRow>
-                      {headersTable.map((header, i) => (
-                        <TableCell
-                          key={`group-${i}`}
-                          align="center"
-                          colSpan={
-                            "children" in header ? header.children!.length : 1
-                          }
-                          rowSpan={
-                            "children" in header ? 1 : (header.rowSpan ?? 2)
-                          }
-                          sx={{
-                            fontWeight: "bold",
-                            minWidth: `${"children" in header ? header.children!.length : 1 * 90}px`,
-                          }}
-                        >
-                          <div className="row">
-                            <div className="col-12 fw-bold">{header.label}</div>
-                          </div>
-                          {"children" in header && (
-                            <div className="row text-center">
-                              {header.children!.map((child, j) => (
-                                <div className="col" key={`child-${i}-${j}`}>
-                                  {child}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </TableCell>
-                      ))}
-
-                      {baseRate > 0 && (
-                        <TableCell
-                          sx={{
-                            fontWeight: "bold",
-                            minWidth: "90px",
-                          }}
-                        >
-                          שכר יומי
-                        </TableCell>
-                      )}
-                    </TableRow>
-                    <TableRow style={{ display: "none" }}>
-                      {headersTable.flatMap((header, i) =>
-                        "children" in header
-                          ? header.children!.map((_, j) => (
-                              <TableCell key={`invisible-${i}-${j}`} />
-                            ))
-                          : [
-                              <TableCell
-                                key={`col-flat-${i}-${header.label}`}
-                              />,
-                            ],
-                      )}
-                      {baseRate > 0 && <TableCell />}
-                    </TableRow>
-                  </TableHead>
+                  <WorkTableHeader headers={headersTable} baseRate={baseRate} />
 
                   {groupByWeeks.map((group, index) => (
                     <TableBody key={index}>
-                      {group.map((day) => (
-                        <DayRow
-                          domain={domain}
-                          key={day.meta.date}
-                          workDay={day}
-                        />
-                      ))}
-                      <TableRow>
-                        <TableCell colSpan={totalColumns} sx={{ p: 0 }}>
-                          <Box sx={{ height: 2, backgroundColor: "red" }} />
-                        </TableCell>
-                      </TableRow>
+                      {group.map((day, dayIndex) => {
+                        const isLastInWeek = dayIndex === group.length - 1;
+
+                        return (
+                          <DayRow
+                            domain={domain}
+                            key={day.meta.date}
+                            workDay={day}
+                            isLastInWeek={isLastInWeek}
+                          />
+                        );
+                      })}
                     </TableBody>
                   ))}
                   <TableFooter>

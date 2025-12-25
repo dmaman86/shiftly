@@ -1,3 +1,5 @@
+import { TableHeader } from "@/domain";
+
 export const fieldShiftPercent: Record<string, number> = {
   hours50: 0.5,
   hours20: 0.2,
@@ -33,7 +35,7 @@ export enum WorkDayType {
   SpecialFull = "SpecialFull",
 }
 
-export const headersTable = [
+export const headersTable: TableHeader[] = [
   { label: "יום", rowSpan: 2 },
   { label: "", children: ["מחלה", "חופש"] },
   { label: "שעות", rowSpan: 2 },

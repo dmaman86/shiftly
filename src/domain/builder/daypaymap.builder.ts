@@ -91,27 +91,37 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
     });
   }
 
-  private buildMealAllowanceDayInfo(params: {
+  private classifyMealAllowanceDayInfo(params: {
     totalHours: number;
     extra: ExtraBreakdown;
     special: SpecialBreakdown;
     isFieldDutyDay: boolean;
   }) {
-    const hasNight =
-      params.extra.hours50.hours >= 2 || params.special.shabbat200.hours >= 2;
+    // Night hours are represented by 50% (regular nights) or 200% (special nights)
+    const nightHours =
+      params.extra.hours50.hours + params.special.shabbat200.hours;
 
-    const nonMorningHours =
-      params.extra.hours20.hours +
-      params.extra.hours50.hours +
-      params.special.shabbat150.hours +
-      params.special.shabbat200.hours;
+    const totalInt = Math.floor(params.totalHours);
+    // Business rule: night is considered "meaningful" only from 4 hours and above
+    const NIGHT_THRESHOLD = 4;
 
-    const hasMorning = params.totalHours - nonMorningHours > 0;
+    if (nightHours < NIGHT_THRESHOLD) {
+      // Day single shift (even if it slightly touches night boundaries)
+      return {
+        totalHours: params.totalHours,
+        hasMorning: true,
+        hasNight: false,
+        isFieldDutyDay: params.isFieldDutyDay,
+      };
+    }
+
+    const nightInt = Math.max(1, Math.floor(nightHours));
+    const ratio = totalInt / nightInt;
 
     return {
       totalHours: params.totalHours,
-      hasMorning,
-      hasNight,
+      hasMorning: ratio >= 2,
+      hasNight: true,
       isFieldDutyDay: params.isFieldDutyDay,
     };
   }
@@ -142,7 +152,7 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
     });
     const perDiem = this.calculatePerDiem(perDiemShifts, year, month);
 
-    const dayInfo = this.buildMealAllowanceDayInfo({
+    const dayInfo = this.classifyMealAllowanceDayInfo({
       totalHours,
       extra,
       special,

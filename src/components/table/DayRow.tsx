@@ -23,6 +23,7 @@ import { dayToPayBreakdownVM } from "@/adapters";
 type DayRowProps = {
   domain: DomainContextType;
   workDay: WorkDayInfo;
+  isLastInWeek?: boolean;
 };
 
 const isSameDayPayMap = (a: WorkDayMap, b: WorkDayMap) => {
@@ -33,7 +34,7 @@ const isSameDayPayMap = (a: WorkDayMap, b: WorkDayMap) => {
   );
 };
 
-export const DayRow = ({ domain, workDay }: DayRowProps) => {
+export const DayRow = ({ domain, workDay, isLastInWeek }: DayRowProps) => {
   const { dayInfoResolver } = domain.resolvers;
   const { baseRate, standardHours, year, month, addDay, removeDay } =
     useGlobalState();
@@ -92,9 +93,26 @@ export const DayRow = ({ domain, workDay }: DayRowProps) => {
   }, [dayPayMap, workDay.meta.date, addDay, removeDay]);
 
   return (
-    <TableRow key={workDay.meta.date}>
-      <TableCell>{dayInfoResolver.formatHebrewWorkDay(workDay)}</TableCell>
-      <TableCell>
+    <TableRow
+      key={workDay.meta.date}
+      sx={
+        isLastInWeek
+          ? {
+              "& td": { borderBottom: "1px solid black" },
+            }
+          : undefined
+      }
+    >
+      <TableCell
+        sx={{
+          borderRight: "1px solid black",
+          borderLeft: "1px solid black",
+          textAlign: "center",
+        }}
+      >
+        {dayInfoResolver.formatHebrewWorkDay(workDay)}
+      </TableCell>
+      <TableCell sx={{ textAlign: "center" }}>
         {!specialFullDay && (
           <Checkbox
             checked={status === WorkDayStatus.sick}
@@ -106,7 +124,7 @@ export const DayRow = ({ domain, workDay }: DayRowProps) => {
           />
         )}
       </TableCell>
-      <TableCell>
+      <TableCell sx={{ borderRight: "1px solid black", textAlign: "center" }}>
         {!specialFullDay && (
           <Checkbox
             checked={status === WorkDayStatus.vacation}
@@ -120,7 +138,7 @@ export const DayRow = ({ domain, workDay }: DayRowProps) => {
           />
         )}
       </TableCell>
-      <TableCell>
+      <TableCell sx={{ borderRight: "1px solid black" }}>
         <Stack direction="row" spacing={2} alignItems="flex-start">
           {isEditable && (
             <>

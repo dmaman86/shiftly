@@ -1,4 +1,4 @@
-import { PayBreakdownViewModel, WorkDayInfo } from "@/domain";
+import { PayBreakdownViewModel, TableHeader, WorkDayInfo } from "@/domain";
 
 export const minutesToTimeStr = (minutes: number): string => {
   const clean = minutes % (24 * 60);
@@ -32,7 +32,7 @@ export const groupByShabbat = (workDays: WorkDayInfo[]): WorkDayInfo[][] => {
   return groups;
 };
 
-export const getTotalColumns = (headers: any[], baseRate: number) => {
+export const getTotalColumns = (headers: TableHeader[], baseRate: number) => {
   const base = headers.reduce((sum, header) => {
     if ("children" in header && Array.isArray(header.children)) {
       return sum + header.children.length;
@@ -41,6 +41,23 @@ export const getTotalColumns = (headers: any[], baseRate: number) => {
   }, 0);
 
   return base + (baseRate > 0 ? 1 : 0);
+};
+
+export const getVerticalGroupSeparators = (headers: TableHeader[]) => {
+  let colIndex = 0;
+  const separators: number[] = [];
+
+  headers.forEach((header) => {
+    const span = "children" in header ? header.children!.length : 1;
+    colIndex += span;
+    separators.push(colIndex - 1); // last column of the group
+  });
+
+  return separators;
+};
+
+export const getVerticalBorder = (colIndex: number, separators: number[]) => {
+  return separators.includes(colIndex) ? "3px solid red" : "1px solid #ddd";
 };
 
 export const computeTotalPay = (
