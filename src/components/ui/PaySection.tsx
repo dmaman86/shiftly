@@ -1,6 +1,7 @@
 import { TableCell, TableRow, TextField } from "@mui/material";
 import { PayRowVM } from "./PayRowVM";
 import { formatValue } from "@/utils";
+import { useEffect, useState } from "react";
 
 type PaySectionProps = {
   rows: PayRowVM[];
@@ -17,7 +18,24 @@ export const PaySection = ({
   onChange,
   backgroundColor = "#f0f0f0",
 }: PaySectionProps) => {
+  const [quantities, setQuantities] = useState<string[]>(
+    rows.map((r) => r.quantity.toString()),
+  );
+
   const total = rows.reduce((sum, r) => sum + r.total, 0);
+
+  useEffect(() => {
+    if (!editMode) return;
+    setQuantities(rows.map((r) => r.quantity.toString()));
+  }, [rows, editMode]);
+
+  const updateQuantity = (index: number, value: string) => {
+    setQuantities((prev) => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+  };
 
   return (
     <>
@@ -27,14 +45,16 @@ export const PaySection = ({
           <TableCell>
             {editMode ? (
               <TextField
-                type="number"
+                type="text"
+                inputMode="numeric"
                 variant="standard"
                 size="small"
-                value={row.quantity}
-                onChange={(e) => {
-                  const quantity = Number(e.target.value);
-                  if (isNaN(quantity) || quantity < 0) return;
-                  onChange(index, quantity);
+                value={quantities[index] ?? ""}
+                onChange={(e) => updateQuantity(index, e.target.value)}
+                onBlur={() => {
+                  const parsed = Number(quantities[index]);
+                  if (isNaN(parsed) || parsed < 0) return;
+                  onChange(index, parsed);
                 }}
               />
             ) : (
