@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   FormControl,
   InputLabel,
@@ -27,6 +27,12 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
     updateBaseRate,
   } = useGlobalState();
 
+  const [inputsValues, setInputsValues] = useState({
+    yearInput: year.toString(),
+    standardHoursInput: standardHours.toString(),
+    baseRateInput: baseRate.toString(),
+  });
+
   const { monthResolver } = domain.resolvers;
 
   const availableMonths: { value: number; label: string }[] = useMemo(() => {
@@ -41,6 +47,21 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
     return "";
   }, [baseRate, mode]);
 
+  useEffect(() => {
+    setInputsValues({
+      yearInput: year.toString(),
+      standardHoursInput: standardHours.toString(),
+      baseRateInput: baseRate.toString(),
+    });
+  }, [year, standardHours, baseRate]);
+
+  const updateInput = (key: keyof typeof inputsValues) => (value: string) => {
+    setInputsValues((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
   return (
     <div className="container">
       <div className="row mb-2">
@@ -50,10 +71,15 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
               <div className="col-6">
                 <ConfigInput
                   name="year"
-                  value={year}
+                  value={inputsValues.yearInput}
                   label="שנה"
-                  onChange={(parsedYear) => {
-                    if (parsedYear <= monthResolver.getCurrentYear()) {
+                  onChange={updateInput("yearInput")}
+                  onBlur={() => {
+                    const parsedYear = Number(inputsValues.yearInput);
+                    if (
+                      !isNaN(parsedYear) &&
+                      parsedYear <= monthResolver.getCurrentYear()
+                    ) {
                       updateYear(parsedYear);
                       updateMonth(1); // reset month to January
                     }
@@ -102,20 +128,32 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
             <div className="col-6">
               <ConfigInput
                 name="standardHours"
-                value={standardHours}
+                value={inputsValues.standardHoursInput}
                 label="שעות תקן"
                 helperText="ברירת מחדל: 6.67 שעות. מעבר לכך נחשב כשעות נוספות"
-                onChange={(hours) => updateStandardHours(hours)}
+                onChange={updateInput("standardHoursInput")}
+                onBlur={() => {
+                  const parsedHours = Number(inputsValues.standardHoursInput);
+                  if (!isNaN(parsedHours) && parsedHours >= 0) {
+                    updateStandardHours(parsedHours);
+                  }
+                }}
               />
             </div>
             <div className="col-6">
               <ConfigInput
                 name="baseRate"
-                value={baseRate}
+                value={inputsValues.baseRateInput}
                 label="שכר שעתי"
                 helperText={helperTextBaseRate()}
                 error={baseRate === 0}
-                onChange={(rate) => updateBaseRate(rate)}
+                onChange={updateInput("baseRateInput")}
+                onBlur={() => {
+                  const parsedRate = Number(inputsValues.baseRateInput);
+                  if (!isNaN(parsedRate) && parsedRate >= 0) {
+                    updateBaseRate(parsedRate);
+                  }
+                }}
               />
             </div>
           </div>

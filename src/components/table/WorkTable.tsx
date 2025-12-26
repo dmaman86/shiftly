@@ -39,7 +39,16 @@ export const WorkTable = ({ domain, workDays }: WorkTableProps) => {
         <div className="row mb-3">
           <div className="col-12">
             <Paper>
-              <TableContainer sx={{ maxHeight: 600 }}>
+              <TableContainer
+                sx={{
+                  maxHeight: {
+                    xs: "70vh", // mobile
+                    sm: 600, // desktop
+                  },
+                  overflowY: "auto",
+                  WebkitOverflowScrolling: "touch",
+                }}
+              >
                 <Table
                   stickyHeader
                   size="small"

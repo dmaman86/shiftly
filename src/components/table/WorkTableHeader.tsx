@@ -11,7 +11,14 @@ export const WorkTableHeader = ({
   baseRate,
 }: WorkTableHeaderProps) => {
   return (
-    <TableHead>
+    <TableHead
+      sx={{
+        position: "sticky",
+        top: 0,
+        zIndex: 3,
+        backgroundColor: "white",
+      }}
+    >
       <TableRow>
         {headers.map((header, i) => {
           const span = header.children?.length ?? 1;
