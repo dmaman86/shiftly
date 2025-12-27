@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WorkDayInfo } from "@/domain";
-import { domain } from "@/context";
+import { domain } from "@/app";
 
 type WorkDaysState = {
   year: number | null;

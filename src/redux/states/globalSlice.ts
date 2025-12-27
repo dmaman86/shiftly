@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { MonthPayMap, WorkDayMap } from "@/domain";
-import { domain } from "@/context";
+import { domain } from "@/app";
 
 interface GlobalState {
   config: {

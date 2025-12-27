@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { Shift, ShiftPayMap, TimeFieldType, WorkDayMeta } from "@/domain";
-import { DomainContextType } from "@/context";
+import { DomainContextType } from "@/app";
 
 type ShiftProps = {
   domain: DomainContextType;

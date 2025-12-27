@@ -1,6 +1,6 @@
-import { ConfigPanel, MonthlySalarySummary } from "@/components";
-import { DomainContextType } from "@/context";
-import { Box, Stack } from "@mui/material";
+import { DomainContextType } from "@/app";
+import { ConfigPanel, MonthlySalarySummary } from "@/features";
+import { Box, Stack, Typography } from "@mui/material";
 
 export const MonthlySummaryPage = ({
   domain,
@@ -8,23 +8,28 @@ export const MonthlySummaryPage = ({
   domain: DomainContextType;
 }) => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-        mt: 4,
-      }}
-    >
-      <Stack spacing={3} sx={{ direction: "ltr" }}>
-        <Box>
-          <ConfigPanel domain={domain} mode={"monthly"} />
-        </Box>
+    <section className="mt-2">
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Stack spacing={3} sx={{ direction: "ltr" }}>
+          <Box>
+            <Typography variant="h5" gutterBottom sx={{ textAlign: "center" }}>
+              חישוב שכר חודשי
+            </Typography>
+          </Box>
+          <Box>
+            <ConfigPanel domain={domain} mode={"monthly"} />
+          </Box>
 
-        <Box>
-          <MonthlySalarySummary domain={domain} />
-        </Box>
-      </Stack>
-    </Box>
+          <Box>
+            <MonthlySalarySummary domain={domain} />
+          </Box>
+        </Stack>
+      </Box>
+    </section>
   );
 };

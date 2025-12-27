@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 
-import { WorkTable, ConfigPanel, MonthlySalarySummary } from "@/components";
+import { WorkTable, ConfigPanel, MonthlySalarySummary } from "@/features";
 import { useFetch, useGlobalState, useWorkDays } from "@/hooks";
 import { service, DateUtils } from "@/utils";
 import { ApiResponse } from "@/domain";
 import { buildEventMap } from "@/adapters";
-import { DomainContextType } from "@/context";
+import { DomainContextType } from "@/app";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const call = service();
@@ -42,39 +42,45 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const hasData = workDays.length > 0;
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-        mt: 4,
-      }}
-    >
-      <Stack spacing={3} sx={{ direction: "ltr" }}>
-        <Box>
-          <ConfigPanel domain={domain} mode={"daily"} />
-          {error && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body1" color="error">
-                {error}
-              </Typography>
+    <section className="mt-2">
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <Stack spacing={3} sx={{ direction: "ltr" }}>
+          <Box>
+            <Typography variant="h5" gutterBottom sx={{ textAlign: "center" }}>
+              חישוב שכר יומי
+            </Typography>
+          </Box>
+
+          <Box>
+            <ConfigPanel domain={domain} mode={"daily"} />
+            {error && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="body1" color="error">
+                  {error}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+
+          <Box sx={{ mt: 4 }}>
+            {loading && <CircularProgress sx={{ mt: 4 }} />}
+            {!loading && !error && hasData && (
+              <WorkTable domain={domain} workDays={workDays} />
+            )}
+          </Box>
+
+          {baseRate > 0 && (
+            <Box>
+              <MonthlySalarySummary domain={domain} />
             </Box>
           )}
-        </Box>
-
-        <Box sx={{ mt: 4 }}>
-          {loading && <CircularProgress sx={{ mt: 4 }} />}
-          {!loading && !error && hasData && (
-            <WorkTable domain={domain} workDays={workDays} />
-          )}
-        </Box>
-
-        {baseRate > 0 && (
-          <Box>
-            <MonthlySalarySummary domain={domain} />
-          </Box>
-        )}
-      </Stack>
-    </Box>
+        </Stack>
+      </Box>
+    </section>
   );
 };

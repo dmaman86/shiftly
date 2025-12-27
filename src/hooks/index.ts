@@ -3,3 +3,4 @@ export { useFetch } from "./useFetch";
 export { useShift } from "./useShift";
 export { useDay } from "./useDay";
 export { useGlobalState } from "./useGlobalState";
+export { useDomain } from "./useDomain";
