@@ -16,6 +16,10 @@ export class DefaultMonthResolver implements MonthResolver {
     "דצמבר",
   ];
 
+  // System effective date
+  private readonly systemStartYear = 2015;
+  private readonly systemStartMonth = 10; // November (0-based)
+
   constructor(private readonly dateProvider: () => Date = () => new Date()) {}
 
   private get now(): Date {
@@ -31,12 +35,30 @@ export class DefaultMonthResolver implements MonthResolver {
   }
 
   getAvailableMonths(year: number): number[] {
+    // Before system start year → no months
+    if (year < this.systemStartYear) {
+      return [];
+    }
+
+    // System start year (2015) → from November only
+    if (year === this.systemStartYear) {
+      return Array.from(
+        { length: 12 - this.systemStartMonth },
+        (_, i) => this.systemStartMonth + i,
+      );
+    }
+
+    // Past years
     if (year < this.currentYear) {
       return Array.from({ length: 12 }, (_, i) => i);
     }
+
+    // Current year
     if (year === this.currentYear) {
       return Array.from({ length: this.currentMonth + 1 }, (_, i) => i);
     }
+
+    // Future years
     return [];
   }
 
@@ -50,7 +72,15 @@ export class DefaultMonthResolver implements MonthResolver {
   }
 
   resolveDefaultMonth(year: number): number {
-    return year === this.currentYear ? this.currentMonth + 1 : 1;
+    if (year === this.systemStartYear) {
+      return this.systemStartMonth;
+    }
+
+    if (year === this.currentYear) {
+      return this.currentMonth;
+    }
+
+    return 0; // January
   }
 
   getMonthName(monthIndex: number): string {

@@ -78,6 +78,7 @@ export const ViewSwitcher = () => {
         <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
           <NavItem to="/daily">חישוב יומי</NavItem>
           <NavItem to="/monthly">חישוב חודשי</NavItem>
+          <NavItem to="/calculation-rules">כללי חישוב</NavItem>
         </Box>
       </Toolbar>
 
@@ -97,6 +98,9 @@ export const ViewSwitcher = () => {
           </NavItem>
           <NavItem to="/monthly" onClick={() => setOpen(false)}>
             חישוב חודשי
+          </NavItem>
+          <NavItem to="/calculation-rules" onClick={() => setOpen(false)}>
+            כללי חישוב
           </NavItem>
         </Box>
       </Collapse>

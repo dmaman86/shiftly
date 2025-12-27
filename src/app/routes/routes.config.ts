@@ -7,4 +7,8 @@ export const routes = [
     path: "/monthly",
     element: "MonthlySummaryPage",
   },
+  {
+    path: "/calculation-rules",
+    element: "CalculationRulesPage",
+  },
 ];
