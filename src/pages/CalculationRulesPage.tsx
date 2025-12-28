@@ -28,10 +28,10 @@ export const CalculationRulesPage = () => {
 
       {/* Daily time split */}
       <RuleCard title="🕒 חלוקת יום עבודה">
-        <RuleAccordion title="חלוקת שעות">
-          <Typography>06:00 – 14:00</Typography>
-          <Typography>14:00 – 22:00</Typography>
-          <Typography>22:00 – 06:00 (למחרת)</Typography>
+        <RuleAccordion title="יום עבודה רגיל">
+          <Typography>06:00 – 14:00 — שעות יום</Typography>
+          <Typography>14:00 – 22:00 — שעות ערב</Typography>
+          <Typography>22:00 – 06:00 — שעות לילה (למחרת)</Typography>
         </RuleAccordion>
 
         <RuleAccordion title="חציית יום">
@@ -42,12 +42,27 @@ export const CalculationRulesPage = () => {
       {/* Friday / Holiday */}
       <RuleCard title="🕯️ שישי וערבי חג">
         <RuleAccordion title="תחילת זמן מיוחד">
-          <Typography>שעון קיץ – החל מ־18:00</Typography>
-          <Typography>שעון חורף – החל מ־17:00</Typography>
+          <Typography>
+            עד שעת כניסת שבת / חג — החישוב מתבצע לפי יום רגיל.
+          </Typography>
+
+          <Typography sx={{ mt: 1 }}>
+            החל משעת כניסת שבת / חג — החישוב עובר למקטע מיוחד:
+          </Typography>
+
+          <Typography sx={{ mt: 1 }}>• שעון קיץ – החל מ־18:00</Typography>
+          <Typography>• שעון חורף – החל מ־17:00</Typography>
 
           <Typography sx={{ mt: 1 }} color="text.secondary">
             הזיהוי מתבצע אוטומטית לפי התאריך.
           </Typography>
+        </RuleAccordion>
+      </RuleCard>
+
+      <RuleCard title="🕯️ שבת / חג">
+        <RuleAccordion title="חלוקת היום">
+          <Typography>06:00 – 22:00 — יום מיוחד</Typography>
+          <Typography>22:00 – 06:00 — לילה מיוחד (למחרת)</Typography>
         </RuleAccordion>
       </RuleCard>
 

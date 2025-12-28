@@ -73,14 +73,14 @@ export class DefaultMonthResolver implements MonthResolver {
 
   resolveDefaultMonth(year: number): number {
     if (year === this.systemStartYear) {
-      return this.systemStartMonth;
+      return this.systemStartMonth + 1;
     }
 
     if (year === this.currentYear) {
-      return this.currentMonth;
+      return this.currentMonth + 1;
     }
 
-    return 0; // January
+    return 1; // January
   }
 
   getMonthName(monthIndex: number): string {

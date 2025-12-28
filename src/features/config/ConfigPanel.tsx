@@ -9,6 +9,7 @@ import {
 import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { ConfigInput } from "./ConfigInput";
+import { SYSTEM_START_YEAR } from "@/constants";
 
 type ConfigPanelProps = {
   domain: DomainContextType;
@@ -47,6 +48,18 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
     return "";
   }, [baseRate, mode]);
 
+  const yearError = useCallback((): boolean => {
+    const parsedYear = Number(inputsValues.yearInput);
+    return !isNaN(parsedYear) && parsedYear < SYSTEM_START_YEAR;
+  }, [inputsValues.yearInput]);
+
+  const yearHelperText = useCallback((): string => {
+    if (yearError()) {
+      return `השנה המינימלית הנתמכת היא ${SYSTEM_START_YEAR}`;
+    }
+    return "";
+  }, [yearError]);
+
   useEffect(() => {
     setInputsValues({
       yearInput: year.toString(),
@@ -73,15 +86,20 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                   name="year"
                   value={inputsValues.yearInput}
                   label="שנה"
+                  error={yearError()}
+                  helperText={yearHelperText()}
                   onChange={updateInput("yearInput")}
                   onBlur={() => {
                     const parsedYear = Number(inputsValues.yearInput);
                     if (
                       !isNaN(parsedYear) &&
+                      parsedYear >= SYSTEM_START_YEAR &&
                       parsedYear <= monthResolver.getCurrentYear()
                     ) {
                       updateYear(parsedYear);
-                      updateMonth(1); // reset month to January
+                      updateMonth(
+                        monthResolver.resolveDefaultMonth(parsedYear),
+                      );
                     }
                   }}
                 />

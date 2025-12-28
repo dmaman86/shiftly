@@ -19,6 +19,8 @@ export const fieldMinutes: Record<string, number> = {
   min22: 22 * 60,
 };
 
+export const SYSTEM_START_YEAR = 2015;
+
 export const regularFields = ["hours100", "hours125", "hours150"] as const;
 export const extraFields = ["hours20", "hours50"] as const;
 export const specialFields = ["shabbat150", "shabbat200"] as const;
