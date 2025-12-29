@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { Box, CircularProgress, Stack, Typography } from "@mui/material";
 
-import { WorkTable, ConfigPanel, MonthlySalarySummary } from "@/features";
+import {
+  WorkTable,
+  ConfigPanel,
+  MonthlySalarySummary,
+  SalaryFeedback,
+} from "@/features";
 import { useFetch, useGlobalState, useWorkDays } from "@/hooks";
 import { service, DateUtils } from "@/utils";
 import { ApiResponse } from "@/domain";
@@ -77,6 +82,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
           {baseRate > 0 && (
             <Box>
               <MonthlySalarySummary domain={domain} />
+              <SalaryFeedback />
             </Box>
           )}
         </Stack>

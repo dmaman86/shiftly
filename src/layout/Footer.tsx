@@ -1,8 +1,24 @@
-import { Box, Container, Typography, Link } from "@mui/material";
+import { Box, Typography, Link } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import EmailIcon from "@mui/icons-material/Email";
+import { useState } from "react";
+import {
+  INFO_DIALOG_CONTENT,
+  InfoDialog,
+  InfoDialogContent,
+  type InfoDialogKey,
+} from "@/features";
 
 export const Footer = () => {
+  const [openDialog, setOpenDialog] = useState<InfoDialogKey | null>(null);
+
+  const dialogConfig = openDialog ? INFO_DIALOG_CONTENT[openDialog] : null;
+
+  const closeDialog = () => setOpenDialog(null);
+
+  const infoKeys = Object.keys(INFO_DIALOG_CONTENT) as InfoDialogKey[];
+  const infoColSize = Math.floor(12 / infoKeys.length);
+
   return (
     <Box
       component="footer"
@@ -12,77 +28,105 @@ export const Footer = () => {
       }}
       dir="rtl"
     >
-      <Container
-        maxWidth="lg"
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          gap: 2,
-        }}
-      >
-        <Box dir="rtl">
-          <Typography variant="body2" color="textSecondary">
-            © {new Date().getFullYear()} Shiftly – מחשבון שכר וחישוב משמרות |
-            Salary & Shift Calculator
-          </Typography>
+      <div className="container">
+        <div className="row justity-content-center align-items-stretch">
+          {/* Column 1 */}
+          <div className="col-12 col-md-4 mb-2 mb-md-0">
+            <div className="d-flex h-100 align-items-center">
+              <Typography variant="body2" color="textSecondary">
+                © {new Date().getFullYear()} Shiftly – מחשבון שכר וחישוב משמרות
+                | Salary & Shift Calculator
+              </Typography>
+            </div>
+          </div>
+          {/* Column 2 */}
+          <div className="col-12 col-md-4">
+            <div className="d-flex h-100 align-items-center">
+              <div className="row w-100 justity-content-center">
+                {infoKeys.map((key) => {
+                  const { title, icon: Icon } = INFO_DIALOG_CONTENT[key];
 
-          <Typography
-            variant="caption"
-            color="textSecondary"
-            sx={{ display: "block", mt: 0.5 }}
-          >
-            מערכת בקרה והסבר לחישוב שעות עבודה ושכר, המיועדת לעובדי ביטחון
-            שעתיים במשרדי ממשלה, ומשחזרת את לוגיקת החישוב על-פי דוחות מערכת
-            מרכבה.
-          </Typography>
+                  return (
+                    <div
+                      key={key}
+                      className={`col-${infoColSize} d-flex justity-content-center`}
+                    >
+                      <Link
+                        key={key}
+                        component="button"
+                        underline="hover"
+                        color="textSecondary"
+                        variant="body2"
+                        onClick={() => setOpenDialog(key)}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5,
+                        }}
+                      >
+                        <Icon fontSize="small" />
+                        {title}
+                      </Link>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
 
-          <Typography
-            variant="caption"
-            color="textSecondary"
-            sx={{ display: "block", mt: 0.5 }}
-          >
-            למרות בדיקות מקיפות, ייתכן שהמערכת תציג חישוב שאינו מדויק בכל
-            התרחישים. אם נתקלתם באי־התאמה, נשמח לקבל דיווח לצורך שיפור המערכת.
-          </Typography>
+          {/* Column 3 */}
+          <div className="col-12 col-md-4">
+            <div className="d-flex h-100 align-items-center">
+              <div className="row w-100 justify-content-md-center justify-content-center">
+                <div className="col-6 col-md-auto">
+                  <Link
+                    component="button"
+                    onClick={() =>
+                      window.open(
+                        "https://github.com/dmaman86/shiftly",
+                        "_blank",
+                      )
+                    }
+                    underline="hover"
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                  >
+                    <GitHubIcon fontSize="small" />
+                    GitHub Repo
+                  </Link>{" "}
+                </div>
+                <div className="col-6 col-md-auto">
+                  <Link
+                    component="button"
+                    onClick={() =>
+                      (window.location.href = "mailto:dmaman86@gmail.com")
+                    }
+                    underline="hover"
+                    variant="body2"
+                    color="textSecondary"
+                    sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                  >
+                    <EmailIcon fontSize="small" />
+                    יצירת קשר
+                  </Link>{" "}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-          <Typography
-            variant="caption"
-            color="textSecondary"
-            sx={{ display: "block", mt: 0.5 }}
-          >
-            המערכת אינה שומרת מידע אישי ואינה עושה שימוש בעוגיות. ניתוח שימוש
-            אנונימי ובסיסי בלבד, לצורכי שיפור המערכת. אין מדובר במערכת שכר או
-            הנהלת חשבונות.
-          </Typography>
-          <Box sx={{ display: "flex", gap: 2, mt: 1 }}>
-            <Link
-              href="https://github.com/dmaman86/shiftly"
-              aria-label="GitHub Repository"
-              target="_blank"
-              rel="noopener noreferrer"
-              underline="hover"
-              variant="body2"
-              color="textSecondary"
-              sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-            >
-              <GitHubIcon fontSize="small" />
-              GitHub Repo
-            </Link>
-            <Link
-              href="mailto:dmaman86@gmail.com"
-              aria-label="Contact via Email"
-              underline="hover"
-              variant="body2"
-              color="textSecondary"
-              sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
-            >
-              <EmailIcon fontSize="small" />
-              יצירת קשר
-            </Link>
-          </Box>
-        </Box>
-      </Container>
+      {dialogConfig && (
+        <InfoDialog
+          open
+          title={dialogConfig.title}
+          icon={dialogConfig.icon}
+          onClose={closeDialog}
+        >
+          <InfoDialogContent paragraphs={dialogConfig.paragraphs} />
+        </InfoDialog>
+      )}
     </Box>
   );
 };
