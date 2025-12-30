@@ -34,8 +34,8 @@ export const Footer = () => {
           <div className="col-12 col-md-4 mb-2 mb-md-0">
             <div className="d-flex h-100 align-items-center">
               <Typography variant="body2" color="textSecondary">
-                © {new Date().getFullYear()} Shiftly – מחשבון שכר וחישוב משמרות
-                | Salary & Shift Calculator
+                © {new Date().getFullYear()} Shiftly – מחשבון סימולציות ובדיקות
+                שכר ומשמרות | Salary & Shift Simulation & Calculator
               </Typography>
             </div>
           </div>

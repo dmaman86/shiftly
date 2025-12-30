@@ -1,4 +1,4 @@
-import { SalaryFeedback, sendSalaryFeedback } from "@/adapters";
+import { SalaryFeedback, sendSalaryFeedback } from "@/services";
 
 export const useSalaryFeedback = () => {
   const submitFeedback = (feedback: SalaryFeedback) => {
