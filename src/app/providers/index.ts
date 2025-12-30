@@ -1,3 +1,5 @@
-export { DomainProvider } from "./DomainProvider";
+export { DomainProvider } from "./domain/DomainProvider";
 export { AppProviders } from "./AppProviders";
-export { DomainContext } from "./domainContext";
+export { AppSnackbarProvider } from "./snackbar/AppSnackbarProvider";
+export { DomainContext } from "./domain/domainContext";
+export { AppSnackbarContext } from "./snackbar/snackbarContext";

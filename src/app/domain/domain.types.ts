@@ -25,3 +25,10 @@ export type DomainContextType = {
     mealAllowanceRateResolver: TimelineMealAllowanceRateResolver;
   };
 };
+
+export interface AppSnackbarContextType {
+  info(message: string): void;
+  success(message: string): void;
+  warning(message: string): void;
+  error(message: string): void;
+}

@@ -27,6 +27,7 @@ export type Shift = {
   id: string;
   start: TimeFieldType;
   end: TimeFieldType;
+  isDuty: boolean;
 };
 
 // --- Breakdowns ---
