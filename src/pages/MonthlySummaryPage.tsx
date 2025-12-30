@@ -1,6 +1,13 @@
 import { DomainContextType } from "@/app";
 import { ConfigPanel, MonthlySalarySummary, Feedback } from "@/features";
-import { Box, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 export const MonthlySummaryPage = ({
   domain,
@@ -9,27 +16,27 @@ export const MonthlySummaryPage = ({
 }) => {
   return (
     <section className="mt-2">
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Stack spacing={3} sx={{ direction: "ltr" }}>
-          <Box>
-            <Typography variant="h5" gutterBottom sx={{ textAlign: "center" }}>
-              חישוב שכר חודשי
-            </Typography>
-          </Box>
-          <Box>
-            <ConfigPanel domain={domain} mode={"monthly"} />
-          </Box>
+      <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, md: 3 } }}>
+        <Card sx={{ mb: 3 }}>
+          <CardHeader
+            title={
+              <Typography variant="h5" fontWeight="bold">
+                חישוב שכר חודשי
+              </Typography>
+            }
+            sx={{
+              textAlign: "center",
+            }}
+          />
+          <CardContent>
+            <Stack spacing={3}>
+              <ConfigPanel domain={domain} mode={"monthly"} />
 
-          <Box>
-            <MonthlySalarySummary domain={domain} />
-            <Feedback />
-          </Box>
-        </Stack>
+              <MonthlySalarySummary domain={domain} />
+              <Feedback />
+            </Stack>
+          </CardContent>
+        </Card>
       </Box>
     </section>
   );

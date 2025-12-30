@@ -1,30 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableRow,
-  Typography,
-  TableCell,
-  Paper,
-  TableContainer,
-  Tooltip,
-  IconButton,
-} from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DoneIcon from "@mui/icons-material/Done";
-
-import { formatValue } from "@/utils";
+import { Typography, Box, Stack, Card, CardContent } from "@mui/material";
+import { AccessTime, AddCircleOutline, Restaurant } from "@mui/icons-material";
 import { Segment } from "@/domain";
 import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { monthToPayBreakdownVM } from "@/adapters";
 import { PayRowVM } from "./salarySummary.vm";
-import { PaySection } from "./PaySection";
 import {
   buildAllowanceRows,
   buildPayRowsFromSegments,
 } from "./salarySummary.mapper";
+import { SalaryCardSection } from "./SalaryCardSection";
+import { formatValue } from "@/utils";
+import { SummaryHeader } from "./SummaryHeader";
 
 export const MonthlySalarySummary = ({
   domain,
@@ -32,11 +20,12 @@ export const MonthlySalarySummary = ({
   domain: DomainContextType;
 }) => {
   const { globalBreakdown, baseRate, year, month } = useGlobalState();
-  const [editMode, setEditMode] = useState<boolean>(false);
 
   const [baseRows, setBaseRows] = useState<PayRowVM[]>([]);
   const [extraRows, setExtraRows] = useState<PayRowVM[]>([]);
   const [allowanceRows, setAllowanceRows] = useState<PayRowVM[]>([]);
+
+  const monthResolver = domain.resolvers.monthResolver;
 
   const rateDiem = domain.resolvers.perDiemResolver.resolve({ year, month });
 
@@ -90,115 +79,86 @@ export const MonthlySalarySummary = ({
     calculateTotal(extraRows) +
     calculateTotal(allowanceRows);
 
-  const toggleEditMode = () => setEditMode((prev) => !prev);
-
   return (
-    <>
-      <div className="container">
-        <div className="row d-flex align-items-center mb-2">
-          <div className="col text-start">
-            <Typography variant="h5" gutterBottom sx={{ textAlign: "center" }}>
-              סיכום שכר חודשי - ברוטו - לפי שעות
-            </Typography>
-          </div>
-          <div className="col-auto">
-            <Tooltip title={editMode ? "סיים עריכה" : "ערוך שעות"}>
-              <IconButton onClick={toggleEditMode} size="small">
-                {editMode ? <DoneIcon /> : <EditIcon />}
-              </IconButton>
-            </Tooltip>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-12">
-            <Paper>
-              <TableContainer>
-                <Table
-                  size="small"
-                  sx={{
-                    borderCollapse: "collapse",
-                    "& td, & th": {
-                      textAlign: "center",
-                      border: "1px solid #ddd",
-                    },
-                    "& th": { fontWeight: "bold" },
-                  }}
-                >
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>סוג</TableCell>
-                      <TableCell>כמות</TableCell>
-                      <TableCell>ערך</TableCell>
-                      <TableCell>סכום</TableCell>
-                      <TableCell />
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    <PaySection
-                      rows={baseRows}
-                      summaryLabel="סה״כ 100%"
-                      editMode={editMode}
-                      onChange={(index, quantity) =>
-                        setBaseRows((prev) =>
-                          prev.map((r, i) =>
-                            i === index
-                              ? { ...r, quantity, total: quantity * r.rate }
-                              : r,
-                          ),
-                        )
-                      }
-                    />
-                    <PaySection
-                      rows={extraRows}
-                      summaryLabel="סה״כ תוספות"
-                      editMode={editMode}
-                      onChange={(index, quantity) =>
-                        setExtraRows((prev) =>
-                          prev.map((r, i) =>
-                            i === index
-                              ? { ...r, quantity, total: quantity * r.rate }
-                              : r,
-                          ),
-                        )
-                      }
-                    />
-
-                    <PaySection
-                      rows={allowanceRows}
-                      summaryLabel="סה״כ"
-                      editMode={editMode}
-                      onChange={(index, quantity) =>
-                        setAllowanceRows((prev) =>
-                          prev.map((r, i) =>
-                            i === index
-                              ? { ...r, quantity, total: quantity * r.rate }
-                              : r,
-                          ),
-                        )
-                      }
-                    />
-
-                    <TableRow
-                      sx={{ backgroundColor: "#e0e0e0", fontWeight: "bold" }}
-                    >
-                      <TableCell />
-                      <TableCell />
-                      <TableCell />
-                      <TableCell>סה״כ לתשלום</TableCell>
-                      <TableCell>
-                        {monthlySalary > 0
-                          ? `₪
-                    ${formatValue(monthlySalary)}`
-                          : ""}
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
-          </div>
-        </div>
-      </div>
-    </>
+    <Card sx={{ mb: 3 }}>
+      <CardContent>
+        <SummaryHeader
+          title="💰 סיכום שכר חודשי"
+          subtitle={`ברוטו - לפי שעות - ${monthResolver.getMonthName(month - 1)} ${year}`}
+        />
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={3}
+          alignItems="flex-start"
+        >
+          <Box sx={{ flex: 1, width: "100%" }}>
+            <SalaryCardSection
+              title="שעות בסיס וזכויות"
+              icon={<AccessTime color="primary" />}
+              rows={baseRows}
+              summaryLabel="סה״כ בסיס"
+              onRowChange={(index, quantity) =>
+                setBaseRows((prev) =>
+                  prev.map((r, i) =>
+                    i === index
+                      ? { ...r, quantity, total: quantity * r.rate }
+                      : r,
+                  ),
+                )
+              }
+              color="#1976d2"
+            />
+            <SalaryCardSection
+              title="תוספות ושעות נוספות"
+              icon={<AddCircleOutline sx={{ color: "#ed6c02" }} />}
+              rows={extraRows}
+              summaryLabel="סה״כ תוספות"
+              onRowChange={(index, quantity) =>
+                setExtraRows((prev) =>
+                  prev.map((r, i) =>
+                    i === index
+                      ? { ...r, quantity, total: quantity * r.rate }
+                      : r,
+                  ),
+                )
+              }
+              color="#ed6c02"
+            />
+            <SalaryCardSection
+              title="אש״ל וכלכלה"
+              icon={<Restaurant sx={{ color: "#2e7d32" }} />}
+              rows={allowanceRows}
+              summaryLabel="סה״כ נלוות"
+              onRowChange={(index, quantity) =>
+                setAllowanceRows((prev) =>
+                  prev.map((r, i) =>
+                    i === index
+                      ? { ...r, quantity, total: quantity * r.rate }
+                      : r,
+                  ),
+                )
+              }
+              color="#2e7d32"
+            />
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <Typography variant="h6" fontWeight="bold">
+                  סה״כ לתשלום (ברוטו):
+                </Typography>
+              </Box>
+              <Typography variant="h6" fontWeight="bold">
+                ₪{formatValue(monthlySalary)}
+              </Typography>
+            </Box>
+          </Box>
+        </Stack>
+      </CardContent>
+    </Card>
   );
 };

@@ -1,4 +1,4 @@
-import { TextField } from "@mui/material";
+import { InputAdornment, TextField } from "@mui/material";
 
 interface ConfigInputProps {
   name: string;
@@ -9,6 +9,7 @@ interface ConfigInputProps {
   disabled?: boolean;
   helperText?: string;
   error?: boolean;
+  icon?: React.ReactNode;
   onChange: (newValue: string) => void;
   onBlur?: () => void;
 }
@@ -22,6 +23,7 @@ export const ConfigInput = ({
   disabled = false,
   helperText,
   error = false,
+  icon,
   onChange,
   onBlur,
 }: ConfigInputProps) => {
@@ -40,6 +42,13 @@ export const ConfigInput = ({
       onChange={(e) => onChange(e.target.value)}
       onBlur={onBlur}
       fullWidth
+      slotProps={{
+        input: {
+          startAdornment: icon ? (
+            <InputAdornment position="start">{icon}</InputAdornment>
+          ) : null,
+        },
+      }}
     />
   );
 };

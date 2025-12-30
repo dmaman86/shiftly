@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { Box, CircularProgress, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  CircularProgress,
+  Stack,
+  Typography,
+  Alert,
+} from "@mui/material";
 
 import {
   WorkTable,
@@ -49,44 +58,43 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
 
   return (
     <section className="mt-2">
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Stack spacing={3} sx={{ direction: "ltr" }}>
-          <Box>
-            <Typography variant="h5" gutterBottom sx={{ textAlign: "center" }}>
-              חישוב שכר יומי
-            </Typography>
-          </Box>
+      <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, md: 3 } }}>
+        <Card sx={{ mb: 3 }}>
+          <CardHeader
+            title={
+              <Typography variant="h5" fontWeight="bold">
+                חישוב שכר יומי
+              </Typography>
+            }
+            sx={{
+              textAlign: "center",
+            }}
+          />
+          <CardContent>
+            <Stack spacing={3}>
+              <ConfigPanel domain={domain} mode={"daily"} />
 
-          <Box>
-            <ConfigPanel domain={domain} mode={"daily"} />
-            {error && (
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="body1" color="error">
-                  {error}
-                </Typography>
-              </Box>
-            )}
-          </Box>
+              {error && <Alert severity="error">{error}</Alert>}
 
-          <Box sx={{ mt: 4 }}>
-            {loading && <CircularProgress sx={{ mt: 4 }} />}
-            {!loading && !error && hasData && (
-              <WorkTable domain={domain} workDays={workDays} />
-            )}
-          </Box>
+              {loading && (
+                <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+                  <CircularProgress />
+                </Box>
+              )}
 
-          {baseRate > 0 && (
-            <Box>
-              <MonthlySalarySummary domain={domain} />
-              <Feedback />
-            </Box>
-          )}
-        </Stack>
+              {!loading && !error && hasData && (
+                <WorkTable domain={domain} workDays={workDays} />
+              )}
+
+              {baseRate > 0 && (
+                <>
+                  <MonthlySalarySummary domain={domain} />
+                  <Feedback />
+                </>
+              )}
+            </Stack>
+          </CardContent>
+        </Card>
       </Box>
     </section>
   );

@@ -6,3 +6,4 @@ export { useGlobalState } from "./useGlobalState";
 export { useDomain } from "./useDomain";
 export { useSalaryFeedback } from "./useSalaryFeedback";
 export { useAppSnackbar } from "./useAppSnackbar";
+export { useDebounce } from "./useDebounce";

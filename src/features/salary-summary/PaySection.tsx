@@ -10,6 +10,7 @@ type PaySectionProps = {
   editMode: boolean;
   onChange: (index: number, quantity: number) => void;
   backgroundColor?: string;
+  showOnlyNonZero?: boolean;
 };
 
 export const PaySection = ({
@@ -18,6 +19,7 @@ export const PaySection = ({
   editMode,
   onChange,
   backgroundColor = "#f0f0f0",
+  showOnlyNonZero = false,
 }: PaySectionProps) => {
   const [quantities, setQuantities] = useState<string[]>(
     rows.map((r) => r.quantity.toString()),
@@ -38,12 +40,30 @@ export const PaySection = ({
     });
   };
 
+  const handleBlur = (index: number) => {
+    const parsed = Number(quantities[index]);
+    if (isNaN(parsed) || parsed < 0) {
+      // Revert to original value if invalid
+      setQuantities((prev) => {
+        const next = [...prev];
+        next[index] = rows[index].quantity.toString();
+        return next;
+      });
+      return;
+    }
+    onChange(index, parsed);
+  };
+
+  const visibleRows = showOnlyNonZero
+    ? rows.filter((row) => row.quantity > 0 || editMode)
+    : rows;
+
   return (
     <>
-      {rows.map((row, index) => (
+      {visibleRows.map((row, index) => (
         <TableRow key={index}>
-          <TableCell>{row.label}</TableCell>
-          <TableCell>
+          <TableCell align="center">{row.label}</TableCell>
+          <TableCell align="center">
             {editMode ? (
               <TextField
                 type="text"
@@ -52,18 +72,14 @@ export const PaySection = ({
                 size="small"
                 value={quantities[index] ?? ""}
                 onChange={(e) => updateQuantity(index, e.target.value)}
-                onBlur={() => {
-                  const parsed = Number(quantities[index]);
-                  if (isNaN(parsed) || parsed < 0) return;
-                  onChange(index, parsed);
-                }}
+                onBlur={() => handleBlur(index)}
               />
             ) : (
               formatValue(row.quantity)
             )}
           </TableCell>
-          <TableCell>₪{formatValue(row.rate)}</TableCell>
-          <TableCell>
+          <TableCell align="center">₪{formatValue(row.rate)}</TableCell>
+          <TableCell align="center">
             {row.total > 0 ? `₪${formatValue(row.total)}` : ""}
           </TableCell>
           <TableCell />
@@ -72,8 +88,10 @@ export const PaySection = ({
 
       <TableRow sx={{ backgroundColor }}>
         <TableCell colSpan={3} />
-        <TableCell>{summaryLabel}</TableCell>
-        <TableCell>{total > 0 ? `₪${formatValue(total)}` : ""}</TableCell>
+        <TableCell align="center">{summaryLabel}</TableCell>
+        <TableCell align="center">
+          {total > 0 ? `₪${formatValue(total)}` : ""}
+        </TableCell>
       </TableRow>
     </>
   );
