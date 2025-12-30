@@ -1,5 +1,5 @@
 import { DomainContextType } from "@/app";
-import { ConfigPanel, MonthlySalarySummary, SalaryFeedback } from "@/features";
+import { ConfigPanel, MonthlySalarySummary, Feedback } from "@/features";
 import { Box, Stack, Typography } from "@mui/material";
 
 export const MonthlySummaryPage = ({
@@ -27,7 +27,7 @@ export const MonthlySummaryPage = ({
 
           <Box>
             <MonthlySalarySummary domain={domain} />
-            <SalaryFeedback />
+            <Feedback />
           </Box>
         </Stack>
       </Box>

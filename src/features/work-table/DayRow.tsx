@@ -71,7 +71,7 @@ export const DayRow = ({ domain, workDay, isLastInWeek }: DayRowProps) => {
     const time = createDateWithTime(workDay.meta.date);
     const start: TimeFieldType = { date: time, minutes: 0 };
     const end: TimeFieldType = { date: time, minutes: 0 };
-    addShift({ id, start, end });
+    addShift({ id, start, end, isDuty: false });
   }, [workDay.meta.date, addShift, createDateWithTime]);
 
   useEffect(() => {

@@ -58,11 +58,20 @@ export const CalculationRulesPage = () => {
               crossDay
             />
           </WorkDayTimeline>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            textAlign="center"
+            sx={{ mt: 1, display: "block" }}
+          >
+            הבהרה: ה־100% מייצג שעות עבודה רגילות, המתחלקות ל־100%, 125% ו־150%
+            ש״נ בהתאם לשעות העבודה ולשעות התקן.
+          </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
             * משמרת החוצה את חצות מחושבת כיום עבודה אחד.
           </Typography>{" "}
           <Typography variant="caption" color="text.secondary">
-            ** המשמרת ממשיכה ליום הבא
+            ** המשמרת ממשיכה ליום הבא.
           </Typography>
         </RuleAccordion>
       </RuleCard>
@@ -70,14 +79,32 @@ export const CalculationRulesPage = () => {
       {/* Friday / Holiday */}
       <RuleCard title="🕯️ שישי וערבי חג">
         <RuleAccordion title="תחילת זמן מיוחד">
-          <WorkDayTimeline>
+          <WorkDayTimeline title="עד כניסת שבת / חג">
             <TimeSegment
               from="06:00"
-              to="17:00 או 18:00"
+              to="14:00"
               label="100%"
               flex={8}
               color="#e3f2fd"
             />
+            <TimeSegment
+              from="14:00"
+              to="17:00 או 18:00"
+              label="100% + 20%"
+              flex={8}
+              color="#f1f8e9"
+            />
+          </WorkDayTimeline>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            textAlign="center"
+            sx={{ mt: 1, display: "block" }}
+          >
+            הבהרה: ה־100% מייצג שעות עבודה רגילות, המתחלקות ל־100%, 125% ו־150%
+            ש״נ בהתאם לשעות העבודה ולשעות התקן.
+          </Typography>
+          <WorkDayTimeline title="מכניסת שבת / חג">
             <TimeSegment
               from="17:00 או 18:00"
               to="22:00"
@@ -94,11 +121,19 @@ export const CalculationRulesPage = () => {
               crossDay
             />
           </WorkDayTimeline>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            textAlign="center"
+            sx={{ mt: 1, display: "block" }}
+          >
+            הבהרה: ה־100% מייצג שעות זכות שבת, שאינן מתחלקות בש״נ.
+          </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
             * משמרת החוצה את חצות מחושבת כיום עבודה אחד.
           </Typography>{" "}
           <Typography variant="caption" color="text.secondary">
-            ** המשמרת ממשיכה ליום הבא
+            ** המשמרת ממשיכה ליום הבא.
           </Typography>
           <Typography
             variant="caption"
@@ -143,11 +178,19 @@ export const CalculationRulesPage = () => {
               crossDay
             />
           </WorkDayTimeline>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            textAlign="center"
+            sx={{ mt: 1, display: "block" }}
+          >
+            הבהרה: ה־100% מייצג שעות זכות שבת, שאינן מתחלקות בש״נ.
+          </Typography>
           <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
             * משמרת החוצה את חצות מחושבת כיום עבודה אחד.
-          </Typography>{" "}
+          </Typography>
           <Typography variant="caption" color="text.secondary">
-            ** המשמרת ממשיכה ליום הבא
+            ** המשמרת ממשיכה ליום הבא.
           </Typography>
         </RuleAccordion>
       </RuleCard>
@@ -155,7 +198,7 @@ export const CalculationRulesPage = () => {
       <RuleCard title="🍽️ אש״ל">
         <RuleAccordion title="תנאי זכאות">
           <Typography>
-            אש״ל מחושב רק בימים בהם קיימת לפחות משמרת אחת בתפקיד (Field Duty).
+            אש״ל מחושב רק בימים בהם קיימת לפחות משמרת אחת בתפקיד.
           </Typography>
           <Typography>נספרות רק שעות שבוצעו בפועל בתפקיד.</Typography>
         </RuleAccordion>
@@ -255,10 +298,16 @@ export const CalculationRulesPage = () => {
       {/* Date limits */}
       <RuleCard title="📅 טווחי תאריכים">
         <RuleAccordion title="מגבלות בחירה">
-          <Typography>המערכת פעילה החל מנובמבר 2015.</Typography>
-          <Typography>לא ניתן לחשב חודשים עתידיים.</Typography>
           <Typography>
-            בשנה הנוכחית ניתן לבחור חודשים עד החודש הנוכחי בלבד.
+            המערכת מאפשרת סימולציות ובדיקות חישוב החל מנובמבר 2015.
+          </Typography>
+          <Typography>
+            לא ניתן לבצע חישוב עבור חודשים עתידיים, מאחר ושינויים עתידיים
+            בתנאים, בתקנות או בהסכמים עשויים להשפיע על אופן החישוב, ונדרש זמן
+            היערכות בהתאם.
+          </Typography>
+          <Typography>
+            בשנה הנוכחית ניתן לבחור חודשים עד החודש הנוכחי בלבד, מאותה סיבה.
           </Typography>
         </RuleAccordion>
       </RuleCard>

@@ -5,11 +5,9 @@ import { DomainContextType } from "@/app";
 
 type ShiftProps = {
   domain: DomainContextType;
-  id: string;
   shift: Shift;
   meta: WorkDayMeta;
   standardHours: number;
-  isDuty: boolean;
 };
 
 type ShiftEntry = {
@@ -19,11 +17,9 @@ type ShiftEntry = {
 
 export const useShift = ({
   domain,
-  id,
   shift,
   meta,
   standardHours,
-  isDuty,
 }: ShiftProps) => {
   const { shiftMapBuilder } = domain.payMap;
 
@@ -32,10 +28,21 @@ export const useShift = ({
 
   const update = useCallback(
     (newStart: TimeFieldType, newEnd: TimeFieldType) => {
-      setLocalShift({ id, start: newStart, end: newEnd });
+      setLocalShift((prev) => ({
+        ...prev,
+        start: newStart,
+        end: newEnd,
+      }));
     },
-    [id],
+    [],
   );
+
+  const toggleDuty = useCallback(() => {
+    setLocalShift((prev) => ({
+      ...prev,
+      isDuty: !prev.isDuty,
+    }));
+  }, []);
 
   const shiftEntry: ShiftEntry = useMemo(() => {
     if (saved) {
@@ -43,16 +50,17 @@ export const useShift = ({
         shift: localShift,
         meta,
         standardHours,
-        isFieldDutyShift: isDuty,
+        isFieldDutyShift: localShift.isDuty,
       });
       return { shift: localShift, payMap: shiftPayMap };
     }
     return { shift: localShift, payMap: null };
-  }, [shiftMapBuilder, localShift, meta, standardHours, isDuty, saved]);
+  }, [shiftMapBuilder, localShift, meta, standardHours, saved]);
 
   return {
     localShift,
     update,
+    toggleDuty,
     saved,
     setSaved,
     shiftEntry,

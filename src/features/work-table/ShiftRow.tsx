@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { Checkbox, IconButton, Stack, Tooltip } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
@@ -8,7 +8,7 @@ import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { addMinutes } from "date-fns";
 import { Shift, ShiftPayMap, TimeFieldType, WorkDayMeta } from "@/domain";
-import { useShift } from "@/hooks";
+import { useAppSnackbar, useShift } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { ShiftTimeInput, ShiftTimeReadonly } from "@/features/work-table";
 
@@ -32,16 +32,15 @@ export const ShiftRow = ({
   onShiftUpdate,
   onRemove,
 }: ShiftRowProps) => {
-  const [isDuty, setIsDuty] = useState<boolean>(false);
+  const { localShift, update, toggleDuty, saved, setSaved, shiftEntry } =
+    useShift({
+      domain,
+      shift,
+      meta,
+      standardHours,
+    });
 
-  const { localShift, update, saved, setSaved, shiftEntry } = useShift({
-    domain,
-    id: shift.id,
-    shift,
-    meta,
-    standardHours,
-    isDuty,
-  });
+  const snackbar = useAppSnackbar();
 
   const handleChange = (field: "start" | "end", newDate: Date | null) => {
     if (!newDate) return;
@@ -67,13 +66,19 @@ export const ShiftRow = ({
     update(newStart, tfEnd);
   };
 
-  const handleToggleDuty = () => {
-    setIsDuty((prev) => !prev);
-  };
+  const crossDay = localShift.end.minutes >= 1440;
+  const hasError =
+    !crossDay && localShift.end.minutes <= localShift.start.minutes;
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
+    if (hasError) {
+      snackbar.warning(
+        'זוהתה משמרת החוצה את חצות. יש לסמן "חוצה יום" לפני שמירה.',
+      );
+      return;
+    }
     setSaved(true);
-  };
+  }, [hasError, snackbar, setSaved]);
 
   const handleEdit = () => {
     setSaved(false);
@@ -82,10 +87,6 @@ export const ShiftRow = ({
   useEffect(() => {
     if (shiftEntry.payMap) onShiftUpdate(shiftEntry.shift, shiftEntry.payMap);
   }, [shiftEntry, onShiftUpdate]);
-
-  const crossDay = localShift.end.minutes >= 1440;
-  const hasError =
-    !crossDay && localShift.end.minutes <= localShift.start.minutes;
 
   return (
     <Stack direction="row" alignItems="center" spacing={1}>
@@ -137,12 +138,8 @@ export const ShiftRow = ({
 
           <Tooltip title="משמרת בתפקיד">
             <span>
-              <IconButton
-                size="small"
-                onClick={handleToggleDuty}
-                disabled={saved}
-              >
-                {isDuty ? (
+              <IconButton size="small" onClick={toggleDuty} disabled={saved}>
+                {localShift.isDuty ? (
                   <DirectionsCarIcon fontSize="small" color="primary" />
                 ) : (
                   <DirectionsCarOutlinedIcon fontSize="small" />
@@ -156,7 +153,7 @@ export const ShiftRow = ({
               <IconButton
                 size="small"
                 onClick={() => (saved ? handleEdit() : handleSave())}
-                disabled={!isEditable || hasError}
+                disabled={!isEditable}
               >
                 {saved ? (
                   <EditIcon fontSize="small" color="info" />

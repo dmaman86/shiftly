@@ -98,7 +98,7 @@ export const MonthlySalarySummary = ({
         <div className="row d-flex align-items-center mb-2">
           <div className="col text-start">
             <Typography variant="h5" gutterBottom sx={{ textAlign: "center" }}>
-              סיכום שכר חודשי לפי שעות
+              סיכום שכר חודשי - ברוטו - לפי שעות
             </Typography>
           </div>
           <div className="col-auto">

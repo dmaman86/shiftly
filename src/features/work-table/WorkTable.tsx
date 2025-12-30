@@ -35,10 +35,12 @@ export const WorkTable = ({ domain, workDays }: WorkTableProps) => {
   return (
     <>
       <div className="container">
-        <div className="row mb-3">
-          <Typography variant="h5" textAlign="center" gutterBottom>
-            שעות חודש {monthResolver.getMonthName(month - 1)} - {year}
-          </Typography>
+        <div className="row mb-3 align-items-center">
+          <div className="col">
+            <Typography variant="h5" textAlign="center" gutterBottom>
+              שעות חודש {monthResolver.getMonthName(month - 1)} - {year}
+            </Typography>
+          </div>
         </div>
         <div className="row mb-3">
           <div className="col-12">

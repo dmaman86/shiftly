@@ -5,16 +5,17 @@ import {
   WorkTable,
   ConfigPanel,
   MonthlySalarySummary,
-  SalaryFeedback,
+  Feedback,
 } from "@/features";
 import { useFetch, useGlobalState, useWorkDays } from "@/hooks";
-import { service, DateUtils } from "@/utils";
+import { DateUtils } from "@/utils";
 import { ApiResponse } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
+import { hebcalService } from "@/services";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
-  const call = service();
+  const call = hebcalService();
   const { year, month, baseRate, reset } = useGlobalState();
 
   const { getDatesRange } = DateUtils();
@@ -82,7 +83,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
           {baseRate > 0 && (
             <Box>
               <MonthlySalarySummary domain={domain} />
-              <SalaryFeedback />
+              <Feedback />
             </Box>
           )}
         </Stack>

@@ -32,36 +32,34 @@ export const useDay = ({
 
   const [status, setStatus] = useState<WorkDayStatus>(WorkDayStatus.normal);
 
-  const addShift = useCallback(
-    (shift: Shift) => {
-      setShiftEntries((prev) => ({
+  const addShift = useCallback((shift: Shift) => {
+    setShiftEntries((prev) => {
+      const next = {
         ...prev,
         [shift.id]: { shift, payMap: null },
-      }));
-    },
-    [setShiftEntries],
-  );
+      };
+      return next;
+    });
+  }, []);
 
-  const updateShift = useCallback(
-    (shift: Shift, payMap: ShiftPayMap) => {
-      setShiftEntries((prev) => ({
+  const updateShift = useCallback((shift: Shift, payMap: ShiftPayMap) => {
+    setShiftEntries((prev) => {
+      const next = {
         ...prev,
         [shift.id]: { shift, payMap },
-      }));
-    },
-    [setShiftEntries],
-  );
+      };
+      return next;
+    });
+  }, []);
 
-  const removeShift = useCallback(
-    (id: string) => {
-      setShiftEntries((prev) => {
-        const copy = { ...prev };
-        delete copy[id];
-        return copy;
-      });
-    },
-    [setShiftEntries],
-  );
+  const removeShift = useCallback((id: string) => {
+    setShiftEntries((prev) => {
+      const copy = { ...prev };
+      delete copy[id];
+
+      return copy;
+    });
+  }, []);
 
   const dayPayMap = useMemo(() => {
     const payMaps = Object.values(shiftEntries)

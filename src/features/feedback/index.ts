@@ -1,1 +1,1 @@
-export { SalaryFeedback } from "./SalaryFeedback";
+export { Feedback } from "./Feedback";
