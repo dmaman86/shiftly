@@ -1,5 +1,7 @@
 import { WorkDayType } from "@/constants";
 
+export type TableViewMode = "compact" | "expanded";
+
 import {
   DailyPerDiemInfo,
   ExtraBreakdown,
@@ -93,6 +95,13 @@ export type PayBreakdownViewModel = {
 
   smallPoints: number;
   smallAmount: number;
+};
+
+export type CompactPayBreakdownVM = {
+  totalHours: number;
+  regularHours: number;
+  extraHours: number;
+  dailySalary?: number;
 };
 
 export interface MonthResolver {

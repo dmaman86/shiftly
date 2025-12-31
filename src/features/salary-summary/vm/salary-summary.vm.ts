@@ -5,6 +5,11 @@ export type PayRowVM = {
   total: number;
 };
 
+export type PayTableVM = {
+  rows: PayRowVM[];
+  total: number;
+};
+
 export type MonthlySalarySummaryVM = {
   baseRows: PayRowVM[];
   extraRows: PayRowVM[];

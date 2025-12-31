@@ -68,6 +68,15 @@ export const headersTable: TableHeader[] = [
   },
 ];
 
+export const headersTableCompact: TableHeader[] = [
+  { label: "יום", rowSpan: 2 },
+  { label: "", children: ["מחלה", "חופש"] },
+  { label: "שעות", rowSpan: 2 },
+  { label: "סך שעות", rowSpan: 2 },
+  { label: "רגילות", rowSpan: 2 },
+  { label: "תוספות", rowSpan: 2 },
+];
+
 export const baseLabels = ["100%", "שבת תוספת 100%", "מחלה", "חופש"];
 export const extraLabels = [
   "תוספת לילה (50%)",
