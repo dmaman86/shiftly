@@ -8,7 +8,8 @@ export const monthToCompactPayBreakdownVM = (
 ): CompactPayBreakdownVM => {
   const regularHours = month.regular.hours100.hours;
 
-  const extraHours = month.totalHours - regularHours;
+  const extraHours =
+    month.regular.hours125.hours + month.regular.hours150.hours;
 
   const totalHours = month.totalHours;
 
