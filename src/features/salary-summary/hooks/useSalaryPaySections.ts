@@ -5,7 +5,7 @@ import {
   buildAllowanceRowsFromPayVM,
   buildBasePayRows,
   buildExtraPayRows,
-  usePayRowVM,
+  usePayTableVM,
 } from "@/features/salary-summary";
 
 type UseSalaryPaySectionsParams = {
@@ -40,13 +40,16 @@ export const useSalaryPaySections = ({
       }),
     [payVM, allowanceRate, rateDiem],
   );
-  const base = usePayRowVM(baseInitialRows);
-  const extra = usePayRowVM(extraInitialRows);
-  const allowance = usePayRowVM(allowanceInitialRows);
+  const base = usePayTableVM(baseInitialRows);
+  const extra = usePayTableVM(extraInitialRows);
+  const allowance = usePayTableVM(allowanceInitialRows);
+
+  const total = base.total + extra.total + allowance.total;
 
   return {
     base,
     extra,
     allowance,
+    total,
   };
 };

@@ -36,9 +36,9 @@ export const useMonthlySalarySummary = (domain: DomainContextType) => {
     extraRows: extra.rows,
     allowanceRows: allowance.rows,
 
-    updateBaseRow: base.updateRows,
-    updateExtraRow: extra.updateRows,
-    updateAllowanceRow: allowance.updateRows,
+    updateBaseRow: base.updateRowQuantity,
+    updateExtraRow: extra.updateRowQuantity,
+    updateAllowanceRow: allowance.updateRowQuantity,
 
     monthlySalary,
     monthLabel: `${monthResolver.getMonthName(month - 1)} ${year}`,
