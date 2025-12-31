@@ -17,8 +17,7 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 import { formatValue } from "@/utils";
-import { PayRowVM } from "./salarySummary.vm";
-import { SalaryRow } from "./SalaryRow";
+import { PayRowVM, SalaryRow } from "@/features/salary-summary";
 
 type SalaryCardSectionProps = {
   title: string;

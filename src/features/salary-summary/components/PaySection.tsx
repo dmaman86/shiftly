@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { TableCell, TableRow, TextField } from "@mui/material";
 import { formatValue } from "@/utils";
-import { PayRowVM } from "./salarySummary.vm";
+import { PayRowVM } from "@/features/salary-summary";
 
 type PaySectionProps = {
   rows: PayRowVM[];

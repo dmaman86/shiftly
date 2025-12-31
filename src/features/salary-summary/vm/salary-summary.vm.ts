@@ -11,3 +11,8 @@ export type MonthlySalarySummaryVM = {
   perDiemRow: PayRowVM | null;
   monthlyTotal: number;
 };
+
+export type PaySectionVM = {
+  rows: PayRowVM[];
+  total: number;
+};

@@ -1,8 +1,6 @@
-import { useState, useEffect } from "react";
 import { TableCell, TableRow, TextField, Typography } from "@mui/material";
 import { formatValue } from "@/utils";
-import { useDebounce } from "@/hooks";
-import { PayRowVM } from "./salarySummary.vm";
+import { PayRowVM, useEditableQuantity } from "@/features/salary-summary";
 
 type SalaryRowProps = {
   row: PayRowVM;
@@ -15,21 +13,11 @@ export const SalaryRow = ({
   editMode,
   onQuantityChange,
 }: SalaryRowProps) => {
-  const [inputValue, setInputValue] = useState(row.quantity.toString());
-
-  const debouncedValue = useDebounce({ value: inputValue, delay: 500 });
-
-  useEffect(() => {
-    setInputValue(row.quantity.toString());
-  }, [row.quantity]);
-
-  useEffect(() => {
-    if (!editMode) return;
-    const parsed = parseFloat(debouncedValue);
-    if (!isNaN(parsed) && parsed >= 0 && parsed !== row.quantity) {
-      onQuantityChange(parsed);
-    }
-  }, [debouncedValue, onQuantityChange, row.quantity, editMode]);
+  const { inputValue, onInputChange } = useEditableQuantity({
+    value: row.quantity,
+    enabled: editMode,
+    onCommit: onQuantityChange,
+  });
 
   return (
     <TableRow hover>
@@ -40,7 +28,7 @@ export const SalaryRow = ({
             variant="standard"
             size="small"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => onInputChange(e.target.value)}
             slotProps={{
               input: {
                 style: { textAlign: "center" },
