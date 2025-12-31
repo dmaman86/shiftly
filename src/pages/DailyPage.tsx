@@ -16,14 +16,16 @@ import {
   MonthlySalarySummary,
   Feedback,
 } from "@/features";
-import { useFetch, useGlobalState, useWorkDays } from "@/hooks";
+import { useDeviceType, useFetch, useGlobalState, useWorkDays } from "@/hooks";
 import { DateUtils } from "@/utils";
-import { ApiResponse } from "@/domain";
+import { ApiResponse, TableViewMode } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
 import { hebcalService } from "@/services";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
+  const { isMobile } = useDeviceType();
+
   const call = hebcalService();
   const { year, month, baseRate, reset } = useGlobalState();
 
@@ -31,6 +33,10 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const { workDays, generate } = useWorkDays();
 
   const [error, setError] = useState<string | undefined>(undefined);
+
+  const [viewMode, setViewMode] = useState<TableViewMode>(
+    isMobile ? "compact" : "expanded",
+  );
 
   const { loading, callEndPoint } = useFetch();
 
@@ -53,6 +59,10 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
 
     loadEvents();
   }, [year, month]);
+
+  useEffect(() => {
+    setViewMode(isMobile ? "compact" : "expanded");
+  }, [isMobile]);
 
   const hasData = workDays.length > 0;
 
@@ -83,7 +93,12 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
               )}
 
               {!loading && !error && hasData && (
-                <WorkTable domain={domain} workDays={workDays} />
+                <WorkTable
+                  domain={domain}
+                  workDays={workDays}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
+                />
               )}
 
               {baseRate > 0 && (
