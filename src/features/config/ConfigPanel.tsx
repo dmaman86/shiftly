@@ -229,7 +229,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                   </Typography>
                 </Box>
 
-                <Stack direction={{ xs: "column", lg: "row" }} spacing={2}>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                   <Box sx={{ flex: 1 }}>
                     <ConfigInput
                       name="standardHours"
