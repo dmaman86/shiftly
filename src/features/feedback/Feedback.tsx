@@ -1,18 +1,27 @@
-import { useAppSnackbar, useSalaryFeedback } from "@/hooks";
-import { SalaryFeedback } from "@/services";
-import { Box, Button, Stack, Typography } from "@mui/material";
 import { useCallback } from "react";
+import { Box, Button, Stack, Typography } from "@mui/material";
+
+import { useAppSnackbar, useGlobalState, useSalaryFeedback } from "@/hooks";
+import { SalaryFeedback } from "@/services";
 
 export const Feedback = () => {
+  const { month, year, baseRate } = useGlobalState();
   const { submitFeedback } = useSalaryFeedback();
   const snackbar = useAppSnackbar();
 
+  const pathname = window.location.pathname;
+
   const handleClick = useCallback(
     (value: SalaryFeedback) => {
-      submitFeedback(value);
+      submitFeedback(value, {
+        month,
+        year,
+        calculationType: pathname.includes("daily") ? "daily" : "monthly",
+        hasAllowances: baseRate > 0,
+      });
       snackbar.success("תודה! המשוב נקלט");
     },
-    [submitFeedback, snackbar],
+    [submitFeedback, snackbar, month, year, pathname, baseRate],
   );
 
   return (
