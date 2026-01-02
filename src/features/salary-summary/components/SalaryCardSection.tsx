@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
@@ -17,27 +17,44 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 import { formatValue } from "@/utils";
-import { PayRowVM, SalaryRow } from "@/features/salary-summary";
+import {
+  SalaryRow,
+  SalarySectionConfig,
+  usePayTableVM,
+} from "@/features/salary-summary";
 
 type SalaryCardSectionProps = {
-  title: string;
-  icon: React.ReactNode;
-  rows: PayRowVM[];
-  summaryLabel: string;
-  onRowChange: (index: number, newQuantity: number) => void;
-  color?: string;
+  section: SalarySectionConfig;
+  onTotalChange?: (id: string, total: number) => void;
 };
 
 export const SalaryCardSection = ({
-  title,
-  icon,
-  rows,
-  summaryLabel,
-  onRowChange,
-  color = "#1976d2",
+  section,
+  onTotalChange,
 }: SalaryCardSectionProps) => {
   const [editMode, setEditMode] = useState(false);
-  const total = rows.reduce((sum, r) => sum + r.total, 0);
+
+  const table = usePayTableVM({
+    payVM: section.payVM,
+    baseRate: section.baseRate,
+    allowanceRate: section.allowanceRate,
+    rateDiem: section.rateDiem,
+    buildRows: section.buildRows,
+  });
+
+  useEffect(() => {
+    onTotalChange?.(section.id, table.total);
+  }, [table.total, onTotalChange, section.id]);
+
+  const handleQuantityChange = (index: number, newQuantity: number) => {
+    const row = table.rows[index];
+
+    table.updateRow(index, {
+      ...row,
+      quantity: newQuantity,
+      total: newQuantity * row.rate,
+    });
+  };
 
   return (
     <Card
@@ -45,10 +62,10 @@ export const SalaryCardSection = ({
       sx={{ mb: 3, borderRadius: 2, overflow: "hidden" }}
     >
       <CardHeader
-        avatar={icon}
+        avatar={section.icon}
         title={
           <Typography variant="subtitle1" fontWeight="bold">
-            {title}
+            {section.title}
           </Typography>
         }
         action={
@@ -90,21 +107,24 @@ export const SalaryCardSection = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, index) => (
+            {table.rows.map((row, index) => (
               <SalaryRow
                 key={row.label}
                 row={row}
                 editMode={editMode}
-                onQuantityChange={(val) => onRowChange(index, val)}
+                onQuantityChange={(val) => handleQuantityChange(index, val)}
               />
             ))}
-            <TableRow sx={{ backgroundColor: alpha(color, 0.08) }}>
+            <TableRow sx={{ backgroundColor: alpha(section.color, 0.08) }}>
               <TableCell colSpan={2} />
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                {summaryLabel}
+                {section.summaryLabel}
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold", color }}>
-                ₪{formatValue(total)}
+              <TableCell
+                align="center"
+                sx={{ fontWeight: "bold", color: section.color }}
+              >
+                ₪{formatValue(table.total)}
               </TableCell>
             </TableRow>
           </TableBody>

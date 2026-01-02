@@ -2,15 +2,24 @@ import { MealAllowanceRates, PayBreakdownViewModel, Segment } from "@/domain";
 import {
   mapSegmentsToPayRows,
   mapAllowanceRows,
+  PayRowVM,
 } from "@/features/salary-summary";
+
+type BuildRowsParams = {
+  payVM: PayBreakdownViewModel;
+  baseRate?: number;
+  allowanceRate?: MealAllowanceRates;
+  rateDiem?: number;
+};
 
 export const buildBasePayRows = ({
   payVM,
   baseRate,
-}: {
-  payVM: PayBreakdownViewModel;
-  baseRate: number;
-}) => {
+}: BuildRowsParams): PayRowVM[] => {
+  if (baseRate === undefined) {
+    throw new Error("baseRate is required for buildBasePayRows");
+  }
+
   const baseMap: Record<string, Segment> = {
     "100%": payVM.regular.hours100,
     "שבת תוספת 100%": payVM.extra100Shabbat,
@@ -24,10 +33,11 @@ export const buildBasePayRows = ({
 export const buildExtraPayRows = ({
   payVM,
   baseRate,
-}: {
-  payVM: PayBreakdownViewModel;
-  baseRate: number;
-}) => {
+}: BuildRowsParams): PayRowVM[] => {
+  if (baseRate === undefined) {
+    throw new Error("baseRate is required for buildExtraPayRows");
+  }
+
   const extraMap: Record<string, Segment> = {
     "תוספת לילה (50%)": payVM.extra.hours50,
     "150%": payVM.regular.hours150,
@@ -44,11 +54,13 @@ export const buildAllowanceRowsFromPayVM = ({
   payVM,
   allowanceRate,
   rateDiem,
-}: {
-  payVM: PayBreakdownViewModel;
-  allowanceRate: MealAllowanceRates;
-  rateDiem: number;
-}) => {
+}: BuildRowsParams): PayRowVM[] => {
+  if (allowanceRate === undefined || rateDiem === undefined) {
+    throw new Error(
+      "allowanceRate and rateDiem are required for buildAllowanceRowsFromPayVM",
+    );
+  }
+
   return mapAllowanceRows({
     perDiem: { points: payVM.perDiemPoints, rate: payVM.perDiemAmount },
     mealAllowance: {

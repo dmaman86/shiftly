@@ -1,46 +1,79 @@
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { DomainContextType } from "@/app";
+import { MonthPayMap } from "@/domain";
 
 import { monthToPayBreakdownVM } from "@/adapters";
-import { DomainContextType } from "@/app";
-import { useGlobalState } from "@/hooks";
+import {
+  buildSectionsSalary,
+  SalarySectionConfig,
+} from "@/features/salary-summary";
 
-import { useSalaryPaySections } from "./useSalaryPaySections";
+type MonthlySalarySummaryParams = {
+  domain: DomainContextType;
+};
 
-export const useMonthlySalarySummary = (domain: DomainContextType) => {
-  const { globalBreakdown, baseRate, year, month } = useGlobalState();
-
+export const useMonthlySalarySummary = ({
+  domain,
+}: MonthlySalarySummaryParams) => {
   const monthResolver = domain.resolvers.monthResolver;
-  const rateDiem = domain.resolvers.perDiemResolver.resolve({ year, month });
-  const allowanceRate = domain.resolvers.mealAllowanceRateResolver.resolve({
-    year,
-    month,
-  });
 
-  const payVM = useMemo(() => {
-    return monthToPayBreakdownVM(globalBreakdown);
-  }, [globalBreakdown]);
+  const [sections, setSections] = useState<SalarySectionConfig[]>([]);
 
-  const { base, extra, allowance } = useSalaryPaySections({
-    payVM,
-    baseRate,
-    allowanceRate,
-    rateDiem,
-  });
+  const getMonthLabel = useCallback(
+    (year: number, month: number) => {
+      return `${monthResolver.getMonthName(month - 1)} ${year}`;
+    },
+    [monthResolver],
+  );
 
-  const monthlySalary = useMemo(() => {
-    return base.total + extra.total + allowance.total;
-  }, [base.total, extra.total, allowance.total]);
+  const updateSections = useCallback(
+    (
+      globalBreakdown: MonthPayMap,
+      year: number,
+      month: number,
+      baseRate: number,
+    ) => {
+      // Resolve rates for the selected month/year
+      const rateDiem = domain.resolvers.perDiemResolver.resolve({
+        year,
+        month,
+      });
+      const allowanceRate = domain.resolvers.mealAllowanceRateResolver.resolve({
+        year,
+        month,
+      });
+
+      // Convert domain to ViewModel
+      const payVM = monthToPayBreakdownVM(globalBreakdown);
+
+      setSections(() => {
+        return buildSectionsSalary({
+          payVM,
+          baseRate,
+          allowanceRate,
+          rateDiem,
+        });
+      });
+    },
+    [domain],
+  );
+
+  const [totals, setTotals] = useState<Record<string, number>>({});
+
+  const handleTotalChange = useCallback((id: string, total: number) => {
+    setTotals((prev) => ({ ...prev, [id]: total }));
+  }, []);
+
+  const monthlyTotal = useMemo(
+    () => Object.values(totals).reduce((sum, val) => sum + val, 0),
+    [totals],
+  );
 
   return {
-    baseRows: base.rows,
-    extraRows: extra.rows,
-    allowanceRows: allowance.rows,
-
-    updateBaseRow: base.updateRowQuantity,
-    updateExtraRow: extra.updateRowQuantity,
-    updateAllowanceRow: allowance.updateRowQuantity,
-
-    monthlySalary,
-    monthLabel: `${monthResolver.getMonthName(month - 1)} ${year}`,
+    sections,
+    updateSections,
+    getMonthLabel,
+    handleTotalChange,
+    monthlyTotal,
   };
 };

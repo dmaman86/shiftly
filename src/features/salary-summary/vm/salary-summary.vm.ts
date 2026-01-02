@@ -1,3 +1,5 @@
+import { MealAllowanceRates, PayBreakdownViewModel } from "@/domain";
+
 export type PayRowVM = {
   label: string;
   quantity: number;
@@ -20,4 +22,22 @@ export type MonthlySalarySummaryVM = {
 export type PaySectionVM = {
   rows: PayRowVM[];
   total: number;
+};
+
+export type SalarySectionConfig = {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  summaryLabel: string;
+  color: string;
+  payVM: PayBreakdownViewModel;
+  baseRate?: number;
+  allowanceRate?: MealAllowanceRates;
+  rateDiem?: number;
+  buildRows: (params: {
+    payVM: PayBreakdownViewModel;
+    baseRate?: number;
+    allowanceRate?: MealAllowanceRates;
+    rateDiem?: number;
+  }) => PayRowVM[];
 };
