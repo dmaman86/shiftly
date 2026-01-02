@@ -22,6 +22,7 @@ import { ApiResponse, TableViewMode } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
 import { hebcalService } from "@/services";
+import { ErrorBoundary, FeatureErrorFallback } from "@/layout";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const { isMobile } = useDeviceType();
@@ -93,17 +94,37 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
               )}
 
               {!loading && !error && hasData && (
-                <WorkTable
-                  domain={domain}
-                  workDays={workDays}
-                  viewMode={viewMode}
-                  onViewModeChange={setViewMode}
-                />
+                <ErrorBoundary
+                  fallback={(error, reset) => (
+                    <FeatureErrorFallback
+                      featureName="טבלת ימי עבודה"
+                      error={error}
+                      resetError={reset}
+                    />
+                  )}
+                >
+                  <WorkTable
+                    domain={domain}
+                    workDays={workDays}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                  />
+                </ErrorBoundary>
               )}
 
               {baseRate > 0 && (
                 <>
-                  <MonthlySalarySummary domain={domain} />
+                  <ErrorBoundary
+                    fallback={(error, reset) => (
+                      <FeatureErrorFallback
+                        featureName="סיכום שכר חודשי"
+                        error={error}
+                        resetError={reset}
+                      />
+                    )}
+                  >
+                    <MonthlySalarySummary domain={domain} />
+                  </ErrorBoundary>
                   <Feedback />
                 </>
               )}

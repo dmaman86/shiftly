@@ -26,6 +26,7 @@ import { DomainContextType } from "@/app";
 import { dayToPayBreakdownVM } from "@/adapters";
 import { CompactDayRow } from "./rows/CompactDayRow";
 import { dayToCompactPayBreakdownVM } from "../mappers/dayToCompactPayBreakdownVM";
+import { withErrorBoundary } from "@/hoc";
 
 type DayRowProps = {
   domain: DomainContextType;
@@ -42,7 +43,7 @@ const isSameDayPayMap = (a: WorkDayMap, b: WorkDayMap) => {
   );
 };
 
-export const DayRow = ({
+const DayRowComponent = ({
   domain,
   workDay,
   isLastInWeek,
@@ -205,3 +206,7 @@ export const DayRow = ({
     </TableRow>
   );
 };
+
+export const DayRow = withErrorBoundary(DayRowComponent, {
+  componentName: "DayRow",
+});

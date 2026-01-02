@@ -1,5 +1,3 @@
-import { DomainContextType } from "@/app";
-import { ConfigPanel, MonthlySalarySummary, Feedback } from "@/features";
 import {
   Box,
   Card,
@@ -8,6 +6,10 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+
+import { DomainContextType } from "@/app";
+import { ConfigPanel, MonthlySalarySummary, Feedback } from "@/features";
+import { ErrorBoundary, FeatureErrorFallback } from "@/layout";
 
 export const MonthlySummaryPage = ({
   domain,
@@ -32,7 +34,17 @@ export const MonthlySummaryPage = ({
             <Stack spacing={3}>
               <ConfigPanel domain={domain} mode={"monthly"} />
 
-              <MonthlySalarySummary domain={domain} />
+              <ErrorBoundary
+                fallback={(error, reset) => (
+                  <FeatureErrorFallback
+                    featureName="סיכום שכר חודשי"
+                    error={error}
+                    resetError={reset}
+                  />
+                )}
+              >
+                <MonthlySalarySummary domain={domain} />
+              </ErrorBoundary>
               <Feedback />
             </Stack>
           </CardContent>
