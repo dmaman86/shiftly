@@ -24,20 +24,39 @@ export type PaySectionVM = {
   total: number;
 };
 
-export type SalarySectionConfig = {
+type BaseSectionConfig = {
   id: string;
   title: string;
   icon: React.ReactNode;
   summaryLabel: string;
   color: string;
   payVM: PayBreakdownViewModel;
-  baseRate?: number;
-  allowanceRate?: MealAllowanceRates;
-  rateDiem?: number;
-  buildRows: (params: {
-    payVM: PayBreakdownViewModel;
-    baseRate?: number;
-    allowanceRate?: MealAllowanceRates;
-    rateDiem?: number;
-  }) => PayRowVM[];
 };
+
+export type BasePaySectionConfig = BaseSectionConfig & {
+  type: "base";
+  baseRate: number;
+  buildRows: (payVM: PayBreakdownViewModel, baseRate: number) => PayRowVM[];
+};
+
+export type ExtraPaySectionConfig = BaseSectionConfig & {
+  type: "extra";
+  baseRate: number;
+  buildRows: (payVM: PayBreakdownViewModel, baseRate: number) => PayRowVM[];
+};
+
+export type AllowanceSectionConfig = BaseSectionConfig & {
+  type: "allowance";
+  allowanceRate: MealAllowanceRates;
+  rateDiem: number;
+  buildRows: (
+    payVM: PayBreakdownViewModel,
+    allowanceRate: MealAllowanceRates,
+    rateDiem: number,
+  ) => PayRowVM[];
+};
+
+export type SalarySectionConfig =
+  | BasePaySectionConfig
+  | ExtraPaySectionConfig
+  | AllowanceSectionConfig;

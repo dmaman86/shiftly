@@ -34,13 +34,7 @@ export const SalaryCardSection = ({
 }: SalaryCardSectionProps) => {
   const [editMode, setEditMode] = useState(false);
 
-  const table = usePayTableVM({
-    payVM: section.payVM,
-    baseRate: section.baseRate,
-    allowanceRate: section.allowanceRate,
-    rateDiem: section.rateDiem,
-    buildRows: section.buildRows,
-  });
+  const table = usePayTableVM({ section });
 
   useEffect(() => {
     onTotalChange?.(section.id, table.total);

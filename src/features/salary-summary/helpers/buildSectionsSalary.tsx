@@ -1,11 +1,11 @@
 import { AccessTime, AddCircleOutline, Restaurant } from "@mui/icons-material";
 import { PayBreakdownViewModel, MealAllowanceRates } from "@/domain";
+
 import {
-  buildAllowanceRowsFromPayVM,
-  buildBasePayRows,
-  buildExtraPayRows,
-} from "../mappers";
-import { createSectionFactory } from "./sectionFactory";
+  createAllowanceSectionFactory,
+  createBaseSectionFactory,
+  createExtraSectionFactory,
+} from "./sectionFactory";
 
 type BuildSectionsSalaryParams = {
   payVM: PayBreakdownViewModel;
@@ -21,25 +21,25 @@ export const buildSectionsSalary = ({
   rateDiem,
 }: BuildSectionsSalaryParams) => {
   return [
-    createSectionFactory("base", {
+    createBaseSectionFactory("base", {
       title: "שעות בסיס",
       icon: <AccessTime color="primary" />,
       summaryLabel: "סה״כ שעות בסיס",
       color: "#1976d2",
       payVM,
       baseRate,
-      buildRows: buildBasePayRows,
     }),
-    createSectionFactory("extra", {
+
+    createExtraSectionFactory("extra", {
       title: "תוספות ושעות נוספות",
       icon: <AddCircleOutline sx={{ color: "#ed6c02" }} />,
       summaryLabel: "סה״כ תוספות",
       color: "#ed6c02",
       payVM,
       baseRate,
-      buildRows: buildExtraPayRows,
     }),
-    createSectionFactory("allowance", {
+
+    createAllowanceSectionFactory("allowance", {
       title: "אש״ל וכלכלה",
       icon: <Restaurant sx={{ color: "#2e7d32" }} />,
       summaryLabel: "סה״כ נלוות",
@@ -47,7 +47,6 @@ export const buildSectionsSalary = ({
       payVM,
       allowanceRate,
       rateDiem,
-      buildRows: buildAllowanceRowsFromPayVM,
     }),
   ];
 };
