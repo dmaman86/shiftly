@@ -1,10 +1,10 @@
 import {
   RegularByShiftCalculator,
   RegularByDayCalculator,
-  RegularByMonthAccumulator,
   RegularCalculator,
   RegularBreakdown,
   Reducer,
+  RegularByMonthAccumulator,
 } from "@/domain";
 
 export class RegularFactory {

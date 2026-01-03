@@ -8,7 +8,6 @@ import {
   DefaultShiftMapBuilder,
   TimelinePerDiemRateResolver,
   MonthPayMapReducer,
-  ShiftResolverFactory,
   DefaultDayPayMapBuilder,
   HolidayResolverService,
   FixedSegmentFactory,
@@ -26,11 +25,14 @@ import {
   WorkDayReducerBundle,
   FixedSegmentMonthReducer,
   MealAllowanceMonthReducer,
+  ShiftSegmentResolver,
+  ShiftSegmentBuilder,
 } from "@/domain";
 import { WorkDayMonthReducer } from "./reducer/workday-month.reducer";
 
 export const buildPayMapPipeline = () => {
-  const shiftResolver = ShiftResolverFactory.create();
+  const segmentResolver = new ShiftSegmentResolver();
+  const shiftSegmentBuilder = new ShiftSegmentBuilder(segmentResolver);
 
   const regularByShift = RegularFactory.byShift();
   const regularByDay = RegularFactory.byDay();
@@ -59,7 +61,7 @@ export const buildPayMapPipeline = () => {
   };
 
   const shiftMapBuilder = new DefaultShiftMapBuilder(
-    shiftResolver,
+    shiftSegmentBuilder,
     shiftsCalculators,
     perdiemShiftCalculator,
   );

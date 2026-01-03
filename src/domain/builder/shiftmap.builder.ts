@@ -1,18 +1,16 @@
 import {
-  LabeledSegmentRange,
   PerDiemShiftCalculator,
   Shift,
   ShiftMapBuilder,
   ShiftPayMap,
   WorkDayMeta,
   PayCalculationBundle,
+  ShiftSegmentBuilder,
 } from "@/domain";
 
 export class DefaultShiftMapBuilder implements ShiftMapBuilder {
   constructor(
-    private readonly segmentResolver: {
-      resolve(shift: Shift, meta: WorkDayMeta): LabeledSegmentRange[];
-    },
+    private readonly segmentBuilder: ShiftSegmentBuilder,
     private readonly shiftsCalculators: PayCalculationBundle,
     private readonly perDiemShiftCalculator: PerDiemShiftCalculator,
   ) {}
@@ -30,7 +28,7 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     } = this.shiftsCalculators;
     const { shift, meta, standardHours, isFieldDutyShift } = params;
 
-    const labeledSegments = this.segmentResolver.resolve(shift, meta);
+    const labeledSegments = this.segmentBuilder.build({ shift, meta });
 
     const totalHours = (shift.end.minutes - shift.start.minutes) / 60;
 
