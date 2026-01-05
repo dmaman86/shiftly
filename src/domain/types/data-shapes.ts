@@ -21,7 +21,7 @@ export interface Segment {
   hours: number;
 }
 
-export type TimeFieldType = { date: Date; minutes: number };
+export type TimeFieldType = { date: Date };
 
 export type Shift = {
   id: string;
