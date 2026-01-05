@@ -6,7 +6,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import { addMinutes } from "date-fns";
 import { Shift, ShiftPayMap, TimeFieldType, WorkDayMeta } from "@/domain";
 import { useAppSnackbar } from "@/hooks";
 import { DomainContextType } from "@/app";
@@ -36,6 +35,7 @@ export const ShiftRow = ({
   onShiftUpdate,
   onRemove,
 }: ShiftRowProps) => {
+  const { dateService, shiftService } = domain.services;
   const { localShift, update, toggleDuty, saved, setSaved, shiftEntry } =
     useShift({
       domain,
@@ -49,8 +49,7 @@ export const ShiftRow = ({
   const handleChange = (field: "start" | "end", newDate: Date | null) => {
     if (!newDate) return;
 
-    const minutes = newDate.getHours() * 60 + newDate.getMinutes();
-    const tf: TimeFieldType = { date: newDate, minutes };
+    const tf: TimeFieldType = { date: newDate };
 
     const newStart = field === "start" ? tf : localShift.start;
     const newEnd = field === "end" ? tf : localShift.end;
@@ -59,20 +58,24 @@ export const ShiftRow = ({
   };
 
   const handleToggleNextDay = (checked: boolean) => {
-    const offset = checked ? 1440 : -1440;
-    const newStart = { ...localShift.start };
-    const newEnd = addMinutes(localShift.end.date, offset);
-
-    const tfEnd: TimeFieldType = {
-      date: newEnd,
-      minutes: localShift.end.minutes + offset,
-    };
-    update(newStart, tfEnd);
+    const updatedEnd = domain.services.shiftService.toggleNextDay(
+      localShift,
+      checked,
+    );
+    update(localShift.start, updatedEnd);
   };
 
-  const crossDay = localShift.end.minutes >= 1440;
+  const crossDay =
+    dateService.getDaysDifference(localShift.end.date, localShift.start.date) >
+    0;
+
+  const startMinutes = shiftService.getMinutesFromMidnight(
+    localShift.start.date,
+  );
+  const endMinutes = shiftService.getMinutesFromMidnight(localShift.end.date);
+
   const hasError =
-    !crossDay && localShift.end.minutes <= localShift.start.minutes;
+    !crossDay && endMinutes + (crossDay ? 1440 : 0) <= startMinutes;
 
   const handleSave = useCallback(() => {
     if (hasError) {
@@ -112,14 +115,8 @@ export const ShiftRow = ({
         </>
       ) : (
         <>
-          <ShiftTimeReadonly
-            label="שעת כניסה"
-            minutes={localShift.start.minutes}
-          />
-          <ShiftTimeReadonly
-            label="שעת יציאה"
-            minutes={localShift.end.minutes}
-          />
+          <ShiftTimeReadonly label="שעת כניסה" minutes={startMinutes} />
+          <ShiftTimeReadonly label="שעת יציאה" minutes={endMinutes} />
         </>
       )}
 

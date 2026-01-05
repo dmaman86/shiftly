@@ -21,7 +21,6 @@ import {
 } from "@/domain";
 import { WorkDayStatus } from "@/constants";
 import { ExpandedDayRow, ShiftRow, useDay } from "@/features/work-table";
-import { DateUtils } from "@/utils";
 import { DomainContextType } from "@/app";
 import { dayToPayBreakdownVM } from "@/adapters";
 import { CompactDayRow } from "./rows/CompactDayRow";
@@ -49,12 +48,11 @@ const DayRowComponent = ({
   isLastInWeek,
   viewMode,
 }: DayRowProps) => {
+  const { dateService } = domain.services;
   const { dayInfoResolver } = domain.resolvers;
   const { baseRate, standardHours, year, month, addDay, removeDay } =
     useGlobalState();
   const { isSpecialFullDay } = useWorkDays();
-
-  const { createDateWithTime } = DateUtils();
 
   const {
     status,
@@ -82,11 +80,11 @@ const DayRowComponent = ({
 
   const handleAddShift = useCallback(() => {
     const id = uuidv4();
-    const time = createDateWithTime(workDay.meta.date);
-    const start: TimeFieldType = { date: time, minutes: 0 };
-    const end: TimeFieldType = { date: time, minutes: 0 };
+    const time = dateService.createDateWithTime(workDay.meta.date);
+    const start: TimeFieldType = { date: time };
+    const end: TimeFieldType = { date: time };
     addShift({ id, start, end, isDuty: false });
-  }, [workDay.meta.date, addShift, createDateWithTime]);
+  }, [workDay.meta.date, addShift, dateService]);
 
   useEffect(() => {
     const dateKey = workDay.meta.date;
