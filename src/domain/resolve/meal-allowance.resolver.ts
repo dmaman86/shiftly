@@ -7,16 +7,13 @@ import {
   Resolver,
 } from "@/domain";
 
-export class MealAllowanceResolver
-  implements
-    Resolver<
-      {
-        day: MealAllowanceDayInfo;
-        rates: MealAllowanceRates;
-      },
-      MealAllowance
-    >
-{
+export class MealAllowanceResolver implements Resolver<
+  {
+    day: MealAllowanceDayInfo;
+    rates: MealAllowanceRates;
+  },
+  MealAllowance
+> {
   constructor(
     private readonly largeCalculator: LargeMealAllowanceCalculator,
     private readonly smallCalculator: SmallMealAllowanceCalculator,

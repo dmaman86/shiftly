@@ -1,8 +1,9 @@
 import { Resolver } from "@/domain";
 
-export class TimelinePerDiemRateResolver
-  implements Resolver<{ year: number; month: number }, number>
-{
+export class TimelinePerDiemRateResolver implements Resolver<
+  { year: number; month: number },
+  number
+> {
   private readonly timeline = [
     { year: 2000, month: 1, rateA: 33.9 },
     { year: 2024, month: 9, rateA: 36.3 },

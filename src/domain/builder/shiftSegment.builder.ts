@@ -3,28 +3,29 @@ import { LabeledSegmentRange, Point, WorkDayMeta } from "@/domain/types/types";
 import { Builder } from "../types/core-behaviors";
 import { ShiftSegmentResolver } from "../resolve";
 import { Shift } from "../types/data-shapes";
+import { ShiftService } from "../services";
 
-export class ShiftSegmentBuilder
-  implements Builder<{ shift: Shift; meta: WorkDayMeta }, LabeledSegmentRange[]>
-{
+export class ShiftSegmentBuilder implements Builder<
+  { shift: Shift; meta: WorkDayMeta },
+  LabeledSegmentRange[]
+> {
   private readonly fieldMinutes = {
     fullDay: 1440,
     min06: 6 * 60,
+    dayLimit: 1440 + 6 * 60,
   };
 
-  constructor(private readonly segmentResolver: ShiftSegmentResolver) {}
+  constructor(
+    private readonly segmentResolver: ShiftSegmentResolver,
+    private readonly shiftService: ShiftService,
+  ) {}
 
   build(params: { shift: Shift; meta: WorkDayMeta }): LabeledSegmentRange[] {
     const { shift, meta } = params;
 
-    const point: Point = {
-      start: shift.start.minutes,
-      end: shift.end.minutes,
-    };
+    if (!this.shiftService.isValidShiftDuration(shift)) return [];
 
-    if (point.start >= point.end) return [];
-
-    const [firstPart, secondPart] = this.splitTarget(point);
+    const [firstPart, secondPart] = this.splitShift(shift);
 
     const part1 = this.segmentResolver.resolve({
       point: firstPart,
@@ -35,7 +36,7 @@ export class ShiftSegmentBuilder
 
     const metaNextDay: WorkDayMeta = {
       ...meta,
-      date: this.nextDate(meta.date),
+      date: shift.end.date.toISOString().split("T")[0],
       typeDay: meta.crossDayContinuation
         ? WorkDayType.SpecialFull
         : WorkDayType.Regular,
@@ -51,19 +52,22 @@ export class ShiftSegmentBuilder
     return this.mergeSegments(part1, part2);
   }
 
-  private splitTarget(target: Point): [Point, Point?] {
-    const dayLimit = this.fieldMinutes.min06 + this.fieldMinutes.fullDay;
+  private splitShift(shift: Shift): [Point, Point?] {
+    const endMinutes = this.shiftService.getMinutesFromMidnight(
+      shift.end.date,
+      shift.start.date,
+    );
 
     const first: Point = {
-      start: target.start,
-      end: Math.min(target.end, dayLimit),
+      start: this.shiftService.getMinutesFromMidnight(shift.start.date),
+      end: Math.min(endMinutes, this.fieldMinutes.dayLimit),
     };
 
     const second: Point | undefined =
-      target.end > dayLimit
+      endMinutes > this.fieldMinutes.dayLimit
         ? {
             start: this.fieldMinutes.min06,
-            end: target.end % this.fieldMinutes.fullDay,
+            end: endMinutes % this.fieldMinutes.fullDay,
           }
         : undefined;
 
@@ -87,11 +91,5 @@ export class ShiftSegmentBuilder
     b: LabeledSegmentRange[],
   ): LabeledSegmentRange[] {
     return [...a, ...b].sort((x, y) => x.point.start - y.point.start);
-  }
-
-  private nextDate(date: string): string {
-    const d = new Date(date);
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().split("T")[0];
   }
 }

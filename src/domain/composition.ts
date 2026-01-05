@@ -1,148 +1,52 @@
 import {
-  ExtraCalculator,
-  RegularFactory,
-  SpecialCalculator,
-  DefaultPerDiemShiftCalculator,
-  DefaultPerDiemDayCalculator,
-  DefaultPerDiemMonthCalculator,
-  DefaultShiftMapBuilder,
-  TimelinePerDiemRateResolver,
-  MonthPayMapReducer,
-  DefaultDayPayMapBuilder,
-  HolidayResolverService,
-  FixedSegmentFactory,
-  WorkDayInfoResolver,
-  DefaultWorkDaysForMonthBuilder,
-  DefaultMonthResolver,
-  LargeMealAllowanceCalculator,
-  SmallMealAllowanceCalculator,
-  TimelineMealAllowanceRateResolver,
-  MealAllowanceResolver,
-  PayCalculationBundle,
-  FixedSegmentBundle,
-  PerDiemBundle,
-  MealAllowanceBundle,
-  WorkDayReducerBundle,
-  FixedSegmentMonthReducer,
-  MealAllowanceMonthReducer,
-  ShiftSegmentResolver,
-  ShiftSegmentBuilder,
-} from "@/domain";
-import { WorkDayMonthReducer } from "./reducer/workday-month.reducer";
+  buildCalculators,
+  buildCoreServices,
+  buildDayLayer,
+  buildMonthLayer,
+  buildResolvers,
+  buildShiftLayer,
+} from "./pipelines";
+import { PayMapPipeline } from "./types/domain.types";
 
-export const buildPayMapPipeline = () => {
-  const segmentResolver = new ShiftSegmentResolver();
-  const shiftSegmentBuilder = new ShiftSegmentBuilder(segmentResolver);
+export const buildPayMapPipeline = (): PayMapPipeline => {
+  const services = buildCoreServices();
 
-  const regularByShift = RegularFactory.byShift();
-  const regularByDay = RegularFactory.byDay();
-  const regularAccumulator = RegularFactory.monthReducer();
+  const resolvers = buildResolvers();
 
-  const extraCalculator = new ExtraCalculator();
-  const specialCalculator = new SpecialCalculator();
+  const calculators = buildCalculators();
 
-  const sickCalculator = new FixedSegmentFactory();
-  const vacationCalculator = new FixedSegmentFactory();
-  const extraShabbatCalculator = new FixedSegmentFactory();
+  const shiftLayer = buildShiftLayer({
+    shiftService: services.shiftService,
+    calculators,
+  });
 
-  const largeMealAllowanceCalculator = new LargeMealAllowanceCalculator();
-  const smallMealAllowanceCalculator = new SmallMealAllowanceCalculator();
+  const dayLayer = buildDayLayer({
+    dateService: services.dateService,
+    calculators,
+    resolvers,
+  });
 
-  const perdiemShiftCalculator = new DefaultPerDiemShiftCalculator();
-  const perDiemDayCalculator = new DefaultPerDiemDayCalculator();
-  const perDiemMonthCalculator = new DefaultPerDiemMonthCalculator();
-  const perDiemRateResolver = new TimelinePerDiemRateResolver();
-  const mealAllowanceRateResolver = new TimelineMealAllowanceRateResolver();
-
-  const shiftsCalculators: PayCalculationBundle = {
-    regular: regularByShift,
-    extra: extraCalculator,
-    special: specialCalculator,
-  };
-
-  const shiftMapBuilder = new DefaultShiftMapBuilder(
-    shiftSegmentBuilder,
-    shiftsCalculators,
-    perdiemShiftCalculator,
-  );
-
-  const holidayResolver = new HolidayResolverService();
-
-  const workDayInfoResolver = new WorkDayInfoResolver();
-
-  const workDaysForMonthBuilder = new DefaultWorkDaysForMonthBuilder(
-    holidayResolver,
-    workDayInfoResolver,
-  );
-
-  const monthResolver = new DefaultMonthResolver();
-
-  const fixedSegmentBundle: FixedSegmentBundle = {
-    sick: sickCalculator,
-    vacation: vacationCalculator,
-    extraShabbat: extraShabbatCalculator,
-  };
-
-  const mealAllowanceResolver = new MealAllowanceResolver(
-    largeMealAllowanceCalculator,
-    smallMealAllowanceCalculator,
-  );
-
-  const payCalculatorBundle: PayCalculationBundle = {
-    regular: regularByDay,
-    extra: extraCalculator,
-    special: specialCalculator,
-  };
-
-  const perDiemBundle: PerDiemBundle = {
-    calculator: perDiemDayCalculator,
-    rateResolver: perDiemRateResolver,
-  };
-
-  const mealAllowanceBundle: MealAllowanceBundle = {
-    resolver: mealAllowanceResolver,
-    rateResolver: mealAllowanceRateResolver,
-  };
-
-  const dayPayMapBuilder = new DefaultDayPayMapBuilder(
-    payCalculatorBundle,
-    fixedSegmentBundle,
-    perDiemBundle,
-    mealAllowanceBundle,
-  );
-
-  const workPay: WorkDayReducerBundle = {
-    regular: regularAccumulator,
-    extra: extraCalculator,
-    special: specialCalculator,
-  };
-
-  const workPayMonthReducer = new WorkDayMonthReducer(workPay);
-
-  const fixed = new FixedSegmentMonthReducer(fixedSegmentBundle);
-
-  const allowances = new MealAllowanceMonthReducer();
-
-  const monthPayMapCalculator = new MonthPayMapReducer(
-    workPayMonthReducer,
-    fixed,
-    allowances,
-    perDiemMonthCalculator,
-  );
+  const monthLayer = buildMonthLayer({
+    calculators,
+  });
 
   return {
     payMap: {
-      shiftMapBuilder,
-      dayPayMapBuilder,
-      monthPayMapCalculator,
-      workDaysForMonthBuilder,
+      shiftMapBuilder: shiftLayer.shiftMapBuilder,
+      dayPayMapBuilder: dayLayer.dayPayMapBuilder,
+      monthPayMapCalculator: monthLayer.monthPayMapCalculator,
+      workDaysForMonthBuilder: dayLayer.workDaysForMonthBuilder,
     },
     resolvers: {
-      perDiemRateResolver,
-      holidayResolver,
-      workDayInfoResolver,
-      monthResolver,
-      mealAllowanceRateResolver,
+      perDiemRateResolver: resolvers.perDiemRateResolver,
+      holidayResolver: resolvers.holidayResolver,
+      workDayInfoResolver: resolvers.workDayInfoResolver,
+      monthResolver: resolvers.monthResolver,
+      mealAllowanceRateResolver: resolvers.mealAllowanceRateResolver,
+    },
+    services: {
+      dateService: services.dateService,
+      shiftService: services.shiftService,
     },
   };
 };

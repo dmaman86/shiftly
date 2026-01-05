@@ -4,9 +4,10 @@ import {
   Calculator,
 } from "@/domain";
 
-export class LargeMealAllowanceCalculator
-  implements Calculator<MealAllowanceCalcParams, MealAllowanceEntry>
-{
+export class LargeMealAllowanceCalculator implements Calculator<
+  MealAllowanceCalcParams,
+  MealAllowanceEntry
+> {
   calculate(params: MealAllowanceCalcParams): MealAllowanceEntry {
     const { day, rate } = params;
     const { totalHours, hasMorning, hasNight, isFieldDutyDay } = day;

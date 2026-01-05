@@ -1,16 +1,6 @@
 import { RegularBreakdown, Reducer, RegularConfig } from "@/domain";
 
-export abstract class BaseRegularCalculator
-  implements Reducer<RegularBreakdown>
-{
-  /*protected readonly MID_TIER = 2; // 2 hours
-
-  protected readonly fieldShiftPercent: Record<string, number> = {
-    hours100: 1,
-    hours125: 1.25,
-    hours150: 1.5,
-  };*/
-
+export abstract class BaseRegularCalculator implements Reducer<RegularBreakdown> {
   protected readonly config: RegularConfig;
 
   constructor(config?: Partial<RegularConfig>) {

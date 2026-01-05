@@ -1,15 +1,12 @@
 import { MealAllowanceRates, Resolver } from "@/domain";
 
-export class TimelineMealAllowanceRateResolver
-  implements
-    Resolver<
-      {
-        year: number;
-        month: number;
-      },
-      MealAllowanceRates
-    >
-{
+export class TimelineMealAllowanceRateResolver implements Resolver<
+  {
+    year: number;
+    month: number;
+  },
+  MealAllowanceRates
+> {
   private readonly timeline: Array<{
     year: number;
     month: number;

@@ -6,6 +6,7 @@ import {
   WorkDayMeta,
   PayCalculationBundle,
   ShiftSegmentBuilder,
+  ShiftService,
 } from "@/domain";
 
 export class DefaultShiftMapBuilder implements ShiftMapBuilder {
@@ -13,6 +14,7 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     private readonly segmentBuilder: ShiftSegmentBuilder,
     private readonly shiftsCalculators: PayCalculationBundle,
     private readonly perDiemShiftCalculator: PerDiemShiftCalculator,
+    private readonly shiftService: ShiftService,
   ) {}
 
   build(params: {
@@ -30,7 +32,7 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
 
     const labeledSegments = this.segmentBuilder.build({ shift, meta });
 
-    const totalHours = (shift.end.minutes - shift.start.minutes) / 60;
+    const totalHours = this.shiftService.getDurationShift(shift);
 
     const extra = extraCalculator.calculate(labeledSegments);
     const special = specialCalculator.calculate(labeledSegments);

@@ -13,10 +13,17 @@ export class DefaultPerDiemShiftCalculator implements PerDiemShiftCalculator {
     isFieldDutyShift: boolean;
   }): PerDiemShiftInfo {
     const { shift, isFieldDutyShift } = params;
-    const hours = (shift.end.minutes - shift.start.minutes) / 60;
+    const endMinutes = this.getMinutesFromMidnight(shift.end.date);
+    const startMinutes = this.getMinutesFromMidnight(shift.start.date);
+
+    const hours = (endMinutes - startMinutes) / 60;
     return {
       isFieldDutyShift,
       hours,
     };
+  }
+
+  private getMinutesFromMidnight(date: Date): number {
+    return date.getHours() * 60 + date.getMinutes();
   }
 }
