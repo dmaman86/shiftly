@@ -1,4 +1,5 @@
 import {
+  DateService,
   DayInfoResolver,
   DayPayMapBuilder,
   HolidayResolver,
@@ -6,6 +7,7 @@ import {
   MonthResolver,
   PerDiemRateResolver,
   ShiftMapBuilder,
+  ShiftService,
   TimelineMealAllowanceRateResolver,
   WorkDaysForMonthBuilder,
 } from "@/domain";
@@ -23,6 +25,10 @@ export type DomainContextType = {
     dayInfoResolver: DayInfoResolver;
     monthResolver: MonthResolver;
     mealAllowanceRateResolver: TimelineMealAllowanceRateResolver;
+  };
+  services: {
+    dateService: DateService;
+    shiftService: ShiftService;
   };
 };
 

@@ -17,7 +17,6 @@ import {
   Feedback,
 } from "@/features";
 import { useDeviceType, useFetch, useGlobalState, useWorkDays } from "@/hooks";
-import { DateUtils } from "@/utils";
 import { ApiResponse, TableViewMode } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
@@ -25,12 +24,12 @@ import { hebcalService } from "@/services";
 import { ErrorBoundary, FeatureErrorFallback } from "@/layout";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
+  const { dateService } = domain.services;
   const { isMobile } = useDeviceType();
 
   const call = hebcalService();
   const { year, month, baseRate, reset } = useGlobalState();
 
-  const { getDatesRange } = DateUtils();
   const { workDays, generate } = useWorkDays();
 
   const [error, setError] = useState<string | undefined>(undefined);
@@ -43,7 +42,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
 
   useEffect(() => {
     const loadEvents = async () => {
-      const { startDate, endDate } = getDatesRange(year, month);
+      const { startDate, endDate } = dateService.getDatesRange(year, month);
 
       const { data, error }: ApiResponse<Record<string, string[]>> =
         await callEndPoint<Record<string, string[]>>(

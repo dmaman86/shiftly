@@ -18,4 +18,8 @@ export const domain: DomainContextType = {
     mealAllowanceRateResolver:
       pipelineInstance.resolvers.mealAllowanceRateResolver,
   },
+  services: {
+    dateService: pipelineInstance.services.dateService,
+    shiftService: pipelineInstance.services.shiftService,
+  },
 };
