@@ -231,27 +231,27 @@ Shiftly כוללת שתי תצוגות חישוב עיקריות:
 **שבת או חג - עבודה מותרת**
 
 - לא ניתן לסמן יום כמחלה או חופש, אך ניתן להזין משמרות עבודה.
-  ![Shabbat Sick Vacation Example](./public/shabbat-sick-vacation.png)
+  ![Shabbat Sick Vacation Example](./.github/assets/shabbat-sick-vacation.png)
 
 **יום מחלה או חופש - ללא משמרות עבודה**
 
 - כאשר יום מסומן כמחלה או חופש, לא ניתן להזין בו משמרות עבודה
-  ![Sick Select Example](./public/sick-day-select.png)
-  ![Vacation Select Example](./public/vacation-day-select.png)
+  ![Sick Select Example](./.github/assets/sick-day-select.png)
+  ![Vacation Select Example](./.github/assets/vacation-day-select.png)
 
 **משמרת חוצה יום - תיבת סימון ״חוצה יום״**
 
 - כאשר שעת הסיום היא ביום הבא המערכת מבקשת אישור מפורש על חציית יום.
-  ![Cross Day Warning](./public/cross-day-warning.png)
-  ![Cross Day Checkbox](./public/cross-day-checkbox.png)
-  ![Cross Day](./public/shift-save.png)
+  ![Cross Day Warning](./.github/assets/cross-day-warning.png)
+  ![Cross Day Checkbox](./.github/assets/cross-day-checkbox.png)
+  ![Cross Day](./.github/assets/shift-save.png)
 
 **סיכום פירוק יומי**
-![Breakdown Day 1](./public/breakdown-summary-1.png)
-![Breakdown Day 2](./public/breakdown-summary-2.png)
+![Breakdown Day 1](./.github/assets/breakdown-summary-1.png)
+![Breakdown Day 2](./.github/assets/breakdown-summary-2.png)
 
 **סיכום חודשי**
-![Monthly Summary](./public/monthly-summary.png)
+![Monthly Summary](./.github/assets/monthly-summary.png)
 
 ---
 

@@ -265,27 +265,27 @@ This separation keeps configuration logic explicit and context-aware.
 **Shabbat or Holiday - Work Hours Allowed**
 
 - Cannot mark as Sick/Vacation, but work segments are allowed.
-  ![Shabbat Sick Vacation Example](./public/shabbat-sick-vacation.png)
+  ![Shabbat Sick Vacation Example](./.github/assets/shabbat-sick-vacation.png)
 
 **Sick Day Or Vacation Day - Not Work Segments**
 
 - Marked as Sick/Vacation; nor work segments allowed.
-  ![Sick Select Example](./public/sick-day-select.png)
-  ![Vacation Select Example](./public/vacation-day-select.png)
+  ![Sick Select Example](./.github/assets/sick-day-select.png)
+  ![Vacation Select Example](./.github/assets/vacation-day-select.png)
 
 **Cross-Day Shift - "חוצה יום" Checkbox**
 
 - End time is next day; system asks to confirm crossing day.
-  ![Cross Day Warning](./public/cross-day-warning.png)
-  ![Cross Day Checkbox](./public/cross-day-checkbox.png)
-  ![Cross Day](./public/shift-save.png)
+  ![Cross Day Warning](./.github/assets/cross-day-warning.png)
+  ![Cross Day Checkbox](./.github/assets/cross-day-checkbox.png)
+  ![Cross Day](./.github/assets/shift-save.png)
 
 **Breakdown Day Summary**
-![Breakdown Day 1](./public/breakdown-summary-1.png)
-![Breakdown Day 2](./public/breakdown-summary-2.png)
+![Breakdown Day 1](./.github/assets/breakdown-summary-1.png)
+![Breakdown Day 2](./.github/assets/breakdown-summary-2.png)
 
 **Monthly Summary**
-![Monthly Summary](./public/monthly-summary.png)
+![Monthly Summary](./.github/assets/monthly-summary.png)
 
 ---
 
