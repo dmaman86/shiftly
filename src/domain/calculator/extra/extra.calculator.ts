@@ -1,9 +1,6 @@
-import {
-  ExtraBreakdown,
-  LabeledSegmentRange,
-  Calculator,
-  Reducer,
-} from "@/domain";
+import type { ExtraBreakdown } from "@/domain/types/data-shapes";
+import type { LabeledSegmentRange } from "@/domain/types/types";
+import type { Calculator, Reducer } from "@/domain/types/core-behaviors";
 
 export class ExtraCalculator
   implements

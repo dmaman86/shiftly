@@ -1,4 +1,4 @@
-import { Segment } from "@/domain";
+import type { Segment } from "@/domain/types/data-shapes";
 
 export class FixedSegmentFactory {
   private readonly fieldShiftPercent: Record<string, number> = {

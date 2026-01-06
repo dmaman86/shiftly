@@ -1,4 +1,5 @@
-import { RegularBreakdown, Reducer, RegularConfig } from "@/domain";
+import type { RegularBreakdown, RegularConfig } from "@/domain/types/data-shapes";
+import type { Reducer } from "@/domain/types/core-behaviors";
 
 export abstract class BaseRegularCalculator implements Reducer<RegularBreakdown> {
   protected readonly config: RegularConfig;

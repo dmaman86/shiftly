@@ -1,8 +1,8 @@
-import {
+import type { 
   MealAllowanceEntry,
-  MealAllowanceCalcParams,
-  Calculator,
-} from "@/domain";
+  MealAllowanceCalcParams 
+} from "@/domain/types/data-shapes";
+import type { Calculator } from "@/domain/types/core-behaviors";
 
 export class LargeMealAllowanceCalculator implements Calculator<
   MealAllowanceCalcParams,

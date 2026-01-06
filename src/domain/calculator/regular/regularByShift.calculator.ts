@@ -1,10 +1,7 @@
 import { WorkDayType } from "@/constants";
-import {
-  RegularBreakdown,
-  BaseRegularCalculator,
-  Calculator,
-  RegularInput,
-} from "@/domain";
+import { BaseRegularCalculator } from "./baseRegular.calculator";
+import type { Calculator } from "@/domain/types/core-behaviors";
+import type { RegularBreakdown, RegularInput } from "@/domain/types/data-shapes";
 
 export class RegularByShiftCalculator
   extends BaseRegularCalculator

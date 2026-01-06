@@ -1,4 +1,6 @@
-import { PerDiemShiftCalculator, PerDiemShiftInfo, Shift } from "@/domain";
+import type { PerDiemShiftCalculator } from "@/domain/types/services";
+import type { PerDiemShiftInfo } from "@/domain/types/types";
+import type { Shift } from "@/domain/types/data-shapes";
 
 export class DefaultPerDiemShiftCalculator implements PerDiemShiftCalculator {
   createEmpty(): PerDiemShiftInfo {

@@ -1,4 +1,5 @@
-import { PerDiemInfo, PerDiemMonthReducer } from "@/domain";
+import type { PerDiemInfo } from "@/domain/types/data-shapes";
+import type { PerDiemMonthReducer } from "@/domain/types/services";
 
 export class DefaultPerDiemMonthCalculator implements PerDiemMonthReducer {
   createEmpty() {

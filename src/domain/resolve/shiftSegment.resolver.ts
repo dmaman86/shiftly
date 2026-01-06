@@ -1,5 +1,6 @@
 import { WorkDayType } from "@/constants";
-import { LabeledSegmentRange, Point, Resolver, WorkDayMeta } from "@/domain";
+import type { LabeledSegmentRange, Point, WorkDayMeta } from "@/domain/types/types";
+import type { Resolver } from "@/domain/types/core-behaviors";
 
 export class ShiftSegmentResolver implements Resolver<
   {

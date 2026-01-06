@@ -25,3 +25,4 @@ dist-ssr
 
 # Mac
 .DS_Store
+coverage/
