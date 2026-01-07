@@ -43,11 +43,11 @@ describe("MealAllowanceResolver", () => {
     // Create mock calculators
     mockLargeCalculator = {
       calculate: vi.fn(),
-    } as any;
+    } as unknown as LargeMealAllowanceCalculator;
 
     mockSmallCalculator = {
       calculate: vi.fn(),
-    } as any;
+    } as unknown as SmallMealAllowanceCalculator;
 
     resolver = new MealAllowanceResolver(
       mockLargeCalculator,

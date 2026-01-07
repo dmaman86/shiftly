@@ -719,7 +719,7 @@ describe("ShiftService", () => {
         getDaysDifference: vi.fn(() => 0),
         isAfterDate: vi.fn(),
         addDaysToDate: vi.fn(),
-      } as any;
+      } as unknown as DateService;
 
       const testService = new ShiftService(mockDateService);
       const date = new Date(2025, 0, 15, 9, 0, 0);
@@ -735,7 +735,7 @@ describe("ShiftService", () => {
         getDaysDifference: vi.fn(() => 1),
         isAfterDate: vi.fn(),
         addDaysToDate: vi.fn(),
-      } as any;
+      } as unknown as DateService;
 
       const testService = new ShiftService(mockDateService);
       const date = new Date(2025, 0, 16, 2, 0, 0);
@@ -756,7 +756,7 @@ describe("ShiftService", () => {
         getDaysDifference: vi.fn(),
         isAfterDate: vi.fn(() => true),
         addDaysToDate: vi.fn(),
-      } as any;
+      } as unknown as DateService;
 
       const testService = new ShiftService(mockDateService);
       const shift = createShift(
@@ -779,7 +779,7 @@ describe("ShiftService", () => {
         getDaysDifference: vi.fn(),
         isAfterDate: vi.fn(),
         addDaysToDate: vi.fn(() => newDate),
-      } as any;
+      } as unknown as DateService;
 
       const testService = new ShiftService(mockDateService);
       const shift = createShift(
@@ -802,7 +802,7 @@ describe("ShiftService", () => {
         getDaysDifference: vi.fn(() => 1),
         isAfterDate: vi.fn(),
         addDaysToDate: vi.fn(),
-      } as any;
+      } as unknown as DateService;
 
       const testService = new ShiftService(mockDateService);
       const shift = createShift(
