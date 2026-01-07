@@ -1,12 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { MonthPayMapReducer } from "@/domain/reducer/month-pay-map.reducer";
-import { WorkDayMonthReducer } from "@/domain/reducer/workday-month.reducer";
-import type {
-  WorkDayMap,
-  FixedSegmentMonthReducer,
-  MealAllowanceMonthReducer,
-  PerDiemMonthReducer,
-} from "@/domain";
+import type { WorkDayMap } from "@/domain";
+import type { WorkDayMonthReducer } from "@/domain/reducer/workday-month.reducer";
+import type { FixedSegmentMonthReducer } from "@/domain/reducer/fixed-segment-month.reducer";
+import type { MealAllowanceMonthReducer } from "@/domain/reducer/meal-allowance-month.reducer";
+import type { PerDiemMonthReducer } from "@/domain/types/services";
 
 describe("MonthPayMapReducer", () => {
   let reducer: MonthPayMapReducer;
@@ -63,7 +61,7 @@ describe("MonthPayMapReducer", () => {
           shabbat200: { percent: 2, hours: Math.max(0, base.special.shabbat200.hours - sub.workMap.special.shabbat200.hours) },
         },
       })),
-    } as any;
+    } as unknown as WorkDayMonthReducer;
 
     // Mock FixedSegmentMonthReducer
     mockFixed = {
@@ -82,7 +80,7 @@ describe("MonthPayMapReducer", () => {
         hours100Vacation: { percent: 1, hours: Math.max(0, base.hours100Vacation.hours - sub.hours100Vacation.hours) },
         extra100Shabbat: { percent: 1.5, hours: Math.max(0, base.extra100Shabbat.hours - sub.extra100Shabbat.hours) },
       })),
-    } as any;
+    } as unknown as FixedSegmentMonthReducer;
 
     // Mock MealAllowanceMonthReducer
     mockAllowances = {
@@ -98,7 +96,7 @@ describe("MonthPayMapReducer", () => {
         small: { points: Math.max(0, base.small.points - sub.small.points), amount: Math.max(0, base.small.amount - sub.small.amount) },
         large: { points: Math.max(0, base.large.points - sub.large.points), amount: Math.max(0, base.large.amount - sub.large.amount) },
       })),
-    } as any;
+    } as unknown as MealAllowanceMonthReducer;
 
     // Mock PerDiemMonthReducer
     mockPerDiem = {
@@ -117,7 +115,7 @@ describe("MonthPayMapReducer", () => {
         points: Math.max(0, base.points - sub.points),
         amount: Math.max(0, base.amount - sub.amount),
       })),
-    } as any;
+    } as unknown as PerDiemMonthReducer;
 
     reducer = new MonthPayMapReducer(mockWorkPay, mockFixed, mockAllowances, mockPerDiem);
   });
