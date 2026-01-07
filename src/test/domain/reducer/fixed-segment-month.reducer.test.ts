@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { FixedSegmentMonthReducer } from "@/domain/reducer/fixed-segment-month.reducer";
+import { FixedSegmentFactory } from "@/domain/factory/fixed-segment.factory";
 import type { FixedSegmentBundle, MonthPayMap, WorkDayMap, Segment } from "@/domain";
 
 describe("FixedSegmentMonthReducer", () => {
@@ -13,19 +14,19 @@ describe("FixedSegmentMonthReducer", () => {
           percent: 1,
           hours,
         })),
-      },
+      } as unknown as FixedSegmentFactory,
       vacation: {
         create: vi.fn((hours: number): Segment => ({
           percent: 1,
           hours,
         })),
-      },
+      } as unknown as FixedSegmentFactory,
       extraShabbat: {
         create: vi.fn((hours: number): Segment => ({
           percent: 1.5,
           hours,
         })),
-      },
+      } as unknown as FixedSegmentFactory,
     };
     reducer = new FixedSegmentMonthReducer(mockBundle);
   });
@@ -592,19 +593,19 @@ describe("FixedSegmentMonthReducer", () => {
             percent: 2, // Custom percentage
             hours,
           }),
-        },
+        } as unknown as FixedSegmentFactory,
         vacation: {
           create: (hours: number): Segment => ({
             percent: 1,
             hours,
           }),
-        },
+        } as unknown as FixedSegmentFactory,
         extraShabbat: {
           create: (hours: number): Segment => ({
             percent: 1.5,
             hours,
           }),
-        },
+        } as unknown as FixedSegmentFactory,
       };
 
       const customReducer = new FixedSegmentMonthReducer(customBundle);
@@ -650,10 +651,10 @@ describe("FixedSegmentMonthReducer", () => {
     });
 
     it("should handle precision with repeated operations", () => {
-      let result = reducer.createEmpty() as MonthPayMap;
+      let result = reducer.createEmpty();
 
       for (let i = 0; i < 10; i++) {
-        result = reducer.accumulate(result, {
+        result = reducer.accumulate(result as MonthPayMap, {
           hours100Sick: { percent: 1, hours: 0.1 },
           hours100Vacation: { percent: 1, hours: 0.1 },
           extra100Shabbat: { percent: 1.5, hours: 0.1 },
@@ -661,7 +662,7 @@ describe("FixedSegmentMonthReducer", () => {
       }
 
       // Should be called with approximately 1.0
-      const lastSickCall = (mockBundle.sick.create as any).mock.calls.slice(-1)[0][0];
+      const lastSickCall = (mockBundle.sick.create as ReturnType<typeof vi.fn>).mock.calls.slice(-1)[0][0];
       expect(lastSickCall).toBeCloseTo(1.0, 1);
     });
   });
