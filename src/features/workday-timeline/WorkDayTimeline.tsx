@@ -7,7 +7,7 @@ type WorkDayTimelineProps = {
 
 export const WorkDayTimeline = ({ title, children }: WorkDayTimelineProps) => {
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: "100%", mb: 2 }}>
       {title && (
         <Typography
           variant="caption"
@@ -22,7 +22,7 @@ export const WorkDayTimeline = ({ title, children }: WorkDayTimelineProps) => {
           display: "flex",
           width: "100%",
           borderRadius: 1,
-          overflow: "hidden",
+          overflow: { xs: "auto", sm: "hidden" },
           border: "1px solid",
           borderColor: "divider",
         }}

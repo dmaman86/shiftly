@@ -7,7 +7,15 @@ type RuleCardProps = {
 
 export const RuleCard = ({ title, children }: RuleCardProps) => {
   return (
-    <Card sx={{ mb: 3 }}>
+    <Card
+      sx={{
+        mb: 3,
+        transition: "all 0.2s",
+        "&:hover": {
+          boxShadow: 2,
+        },
+      }}
+    >
       <CardContent>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
           {title}
