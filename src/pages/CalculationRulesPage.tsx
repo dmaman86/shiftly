@@ -1,10 +1,4 @@
 import {
-  RuleAccordion,
-  RuleCard,
-  TimeSegment,
-  WorkDayTimeline,
-} from "@/features";
-import {
   Box,
   Container,
   Table,
@@ -18,8 +12,18 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
+import {
+  RuleAccordion,
+  RuleCard,
+  TimeSegment,
+  WorkDayTimeline,
+  TimelineNote,
+} from "@/features";
+import { useGlobalState } from "@/hooks";
 
 export const CalculationRulesPage = () => {
+  const { standardHours } = useGlobalState();
+
   return (
     <Container maxWidth="md" sx={{ mt: 2 }}>
       <Card sx={{ mb: 3 }}>
@@ -52,177 +56,144 @@ export const CalculationRulesPage = () => {
 
           {/* Daily time split */}
           <RuleCard title="🕒 חלוקת יום עבודה">
-            <RuleAccordion title="יום עבודה רגיל">
+            <RuleAccordion title="חלוקת שעות נוספות (ש״נ)">
               <WorkDayTimeline>
                 <TimeSegment
-                  from="06:00"
-                  to="14:00"
+                  from=""
+                  to={`עד ${standardHours}`}
                   label="100%"
-                  flex={8}
+                  flex={1}
                   color="#e3f2fd"
                 />
                 <TimeSegment
-                  from="14:00"
-                  to="22:00"
-                  label="100% + 20%"
-                  flex={8}
+                  from=""
+                  to="עד שעתיים"
+                  label="125%"
+                  flex={1}
                   color="#fff8e1"
                 />
                 <TimeSegment
+                  from=""
+                  to="עד יתרת השעות"
+                  label="150%"
+                  flex={1}
+                  color="#fce4ec"
+                />
+              </WorkDayTimeline>
+              <TimelineNote variant="tip">
+                נכון להיום, שעות התקן הן {standardHours}.
+              </TimelineNote>
+            </RuleAccordion>
+          </RuleCard>
+
+          <RuleCard title="💰 תוספות שכר לפי שעות עבודה">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 2, whiteSpace: "pre-line" }}
+            >
+              {`התוספות המוצגות מסומנות כ־"+" ומתווספות לשכר הבסיסי.
+ביום חול ייתכן חישוב שעות נוספות (ש״נ).
+בשבת ובחג משולם שכר שבת (בסיס + תוספת), ללא ש״נ.`}
+            </Typography>
+            <RuleAccordion title="יום חול">
+              <WorkDayTimeline title="תחילת יום">
+                <TimeSegment
+                  from="00:00"
+                  to="06:00"
+                  label="+50%"
+                  flex={8}
+                  color="#fce4ec"
+                />
+
+                <TimeSegment
+                  from="06:00"
+                  to="14:00"
+                  label="שכר בסיס"
+                  flex={8}
+                  color="#e3f2fd"
+                />
+              </WorkDayTimeline>
+              <WorkDayTimeline title="המשך יום">
+                <TimeSegment
+                  from="14:00"
+                  to="22:00"
+                  label="+20%"
+                  flex={8}
+                  color="#fff8e1"
+                />
+
+                <TimeSegment
                   from="22:00"
                   to="6:00"
-                  label="100% + 50%"
+                  label="+50%"
                   flex={8}
                   color="#fce4ec"
                   crossDay
                 />
               </WorkDayTimeline>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                textAlign="center"
-                sx={{ mt: 1, display: "block" }}
-              >
-                הבהרה: ה־100% מייצג שעות עבודה רגילות, המתחלקות ל־100%, 125%
-                ו־150% ש״נ בהתאם לשעות העבודה ולשעות התקן.
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
-                * משמרת החוצה את חצות מחושבת כיום עבודה אחד.
-              </Typography>{" "}
-              <Typography variant="caption" color="text.secondary">
-                ** המשמרת ממשיכה ליום הבא.
-              </Typography>
+              <TimelineNote>
+                <div>* משמרת החוצה את חצות מחושבת כיום עבודה אחד.</div>
+                <div>** המשמרת ממשיכה ליום הבא.</div>
+              </TimelineNote>
             </RuleAccordion>
-          </RuleCard>
-
-          {/* Friday / Holiday */}
-          <RuleCard title="🕯️ שישי וערבי חג">
-            <RuleAccordion title="תחילת זמן מיוחד">
-              <WorkDayTimeline title="עד כניסת שבת / חג">
-                <TimeSegment
-                  from="06:00"
-                  to="14:00"
-                  label="100%"
-                  flex={8}
-                  color="#e3f2fd"
-                />
+            <RuleAccordion title="שישי וערבי חג">
+              <WorkDayTimeline>
                 <TimeSegment
                   from="14:00"
                   to="17:00 או 18:00"
-                  label="100% + 20%"
+                  label="+20%"
                   flex={8}
-                  color="#f1f8e9"
+                  color="#e3f2fd"
                 />
-              </WorkDayTimeline>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                textAlign="center"
-                sx={{ mt: 1, display: "block" }}
-              >
-                הבהרה: ה־100% מייצג שעות עבודה רגילות, המתחלקות ל־100%, 125%
-                ו־150% ש״נ בהתאם לשעות העבודה ולשעות התקן.
-              </Typography>
-              <WorkDayTimeline title="מכניסת שבת / חג">
                 <TimeSegment
                   from="17:00 או 18:00"
                   to="22:00"
-                  label="150% + 100%"
+                  label="+150%"
                   flex={8}
                   color="#fff8e1"
                 />
                 <TimeSegment
                   from="22:00"
                   to="6:00"
-                  label="200% + 100%"
+                  label="+200%"
                   flex={8}
                   color="#fce4ec"
                   crossDay
                 />
               </WorkDayTimeline>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                textAlign="center"
-                sx={{ mt: 1, display: "block" }}
-              >
-                הבהרה: ה־100% מייצג שעות זכות שבת, שאינן מתחלקות בש״נ.
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
-                * משמרת החוצה את חצות מחושבת כיום עבודה אחד.
-              </Typography>{" "}
-              <Typography variant="caption" color="text.secondary">
-                ** המשמרת ממשיכה ליום הבא.
-              </Typography>
-              <Typography
-                variant="caption"
-                sx={{ mt: 1, display: "block" }}
-                color="text.secondary"
-              >
-                • שעון קיץ – החל מ־18:00
-              </Typography>
-              <Typography
-                variant="caption"
-                sx={{ display: "block" }}
-                color="text.secondary"
-              >
-                • שעון חורף – החל מ־17:00
-              </Typography>
-              <Typography
-                sx={{ display: "block" }}
-                color="text.secondary"
-                variant="caption"
-              >
-                • הזיהוי מתבצע אוטומטית לפי התאריך.
-              </Typography>
+              <TimelineNote>
+                <div>* משמרת החוצה את חצות מחושבת כיום עבודה אחד.</div>
+                <div>** המשמרת ממשיכה ליום הבא.</div>
+              </TimelineNote>
+              <TimelineNote variant="tip">
+                <div>• שעון קיץ – החל מ־18:00</div>
+                <div>• שעון חורף – החל מ־17:00</div>
+                <div>• הזיהוי מתבצע אוטומטית לפי התאריך.</div>
+              </TimelineNote>
             </RuleAccordion>
-          </RuleCard>
-
-          <RuleCard title="🕯️ שבת / חג">
-            <RuleAccordion title="חלוקת היום">
-              <WorkDayTimeline>
+            <RuleAccordion title="שבת / חג">
+              <WorkDayTimeline title="תחילת יום">
                 <TimeSegment
                   from="06:00"
                   to="22:00"
-                  label="150% + 100%"
+                  label="+150%"
                   flex={8}
-                  color="#e3f2fd"
+                  color="#fff8e1"
                 />
                 <TimeSegment
                   from="22:00"
                   to="6:00"
-                  label="200% + 100%"
+                  label="+200%"
                   flex={8}
                   color="#fce4ec"
                   crossDay
                 />
               </WorkDayTimeline>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                textAlign="center"
-                sx={{ mt: 1, display: "block" }}
-              >
-                הבהרה: ה־100% מייצג שעות זכות שבת, שאינן מתחלקות בש״נ.
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ mt: 1 }}
-              >
-                * משמרת החוצה את חצות מחושבת כיום עבודה אחד.
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                ** המשמרת ממשיכה ליום הבא.
-              </Typography>
+              <TimelineNote>
+                <div>* משמרת החוצה את חצות מחושבת כיום עבודה אחד.</div>
+                <div>** המשמרת ממשיכה ליום הבא.</div>
+              </TimelineNote>
             </RuleAccordion>
           </RuleCard>
 

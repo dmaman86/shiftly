@@ -25,40 +25,61 @@ export const TimeSegment = ({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        px: 1,
-        py: 0.5,
+        px: { xs: 0.5, sm: 1 },
+        py: { xs: 0.5, sm: 0.75 },
         position: "relative",
+        minWidth: { xs: "80px", sm: "auto" },
       }}
     >
       {/* Time range */}
-      <div className="row">
-        <div className="col-6 d-flex align-items-start">
-          <Typography variant="caption" fontWeight="bold">
-            {from}
-            {crossDay && <sup>*</sup>}
-          </Typography>
-        </div>
-        <div className="col-6 d-flex align-items-end flex-column">
-          <Typography variant="caption" fontWeight="bold">
-            {to}
-            {crossDay && <sup>**</sup>}
-          </Typography>
-        </div>
-      </div>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: 0.5,
+          mb: 0.5,
+        }}
+      >
+        <Typography
+          variant="caption"
+          fontWeight="bold"
+          sx={{
+            fontSize: { xs: "0.65rem", sm: "0.75rem" },
+            lineHeight: 1.2,
+          }}
+        >
+          {from}
+          {crossDay && <sup>*</sup>}
+        </Typography>
+        <Typography
+          variant="caption"
+          fontWeight="bold"
+          sx={{
+            fontSize: { xs: "0.65rem", sm: "0.75rem" },
+            lineHeight: 1.2,
+            textAlign: "left",
+          }}
+        >
+          {to}
+          {crossDay && <sup>**</sup>}
+        </Typography>
+      </Box>
 
       {/* Percentage label */}
-      <div className="row">
-        <div className="col text-center">
-          <Typography
-            variant="caption"
-            fontWeight="bold"
-            textAlign="center"
-            sx={{ mt: 0.5 }}
-          >
-            {label}
-          </Typography>
-        </div>
-      </div>
+      <Box sx={{ textAlign: "center" }}>
+        <Typography
+          variant="caption"
+          fontWeight="bold"
+          sx={{
+            fontSize: { xs: "0.7rem", sm: "0.75rem" },
+            display: "block",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {label}
+        </Typography>
+      </Box>
     </Box>
   );
 };
