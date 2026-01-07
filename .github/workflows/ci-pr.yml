@@ -1,0 +1,45 @@
+name: CI - Pull Request
+
+# Trigger only on pull requests to main/master branches
+# This workflow provides fast feedback for code review
+on:
+  pull_request:
+
+# Define the jobs to run
+jobs:
+  ci-pr:
+    name: Fast Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the PR code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 4: Run TypeScript type checking
+      - name: Run type check
+        run: npm run typecheck
+
+      # Step 5: Run ESLint to check code quality
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage

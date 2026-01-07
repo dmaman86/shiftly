@@ -7,14 +7,16 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --project tsconfig.app.json && vite build",
+    "typecheck": "tsc --project tsconfig.app.json --noEmit",
+    "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "test:ci": "vitest run",
+    "predeploy": "npm run typecheck && npm run lint && npm run test:ci && npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@date-io/date-fns": "^3.2.1",

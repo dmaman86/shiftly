@@ -1,0 +1,45 @@
+name: CI - Main Branch
+
+# Trigger only on push to main/master branches
+# This workflow runs comprehensive checks and generates quality metrics
+on:
+  push:
+    branches: [main, master]
+
+# Define the jobs to run
+jobs:
+  ci:
+    name: TypeCheck, Lint, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm ci
+
+      # Step 4: Run TypeScript type checking
+      - name: Run type check
+        run: npm run typecheck
+
+      # Step 5: Run ESLint to check code quality
+      - name: Run linter
+        run: npm run lint
+
+      # Step 6: Run tests with Vitest in CI mode
+      - name: Run tests
+        run: npm run test:ci
+
+      # Step 7: Build the application
+      - name: Build application
+        run: npm run build
