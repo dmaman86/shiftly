@@ -199,7 +199,7 @@ describe("DefaultMonthResolver", () => {
 
       it("should handle first day of month correctly", () => {
         const resolver = new DefaultMonthResolver(
-          () => new Date("2023-05-01T00:00:00.000Z")
+          () => new Date(2023, 4, 1, 0, 0, 0, 0) // May 1, 2023 in local time
         );
 
         const result = resolver.getAvailableMonths(2023);
@@ -209,12 +209,12 @@ describe("DefaultMonthResolver", () => {
 
       it("should handle last day of month correctly", () => {
         const resolver = new DefaultMonthResolver(
-          () => new Date("2023-07-31T23:59:59.999Z")
+          () => new Date(2023, 6, 31, 23, 59, 59, 999) // July 31, 2023 in local time
         );
 
         const result = resolver.getAvailableMonths(2023);
 
-        expect(result).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+        expect(result).toEqual([0, 1, 2, 3, 4, 5, 6]);
       });
     });
 
@@ -646,7 +646,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should handle midnight boundary correctly", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2023-06-01T00:00:00.000Z")
+        () => new Date(2023, 5, 1, 0, 0, 0, 0) // June 1, 2023 in local time
       );
 
       const months = resolver.getAvailableMonths(2023);
@@ -736,7 +736,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should handle January edge case correctly", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2023-01-01T00:00:00.000Z")
+        () => new Date(2023, 0, 1, 0, 0, 0, 0) // January 1, 2023 in local time
       );
 
       const currentYear = resolver.getCurrentYear();
