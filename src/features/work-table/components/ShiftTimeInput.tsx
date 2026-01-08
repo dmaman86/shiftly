@@ -25,7 +25,18 @@ export const ShiftTimeInput = ({
       onChange={onChange}
       format="HH:mm"
       ampm={false}
-      sx={{ width: 100 }}
+      sx={{
+        width: 80,
+        maxWidth: 80,
+        "& .MuiInputBase-root": {
+          fontSize: "0.875rem",
+        },
+        "& .MuiInputBase-input": {
+          py: 0.75,
+          px: 1,
+          textAlign: "center",
+        },
+      }}
     />
   );
 };

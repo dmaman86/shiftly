@@ -39,24 +39,32 @@ export enum WorkDayType {
 
 export const headersTable: TableHeader[] = [
   { label: "יום", rowSpan: 2 },
-  { label: "", children: ["מחלה", "חופש"] },
-  { label: "שעות", rowSpan: 2 },
+  { label: "", children: ["מחלה", "חופש"], widths: [48, 48] },
+  {
+    label: "שעות",
+    children: ["", "כניסה", "יציאה", ""],
+    widths: [48, 96, 96, 120],
+  },
   { label: "סך שעות", rowSpan: 2 },
   {
     label: "ש״נ",
     children: ["100%", "125%", "150%"],
+    widths: [64, 64, 64],
   },
   {
     label: "שבת",
     children: ["150%", "200%"],
+    widths: [64, 64],
   },
   {
     label: "תוספות",
     children: ["ז. שבת ", "20%", "50%"],
+    widths: [64, 64, 64],
   },
   {
     label: "היעדרות",
     children: ["מחלה", "חופש"],
+    widths: [64, 64],
   },
   {
     label: "אש״ל",
@@ -65,13 +73,18 @@ export const headersTable: TableHeader[] = [
   {
     label: "כלכלה",
     children: ["גדולה", "קטנה"],
+    widths: [64, 64],
   },
 ];
 
 export const headersTableCompact: TableHeader[] = [
   { label: "יום", rowSpan: 2 },
-  { label: "", children: ["מחלה", "חופש"] },
-  { label: "שעות", rowSpan: 2 },
+  { label: "", children: ["מחלה", "חופש"], widths: [48, 48] },
+  {
+    label: "שעות",
+    children: ["", "כניסה", "יציאה", ""],
+    widths: [48, 96, 96, 120],
+  },
   { label: "סך שעות", rowSpan: 2 },
   { label: "רגילות", rowSpan: 2 },
   { label: "תוספות", rowSpan: 2 },

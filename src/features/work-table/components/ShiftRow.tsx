@@ -1,9 +1,8 @@
 import { useCallback, useEffect } from "react";
-import { Checkbox, IconButton, Stack, Tooltip } from "@mui/material";
+import { Checkbox, IconButton, TableCell, Tooltip } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { Shift, ShiftPayMap, TimeFieldType, WorkDayMeta } from "@/domain";
@@ -96,82 +95,143 @@ export const ShiftRow = ({
   }, [shiftEntry, onShiftUpdate]);
 
   return (
-    <Stack direction="row" alignItems="center" spacing={1}>
-      {!saved ? (
-        <>
+    <>
+      <TableCell
+        sx={{
+          borderRight: "1px solid black",
+          textAlign: "center",
+          width: 96,
+          maxWidth: 96,
+          p: 0.5,
+          overflow: "hidden",
+          verticalAlign: "middle",
+        }}
+      >
+        {!saved ? (
           <ShiftTimeInput
-            label="שעת כניסה"
+            label=""
             value={localShift.start.date}
             onChange={(newVal) => handleChange("start", newVal)}
             disabled={!isEditable}
           />
+        ) : (
+          <ShiftTimeReadonly label="" minutes={startMinutes} />
+        )}
+      </TableCell>
+
+      <TableCell
+        sx={{
+          borderRight: "1px solid black",
+          textAlign: "center",
+          width: 96,
+          maxWidth: 96,
+          p: 0.5,
+          overflow: "hidden",
+          verticalAlign: "middle",
+        }}
+      >
+        {!saved ? (
           <ShiftTimeInput
-            label="שעת יציאה"
+            label=""
             value={localShift.end.date}
             onChange={(newVal) => handleChange("end", newVal)}
             disabled={!isEditable}
-            error={hasError}
           />
-        </>
-      ) : (
-        <>
-          <ShiftTimeReadonly label="שעת כניסה" minutes={startMinutes} />
-          <ShiftTimeReadonly label="שעת יציאה" minutes={endMinutes} />
-        </>
-      )}
+        ) : (
+          <ShiftTimeReadonly label="" minutes={endMinutes} />
+        )}
+      </TableCell>
 
-      {isEditable && (
-        <>
-          {!saved && (
-            <Tooltip title="חוצה יום">
-              <Checkbox
-                checked={crossDay}
-                onChange={(e) => handleToggleNextDay(e.target.checked)}
-              />
+      <TableCell
+        sx={{
+          borderRight: "1px solid black",
+          textAlign: "center",
+          whiteSpace: "nowrap",
+          width: 120,
+          maxWidth: 120,
+          p: 0.25,
+          overflow: "visible",
+          verticalAlign: "middle",
+        }}
+      >
+        {isEditable && (
+          <>
+            {!saved && (
+              <Tooltip
+                title={
+                  hasError
+                    ? "⚠️ יש לסמן חוצה יום - שעת סיום לפני שעת התחלה"
+                    : "חוצה יום"
+                }
+              >
+                <Checkbox
+                  checked={crossDay}
+                  onChange={(e) => handleToggleNextDay(e.target.checked)}
+                  size="small"
+                  sx={{
+                    p: 0.5,
+                    color: hasError ? "warning.main" : undefined,
+                    "&.Mui-checked": {
+                      color: hasError ? "warning.main" : undefined,
+                    },
+                    ...(hasError && {
+                      animation: "blink 1.5s ease-in-out infinite",
+                      "@keyframes blink": {
+                        "0%, 100%": { opacity: 1 },
+                        "50%": { opacity: 0.3 },
+                      },
+                    }),
+                  }}
+                />
+              </Tooltip>
+            )}
+
+            <Tooltip title="משמרת בתפקיד">
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={toggleDuty}
+                  disabled={saved}
+                  sx={{ p: 0.5 }}
+                >
+                  {localShift.isDuty ? (
+                    <DirectionsCarIcon fontSize="small" color="primary" />
+                  ) : (
+                    <DirectionsCarOutlinedIcon fontSize="small" />
+                  )}
+                </IconButton>
+              </span>
             </Tooltip>
-          )}
 
-          {hasError && !saved && (
-            <Tooltip title="יש לסמן חוצה יום - שעת סיום לפני שעת התחלה">
-              <WarningAmberIcon fontSize="small" color="warning" />
+            <Tooltip title={!saved ? "שמור" : "ערוך"}>
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={() => (saved ? handleEdit() : handleSave())}
+                  disabled={!isEditable}
+                  sx={{ p: 0.5 }}
+                >
+                  {saved ? (
+                    <EditIcon fontSize="small" color="info" />
+                  ) : (
+                    <SaveIcon fontSize="small" color="primary" />
+                  )}
+                </IconButton>
+              </span>
             </Tooltip>
-          )}
 
-          <Tooltip title="משמרת בתפקיד">
-            <span>
-              <IconButton size="small" onClick={toggleDuty} disabled={saved}>
-                {localShift.isDuty ? (
-                  <DirectionsCarIcon fontSize="small" color="primary" />
-                ) : (
-                  <DirectionsCarOutlinedIcon fontSize="small" />
-                )}
-              </IconButton>
-            </span>
-          </Tooltip>
-
-          <Tooltip title={!saved ? "שמור" : "ערוך"}>
-            <span>
+            <Tooltip title="מחק">
               <IconButton
                 size="small"
-                onClick={() => (saved ? handleEdit() : handleSave())}
-                disabled={!isEditable}
+                onClick={() => onRemove(shift.id)}
+                sx={{ p: 0.5 }}
               >
-                {saved ? (
-                  <EditIcon fontSize="small" color="info" />
-                ) : (
-                  <SaveIcon fontSize="small" color="primary" />
-                )}
+                <DeleteIcon fontSize="small" color="error" />
               </IconButton>
-            </span>
-          </Tooltip>
-
-          <Tooltip title="מחק">
-            <IconButton size="small" onClick={() => onRemove(shift.id)}>
-              <DeleteIcon fontSize="small" color="error" />
-            </IconButton>
-          </Tooltip>
-        </>
-      )}
-    </Stack>
+            </Tooltip>
+          </>
+        )}
+      </TableCell>
+    </>
   );
 };
