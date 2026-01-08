@@ -47,6 +47,9 @@ export const WorkTable = ({
   const { year, month, baseRate, globalBreakdown } = useGlobalState();
   const { monthResolver } = domain.resolvers;
 
+  // Group workdays by week (ending on Shabbat/Saturday)
+  // Note: groupByShabbat is O(n) with n=30, very fast (~0.01ms)
+  // useMemo here prevents recreation on every render, but the gain is minimal
   const groupByWeeks = useMemo(() => groupByShabbat(workDays), [workDays]);
 
   const headers = viewMode === "compact" ? headersTableCompact : headersTable;
