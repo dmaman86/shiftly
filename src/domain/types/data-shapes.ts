@@ -4,13 +4,15 @@ import { WorkDayMeta } from "./types";
 export type HeaderWithChildren = {
   label: string;
   children: string[];
-  rowSpan?: never;
+  rowSpan?: number;
+  widths?: number[];
 };
 
 export type HeaderSingle = {
   label: string;
   rowSpan?: number;
-  children?: never;
+  children?: string[];
+  widths?: number[];
 };
 
 export type TableHeader = HeaderWithChildren | HeaderSingle;

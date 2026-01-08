@@ -1,14 +1,6 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-import {
-  Box,
-  Checkbox,
-  Stack,
-  TableCell,
-  TableRow,
-  IconButton,
-  Divider,
-} from "@mui/material";
+import { Checkbox, TableCell, TableRow, IconButton } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
@@ -104,104 +96,158 @@ const DayRowComponent = ({
     }
   }, [dayPayMap, workDay.meta.date, addDay, removeDay]);
 
+  const shifts = Object.values(shiftEntries);
+  const shiftCount = Math.max(shifts.length, 1);
+
   return (
-    <TableRow
-      key={workDay.meta.date}
-      sx={
-        isLastInWeek
-          ? {
-              "& td": { borderBottom: "1px solid black" },
-            }
-          : undefined
-      }
-    >
-      <TableCell
-        sx={{
-          borderRight: "1px solid black",
-          borderLeft: "1px solid black",
-          textAlign: "center",
-        }}
-      >
-        {dayInfoResolver.formatHebrewWorkDay(workDay)}
-      </TableCell>
-      <TableCell sx={{ textAlign: "center" }}>
-        {!specialFullDay && (
-          <Checkbox
-            checked={status === WorkDayStatus.sick}
-            onChange={(e) =>
-              handleStatusChanged(
-                e.target.checked ? WorkDayStatus.sick : WorkDayStatus.normal,
-              )
-            }
-          />
-        )}
-      </TableCell>
-      <TableCell sx={{ borderRight: "1px solid black", textAlign: "center" }}>
-        {!specialFullDay && (
-          <Checkbox
-            checked={status === WorkDayStatus.vacation}
-            onChange={(e) =>
-              handleStatusChanged(
-                e.target.checked
-                  ? WorkDayStatus.vacation
-                  : WorkDayStatus.normal,
-              )
-            }
-          />
-        )}
-      </TableCell>
-      <TableCell sx={{ borderRight: "1px solid black" }}>
-        <Stack direction="row" spacing={2} alignItems="flex-start">
-          {isEditable && (
+    <>
+      {(shifts.length ? shifts : [null]).map((item, index) => (
+        <TableRow
+          key={item?.shift.id ?? `${workDay.meta.date}-empty`}
+          sx={
+            isLastInWeek
+              ? { "& td": { borderBottom: "1px solid black" } }
+              : undefined
+          }
+        >
+          {index === 0 && (
             <>
-              <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                pt={1}
+              <TableCell
+                rowSpan={shiftCount}
+                sx={{
+                  width: 80,
+                  borderLeft: "1px solid black",
+                  borderRight: "1px solid black",
+                  textAlign: "center",
+                  verticalAlign: "middle",
+                }}
               >
-                <IconButton size="small" onClick={() => handleAddShift()}>
-                  <AddIcon fontSize="small" />
-                </IconButton>
-              </Box>
-              {Object.values(shiftEntries).length > 0 && (
-                <>
-                  <Divider orientation="vertical" flexItem />
-                  <Stack spacing={1}>
-                    {Object.values(shiftEntries).map((item, index) => (
-                      <React.Fragment key={item.shift.id}>
-                        <ShiftRow
-                          domain={domain}
-                          shift={item.shift}
-                          meta={workDay.meta}
-                          standardHours={standardHours}
-                          isEditable={isEditable}
-                          onShiftUpdate={updateShift}
-                          onRemove={removeShift}
-                        />
-                        {index < Object.values(shiftEntries).length - 1 && (
-                          <Divider />
-                        )}
-                      </React.Fragment>
-                    ))}
-                  </Stack>
-                </>
-              )}
+                {dayInfoResolver.formatHebrewWorkDay(workDay)}
+              </TableCell>
+
+              <TableCell
+                rowSpan={shiftCount}
+                sx={{
+                  textAlign: "center",
+                  width: 48,
+                  verticalAlign: "middle",
+                }}
+              >
+                <Checkbox
+                  checked={status === WorkDayStatus.sick}
+                  onChange={(e) =>
+                    handleStatusChanged(
+                      e.target.checked
+                        ? WorkDayStatus.sick
+                        : WorkDayStatus.normal,
+                    )
+                  }
+                  sx={{ display: specialFullDay ? "none" : "inline-flex" }}
+                />
+              </TableCell>
+
+              <TableCell
+                rowSpan={shiftCount}
+                sx={{
+                  borderRight: "1px solid black",
+                  textAlign: "center",
+                  width: 48,
+                  verticalAlign: "middle",
+                }}
+              >
+                <Checkbox
+                  checked={status === WorkDayStatus.vacation}
+                  onChange={(e) =>
+                    handleStatusChanged(
+                      e.target.checked
+                        ? WorkDayStatus.vacation
+                        : WorkDayStatus.normal,
+                    )
+                  }
+                  sx={{ display: specialFullDay ? "none" : "inline-flex" }}
+                />
+              </TableCell>
+
+              <TableCell
+                rowSpan={shiftCount}
+                sx={{
+                  borderRight: "1px solid black",
+                  textAlign: "center",
+                  width: 48,
+                  px: 0.5,
+                  py: 0.5,
+                  verticalAlign: "middle",
+                }}
+              >
+                {isEditable && (
+                  <IconButton
+                    size="small"
+                    onClick={handleAddShift}
+                    sx={{ p: 0.5 }}
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                )}
+              </TableCell>
             </>
           )}
-        </Stack>
-      </TableCell>
-      {viewMode === "compact" ? (
-        <CompactDayRow
-          breakdown={dayToCompactPayBreakdownVM(dayPayMap, baseRate)}
-        />
-      ) : (
-        <ExpandedDayRow
-          breakdown={dayToPayBreakdownVM(dayPayMap)}
-          baseRate={baseRate}
-        />
-      )}
-    </TableRow>
+          {item ? (
+            <ShiftRow
+              domain={domain}
+              shift={item.shift}
+              meta={workDay.meta}
+              standardHours={standardHours}
+              isEditable={isEditable}
+              onShiftUpdate={updateShift}
+              onRemove={removeShift}
+            />
+          ) : (
+            <>
+              <TableCell
+                sx={{
+                  borderRight: "1px solid black",
+                  width: 96,
+                  maxWidth: 96,
+                  px: 0,
+                  verticalAlign: "middle",
+                }}
+              ></TableCell>
+              <TableCell
+                sx={{
+                  borderRight: "1px solid black",
+                  width: 96,
+                  maxWidth: 96,
+                  px: 0,
+                  verticalAlign: "middle",
+                }}
+              ></TableCell>
+              <TableCell
+                sx={{
+                  borderRight: "1px solid black",
+                  width: 180,
+                  maxWidth: 180,
+                  px: 0,
+                  verticalAlign: "middle",
+                }}
+              ></TableCell>
+            </>
+          )}
+          {index === 0 &&
+            (viewMode === "compact" ? (
+              <CompactDayRow
+                breakdown={dayToCompactPayBreakdownVM(dayPayMap, baseRate)}
+                rowSpan={shiftCount}
+              />
+            ) : (
+              <ExpandedDayRow
+                breakdown={dayToPayBreakdownVM(dayPayMap)}
+                baseRate={baseRate}
+                rowSpan={shiftCount}
+              />
+            ))}
+        </TableRow>
+      ))}
+    </>
   );
 };
 

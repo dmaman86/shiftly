@@ -3,6 +3,7 @@ import { SystemStyleObject } from "@mui/system";
 
 export const baseCellSx = (isFooter: boolean): SystemStyleObject<Theme> => ({
   textAlign: "center",
+  verticalAlign: "middle",
   ...(isFooter ? {} : { minWidth: "90px" }),
 });
 

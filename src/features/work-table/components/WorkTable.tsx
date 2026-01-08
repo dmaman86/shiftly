@@ -148,14 +148,14 @@ export const WorkTable = ({
                         baseRate,
                       )}
                       isFooter
-                      emptyStartCells={4}
+                      emptyStartCells={7}
                     />
                   ) : (
                     <ExpandedDayRow
                       breakdown={monthToPayBreakdownVM(globalBreakdown)}
                       baseRate={baseRate}
                       isFooter
-                      emptyStartCells={4}
+                      emptyStartCells={7}
                     />
                   )}
                 </TableRow>

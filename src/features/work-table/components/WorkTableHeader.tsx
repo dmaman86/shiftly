@@ -1,5 +1,5 @@
 import { TableHeader } from "@/domain";
-import { TableCell, TableHead, TableRow, Box, Stack } from "@mui/material";
+import { TableCell, TableHead, TableRow } from "@mui/material";
 
 type WorkTableHeaderProps = {
   headers: TableHeader[];
@@ -19,44 +19,49 @@ export const WorkTableHeader = ({
         backgroundColor: "white",
       }}
     >
-      <TableRow>
+      {/* Row 1: Main headers */}
+      <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         {headers.map((header, i) => {
           const span = header.children?.length ?? 1;
+          const totalWidth = header.widths
+            ? header.widths.reduce((a, b) => a + b, 0)
+            : span * 50;
 
           return (
             <TableCell
               key={`group-${i}`}
               colSpan={span}
-              rowSpan={header.children ? 1 : (header.rowSpan ?? 2)}
+              rowSpan={header.children?.length ? 1 : (header.rowSpan ?? 2)}
               sx={{
                 fontWeight: "bold",
-                minWidth: `${span * 50}px`,
-                position: "relative",
-                border: "1px solid black",
+                textAlign: "center",
+                verticalAlign: "middle",
+                minWidth: totalWidth,
+                borderTop: "1px solid black",
+                borderBottom: header.children?.length ? "none !important" : "1px solid black",
+                borderLeft: i === 0 ? "1px solid black" : "none",
+                borderRight: "1px solid black",
+                p: 0.5,
               }}
             >
-              <Box sx={{ fontWeight: "bold" }}>{header.label}</Box>
-
-              {header.children && (
-                <Stack direction="row" sx={{ textAlign: "center" }}>
-                  {header.children.map((child, j) => (
-                    <Box key={`child-${i}-${j}`} sx={{ flex: 1 }}>
-                      {child}
-                    </Box>
-                  ))}
-                </Stack>
-              )}
+              {header.label}
             </TableCell>
           );
         })}
 
         {baseRate > 0 && (
           <TableCell
+            rowSpan={2}
             sx={{
               fontWeight: "bold",
-              minWidth: "50px",
-              position: "relative",
-              border: "1px solid black",
+              minWidth: 96,
+              borderTop: "1px solid black",
+              borderBottom: "1px solid black",
+              borderLeft: "none",
+              borderRight: "1px solid black",
+              textAlign: "center",
+              verticalAlign: "middle",
+              p: 0.5,
             }}
           >
             שכר יומי
@@ -64,16 +69,35 @@ export const WorkTableHeader = ({
         )}
       </TableRow>
 
-      {/* Invisible row for column alignment */}
-      <TableRow style={{ display: "none" }}>
-        {headers.flatMap((header, i) =>
-          header.children
-            ? header.children.map((_, j) => (
-                <TableCell key={`invisible-${i}-${j}`} />
-              ))
-            : [<TableCell key={`col-flat-${i}`} />],
-        )}
-        {baseRate > 0 && <TableCell />}
+      {/* Row 2: Sub-headers */}
+      <TableRow sx={{ "& > *": { borderTop: "unset" } }}>
+        {headers.flatMap((header, headerIndex) => {
+          if (!header.children) return [];
+          
+          return header.children.map((child, childIndex) => {
+            const isLastChild = childIndex === header.children!.length - 1;
+            const isFirstOverall = headerIndex === 0 && childIndex === 0;
+            
+            return (
+              <TableCell
+                key={`child-${headerIndex}-${childIndex}`}
+                sx={{
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  verticalAlign: "middle",
+                  width: header.widths?.[childIndex] ?? 50,
+                  borderTop: "none !important",
+                  borderBottom: "1px solid black",
+                  borderLeft: isFirstOverall ? "1px solid black" : "none",
+                  borderRight: isLastChild ? "1px solid black" : "none",
+                  p: 0.5,
+                }}
+              >
+                {child}
+              </TableCell>
+            );
+          });
+        })}
       </TableRow>
     </TableHead>
   );
