@@ -1,5 +1,5 @@
 import { TableHeader } from "@/domain";
-import { TableCell, TableHead, TableRow } from "@mui/material";
+import { TableCell, TableHead, TableRow, Box, Stack } from "@mui/material";
 
 type WorkTableHeaderProps = {
   headers: TableHeader[];
@@ -35,18 +35,16 @@ export const WorkTableHeader = ({
                 border: "1px solid black",
               }}
             >
-              <div className="row">
-                <div className="col-12 fw-bold">{header.label}</div>
-              </div>
+              <Box sx={{ fontWeight: "bold" }}>{header.label}</Box>
 
               {header.children && (
-                <div className="row text-center">
+                <Stack direction="row" sx={{ textAlign: "center" }}>
                   {header.children.map((child, j) => (
-                    <div className="col" key={`child-${i}-${j}`}>
+                    <Box key={`child-${i}-${j}`} sx={{ flex: 1 }}>
                       {child}
-                    </div>
+                    </Box>
                   ))}
-                </div>
+                </Stack>
               )}
             </TableCell>
           );

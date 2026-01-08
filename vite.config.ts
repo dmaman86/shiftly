@@ -46,7 +46,6 @@ export default defineConfig({
           ],
           // Other UI libraries
           "vendor-ui": [
-            "bootstrap",
             "notistack",
             "stylis",
             "stylis-plugin-rtl",

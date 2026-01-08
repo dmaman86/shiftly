@@ -67,7 +67,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const hasData = workDays.length > 0;
 
   return (
-    <section className="mt-2">
+    <Box component="section" sx={{ mt: 2 }}>
       <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, md: 3 } }}>
         <Card sx={{ mb: 3 }}>
           <CardHeader
@@ -131,6 +131,6 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
           </CardContent>
         </Card>
       </Box>
-    </section>
+    </Box>
   );
 };

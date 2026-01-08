@@ -17,9 +17,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </Box>
 
-      <footer className="mt-2">
+      <Box component="footer" sx={{ mt: 2 }}>
         <Footer />
-      </footer>
+      </Box>
     </Box>
   );
 };
