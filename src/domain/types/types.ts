@@ -1,6 +1,6 @@
 import { WorkDayType } from "@/constants";
 
-export type TableViewMode = "compact" | "expanded";
+export type TableViewMode = "compact" | "expanded" | "both";
 
 import {
   DailyPerDiemInfo,

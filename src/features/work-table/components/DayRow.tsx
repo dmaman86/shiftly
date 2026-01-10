@@ -12,7 +12,12 @@ import {
   WorkDayMap,
 } from "@/domain";
 import { WorkDayStatus } from "@/constants";
-import { ExpandedDayRow, ShiftRow, useDay } from "@/features/work-table";
+import {
+  ExpandedDayRow,
+  isSameDayPayMap,
+  ShiftRow,
+  useDay,
+} from "@/features/work-table";
 import { DomainContextType } from "@/app";
 import { dayToPayBreakdownVM } from "@/adapters";
 import { CompactDayRow } from "./rows/CompactDayRow";
@@ -24,14 +29,6 @@ type DayRowProps = {
   workDay: WorkDayInfo;
   isLastInWeek?: boolean;
   viewMode: TableViewMode;
-};
-
-const isSameDayPayMap = (a: WorkDayMap, b: WorkDayMap) => {
-  return (
-    a.totalHours === b.totalHours &&
-    a.perDiem.diemInfo.amount === b.perDiem.diemInfo.amount &&
-    JSON.stringify(a.workMap) === JSON.stringify(b.workMap)
-  );
 };
 
 const DayRowComponent = ({
