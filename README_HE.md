@@ -116,65 +116,138 @@ Slices מרכזיים:
 אחראים להרכבת מבני דומיין:
 
 - `ShiftMapBuilder`
+- `ShiftSegmentBuilder`
 - `DayPayMapBuilder`
 - `WorkDaysForMonthBuilder`
 
 ### Calculators
 
-לוגיקת חישוב טהורה:
+לוגיקת חישוב טהורה מאורגנת לפי תחום:
 
-- שעות רגילות (לפי משמרת / יום)
-- שעות נוספות ומיוחדות
-- חישוב אש״ל (משמרת / יום / חודש)
-- חישוב כלכלה (קטנה / גדולה)
+- **שעות רגילות**: לפי משמרת / יום
+- **מקטעים נוספים ומיוחדים**: תוספות מבוססות זמן
+- **אש״ל**: רמות משמרת / יום / חודש
+- **כלכלה**: חישוב זכאות ותעריף
 
 ### Reducers
 
 צבירה והפחתה של נתונים:
 
-- Reducer חודשי לשכר
+- Reducer חודשי למפת שכר
 - צובר שעות רגילות
-- Reducers למקטעים קבועים
+- Reducer חודשי למקטעים קבועים
+- Reducer חודשי לאש״ל
+- Reducer חודשי לימי עבודה
 
 ### Resolvers
 
 לוגיקת החלטה תלוית הקשר:
 
-- Resolver חגים (Hebcal)
+- Resolver חגים (מבוסס Hebcal)
 - Resolver מקטעי משמרת
-- Resolver תעריפים מבוססי ציר זמן
+- Resolver תעריפי אש״ל מבוסס ציר זמן
+- Resolver תעריפי כלכלה מבוסס ציר זמן
+- Resolver חודש
+- Resolver מידע יום עבודה
+
+### Services
+
+כלי שירות ברמת הדומיין:
+
+- `DateService`: טיפול ואימות תאריכים
+- `ShiftService`: לוגיקה עסקית הקשורה למשמרות
+
+### Pipelines
+
+צינורות הרכבה לחיבור רכיבי דומיין:
+
+- `buildCoreServices`: שירותי תאריך ומשמרת
+- `buildResolvers`: כל מופעי ה־Resolvers
+- `buildCalculators`: מופעי Calculators
+- `buildShiftLayer`: לוגיקה ברמת משמרת
+- `buildDayLayer`: צבירה ברמת יום
+- `buildMonthLayer`: צבירה ברמת חודש
+
+### Factories
+
+יצירת מופעי calculators ספציפיים:
+
+- `FixedSegmentFactory`
+- `RegularFactory`
 
 ---
 
 ## טכנולוגיות
 
-- React
-- TypeScript
-- Redux Toolkit
-- MUI (Material UI) & Bootstrap
-- Vite
-- Hebcal API
+### ליבה
+
+- **React** 19.2.3
+- **TypeScript** 5.7.2
+- **Vite** 6.2.0
+
+### State וניווט
+
+- **Redux Toolkit** 2.11.0
+- **React Router** 7.11.0
+
+### UI ועיצוב
+
+- **Material UI (MUI)** 7.0.2
+- **Notistack** 3.0.2 (התראות)
+
+### נתונים ושירותים
+
+- **Axios** 1.9.0 (HTTP client)
+- **date-fns** 4.1.0 (טיפול בתאריכים)
+- **Hebcal API** (זיהוי חגים)
+
+### בדיקות
+
+- **Vitest** 4.0.16
+- **Testing Library** (React, Jest-DOM, User Event)
 
 ---
 
-## מבנה הפרויקט (מקוצר)
+## מבנה הפרויקט
 
 ```plaintext
 src/
-├── domain/         # לוגיקה עסקית - בלתי תלויה בפריימוורקים
-│ ├── builder/
-│ ├── calculator/
-│ ├── reducer/
-│ ├── resolve/
-│ ├── factory/
-│ └── types/
-├── adapters/       # המרה הדומיין ל-UI
-├── hooks/          # שכבת תיאום
-├── redux/          # ניהול מצב גלובלי
-├── components/     # רכיבי UI
-├── pages/          # תצוגות יומיות וחודשיות
-├── context/        # חיבור וספקי דומיין
-└── utils/          # עזרי תשתית
+├── app/              # מעטפת האפליקציה
+│   ├── domain/       # אתחול וחיבור הדומיין
+│   ├── providers/    # ספקי Context
+│   └── routes/       # הגדרות ניתוב
+├── domain/           # לוגיקה עסקית (בלתי תלויה בפריימוורקים)
+│   ├── builder/      # בוני מבני דומיין
+│   ├── calculator/   # לוגיקת חישוב שכר
+│   │   ├── regular/
+│   │   ├── special/
+│   │   ├── perdiem/
+│   │   └── mealallowance/
+│   ├── reducer/      # צבירה והפחתה של מצב
+│   ├── resolve/      # החלטות תלויות הקשר
+│   ├── factory/      # פקטוריות רכיבים
+│   ├── pipelines/    # צינורות הרכבה
+│   ├── services/     # שירותי דומיין (תאריך, משמרת)
+│   └── types/        # הגדרות טיפוסים
+├── adapters/         # המרת דומיין ל־UI
+├── features/         # מודולי UI ספציפיים
+│   ├── calculation-rules/
+│   ├── config/
+│   ├── info-dialog/
+│   ├── salary-summary/
+│   ├── work-table/
+│   └── workday-timeline/
+├── hooks/            # React hooks (שכבת תיאום)
+├── hoc/              # רכיבי Higher-order
+├── layout/           # רכיבי פריסה ו־error boundaries
+├── pages/            # רכיבי עמודים (יומי, חודשי, כללים)
+├── redux/            # ניהול מצב
+│   └── states/       # Redux slices
+├── services/         # שירותים חיצוניים
+│   ├── analytics/    # שירות משוב שכר
+│   └── hebcal/       # אינטגרציה עם API חגים
+├── constants/        # קבועי אפליקציה
+└── utils/            # עזרי שירות
 ```
 
 ---
@@ -207,7 +280,6 @@ Shiftly כוללת שתי תצוגות חישוב עיקריות:
 רכיב ה־`ConfigPanel` מותאם להקשר הפעיל:
 
 - **בתצוגה יומית**:
-
   - הגדרת שעות תקן ושכר שעתי
   - החישוב החודשי נגזר מהנתונים היומיים
 
@@ -235,20 +307,22 @@ Shiftly כוללת שתי תצוגות חישוב עיקריות:
 
 **יום מחלה או חופש - ללא משמרות עבודה**
 
-- כאשר יום מסומן כמחלה או חופש, לא ניתן להזין בו משמרות עבודה
-  ![Sick Select Example](./.github/assets/sick-day-select.png)
+- כאשר יום מסומן כמחלה או חופש, לא ניתן להזין בו משמרות עבודה.
+  ![Sick Select Example](./.github/assets/sick-vacation-select.png)
   ![Vacation Select Example](./.github/assets/vacation-day-select.png)
 
 **משמרת חוצה יום - תיבת סימון ״חוצה יום״**
 
 - כאשר שעת הסיום היא ביום הבא המערכת מבקשת אישור מפורש על חציית יום.
   ![Cross Day Warning](./.github/assets/cross-day-warning.png)
-  ![Cross Day Checkbox](./.github/assets/cross-day-checkbox.png)
   ![Cross Day](./.github/assets/shift-save.png)
 
-**סיכום פירוק יומי**
+**סיכום פירוק יומי - מורחב**
 ![Breakdown Day 1](./.github/assets/breakdown-summary-1.png)
 ![Breakdown Day 2](./.github/assets/breakdown-summary-2.png)
+
+**סיכום פירוק יומי - קומפקטי**
+![Breakdown Compact](./.github/assets/breakdown-compact-summary.png)
 
 **סיכום חודשי**
 ![Monthly Summary](./.github/assets/monthly-summary.png)
@@ -263,16 +337,51 @@ Shiftly כוללת שתי תצוגות חישוב עיקריות:
 - מקרי קצה מבוססי זמן
 - רמות צבירה שונות (משמרת → יום → חודש)
 - חישוב אינקרמנטלי ללא חישוב מחדש מלא
+- דיוק היסטורי ללא שינוי בלוגיקה הליבה
 
 היא מאפשרת התפתחות עתידית של המערכת **בלי להעמיס לוגיקה מותנית ברכיבי ה-UI**.
 
 ---
 
-## הערות
+## הערות מימוש
 
-- כל האחוזים מנורמלים (לדוגמה: `1`, `1.25`, `1.5`, `0.2`)
-- לוגיקת הדומיין אינה תלויה בפריימוורק
-- ה־UI אינו מכיל חוקים עסקיים
+- כל האחוזים מנורמלים (לדוגמה: `1` = 100%, `1.5` = 150%, `2` = 200%)
+- לוגיקת הדומיין בלתי תלויה בפריימוורק וניתנת לבדיקה באופן מלא
+- ה־UI מגיב לנתונים ולא מכיל חוקים עסקיים
+- חישובים היסטוריים משתמשים בהקשר מבוסס זמן, לא בשינויי קוד
+
+---
+
+## בדיקות
+
+Shiftly משתמשת ב־**Vitest** לבדיקות יחידה ואינטגרציה, עם דגש על אימות לוגיקת הדומיין.
+
+### הרצת בדיקות
+
+```bash
+# הרצת בדיקות במצב watch
+npm run test
+
+# הרצת בדיקות עם ממשק UI
+npm run test:ui
+
+# הרצת בדיקות עם כיסוי קוד
+npm run test:coverage
+
+# הרצת בדיקות במצב CI (הרצה חד־פעמית)
+npm run test:ci
+```
+
+### כיסוי בדיקות
+
+הבדיקות מכסות:
+
+- לוגיקת חישוב (builders, calculators, reducers)
+- פתרונות מבוססי זמן (חגים, תעריפים, מקטעים)
+- מקרי קצה (משמרות חוצות יום, ימים חלקיים, מחלה/חופשה)
+- תרחישי חישוב מקצה לקצה
+
+שכבת הדומיין ניתנת לבדיקה באופן מלא ובלתי תלויה בפריימוורק, מה שמקל על אימות חוקים עסקיים בבידוד.
 
 ---
 
@@ -294,4 +403,3 @@ npm run dev
 הפרויקט מופץ תחת רישיון [MIT](LICENSE).
 
 </div>
-

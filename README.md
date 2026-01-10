@@ -116,17 +116,18 @@ UI reacts to data - it does not implement salary rules.
 Responsible for assembling domain structures:
 
 - `ShiftMapBuilder`
+- `ShiftSegmentBuilder`
 - `DayPayMapBuilder`
 - `WorkDaysForMonthBuilder`
 
 ### Calculators
 
-Pure calculation logic:
+Pure calculation logic organized by concern:
 
-- Regular hours (by shift / by day)
-- Extra & special segment
-- Per-diem calculation (shift, day, month)
-- Meal allowance calculation
+- **Regular hours**: by shift / by day
+- **Extra & special segments**: time-based bonuses
+- **Per-diem**: shift / day / month levels
+- **Meal allowance**: eligibility & rate calculation
 
 ### Reducers
 
@@ -134,7 +135,9 @@ Accumulate and subtract breakdowns:
 
 - Monthly pay map reducer
 - Regular hours accumulator
-- Fixed segment reducers
+- Fixed segment month reducer
+- Meal allowance month reducer
+- Workday month reducer
 
 ### Resolvers
 
@@ -142,18 +145,99 @@ Context-aware decision logic:
 
 - Holiday resolver (Hebcal-based)
 - Shift segment resolver
-- Timeline-based per-diem and meal allowance rate resolvers
+- Timeline-based per-diem rate resolver
+- Timeline-based meal allowance rate resolver
+- Month resolver
+- Workday info resolver
+
+### Services
+
+Domain-level utilities:
+
+- `DateService`: Date manipulation and validation
+- `ShiftService`: Shift-related business logic
+
+### Pipelines
+
+Composition pipelines for wiring domain components:
+
+- `buildCoreServices`: Date & shift services
+- `buildResolvers`: All resolver instances
+- `buildCalculators`: Calculator instances
+- `buildShiftLayer`: Shift-level logic
+- `buildDayLayer`: Day-level aggregation
+- `buildMonthLayer`: Month-level aggregation
+
+### Factories
+
+Create specific calculator instances:
+
+- `FixedSegmentFactory`
+- `RegularFactory`
 
 ---
 
 ## Tech Stack
 
-- React
-- TypeScript
-- Redux Toolkit
-- MUI (Material UI) & Bootstrap
-- Vite
-- Hebcal API
+### Core
+
+- **React** 19.2.3
+- **TypeScript** 5.7.2
+- **Vite** 6.2.0
+
+### State & Routing
+
+- **Redux Toolkit** 2.11.0
+- **React Router** 7.11.0
+
+### UI & Styling
+
+- **Material UI (MUI)** 7.0.2
+- **Notistack** 3.0.2 (notifications)
+
+### Data & Services
+
+- **Axios** 1.9.0 (HTTP client)
+- **date-fns** 4.1.0 (date manipulation)
+- **Hebcal API** (holiday detection)
+
+### Testing
+
+- **Vitest** 4.0.16
+- **Testing Library** (React, Jest-DOM, User Event)
+
+---
+
+## Testing
+
+Shiftly uses **Vitest** for unit and integration testing, with a focus on domain logic validation.
+
+### Running Tests
+
+```bash
+# Run tests in watch mode
+npm run test
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests in CI mode (single run)
+npm run test:ci
+```
+
+### Test Coverage
+
+Tests cover:
+
+- Calculation logic (builders, calculators, reducers)
+- Time-based resolution (holidays, rates, segments)
+- Edge cases (cross-day shifts, partial days, sick/vacation)
+- End-to-end calculation scenarios
+
+The domain layer is fully testable and framework-independent, making it easy to validate business rules in isolation.
 
 ---
 
@@ -172,24 +256,46 @@ Visit `http://localhost:5173/shiftly` in your browser.
 
 ---
 
-## Project Structure (Simplified)
+## Project Structure
 
 ```plaintext
 src/
-├── domain/         # Business logic (framework-agnostic)
-│ ├── builder/
-│ ├── calculator/
-│ ├── reducer/
-│ ├── resolve/
-│ ├── factory/
-│ └── types/
-├── adapters/       # Domain -> UI view models
-├── hooks/          # Orchestration layer
-├── redux/          # State management
-├── components/     # UI components
-├── pages/          # Daily & Monthly views
-├── context/        # Domain wiring & providers
-└── utils/          # Infrastructure helpers
+├── app/              # Application shell
+│   ├── domain/       # Domain instance & wiring
+│   ├── providers/    # Context providers
+│   └── routes/       # Route configuration
+├── domain/           # Business logic (framework-agnostic)
+│   ├── builder/      # Domain structure builders
+│   ├── calculator/   # Salary calculation logic
+│   │   ├── regular/
+│   │   ├── special/
+│   │   ├── perdiem/
+│   │   └── mealallowance/
+│   ├── reducer/      # State accumulation & rollback
+│   ├── resolve/      # Context-aware decisions
+│   ├── factory/      # Component factories
+│   ├── pipelines/    # Composition pipelines
+│   ├── services/     # Domain services (date, shift)
+│   └── types/        # Type definitions
+├── adapters/         # Domain -> UI view models
+├── features/         # Feature-specific UI modules
+│   ├── calculation-rules/
+│   ├── config/
+│   ├── info-dialog/
+│   ├── salary-summary/
+│   ├── work-table/
+│   └── workday-timeline/
+├── hooks/            # React hooks (orchestration layer)
+├── hoc/              # Higher-order components
+├── layout/           # Layout components & error boundaries
+├── pages/            # Page components (Daily, Monthly, Rules)
+├── redux/            # State management
+│   └── states/       # Redux slices
+├── services/         # External services
+│   ├── analytics/    # Salary feedback service
+│   └── hebcal/       # Holiday API integration
+├── constants/        # Application constants
+└── utils/            # Helper utilities
 ```
 
 ---
@@ -202,14 +308,18 @@ This architecture was chosen to handle:
 - Time-based edge cases (cross-day shifts, partial days)
 - Multiple aggregation levels (shift → day → month)
 - Incremental recalculation without full recompute
+- Historical accuracy without modifying core logic
 
-## It allows the system to scale **without turning into tightly coupled conditional logic** inside UI components or reducers.
+It allows the system to scale **without turning into tightly coupled conditional logic** inside UI components or reducers.
 
-## Notes
+---
 
-- All percentages are normalized (e.g. `1`, `1.5`, `2`, `0.2`)
-- Domain logic is framework-agnostic
+## Implementation Notes
+
+- All percentages are normalized (e.g. `1` = 100%, `1.5` = 150%, `2` = 200%)
+- Domain logic is framework-agnostic and fully testable
 - UI reacts to data, not business rules
+- Historical calculations use time-based context, not code changes
 
 ---
 
@@ -241,7 +351,6 @@ Only the presentation and configuration context changes.
 The `ConfigPanel` adapts its behavior based on the active view:
 
 - In **Daily mode**:
-
   - Allows defining standard hours and hourly rate
   - Monthly values are derived incrementally
 
@@ -260,31 +369,50 @@ This separation keeps configuration logic explicit and context-aware.
 - **Shabbat/holiday**: only allows work, not absence.
 - **Cross-day shifts**: user must confirm with a checkbox.
 
-### Day Configuration Logic
+### Day Configuration Examples
 
-**Shabbat or Holiday - Work Hours Allowed**
+#### Shabbat or Holiday - Work Hours Allowed
 
-- Cannot mark as Sick/Vacation, but work segments are allowed.
-  ![Shabbat Sick Vacation Example](./.github/assets/shabbat-sick-vacation.png)
+Cannot mark as Sick/Vacation, but work segments are allowed.
 
-**Sick Day Or Vacation Day - Not Work Segments**
+![Shabbat Sick Vacation](./.github/assets/shabbat-sick-vacation.png)
 
-- Marked as Sick/Vacation; nor work segments allowed.
-  ![Sick Select Example](./.github/assets/sick-day-select.png)
-  ![Vacation Select Example](./.github/assets/vacation-day-select.png)
+#### Sick Day or Vacation Day - No Work Segments
 
-**Cross-Day Shift - "חוצה יום" Checkbox**
+Marked as Sick/Vacation; no work segments allowed.
 
-- End time is next day; system asks to confirm crossing day.
-  ![Cross Day Warning](./.github/assets/cross-day-warning.png)
-  ![Cross Day Checkbox](./.github/assets/cross-day-checkbox.png)
-  ![Cross Day](./.github/assets/shift-save.png)
+![Sick/Vacation Select](./.github/assets/sick-vacation-select.png)
 
-**Breakdown Day Summary**
-![Breakdown Day 1](./.github/assets/breakdown-summary-1.png)
-![Breakdown Day 2](./.github/assets/breakdown-summary-2.png)
+#### Cross-Day Shift - "חוצה יום" Checkbox
 
-**Monthly Summary**
+End time is next day; system asks to confirm crossing day.
+
+|                      Cross-Day Warning                       |                   Shift Save                   |
+| :----------------------------------------------------------: | :--------------------------------------------: |
+| ![Cross Day Warning](./.github/assets/cross-day-warning.png) | ![Shift Save](./.github/assets/shift-save.png) |
+
+---
+
+### Breakdown Summaries
+
+#### Daily Breakdown - Expanded View
+
+Detailed breakdown showing all calculation components for a single day.
+
+|                     Breakdown Summary 1                      |                     Breakdown Summary 2                      |
+| :----------------------------------------------------------: | :----------------------------------------------------------: |
+| ![Breakdown Day 1](./.github/assets/breakdown-summary-1.png) | ![Breakdown Day 2](./.github/assets/breakdown-summary-2.png) |
+
+#### Daily Breakdown - Compact View
+
+Condensed view for quick daily salary overview.
+
+![Breakdown Compact Summary](./.github/assets/breakdown-compact-summary.png)
+
+#### Monthly Summary
+
+Aggregated monthly salary calculation with all components.
+
 ![Monthly Summary](./.github/assets/monthly-summary.png)
 
 ---
