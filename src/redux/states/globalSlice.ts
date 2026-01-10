@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MonthPayMap, WorkDayMap } from "@/domain";
 import { domain } from "@/app";
 
-interface GlobalState {
+export interface GlobalState {
   config: {
     standardHours: number;
     baseRate: number;
