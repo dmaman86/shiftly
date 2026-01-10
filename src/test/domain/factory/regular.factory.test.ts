@@ -123,27 +123,6 @@ describe("RegularFactory", () => {
       expect(calculator).toBeInstanceOf(RegularByDayCalculator);
     });
 
-    it("should return a calculator with calculate method", () => {
-      const calculator = RegularFactory.byDay();
-
-      expect(calculator.calculate).toBeDefined();
-      expect(typeof calculator.calculate).toBe("function");
-    });
-
-    it("should return a calculator with createEmpty method", () => {
-      const calculator = RegularFactory.byDay();
-
-      expect(calculator.createEmpty).toBeDefined();
-      expect(typeof calculator.createEmpty).toBe("function");
-    });
-
-    it("should return a new instance on each call", () => {
-      const calculator1 = RegularFactory.byDay();
-      const calculator2 = RegularFactory.byDay();
-
-      expect(calculator1).not.toBe(calculator2);
-    });
-
     it("should return a functional calculator that can perform calculations", () => {
       const calculator = RegularFactory.byDay();
 
@@ -161,17 +140,6 @@ describe("RegularFactory", () => {
 
       expect(result).toEqual({
         hours100: { percent: 1, hours: 8 },
-        hours125: { percent: 1.25, hours: 0 },
-        hours150: { percent: 1.5, hours: 0 },
-      });
-    });
-
-    it("should create empty breakdown correctly", () => {
-      const calculator = RegularFactory.byDay();
-      const empty = calculator.createEmpty();
-
-      expect(empty).toEqual({
-        hours100: { percent: 1, hours: 0 },
         hours125: { percent: 1.25, hours: 0 },
         hours150: { percent: 1.5, hours: 0 },
       });

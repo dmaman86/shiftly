@@ -42,21 +42,11 @@ describe("FixedSegmentMonthReducer", () => {
       });
     });
 
-    it("should call sick factory with zero", () => {
+    it("should call all factories with zero", () => {
       reducer.createEmpty();
 
       expect(mockBundle.sick.create).toHaveBeenCalledWith(0);
-    });
-
-    it("should call vacation factory with zero", () => {
-      reducer.createEmpty();
-
       expect(mockBundle.vacation.create).toHaveBeenCalledWith(0);
-    });
-
-    it("should call extraShabbat factory with zero", () => {
-      reducer.createEmpty();
-
       expect(mockBundle.extraShabbat.create).toHaveBeenCalledWith(0);
     });
 
@@ -311,56 +301,24 @@ describe("FixedSegmentMonthReducer", () => {
       expect(result.extra100Shabbat.hours).toBe(10);
     });
 
-    it("should not go below zero for sick hours", () => {
+    it("should not go below zero for any segment", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 5 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        hours100Vacation: { percent: 1, hours: 8 },
+        extra100Shabbat: { percent: 1.5, hours: 3 },
       };
       const sub: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 10 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        hours100Vacation: { percent: 1, hours: 20 },
+        extra100Shabbat: { percent: 1.5, hours: 10 },
       };
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
       expect(mockBundle.sick.create).toHaveBeenCalledWith(0);
       expect(result.hours100Sick.hours).toBe(0);
-    });
-
-    it("should not go below zero for vacation hours", () => {
-      const base: Partial<MonthPayMap> = {
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
-      };
-      const sub: Partial<WorkDayMap> = {
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 20 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
-      };
-
-      const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
-
       expect(mockBundle.vacation.create).toHaveBeenCalledWith(0);
       expect(result.hours100Vacation.hours).toBe(0);
-    });
-
-    it("should not go below zero for extra Shabbat hours", () => {
-      const base: Partial<MonthPayMap> = {
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 3 },
-      };
-      const sub: Partial<WorkDayMap> = {
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
-      };
-
-      const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
-
       expect(mockBundle.extraShabbat.create).toHaveBeenCalledWith(0);
       expect(result.extra100Shabbat.hours).toBe(0);
     });
