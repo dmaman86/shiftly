@@ -6,6 +6,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import { SnackbarProvider } from "notistack";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { configureStore } from "@reduxjs/toolkit";
 import type { RootState } from "@/redux/store";
 import globalReducer from "@/redux/states/globalSlice";
@@ -83,7 +85,9 @@ export function renderWithProviders(
       component = (
         <CacheProvider value={cache}>
           <ThemeProvider theme={theme}>
-            {component}
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              {component}
+            </LocalizationProvider>
           </ThemeProvider>
         </CacheProvider>
       );
@@ -126,6 +130,7 @@ export function renderPure(
 
 /**
  * Render with only Theme provider (for presentational components)
+ * Includes LocalizationProvider for date/time pickers
  */
 export function renderWithTheme(
   ui: ReactElement,
@@ -135,7 +140,9 @@ export function renderWithTheme(
     return (
       <CacheProvider value={cache}>
         <ThemeProvider theme={theme}>
-          {children}
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            {children}
+          </LocalizationProvider>
         </ThemeProvider>
       </CacheProvider>
     );
@@ -144,6 +151,21 @@ export function renderWithTheme(
   return render(ui, { wrapper: Wrapper, ...options });
 }
 
-// Re-export everything from testing-library
-export * from "@testing-library/react";
+/**
+ * Re-export commonly used utilities from testing-library
+ * 
+ * Note: We explicitly list exports instead of using `export *` to:
+ * 1. Satisfy ESLint rules about restricted imports
+ * 2. Make it clear what's available from this module
+ * 3. Avoid accidentally exporting unwanted utilities
+ */
+export {
+  screen,
+  within,
+  waitFor,
+  waitForElementToBeRemoved,
+  fireEvent,
+  act,
+  cleanup,
+} from "@testing-library/react";
 export { default as userEvent } from "@testing-library/user-event";
