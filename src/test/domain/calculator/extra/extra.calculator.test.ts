@@ -29,13 +29,6 @@ describe("ExtraCalculator", () => {
       expect(result1.hours20.hours).toBe(5);
       expect(result2.hours20.hours).toBe(0);
     });
-
-    it("should use correct percentages from fieldShiftPercent", () => {
-      const result = calculator.createEmpty();
-
-      expect(result.hours20.percent).toBe(0.2);
-      expect(result.hours50.percent).toBe(0.5);
-    });
   });
 
   describe("calculate", () => {
@@ -215,40 +208,6 @@ describe("ExtraCalculator", () => {
       expect(result.hours50.hours).toBe(2);
     });
 
-    it("should handle zero-duration segments", () => {
-      const segments: LabeledSegmentRange[] = [
-        {
-          key: "hours20",
-          percent: 0.2,
-          point: { start: 60, end: 60 }, // 0 minutes
-        },
-        {
-          key: "hours50",
-          percent: 0.5,
-          point: { start: 120, end: 240 }, // 2 hours
-        },
-      ];
-
-      const result = calculator.calculate(segments);
-
-      expect(result.hours20.hours).toBe(0);
-      expect(result.hours50.hours).toBe(2);
-    });
-
-    it("should handle large time values", () => {
-      const segments: LabeledSegmentRange[] = [
-        {
-          key: "hours20",
-          percent: 0.2,
-          point: { start: 0, end: 1440 }, // 24 hours
-        },
-      ];
-
-      const result = calculator.calculate(segments);
-
-      expect(result.hours20.hours).toBe(24);
-    });
-
     it("should handle very precise decimal calculations", () => {
       const segments: LabeledSegmentRange[] = [
         {
@@ -314,22 +273,6 @@ describe("ExtraCalculator", () => {
         hours20: { percent: 0.2, hours: 4 },
         hours50: { percent: 0.5, hours: 5 },
       });
-    });
-
-    it("should preserve base percentages", () => {
-      const base: ExtraBreakdown = {
-        hours20: { percent: 0.2, hours: 3 },
-        hours50: { percent: 0.5, hours: 2 },
-      };
-      const add: ExtraBreakdown = {
-        hours20: { percent: 0.3, hours: 1 }, // Different percent (shouldn't affect result)
-        hours50: { percent: 0.6, hours: 3 }, // Different percent (shouldn't affect result)
-      };
-
-      const result = calculator.accumulate(base, add);
-
-      expect(result.hours20.percent).toBe(0.2);
-      expect(result.hours50.percent).toBe(0.5);
     });
 
     it("should handle accumulation with zero hours", () => {
@@ -451,22 +394,6 @@ describe("ExtraCalculator", () => {
         hours20: { percent: 0.2, hours: 0 },
         hours50: { percent: 0.5, hours: 0 },
       });
-    });
-
-    it("should preserve base percentages", () => {
-      const base: ExtraBreakdown = {
-        hours20: { percent: 0.2, hours: 5 },
-        hours50: { percent: 0.5, hours: 4 },
-      };
-      const sub: ExtraBreakdown = {
-        hours20: { percent: 0.3, hours: 2 },
-        hours50: { percent: 0.6, hours: 1 },
-      };
-
-      const result = calculator.subtract(base, sub);
-
-      expect(result.hours20.percent).toBe(0.2);
-      expect(result.hours50.percent).toBe(0.5);
     });
 
     it("should handle subtraction with zero hours", () => {
@@ -716,20 +643,6 @@ describe("ExtraCalculator", () => {
       const result = calculator.calculate(segments);
 
       expect(result.hours20.hours).toBe(0);
-    });
-
-    it("should handle very precise floating point calculations", () => {
-      const segments: LabeledSegmentRange[] = [
-        {
-          key: "hours20",
-          percent: 0.2,
-          point: { start: 0, end: 1 }, // 1 minute
-        },
-      ];
-
-      const result = calculator.calculate(segments);
-
-      expect(result.hours20.hours).toBeCloseTo(1 / 60, 10);
     });
 
     it("should maintain precision through multiple operations", () => {

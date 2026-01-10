@@ -26,3 +26,7 @@ dist-ssr
 # Mac
 .DS_Store
 coverage/
+
+# Internal documentation (not for repo)
+DELEGATION_*.md
+src/test/ui/README.md
