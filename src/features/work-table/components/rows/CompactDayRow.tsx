@@ -1,7 +1,7 @@
 import { TableCell } from "@mui/material";
 import { formatValue } from "@/utils";
 import { CompactPayBreakdownVM } from "@/domain";
-import { baseCellSx, rightBorderIfNotFooter } from "./helper.rows";
+import { baseCellSx, rightBorderIfNotFooter } from "../../helpers";
 
 type CompactDayRowProps = {
   breakdown: CompactPayBreakdownVM;

@@ -19,7 +19,7 @@ import { CalendarMonth } from "@mui/icons-material";
 
 import { useGlobalState } from "@/hooks";
 import { groupByShabbat } from "@/utils";
-import { headersTable, headersTableCompact } from "@/constants";
+import { headersTable } from "@/constants";
 import {
   ExpandedDayRow,
   DayRow,
@@ -51,8 +51,6 @@ export const WorkTable = ({
   // Note: groupByShabbat is O(n) with n=30, very fast (~0.01ms)
   // useMemo here prevents recreation on every render, but the gain is minimal
   const groupByWeeks = useMemo(() => groupByShabbat(workDays), [workDays]);
-
-  const headers = viewMode === "compact" ? headersTableCompact : headersTable;
 
   return (
     <Card sx={{ mb: 3 }}>
@@ -109,7 +107,11 @@ export const WorkTable = ({
                 },
               }}
             >
-              <WorkTableHeader headers={headers} baseRate={baseRate} />
+              <WorkTableHeader
+                headers={headersTable}
+                baseRate={baseRate}
+                viewMode={viewMode}
+              />
 
               {groupByWeeks.map((group, index) => (
                 <TableBody key={index}>

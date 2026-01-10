@@ -3,7 +3,7 @@ import { TableCell } from "@mui/material";
 
 import { PayBreakdownViewModel } from "@/domain";
 import { computeTotalPay, formatValue } from "@/utils";
-import { baseCellSx, rightBorderIfNotFooter } from "./helper.rows";
+import { baseCellSx, rightBorderIfNotFooter } from "../../helpers";
 
 type ExpandedDayRowProps = {
   breakdown: PayBreakdownViewModel;
