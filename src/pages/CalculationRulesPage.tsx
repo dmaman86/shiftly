@@ -55,8 +55,16 @@ export const CalculationRulesPage = () => {
           <Divider sx={{ mt: 3 }} />
 
           {/* Daily time split */}
-          <RuleCard title="🕒 חלוקת יום עבודה">
-            <RuleAccordion title="חלוקת שעות נוספות (ש״נ)">
+          <RuleCard title="🕒 שעות נוספות (ש״נ)">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 2 }}
+            >
+              חישוב שעות נוספות מתבצע בשלושה מדרגות תשלום, בהתאם למספר השעות שעובדים ביום.
+            </Typography>
+            
+            <RuleAccordion title="מדרגות תשלום">
               <WorkDayTimeline>
                 <TimeSegment
                   from=""
@@ -74,29 +82,48 @@ export const CalculationRulesPage = () => {
                 />
                 <TimeSegment
                   from=""
-                  to="עד יתרת השעות"
+                  to="יתרת השעות"
                   label="150%"
                   flex={1}
                   color="#fce4ec"
                 />
               </WorkDayTimeline>
+              
+              <Box sx={{ mt: 2, p: 1.5, bgcolor: "action.hover", borderRadius: 1 }}>
+                <Typography variant="body2" fontWeight="medium" gutterBottom>
+                  לדוגמה:
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  • שעות 1-{standardHours}: שכר רגיל (100%)
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  • שעות {Number(standardHours) + 1}-{Number(standardHours) + 2}: תוספת של 25%
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  • מעל {Number(standardHours) + 2} שעות: תוספת של 50%
+                </Typography>
+              </Box>
+              
               <TimelineNote variant="tip">
-                נכון להיום, שעות התקן הן {standardHours}.
+                שעות התקן הנוכחיות: {standardHours} שעות ליום
               </TimelineNote>
             </RuleAccordion>
           </RuleCard>
 
-          <RuleCard title="💰 תוספות שכר לפי שעות עבודה">
+          <RuleCard title="💰 תוספות שכר לפי שעות היום">
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{ mb: 2, whiteSpace: "pre-line" }}
+              sx={{ mb: 2 }}
             >
-              {`התוספות המוצגות מסומנות כ־"+" ומתווספות לשכר הבסיסי.
-ביום חול ייתכן חישוב שעות נוספות (ש״נ).
-בשבת ובחג משולם שכר שבת (בסיס + תוספת), ללא ש״נ.`}
+              תוספות השכר משתנות בהתאם לשעות היום בהן מתבצעת העבודה. התוספות מסומנות כ־"+" ומתווספות לשכר הבסיסי.
             </Typography>
+
             <RuleAccordion title="יום חול">
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                ביום חול רגיל, תוספות השכר תלויות בשעה בה מתבצעת העבודה. בנוסף, ייתכן חישוב שעות נוספות (ש״נ).
+              </Typography>
+              
               <WorkDayTimeline title="תחילת יום">
                 <TimeSegment
                   from="00:00"
@@ -105,7 +132,6 @@ export const CalculationRulesPage = () => {
                   flex={8}
                   color="#fce4ec"
                 />
-
                 <TimeSegment
                   from="06:00"
                   to="14:00"
@@ -114,6 +140,7 @@ export const CalculationRulesPage = () => {
                   color="#e3f2fd"
                 />
               </WorkDayTimeline>
+              
               <WorkDayTimeline title="המשך יום">
                 <TimeSegment
                   from="14:00"
@@ -122,7 +149,6 @@ export const CalculationRulesPage = () => {
                   flex={8}
                   color="#fff8e1"
                 />
-
                 <TimeSegment
                   from="22:00"
                   to="6:00"
@@ -132,12 +158,18 @@ export const CalculationRulesPage = () => {
                   crossDay
                 />
               </WorkDayTimeline>
+              
               <TimelineNote>
                 <div>* משמרת החוצה את חצות מחושבת כיום עבודה אחד.</div>
                 <div>** המשמרת ממשיכה ליום הבא.</div>
               </TimelineNote>
             </RuleAccordion>
+
             <RuleAccordion title="שישי וערבי חג">
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                בימי שישי וערבי חג התוספות גבוהות יותר, במיוחד לקראת כניסת השבת/חג.
+              </Typography>
+              
               <WorkDayTimeline>
                 <TimeSegment
                   from="14:00"
@@ -162,18 +194,25 @@ export const CalculationRulesPage = () => {
                   crossDay
                 />
               </WorkDayTimeline>
+              
               <TimelineNote>
                 <div>* משמרת החוצה את חצות מחושבת כיום עבודה אחד.</div>
                 <div>** המשמרת ממשיכה ליום הבא.</div>
               </TimelineNote>
+              
               <TimelineNote variant="tip">
                 <div>• שעון קיץ – החל מ־18:00</div>
                 <div>• שעון חורף – החל מ־17:00</div>
                 <div>• הזיהוי מתבצע אוטומטית לפי התאריך.</div>
               </TimelineNote>
             </RuleAccordion>
-            <RuleAccordion title="שבת / חג">
-              <WorkDayTimeline title="תחילת יום">
+
+            <RuleAccordion title="שבת וחג">
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                בשבת ובחג משולם שכר שבת (בסיס + תוספת גבוהה), ללא חישוב שעות נוספות (ש״נ).
+              </Typography>
+              
+              <WorkDayTimeline>
                 <TimeSegment
                   from="06:00"
                   to="22:00"
@@ -190,6 +229,7 @@ export const CalculationRulesPage = () => {
                   crossDay
                 />
               </WorkDayTimeline>
+              
               <TimelineNote>
                 <div>* משמרת החוצה את חצות מחושבת כיום עבודה אחד.</div>
                 <div>** המשמרת ממשיכה ליום הבא.</div>
@@ -198,12 +238,17 @@ export const CalculationRulesPage = () => {
           </RuleCard>
 
           <RuleCard title="🍽️ אש״ל וכלכלה">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ mb: 2 }}
+            >
+              תשלומים עבור ארוחות - אש״ל (אוכל, שתייה, לינה) וכלכלה - המשולמים בהתאם לשעות העבודה ותנאי הזכאות.
+            </Typography>
+            
             <RuleAccordion title="תנאי זכאות אש״ל">
-              <Typography variant="body2" gutterBottom>
-                אש״ל מחושב רק בימים בהם קיימת לפחות משמרת אחת בתפקיד.
-              </Typography>
-              <Typography variant="body2">
-                נספרות רק שעות שבוצעו בפועל בתפקיד.
+              <Typography variant="body2" color="text.secondary">
+                אש״ל מחושב רק בימים בהם קיימת לפחות משמרת אחת בתפקיד, ונספרות רק שעות שבוצעו בפועל בתפקיד.
               </Typography>
             </RuleAccordion>
 
