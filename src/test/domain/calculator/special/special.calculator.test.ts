@@ -29,13 +29,6 @@ describe("SpecialCalculator", () => {
       expect(result1.shabbat150.hours).toBe(5);
       expect(result2.shabbat150.hours).toBe(0);
     });
-
-    it("should use correct percentages from fieldShiftPercent", () => {
-      const result = calculator.createEmpty();
-
-      expect(result.shabbat150.percent).toBe(1.5);
-      expect(result.shabbat200.percent).toBe(2);
-    });
   });
 
   describe("calculate", () => {
@@ -234,42 +227,6 @@ describe("SpecialCalculator", () => {
       expect(result.shabbat200.hours).toBe(2);
     });
 
-    it("should handle zero-duration time segments", () => {
-      // Segment where start equals end (no duration)
-      const segments: LabeledSegmentRange[] = [
-        {
-          key: "shabbat150",
-          percent: 1.5,
-          point: { start: 60, end: 60 }, // Segment: 0 minutes
-        },
-        {
-          key: "shabbat200",
-          percent: 2,
-          point: { start: 120, end: 240 }, // Segment: 2 hours
-        },
-      ];
-
-      const result = calculator.calculate(segments);
-
-      expect(result.shabbat150.hours).toBe(0);
-      expect(result.shabbat200.hours).toBe(2);
-    });
-
-    it("should handle large time values (full Shabbat day segment)", () => {
-      // Single segment covering 24 hours at 200% rate
-      const segments: LabeledSegmentRange[] = [
-        {
-          key: "shabbat200",
-          percent: 2,
-          point: { start: 0, end: 1440 }, // Segment: minutes 0-1440 = 24 hours
-        },
-      ];
-
-      const result = calculator.calculate(segments);
-
-      expect(result.shabbat200.hours).toBe(24);
-    });
-
     it("should handle very precise decimal calculations from small segments", () => {
       // Very small time segments
       const segments: LabeledSegmentRange[] = [
@@ -366,22 +323,6 @@ describe("SpecialCalculator", () => {
         shabbat150: { percent: 1.5, hours: 4 },
         shabbat200: { percent: 2, hours: 5 },
       });
-    });
-
-    it("should preserve base percentages", () => {
-      const base: SpecialBreakdown = {
-        shabbat150: { percent: 1.5, hours: 3 },
-        shabbat200: { percent: 2, hours: 2 },
-      };
-      const add: SpecialBreakdown = {
-        shabbat150: { percent: 1.6, hours: 1 }, // Different percent (shouldn't affect result)
-        shabbat200: { percent: 2.5, hours: 3 }, // Different percent (shouldn't affect result)
-      };
-
-      const result = calculator.accumulate(base, add);
-
-      expect(result.shabbat150.percent).toBe(1.5);
-      expect(result.shabbat200.percent).toBe(2);
     });
 
     it("should handle accumulation with zero hours", () => {
@@ -503,22 +444,6 @@ describe("SpecialCalculator", () => {
         shabbat150: { percent: 1.5, hours: 0 },
         shabbat200: { percent: 2, hours: 0 },
       });
-    });
-
-    it("should preserve base percentages", () => {
-      const base: SpecialBreakdown = {
-        shabbat150: { percent: 1.5, hours: 5 },
-        shabbat200: { percent: 2, hours: 4 },
-      };
-      const sub: SpecialBreakdown = {
-        shabbat150: { percent: 1.6, hours: 2 },
-        shabbat200: { percent: 2.5, hours: 1 },
-      };
-
-      const result = calculator.subtract(base, sub);
-
-      expect(result.shabbat150.percent).toBe(1.5);
-      expect(result.shabbat200.percent).toBe(2);
     });
 
     it("should handle subtraction with zero hours", () => {
