@@ -3,6 +3,7 @@
 # Shiftly - מערכת לניהול שעות וחישוב שכר
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Online-blue)](https://dmaman86.github.io/shiftly/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dmaman86/shiftly)
 
 > 📘 גרסה באנגלית זמינה כאן: [README.md](./README.md)
 

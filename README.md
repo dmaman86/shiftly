@@ -1,6 +1,7 @@
 # Shiftly – Work Hours Tracking & Calculation System
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Online-blue)](https://dmaman86.github.io/shiftly/)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dmaman86/shiftly)
 
 > 📘 Hebrew version available: [README_HE.md](./README_HE.md)
 
