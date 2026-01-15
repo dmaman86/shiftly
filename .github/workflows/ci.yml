@@ -36,10 +36,20 @@ jobs:
       - name: Run linter
         run: npm run lint
 
-      # Step 6: Run tests with Vitest in CI mode
-      - name: Run tests
-        run: npm run test:ci
+      # Step 6: Run tests with coverage
+      - name: Run tests with coverage
+        run: npm run test:coverage
 
-      # Step 7: Build the application
+      # Step 7: Upload coverage to Codecov
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+      # Step 8: Build the application
       - name: Build application
         run: npm run build
