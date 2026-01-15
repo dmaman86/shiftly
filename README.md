@@ -3,6 +3,17 @@
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Online-blue)](https://dmaman86.github.io/shiftly/)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dmaman86/shiftly)
 
+![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?logo=vite&logoColor=white)
+![Redux](https://img.shields.io/badge/Redux_Toolkit-2.11.0-764ABC?logo=redux&logoColor=white)
+![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-4.0.16-6E9F18?logo=vitest&logoColor=white)
+
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
+[![codecov](https://codecov.io/gh/dmaman86/shiftly/branch/main/graph/badge.svg)](https://codecov.io/gh/dmaman86/shiftly)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
 > 📘 Hebrew version available: [README_HE.md](./README_HE.md)
 
 **Shiftly** is a work-hours tracking and salary calculation application built with **React + TypeScript**.
