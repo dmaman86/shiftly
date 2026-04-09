@@ -152,8 +152,24 @@ describe("HolidayResolverService", () => {
       expect(result).toBe(WorkDayType.SpecialPartialStart);
     });
 
-    it("should identify any event starting with 'Erev' as partial start", () => {
+    it("should not identify arbitrary 'Erev X' events as partial start", () => {
       const params = createResolveParams(1, ["Erev CustomHoliday"]);
+
+      const result = resolver.resolve(params);
+
+      expect(result).toBe(WorkDayType.Regular);
+    });
+
+    it("should not identify Erev Purim as partial start (not a paid holiday)", () => {
+      const params = createResolveParams(1, ["Erev Purim"]);
+
+      const result = resolver.resolve(params);
+
+      expect(result).toBe(WorkDayType.Regular);
+    });
+
+    it("should identify Erev Rosh Hashana as partial start", () => {
+      const params = createResolveParams(2, ["Erev Rosh Hashana"]);
 
       const result = resolver.resolve(params);
 
