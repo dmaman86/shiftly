@@ -19,12 +19,18 @@ export class HolidayResolverService implements HolidayResolver {
     );
   }
 
+  private readonly partialStartEvents = [
+    "Erev Rosh Hashana",
+    "Erev Yom Kippur",
+    "Erev Sukkot",
+    "Erev Pesach",
+    "Erev Shavuot",
+    "Yom HaZikaron",
+    "Sukkot VII (Hoshana Rabba)",
+  ];
+
   private isPartialStart(eventTitles: string[]): boolean {
-    return (
-      eventTitles.some((e) => e.startsWith("Erev")) ||
-      eventTitles.includes("Yom HaZikaron") ||
-      eventTitles.includes("Sukkot VII (Hoshana Rabba)")
-    );
+    return eventTitles.some((e) => this.partialStartEvents.includes(e));
   }
 
   resolve(params: { weekday: number; eventTitles: string[] }): WorkDayType {
