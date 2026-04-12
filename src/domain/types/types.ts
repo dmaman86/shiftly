@@ -35,6 +35,7 @@ export interface WorkDayMeta {
   date: string;
   typeDay: WorkDayType;
   crossDayContinuation: boolean;
+  holidayName?: string;
 }
 
 export interface Point {
