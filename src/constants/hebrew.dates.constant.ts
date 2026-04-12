@@ -22,7 +22,7 @@ export const PAID_HOLIDAYS = [
   "Sukkot I",
   "Shmini Atzeret",
   "Pesach I",
-  "Yom HaAtzma’ut",
+  "Yom HaAtzma'ut",
   "Shavuot I",
 ];
 

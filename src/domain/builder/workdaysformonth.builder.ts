@@ -4,7 +4,7 @@ import {
   WorkDayInfoResolver,
   DateService,
 } from "@/domain";
-import { WorkDayType } from "@/constants";
+import { WorkDayType, hebrewHolidayNames } from "@/constants";
 
 export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
   private readonly hebrewDays = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
@@ -26,6 +26,19 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
     const daysInMonth = this.dateService.getDaysInMonth(year, month);
     const workDays: WorkDayInfo[] = [];
 
+    const sortedHolidayKeys = Object.keys(hebrewHolidayNames).sort(
+      (a, b) => b.length - a.length,
+    );
+    const resolveHolidayName = (title: string): string | undefined =>
+      hebrewHolidayNames[title] ??
+      hebrewHolidayNames[
+        sortedHolidayKeys.find((k) => {
+          if (!title.startsWith(k)) return false;
+          const nextChar = title[k.length];
+          return nextChar === undefined || nextChar === " ";
+        }) ?? ""
+      ];
+
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month - 1, day);
       const formattedDate = this.dateService.formatDate(date);
@@ -36,11 +49,17 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
 
       const typeDay = this.holidayResolver.resolve({ weekday, eventTitles });
 
+      const holidayName =
+        typeDay !== WorkDayType.Regular
+          ? eventTitles.map(resolveHolidayName).find(Boolean)
+          : undefined;
+
       const row: WorkDayInfo = {
         meta: {
           date: formattedDate,
           typeDay: typeDay,
           crossDayContinuation: false,
+          holidayName,
         },
         hebrewDay: hebrewDay,
       };

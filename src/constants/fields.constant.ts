@@ -86,6 +86,26 @@ export const headersTable: TableHeader[] = [
   },
 ];
 
+export const hebrewHolidayNames: Record<string, string> = {
+  "Rosh Hashana": "ראש השנה",
+  "Rosh Hashana II": "ראש השנה ב׳",
+  "Yom Kippur": "יום כיפור",
+  "Sukkot I": "סוכות",
+  "Shmini Atzeret": "שמיני עצרת",
+  "Pesach I": "פסח",
+  "Pesach VI (CH'M)": "ערב שביעי של פסח",
+  "Pesach VII": "שביעי של פסח",
+  "Yom HaAtzma'ut": "יום העצמאות",
+  "Shavuot I": "שבועות",
+  "Erev Rosh Hashana": "ערב ראש השנה",
+  "Erev Yom Kippur": "ערב יום כיפור",
+  "Erev Sukkot": "ערב סוכות",
+  "Erev Pesach": "ערב פסח",
+  "Erev Shavuot": "ערב שבועות",
+  "Yom HaZikaron": "יום הזיכרון",
+  "Sukkot VII (Hoshana Rabba)": "הושענא רבה",
+};
+
 export const baseLabels = ["100%", "שבת תוספת 100%", "מחלה", "חופש"];
 export const extraLabels = [
   "תוספת לילה (50%)",

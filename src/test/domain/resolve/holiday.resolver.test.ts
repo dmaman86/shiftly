@@ -68,8 +68,8 @@ describe("HolidayResolverService", () => {
       expect(result).toBe(WorkDayType.SpecialFull);
     });
 
-    it("should identify Yom HaAtzma’ut as paid holiday", () => {
-      const params = createResolveParams(4, ["Yom HaAtzma’ut"]);
+    it("should identify Yom HaAtzma'ut as paid holiday", () => {
+      const params = createResolveParams(4, ["Yom HaAtzma'ut"]);
 
       const result = resolver.resolve(params);
 
@@ -387,7 +387,7 @@ describe("HolidayResolverService", () => {
     it("should handle both Yom HaZikaron and Erev in events", () => {
       const params = createResolveParams(3, [
         "Yom HaZikaron",
-        "Erev Yom HaAtzma’ut",
+        "Erev Yom HaAtzma'ut",
       ]);
 
       const result = resolver.resolve(params);
@@ -429,8 +429,8 @@ describe("HolidayResolverService", () => {
       expect(result).toBe(WorkDayType.SpecialPartialStart);
     });
 
-    it("should handle Yom HaAtzma’ut (Independence Day)", () => {
-      const params = createResolveParams(4, ["Yom HaAtzma’ut"]);
+    it("should handle Yom HaAtzma'ut (Independence Day)", () => {
+      const params = createResolveParams(4, ["Yom HaAtzma'ut"]);
 
       const result = resolver.resolve(params);
 

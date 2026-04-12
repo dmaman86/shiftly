@@ -9,7 +9,8 @@ export class HolidayResolverService implements HolidayResolver {
     "Sukkot I",
     "Shmini Atzeret",
     "Pesach I",
-    "Yom HaAtzma’ut",
+    "Pesach VII",
+    "Yom HaAtzma'ut",
     "Shavuot I",
   ];
 
@@ -27,6 +28,7 @@ export class HolidayResolverService implements HolidayResolver {
     "Erev Shavuot",
     "Yom HaZikaron",
     "Sukkot VII (Hoshana Rabba)",
+    "Pesach VI (CH'M)",
   ];
 
   private isPartialStart(eventTitles: string[]): boolean {

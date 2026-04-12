@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Checkbox, TableCell, TableRow, IconButton } from "@mui/material";
+import { Box, Checkbox, Chip, TableCell, TableRow, IconButton } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 
@@ -119,7 +119,17 @@ const DayRowComponent = ({
                   verticalAlign: "middle",
                 }}
               >
-                {dayInfoResolver.formatHebrewWorkDay(workDay)}
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5 }}>
+                  {dayInfoResolver.formatHebrewWorkDay(workDay)}
+                  {workDay.meta.holidayName && (
+                    <Chip
+                      label={workDay.meta.holidayName}
+                      size="small"
+                      color={dayInfoResolver.isSpecialFullDay(workDay) ? "warning" : "info"}
+                      sx={{ height: 16, fontSize: "0.6rem", "& .MuiChip-label": { px: 0.5 } }}
+                    />
+                  )}
+                </Box>
               </TableCell>
 
               <TableCell
