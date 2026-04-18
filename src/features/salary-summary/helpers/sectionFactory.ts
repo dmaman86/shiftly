@@ -1,9 +1,4 @@
 import {
-  buildAllowanceRows,
-  buildBasePayRows,
-  buildExtraPayRows,
-} from "../mappers";
-import {
   AllowanceSectionConfig,
   BasePaySectionConfig,
   ExtraPaySectionConfig,
@@ -11,35 +6,31 @@ import {
 
 export const createBaseSectionFactory = (
   id: string,
-  config: Omit<BasePaySectionConfig, "id" | "type" | "buildRows">,
+  config: Omit<BasePaySectionConfig, "id" | "type">,
 ): BasePaySectionConfig => ({
   type: "base",
   id,
   ...config,
-  buildRows: buildBasePayRows,
 });
 
 export const createExtraSectionFactory = (
   id: string,
-  config: Omit<ExtraPaySectionConfig, "id" | "type" | "buildRows">,
+  config: Omit<ExtraPaySectionConfig, "id" | "type">,
 ): ExtraPaySectionConfig => ({
   type: "extra",
   id,
   ...config,
-  buildRows: buildExtraPayRows,
 });
 
 export const createAllowanceSectionFactory = (
   id: string,
-  config: Omit<AllowanceSectionConfig, "id" | "type" | "buildRows">,
+  config: Omit<AllowanceSectionConfig, "id" | "type">,
 ): AllowanceSectionConfig => ({
   type: "allowance",
   id,
   ...config,
-  buildRows: buildAllowanceRows,
 });
 
-// Union de todos los factories (opcional, para conveniencia)
 export const createSectionFactory = {
   base: createBaseSectionFactory,
   extra: createExtraSectionFactory,

@@ -43,7 +43,7 @@ export const usePayTableVM = ({ section }: UsePayTableVMParams) => {
 
     if (quantityChanged) return incomingRow;
 
-    return currentRow;
+    return { ...currentRow, label: incomingRow.label };
   };
 
   useEffect(() => {

@@ -9,6 +9,7 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import {
   WorkTable,
@@ -16,7 +17,13 @@ import {
   MonthlySalarySummary,
   Feedback,
 } from "@/features";
-import { useDeviceType, useFetch, useGlobalState, useWorkDays } from "@/hooks";
+import {
+  useDeviceType,
+  useFetch,
+  useGlobalState,
+  useWorkDays,
+  useAsync,
+} from "@/hooks";
 import { ApiResponse, TableViewMode } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
@@ -24,6 +31,7 @@ import { hebcalService } from "@/services";
 import { ErrorBoundary, FeatureErrorFallback } from "@/layout";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
+  const { t } = useTranslation("work-table");
   const { dateService } = domain.services;
   const { isMobile } = useDeviceType();
 
@@ -38,27 +46,29 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
     isMobile ? "compact" : "expanded",
   );
 
-  const { loading, callEndPoint } = useFetch();
+  const { loading, callEndPoint, cancelEndPoint } = useFetch();
 
-  useEffect(() => {
-    const loadEvents = async () => {
+  useAsync<ApiResponse<Record<string, string[]>>>(
+    () => {
       const { startDate, endDate } = dateService.getDatesRange(year, month);
-
-      const { data, error }: ApiResponse<Record<string, string[]>> =
-        await callEndPoint<Record<string, string[]>>(
-          call.getData(startDate, endDate),
-          buildEventMap,
-        );
-      // setEventMap(data);
+      return callEndPoint<Record<string, string[]>>(
+        call.getData(startDate, endDate),
+        buildEventMap,
+      );
+    },
+    ({ data, error }) => {
       if (data) {
+        // console.log(data);
         generate(year, month, data);
         reset();
+        setError(undefined);
+        return;
       }
       setError(error);
-    };
-
-    loadEvents();
-  }, [year, month]);
+    },
+    [year, month],
+    cancelEndPoint,
+  );
 
   useEffect(() => {
     setViewMode(isMobile ? "compact" : "expanded");
@@ -73,7 +83,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
           <CardHeader
             title={
               <Typography variant="h5" fontWeight="bold">
-                חישוב שכר יומי
+                {t("page_title")}
               </Typography>
             }
             sx={{
@@ -96,7 +106,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                 <ErrorBoundary
                   fallback={(error, reset) => (
                     <FeatureErrorFallback
-                      featureName="טבלת ימי עבודה"
+                      featureName={t("feature_name_work_table")}
                       error={error}
                       resetError={reset}
                     />
@@ -116,7 +126,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                   <ErrorBoundary
                     fallback={(error, reset) => (
                       <FeatureErrorFallback
-                        featureName="סיכום שכר חודשי"
+                        featureName={t("feature_name_salary_summary")}
                         error={error}
                         resetError={reset}
                       />

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-
+import { useTranslation } from "react-i18next";
 import { Typography, Box, Stack, Card, CardContent } from "@mui/material";
 
 import { DomainContextType } from "@/app";
@@ -18,6 +18,8 @@ export const MonthlySalarySummary = ({
 }: {
   domain: DomainContextType;
 }) => {
+  const { t } = useTranslation("work-table");
+
   const { globalBreakdown, baseRate, year, month } = useGlobalState();
 
   const {
@@ -36,8 +38,10 @@ export const MonthlySalarySummary = ({
     <Card sx={{ mb: 3 }}>
       <CardContent>
         <SummaryHeader
-          title="💰 סיכום שכר חודשי"
-          subtitle={`ברוטו - לפי שעות - ${getMonthLabel(year, month)}`}
+          title={t("salary_summary.title")}
+          subtitle={t("salary_summary.subtitle", {
+            monthLabel: getMonthLabel(year, month),
+          })}
         />
         <Stack
           direction={{ xs: "column", md: "row" }}
@@ -62,7 +66,7 @@ export const MonthlySalarySummary = ({
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
                 <Typography variant="h6" fontWeight="bold">
-                  סה״כ לתשלום (ברוטו) משוער:
+                  {t("salary_summary.total_label")}
                 </Typography>
               </Box>
               <Typography variant="h6" fontWeight="bold">

@@ -1,43 +1,48 @@
 import { useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { Box, Button, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
-import { useAppSnackbar, useGlobalState, useSalaryFeedback } from "@/hooks";
-import { SalaryFeedback } from "@/services";
+import { useAppSnackbar, useGlobalState } from "@/hooks";
+import { SalaryFeedback, sendSalaryFeedback } from "@/services";
 
 export const Feedback = () => {
+  const { t } = useTranslation();
+  const { pathname } = useLocation();
   const { month, year, baseRate } = useGlobalState();
-  const { submitFeedback } = useSalaryFeedback();
   const snackbar = useAppSnackbar();
-
-  const pathname = window.location.pathname;
 
   const handleClick = useCallback(
     (value: SalaryFeedback) => {
-      submitFeedback(value, {
+      sendSalaryFeedback(value, {
         month,
         year,
         calculationType: pathname.includes("daily") ? "daily" : "monthly",
         hasAllowances: baseRate > 0,
       });
-      snackbar.success("תודה! המשוב נקלט");
+      snackbar.success(t("feedback.success"));
     },
-    [submitFeedback, snackbar, month, year, pathname, baseRate],
+    [snackbar, month, year, pathname, baseRate, t],
   );
 
   return (
     <Box sx={{ mt: 4, textAlign: "center" }}>
       <Typography variant="body2" sx={{ mb: 1 }}>
-        האם החישוב עזר לך לזהות טעות בתלוש?
+        {t("feedback.question")}
       </Typography>
 
       <Stack direction="row" spacing={2} justifyContent="center">
         <Button onClick={() => handleClick("found_issue")}>
-          כן, מצאתי טעות
+          {t("feedback.found_issue")}
         </Button>
 
-        <Button onClick={() => handleClick("all_ok")}>לא, הכל תקין</Button>
+        <Button onClick={() => handleClick("all_ok")}>
+          {t("feedback.all_ok")}
+        </Button>
 
-        <Button onClick={() => handleClick("not_sure")}>לא בטוח</Button>
+        <Button onClick={() => handleClick("not_sure")}>
+          {t("feedback.not_sure")}
+        </Button>
       </Stack>
     </Box>
   );

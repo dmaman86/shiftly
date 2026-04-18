@@ -1,0 +1,6 @@
+{
+  "global_title": "Oops! Something went wrong",
+  "unexpected": "Unexpected error",
+  "apology": "We apologize for the inconvenience. Please try refreshing the page or returning to the main screen.",
+  "feature_load": "Error loading {{featureName}}: {{message}}"
+}

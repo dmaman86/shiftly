@@ -47,5 +47,5 @@ export const useFetch = () => {
     };
   }, []);
 
-  return { loading, callEndPoint };
+  return { loading, callEndPoint, cancelEndPoint };
 };

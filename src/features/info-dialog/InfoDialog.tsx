@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 type InfoDialogProps = {
   open: boolean;
@@ -23,6 +24,8 @@ export const InfoDialog = ({
   onClose,
   children,
 }: InfoDialogProps) => {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>
@@ -35,7 +38,7 @@ export const InfoDialog = ({
       <DialogContent dividers>{children}</DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose}>לסגור</Button>
+        <Button onClick={onClose}>{t("actions.close")}</Button>
       </DialogActions>
     </Dialog>
   );

@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { DomainContextType } from "@/app";
 import { ConfigPanel, MonthlySalarySummary, Feedback } from "@/features";
@@ -16,6 +17,9 @@ export const MonthlySummaryPage = ({
 }: {
   domain: DomainContextType;
 }) => {
+  const { t } = useTranslation("pages");
+  const { t: tWT } = useTranslation("work-table");
+
   return (
     <Box component="section" sx={{ mt: 2 }}>
       <Box sx={{ maxWidth: 1200, mx: "auto", px: { xs: 2, md: 3 } }}>
@@ -23,7 +27,7 @@ export const MonthlySummaryPage = ({
           <CardHeader
             title={
               <Typography variant="h5" fontWeight="bold">
-                חישוב שכר חודשי
+                {t("monthly_summary_page.title")}
               </Typography>
             }
             sx={{
@@ -37,7 +41,7 @@ export const MonthlySummaryPage = ({
               <ErrorBoundary
                 fallback={(error, reset) => (
                   <FeatureErrorFallback
-                    featureName="סיכום שכר חודשי"
+                    featureName={tWT("feature_name_salary_summary")}
                     error={error}
                     resetError={reset}
                   />

@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
+import { useTranslation } from "react-i18next";
 import { formatValue } from "@/utils";
 import {
   SalaryRow,
@@ -32,6 +33,7 @@ export const SalaryCardSection = ({
   section,
   onTotalChange,
 }: SalaryCardSectionProps) => {
+  const { t } = useTranslation("work-table");
   const [editMode, setEditMode] = useState(false);
 
   const table = usePayTableVM({ section });
@@ -63,7 +65,7 @@ export const SalaryCardSection = ({
           </Typography>
         }
         action={
-          <Tooltip title={editMode ? "סיים עריכה" : "ערוך כמויות"}>
+          <Tooltip title={editMode ? t("salary_summary.edit_done") : t("salary_summary.edit_quantities")}>
             <IconButton
               onClick={() => setEditMode(!editMode)}
               size="small"
@@ -88,15 +90,15 @@ export const SalaryCardSection = ({
             }}
           >
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>סוג</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>{t("salary_summary.table_col_type")}</TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                כמות
+                {t("salary_summary.table_col_quantity")}
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                ערך
+                {t("salary_summary.table_col_value")}
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                סכום
+                {t("salary_summary.table_col_total")}
               </TableCell>
             </TableRow>
           </TableHead>

@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "app_title": "Shiftly – Shift & Salary Management",
+    "daily": "Daily",
+    "monthly": "Monthly",
+    "calculation_rules": "Calculation Rules"
+  },
+  "footer": {
+    "copyright": "© {{year}} Shiftly – Salary & Shift Simulation & Calculator",
+    "contact": "Contact"
+  },
+  "config": {
+    "title": "Calculation Settings",
+    "date_section": "Date",
+    "work_params_section": "Work Parameters",
+    "year_label": "Year",
+    "month_label": "Month",
+    "standard_hours_label": "Standard Hours",
+    "standard_hours_helper": "Default: 6.67",
+    "base_rate_label": "Hourly Rate",
+    "year_min_error": "Minimum supported year is {{year}}",
+    "base_rate_helper_daily": "Enter hourly rate to display daily or monthly salary",
+    "base_rate_helper_monthly": "Monthly salary calculation requires setting hourly rate",
+    "calculation_based_on": "Calculation based on {{monthName}} {{year}}"
+  },
+  "feedback": {
+    "question": "Did the calculation help you identify an error in your pay stub?",
+    "found_issue": "Yes, I found an error",
+    "all_ok": "No, everything is correct",
+    "not_sure": "Not sure",
+    "success": "Thank you! Feedback received"
+  },
+  "actions": {
+    "try_again": "Try Again",
+    "refresh_page": "Refresh Page",
+    "back_to_home": "Back to Home",
+    "close": "Close"
+  },
+  "info_dialogs": {
+    "about": {
+      "title": "About the System",
+      "paragraphs": [
+        "Shiftly is a work hours and salary calculation system designed for hourly security employees in government offices.",
+        "The system reconstructs the calculation logic as it appears in Merkava system reports, aiming to enable simulation, verification, and understanding of the monthly pay slip calculation.",
+        "The displayed result is gross salary, calculated based on work hours only."
+      ]
+    },
+    "disclaimer": {
+      "title": "Liability & Calculation",
+      "paragraphs": [
+        "The calculation displayed in the system is indicative only.",
+        "There may be scenarios where the calculation does not fully match the official result, due to exceptions, updates, or missing data.",
+        "The system is not a substitute for an official payroll system or accounting."
+      ]
+    },
+    "privacy": {
+      "title": "Privacy & Data Usage",
+      "paragraphs": [
+        "The system does not store personal information, salary data, work hours, or user identification details.",
+        "The system does not perform user identification and does not use cookies for advertising or cross-site tracking purposes.",
+        "Basic anonymous usage analytics may be used (such as page views and general interactions) to improve calculation clarity and user experience.",
+        "Collected data is aggregated and does not allow identification of a person, pay slip, or specific workplace."
+      ]
+    }
+  }
+}

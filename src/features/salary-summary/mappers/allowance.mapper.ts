@@ -1,9 +1,12 @@
+import type { useTranslation } from "react-i18next";
 import {
   MealAllowance,
   MealAllowanceEntry,
   MealAllowanceRates,
 } from "@/domain";
 import { PayRowVM } from "@/features/salary-summary";
+
+type TranslateFn = ReturnType<typeof useTranslation<"work-table">>["t"];
 
 export const createPayRow = ({
   label,
@@ -23,7 +26,7 @@ export const createPayRow = ({
 export const mapPerDiemToPayRow = (
   points: number,
   rate: number,
-  label = "קצובת כלכלה",
+  label: string,
 ): PayRowVM =>
   createPayRow({
     label,
@@ -47,17 +50,15 @@ export const mapAllowanceRows = ({
   mealAllowance,
   rates,
   rateDiem,
+  t,
 }: {
   perDiem: { points: number; rate: number };
   mealAllowance: MealAllowance;
   rates: MealAllowanceRates;
   rateDiem: number;
+  t: TranslateFn;
 }): PayRowVM[] => [
-  mapPerDiemToPayRow(perDiem.points, rateDiem),
-  mapMealAllowanceToPayRow(mealAllowance.large, rates.large, "דמי כלכלה"),
-  mapMealAllowanceToPayRow(
-    mealAllowance.small,
-    rates.small,
-    "תוספת כלכלה למשמרת ג",
-  ),
+  mapPerDiemToPayRow(perDiem.points, rateDiem, t("pay_labels.per_diem")),
+  mapMealAllowanceToPayRow(mealAllowance.large, rates.large, t("pay_labels.meal_large")),
+  mapMealAllowanceToPayRow(mealAllowance.small, rates.small, t("pay_labels.meal_small")),
 ];
