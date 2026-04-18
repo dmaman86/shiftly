@@ -4,7 +4,12 @@ import {
   WorkDayInfoResolver,
   DateService,
 } from "@/domain";
-import { WorkDayType, hebrewHolidayNames, holidayKeyMap } from "@/constants";
+import {
+  WorkDayType,
+  hebrewHolidayNames,
+  holidayKeyMap,
+  HolidayKey,
+} from "@/constants";
 
 export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
   private readonly hebrewDays = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
@@ -29,15 +34,19 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
     const sortedHolidayKeys = Object.keys(hebrewHolidayNames).sort(
       (a, b) => b.length - a.length,
     );
-    const resolveHolidayKey = (title: string): string | undefined => {
-      const directKey = holidayKeyMap[title];
+    const holidayKeyMapLoose = holidayKeyMap as Record<
+      string,
+      HolidayKey | undefined
+    >;
+    const resolveHolidayKey = (title: string): HolidayKey | undefined => {
+      const directKey = holidayKeyMapLoose[title];
       if (directKey) return directKey;
       const matchedApiKey = sortedHolidayKeys.find((k) => {
         if (!title.startsWith(k)) return false;
         const nextChar = title[k.length];
         return nextChar === undefined || nextChar === " ";
       });
-      return matchedApiKey ? holidayKeyMap[matchedApiKey] : undefined;
+      return matchedApiKey ? holidayKeyMapLoose[matchedApiKey] : undefined;
     };
 
     for (let day = 1; day <= daysInMonth; day++) {
