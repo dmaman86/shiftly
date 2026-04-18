@@ -8,9 +8,7 @@ export const InfoDialogContent = ({ paragraphs }: InfoDialogContentProps) => {
   return (
     <>
       {paragraphs.map((text, index) => (
-        <Typography key={index} paragraph>
-          {text}
-        </Typography>
+        <Typography key={index}>{text}</Typography>
       ))}
     </>
   );

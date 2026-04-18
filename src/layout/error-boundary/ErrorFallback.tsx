@@ -1,5 +1,6 @@
 import { Box, Button, Typography, Paper, Alert } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import { useTranslation } from "react-i18next";
 
 interface ErrorFallbackProps {
   error: Error;
@@ -7,6 +8,9 @@ interface ErrorFallbackProps {
 }
 
 export const ErrorFallback = ({ error, resetError }: ErrorFallbackProps) => {
+  const { t } = useTranslation("errors");
+  const { t: tc } = useTranslation();
+
   return (
     <Box
       display="flex"
@@ -20,18 +24,18 @@ export const ErrorFallback = ({ error, resetError }: ErrorFallbackProps) => {
         <Box display="flex" alignItems="center" gap={2} mb={2}>
           <ErrorOutlineIcon color="error" sx={{ fontSize: 40 }} />
           <Typography variant="h5" component="h1" fontWeight="bold">
-            אופס! משהו השתבש
+            {t("global_title")}
           </Typography>
         </Box>
 
         <Alert severity="error" sx={{ mb: 2 }}>
           <Typography variant="body2" fontWeight="medium">
-            {error.message || "שגיאה לא צפויה"}
+            {error.message || t("unexpected")}
           </Typography>
         </Alert>
 
         <Typography variant="body2" color="text.secondary">
-          אנחנו מתנצלים על אי הנוחות. אנא נסה לרענן את הדף או לחזור למסך הראשי.
+          {t("apology")}
         </Typography>
 
         {import.meta.env.DEV && error.stack && (
@@ -62,16 +66,16 @@ export const ErrorFallback = ({ error, resetError }: ErrorFallbackProps) => {
 
         <Box mt={3} display="flex" gap={2} flexWrap="wrap">
           <Button variant="contained" color="primary" onClick={resetError}>
-            נסה שוב
+            {tc("actions.try_again")}
           </Button>
           <Button variant="outlined" onClick={() => window.location.reload()}>
-            רענן דף
+            {tc("actions.refresh_page")}
           </Button>
           <Button
             variant="text"
             onClick={() => (window.location.href = "/shiftly")}
           >
-            חזור לדף הבית
+            {tc("actions.back_to_home")}
           </Button>
         </Box>
       </Paper>

@@ -1,0 +1,98 @@
+{
+  "daily_page": {
+    "title": "Daily Salary Calculator"
+  },
+  "monthly_summary_page": {
+    "title": "Monthly Salary Calculator"
+  },
+  "calculation_rules_page": {
+    "title": "Calculation Rules",
+    "sub_title": "This screen displays the calculation rules and data used by the system to calculate hours and bonuses. The information is shown for transparency and cannot be edited.",
+    "card_extra_hours": {
+      "title": "🕒 Overtime (OT)",
+      "sub_title": "Overtime calculation is done in three payment tiers, based on the number of hours worked per day.",
+      "accordion_title": "Payment Tiers",
+      "segment_standard": "Up to {{standardHours}}",
+      "segment_overtime_1": "Up to 2 hours",
+      "segment_overtime_2": "Remaining hours",
+      "example_label": "Example:",
+      "example_regular": "• Hours 1-{{to}}: regular pay (100%)",
+      "example_extra_125": "• Hours {{from}}-{{to}}: 25% bonus",
+      "example_extra_150": "• Over {{from}} hours: 50% bonus",
+      "tip": "Current standard hours: {{standardHours}} hours/day"
+    },
+    "card_salary_additions": {
+      "title": "💰 Hourly Salary Bonuses",
+      "sub_title": "Salary bonuses vary based on the time of day the work is performed. Bonuses are marked as \"+\" and added to the base salary.",
+      "accordion_weekday": {
+        "title": "Weekday",
+        "sub_title": "On a regular weekday, salary bonuses depend on the time of day the work is performed. Overtime (OT) may also apply.",
+        "timeline_start_label": "Start of day",
+        "timeline_continue_label": "Continue day",
+        "base_salary": "Base salary",
+        "note_midnight": "* Shifts crossing midnight are calculated as a single workday.",
+        "note_next_day": "** The shift continues to the next day."
+      },
+      "accordion_friday": {
+        "title": "Friday & Holiday Eves",
+        "sub_title": "On Fridays and holiday eves, bonuses are higher, especially approaching the start of Shabbat/holiday.",
+        "note_midnight": "* Shifts crossing midnight are calculated as a single workday.",
+        "note_next_day": "** The shift continues to the next day.",
+        "tip_summer": "• Summer time – starting from 18:00",
+        "tip_winter": "• Winter time – starting from 17:00",
+        "tip_auto": "• Detection is automatic based on the date."
+      },
+      "accordion_shabbat": {
+        "title": "Shabbat & Holidays",
+        "sub_title": "On Shabbat and holidays, Shabbat pay is applied (base + high bonus), without overtime (OT) calculation.",
+        "note_midnight": "* Shifts crossing midnight are calculated as a single workday.",
+        "note_next_day": "** The shift continues to the next day."
+      }
+    },
+    "card_meal_allowance": {
+      "title": "🍽️ Meal & Per Diem Allowance",
+      "sub_title": "Payments for meals – meal allowance (food, drinks, accommodation) and per diem – paid according to work hours and eligibility conditions.",
+      "accordion_eligibility": {
+        "title": "Meal Allowance Eligibility",
+        "description": "Meal allowance is calculated only on days with at least one shift in the position, counting only hours actually worked in the position."
+      },
+      "accordion_tiers": {
+        "title": "Meal Allowance Tiers",
+        "col_hours": "Total hours in position",
+        "col_tier": "Tier",
+        "col_points": "Points",
+        "tier_a_hours": "Over 4 hours",
+        "tier_a_label": "A",
+        "tier_b_hours": "Over 8 hours",
+        "tier_b_label": "B",
+        "tier_c_hours": "Over 12 hours",
+        "tier_c_label": "C",
+        "official_doc_link": "View official document on gov.il"
+      },
+      "accordion_per_diem": {
+        "title": "Per Diem Rates",
+        "col_condition": "Eligibility condition",
+        "col_until_2024": "Until 31.08.2024",
+        "col_from_2024": "From 01.09.2024",
+        "row_overtime_2h": "At least 2 overtime hours",
+        "row_overtime_2h_no_meal": "At least 2 overtime hours (no meal agreement)",
+        "row_night_shift": "Night shift (at least 4 hours)",
+        "source_link": "Data source – malam-payroll.com"
+      }
+    },
+    "card_important_info": {
+      "title": "ℹ️ Important Information",
+      "accordion_limitations": {
+        "title": "Selection Limitations",
+        "text_1": "The system allows simulations and calculation checks starting from November 2015.",
+        "text_2": "Calculations cannot be performed for future months, as future changes in conditions, regulations, or agreements may affect the calculation method, and preparation time is required accordingly.",
+        "text_3": "In the current year, only months up to the current month can be selected, for the same reason."
+      },
+      "accordion_disclaimers": {
+        "title": "Disclaimers",
+        "text_1": "The system calculation is for estimation purposes only and does not replace an official report and/or official pay slip.",
+        "text_2": "Differences may occur based on personal agreements or internal procedures."
+      }
+    }
+  }
+}

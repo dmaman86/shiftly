@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { Checkbox, IconButton, TableCell, Tooltip } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -44,6 +45,7 @@ export const ShiftRow = ({
     });
 
   const snackbar = useAppSnackbar();
+  const { t } = useTranslation("work-table");
 
   const handleChange = (field: "start" | "end", newDate: Date | null) => {
     if (!newDate) return;
@@ -78,13 +80,11 @@ export const ShiftRow = ({
 
   const handleSave = useCallback(() => {
     if (hasError) {
-      snackbar.warning(
-        'זוהתה משמרת החוצה את חצות. יש לסמן "חוצה יום" לפני שמירה.',
-      );
+      snackbar.warning(t("shift_row.cross_midnight_warning"));
       return;
     }
     setSaved(true);
-  }, [hasError, snackbar, setSaved]);
+  }, [hasError, snackbar, setSaved, t]);
 
   const handleEdit = () => {
     setSaved(false);
@@ -160,8 +160,8 @@ export const ShiftRow = ({
               <Tooltip
                 title={
                   hasError
-                    ? "⚠️ יש לסמן חוצה יום - שעת סיום לפני שעת התחלה"
-                    : "חוצה יום"
+                    ? t("shift_row.tooltip_cross_day_error")
+                    : t("shift_row.tooltip_cross_day")
                 }
               >
                 <Checkbox
@@ -186,7 +186,7 @@ export const ShiftRow = ({
               </Tooltip>
             )}
 
-            <Tooltip title="משמרת בתפקיד">
+            <Tooltip title={t("shift_row.tooltip_duty")}>
               <span>
                 <IconButton
                   size="small"
@@ -203,7 +203,13 @@ export const ShiftRow = ({
               </span>
             </Tooltip>
 
-            <Tooltip title={!saved ? "שמור" : "ערוך"}>
+            <Tooltip
+              title={
+                !saved
+                  ? t("shift_row.tooltip_save")
+                  : t("shift_row.tooltip_edit")
+              }
+            >
               <span>
                 <IconButton
                   size="small"
@@ -220,7 +226,7 @@ export const ShiftRow = ({
               </span>
             </Tooltip>
 
-            <Tooltip title="מחק">
+            <Tooltip title={t("shift_row.tooltip_delete")}>
               <IconButton
                 size="small"
                 onClick={() => onRemove(shift.id)}

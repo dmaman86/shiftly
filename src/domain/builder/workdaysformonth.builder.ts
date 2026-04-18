@@ -4,7 +4,7 @@ import {
   WorkDayInfoResolver,
   DateService,
 } from "@/domain";
-import { WorkDayType, hebrewHolidayNames } from "@/constants";
+import { WorkDayType, hebrewHolidayNames, holidayKeyMap } from "@/constants";
 
 export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
   private readonly hebrewDays = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
@@ -29,15 +29,16 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
     const sortedHolidayKeys = Object.keys(hebrewHolidayNames).sort(
       (a, b) => b.length - a.length,
     );
-    const resolveHolidayName = (title: string): string | undefined =>
-      hebrewHolidayNames[title] ??
-      hebrewHolidayNames[
-        sortedHolidayKeys.find((k) => {
-          if (!title.startsWith(k)) return false;
-          const nextChar = title[k.length];
-          return nextChar === undefined || nextChar === " ";
-        }) ?? ""
-      ];
+    const resolveHolidayKey = (title: string): string | undefined => {
+      const directKey = holidayKeyMap[title];
+      if (directKey) return directKey;
+      const matchedApiKey = sortedHolidayKeys.find((k) => {
+        if (!title.startsWith(k)) return false;
+        const nextChar = title[k.length];
+        return nextChar === undefined || nextChar === " ";
+      });
+      return matchedApiKey ? holidayKeyMap[matchedApiKey] : undefined;
+    };
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month - 1, day);
@@ -49,9 +50,9 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
 
       const typeDay = this.holidayResolver.resolve({ weekday, eventTitles });
 
-      const holidayName =
+      const holidayKey =
         typeDay !== WorkDayType.Regular
-          ? eventTitles.map(resolveHolidayName).find(Boolean)
+          ? eventTitles.map(resolveHolidayKey).find(Boolean)
           : undefined;
 
       const row: WorkDayInfo = {
@@ -59,7 +60,7 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
           date: formattedDate,
           typeDay: typeDay,
           crossDayContinuation: false,
-          holidayName,
+          holidayKey,
         },
         hebrewDay: hebrewDay,
       };

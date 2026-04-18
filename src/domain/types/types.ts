@@ -1,4 +1,4 @@
-import { WorkDayType } from "@/constants";
+import { WorkDayType, HolidayKey } from "@/constants";
 
 export type TableViewMode = "compact" | "expanded" | "both";
 
@@ -35,7 +35,7 @@ export interface WorkDayMeta {
   date: string;
   typeDay: WorkDayType;
   crossDayContinuation: boolean;
-  holidayName?: string;
+  holidayKey?: HolidayKey;
 }
 
 export interface Point {

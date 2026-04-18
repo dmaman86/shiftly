@@ -2,14 +2,45 @@ import { Box, Typography, Link, Stack } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import EmailIcon from "@mui/icons-material/Email";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   INFO_DIALOG_CONTENT,
   InfoDialog,
   InfoDialogContent,
   type InfoDialogKey,
 } from "@/features";
+import { useDirection } from "@/hooks";
+
+const DIALOG_I18N_KEYS: Record<
+  InfoDialogKey,
+  {
+    title:
+      | "info_dialogs.about.title"
+      | "info_dialogs.disclaimer.title"
+      | "info_dialogs.privacy.title";
+    paragraphs:
+      | "info_dialogs.about.paragraphs"
+      | "info_dialogs.disclaimer.paragraphs"
+      | "info_dialogs.privacy.paragraphs";
+  }
+> = {
+  about: {
+    title: "info_dialogs.about.title",
+    paragraphs: "info_dialogs.about.paragraphs",
+  },
+  disclaimer: {
+    title: "info_dialogs.disclaimer.title",
+    paragraphs: "info_dialogs.disclaimer.paragraphs",
+  },
+  privacy: {
+    title: "info_dialogs.privacy.title",
+    paragraphs: "info_dialogs.privacy.paragraphs",
+  },
+};
 
 export const Footer = () => {
+  const { t } = useTranslation();
+  const { direction } = useDirection();
   const [openDialog, setOpenDialog] = useState<InfoDialogKey | null>(null);
 
   const dialogConfig = openDialog ? INFO_DIALOG_CONTENT[openDialog] : null;
@@ -25,7 +56,7 @@ export const Footer = () => {
         py: 2,
         backgroundColor: "#f5f5f5",
       }}
-      dir="rtl"
+      dir={direction}
     >
       <Box sx={{ maxWidth: 1200, mx: "auto", px: 2 }}>
         <Stack
@@ -42,12 +73,11 @@ export const Footer = () => {
               flex: { xs: "none", md: 1 },
               display: "flex",
               alignItems: "center",
-              textAlign: { xs: "center", md: "left" },
+              textAlign: { xs: "center", md: "start" },
             }}
           >
             <Typography variant="body2" color="textSecondary">
-              © {new Date().getFullYear()} Shiftly – מחשבון סימולציות ובדיקות
-              שכר ומשמרות | Salary & Shift Simulation & Calculator
+              {t("footer.copyright", { year: new Date().getFullYear() })}
             </Typography>
           </Box>
 
@@ -69,7 +99,7 @@ export const Footer = () => {
               }}
             >
               {infoKeys.map((key) => {
-                const { title, icon: Icon } = INFO_DIALOG_CONTENT[key];
+                const { icon: Icon } = INFO_DIALOG_CONTENT[key];
 
                 return (
                   <Box
@@ -92,7 +122,7 @@ export const Footer = () => {
                       }}
                     >
                       <Icon fontSize="small" />
-                      {title}
+                      {t(DIALOG_I18N_KEYS[key].title)}
                     </Link>
                   </Box>
                 );
@@ -113,10 +143,7 @@ export const Footer = () => {
               <Link
                 component="button"
                 onClick={() =>
-                  window.open(
-                    "https://github.com/dmaman86/shiftly",
-                    "_blank",
-                  )
+                  window.open("https://github.com/dmaman86/shiftly", "_blank")
                 }
                 underline="hover"
                 variant="body2"
@@ -137,21 +164,27 @@ export const Footer = () => {
                 sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
               >
                 <EmailIcon fontSize="small" />
-                יצירת קשר
+                {t("footer.contact")}
               </Link>
             </Stack>
           </Box>
         </Stack>
       </Box>
 
-      {dialogConfig && (
+      {openDialog && dialogConfig && (
         <InfoDialog
           open
-          title={dialogConfig.title}
+          title={t(DIALOG_I18N_KEYS[openDialog].title)}
           icon={dialogConfig.icon}
           onClose={closeDialog}
         >
-          <InfoDialogContent paragraphs={dialogConfig.paragraphs} />
+          <InfoDialogContent
+            paragraphs={
+              t(DIALOG_I18N_KEYS[openDialog].paragraphs, {
+                returnObjects: true,
+              }) as string[]
+            }
+          />
         </InfoDialog>
       )}
     </Box>

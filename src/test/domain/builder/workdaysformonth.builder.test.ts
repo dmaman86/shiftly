@@ -705,4 +705,73 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       }
     });
   });
+
+  describe("build - holidayKey assignment", () => {
+    it("should set holidayKey for a SpecialFull holiday", () => {
+      const result = builder.build({
+        year: 2024,
+        month: 1,
+        eventMap: { "2024-01-15": ["Rosh Hashana"] },
+      });
+
+      expect(result[14].meta.holidayKey).toBe("rosh_hashana");
+    });
+
+    it("should set holidayKey for a SpecialPartialStart (Erev) holiday", () => {
+      const result = builder.build({
+        year: 2024,
+        month: 1,
+        eventMap: { "2024-01-15": ["Erev Pesach"] },
+      });
+
+      expect(result[14].meta.holidayKey).toBe("erev_pesach");
+    });
+
+    it("should not set holidayKey for Regular days", () => {
+      const result = builder.build({
+        year: 2024,
+        month: 1,
+        eventMap: {},
+      });
+
+      // Monday — Regular day with no events
+      expect(result[0].meta.holidayKey).toBeUndefined();
+    });
+
+    it("should not set holidayKey for Saturday (no event)", () => {
+      const result = builder.build({
+        year: 2024,
+        month: 1,
+        eventMap: {},
+      });
+
+      // January 6 is Saturday — SpecialFull but no holidayKey from events
+      expect(result[5].meta.typeDay).toBe(WorkDayType.SpecialFull);
+      expect(result[5].meta.holidayKey).toBeUndefined();
+    });
+
+    it("should resolve holidayKey via fuzzy prefix match when title has extra suffix", () => {
+      // "Rosh Hashana (Observed)" is not a direct key but starts with "Rosh Hashana"
+      const result = builder.build({
+        year: 2024,
+        month: 1,
+        eventMap: { "2024-01-15": ["Rosh Hashana (Observed)"] },
+      });
+
+      // The fuzzy matcher should pick up "Rosh Hashana" prefix
+      expect(result[14].meta.holidayKey).toBe("rosh_hashana");
+    });
+
+    it("should return undefined holidayKey when event title has no matching holiday", () => {
+      const result = builder.build({
+        year: 2024,
+        month: 1,
+        eventMap: { "2024-01-15": ["Some Unknown Event"] },
+      });
+
+      // typeDay would still be Regular (no known holiday resolver match)
+      // holidayKey should be undefined since no resolveHolidayKey match
+      expect(result[14].meta.holidayKey).toBeUndefined();
+    });
+  });
 });

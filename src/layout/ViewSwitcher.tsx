@@ -6,10 +6,14 @@ import {
   Toolbar,
   Typography,
   Collapse,
+  //Tooltip,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+// import TranslateIcon from "@mui/icons-material/Translate";
 import { useState } from "react";
 import { NavLink, NavLinkRenderProps } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useDirection } from "@/hooks";
 
 const navButtonBaseStyle = {
   color: "text.secondary",
@@ -45,11 +49,13 @@ const NavItem = ({
 );
 
 export const ViewSwitcher = () => {
+  const { t } = useTranslation();
+  const { direction /*toggleDirection*/ } = useDirection();
   const [open, setOpen] = useState(false);
 
   return (
     <AppBar position="static" color="default" elevation={1}>
-      <Toolbar dir="rtl">
+      <Toolbar dir={direction}>
         <Typography
           variant="h6"
           component={NavLink}
@@ -61,10 +67,26 @@ export const ViewSwitcher = () => {
             cursor: "pointer",
           }}
         >
-          Shiftly – ניהול שעות עבודה ושכר
+          {t("nav.app_title")}
         </Typography>
 
-        {/* Mobile toggle */}
+        {/* Desktop nav */}
+        <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
+          <NavItem to="/daily">{t("nav.daily")}</NavItem>
+          <NavItem to="/monthly">{t("nav.monthly")}</NavItem>
+          <NavItem to="/calculation-rules">
+            {t("nav.calculation_rules")}
+          </NavItem>
+        </Box>
+
+        {/* Direction toggle */}
+        {/*<Tooltip title={direction === "rtl" ? "Switch to English" : "עבור לעברית"}>
+          <IconButton onClick={toggleDirection} size="small" sx={{ mx: 1 }}>
+            <TranslateIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>*/}
+
+        {/* Mobile menu toggle */}
         <IconButton
           aria-label="Open navigation menu"
           edge="end"
@@ -73,19 +95,12 @@ export const ViewSwitcher = () => {
         >
           <MenuIcon />
         </IconButton>
-
-        {/* Desktop nav */}
-        <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
-          <NavItem to="/daily">חישוב יומי</NavItem>
-          <NavItem to="/monthly">חישוב חודשי</NavItem>
-          <NavItem to="/calculation-rules">כללי חישוב</NavItem>
-        </Box>
       </Toolbar>
 
       {/* Mobile collapse */}
       <Collapse in={open} timeout="auto" unmountOnExit>
         <Box
-          dir="rtl"
+          dir={direction}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -94,13 +109,13 @@ export const ViewSwitcher = () => {
           }}
         >
           <NavItem to="/daily" onClick={() => setOpen(false)}>
-            חישוב יומי
+            {t("nav.daily")}
           </NavItem>
           <NavItem to="/monthly" onClick={() => setOpen(false)}>
-            חישוב חודשי
+            {t("nav.monthly")}
           </NavItem>
           <NavItem to="/calculation-rules" onClick={() => setOpen(false)}>
-            כללי חישוב
+            {t("nav.calculation_rules")}
           </NavItem>
         </Box>
       </Collapse>

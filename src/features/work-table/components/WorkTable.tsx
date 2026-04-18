@@ -16,6 +16,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { CalendarMonth } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 import { useGlobalState } from "@/hooks";
 import { groupByShabbat } from "@/utils";
@@ -45,7 +46,8 @@ export const WorkTable = ({
   onViewModeChange,
 }: WorkTableProps) => {
   const { year, month, baseRate, globalBreakdown } = useGlobalState();
-  const { monthResolver } = domain.resolvers;
+  const { t } = useTranslation("work-table");
+  const monthNames = t("months", { returnObjects: true }) as string[];
 
   // Group workdays by week (ending on Shabbat/Saturday)
   // Note: groupByShabbat is O(n) with n=30, very fast (~0.01ms)
@@ -59,9 +61,12 @@ export const WorkTable = ({
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
           <CalendarMonth color="primary" />
           <Typography variant="h6" fontWeight="bold">
-            שעות חודש {monthResolver.getMonthName(month - 1)} {year}
+            {t("table.month_hours_title", {
+              monthName: monthNames[month - 1],
+              year,
+            })}
           </Typography>
-          <Tooltip title="החלף בין תצוגה מצומצמת למלאה">
+          <Tooltip title={t("table.toggle_view_tooltip")}>
             <FormControlLabel
               control={
                 <Switch
@@ -73,7 +78,11 @@ export const WorkTable = ({
                   color="primary"
                 />
               }
-              label={<Typography variant="body2">תצוגה מלאה</Typography>}
+              label={
+                <Typography variant="body2">
+                  {t("table.toggle_view_label")}
+                </Typography>
+              }
               labelPlacement="start"
             />
           </Tooltip>
@@ -179,28 +188,28 @@ export const WorkTable = ({
             color="text.secondary"
             sx={{ fontStyle: "italic" }}
           >
-            • לחץ על ➕ להוספת משמרת
+            {t("table.hint_add_shift")}
           </Typography>
           <Typography
             variant="caption"
             color="text.secondary"
             sx={{ fontStyle: "italic" }}
           >
-            • סמן ✅ למשמרת שחוצה את חצות
+            {t("table.hint_cross_midnight")}
           </Typography>
           <Typography
             variant="caption"
             color="text.secondary"
             sx={{ fontStyle: "italic" }}
           >
-            • לחץ על 🚗 לסימון משמרת בתפקיד (זכאות אש״ל)
+            {t("table.hint_duty_shift")}
           </Typography>
           <Typography
             variant="caption"
             color="text.secondary"
             sx={{ fontStyle: "italic" }}
           >
-            • לחץ על 💾 לשמירת שינויים ועדכון שכר
+            {t("table.hint_save_shift")}
           </Typography>
         </Box>
       </CardContent>

@@ -12,6 +12,7 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import {
   RuleAccordion,
   RuleCard,
@@ -23,6 +24,10 @@ import { useGlobalState } from "@/hooks";
 
 export const CalculationRulesPage = () => {
   const { standardHours } = useGlobalState();
+  const { t } = useTranslation("pages");
+
+  const std = Number(standardHours);
+  const cr = "calculation_rules_page";
 
   return (
     <Container maxWidth="md" sx={{ mt: 2 }}>
@@ -40,7 +45,7 @@ export const CalculationRulesPage = () => {
               }}
             >
               <Typography variant="h5" fontWeight="bold">
-                כללי החישוב
+                {t(`${cr}.title`)}
               </Typography>
             </Box>
             <Typography
@@ -48,83 +53,82 @@ export const CalculationRulesPage = () => {
               color="text.secondary"
               sx={{ maxWidth: 600, mx: "auto" }}
             >
-              מסך זה מציג את כללי החישוב והנתונים לפיהם המערכת מחשבת שעות
-              ותוספות. המידע מוצג לצורך שקיפות ואינו ניתן לעריכה.
+              {t(`${cr}.sub_title`)}
             </Typography>
           </Box>
           <Divider sx={{ mt: 3 }} />
 
           {/* Daily time split */}
-          <RuleCard title="🕒 שעות נוספות (ש״נ)">
+          <RuleCard title={t(`${cr}.card_extra_hours.title`)}>
             <Typography
               variant="body2"
               color="text.secondary"
               sx={{ mb: 2 }}
             >
-              חישוב שעות נוספות מתבצע בשלושה מדרגות תשלום, בהתאם למספר השעות שעובדים ביום.
+              {t(`${cr}.card_extra_hours.sub_title`)}
             </Typography>
-            
-            <RuleAccordion title="מדרגות תשלום">
+
+            <RuleAccordion title={t(`${cr}.card_extra_hours.accordion_title`)}>
               <WorkDayTimeline>
                 <TimeSegment
                   from=""
-                  to={`עד ${standardHours}`}
+                  to={t(`${cr}.card_extra_hours.segment_standard`, { standardHours })}
                   label="100%"
                   flex={1}
                   color="#e3f2fd"
                 />
                 <TimeSegment
                   from=""
-                  to="עד שעתיים"
+                  to={t(`${cr}.card_extra_hours.segment_overtime_1`)}
                   label="125%"
                   flex={1}
                   color="#fff8e1"
                 />
                 <TimeSegment
                   from=""
-                  to="יתרת השעות"
+                  to={t(`${cr}.card_extra_hours.segment_overtime_2`)}
                   label="150%"
                   flex={1}
                   color="#fce4ec"
                 />
               </WorkDayTimeline>
-              
+
               <Box sx={{ mt: 2, p: 1.5, bgcolor: "action.hover", borderRadius: 1 }}>
                 <Typography variant="body2" fontWeight="medium" gutterBottom>
-                  לדוגמה:
+                  {t(`${cr}.card_extra_hours.example_label`)}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  • שעות 1-{standardHours}: שכר רגיל (100%)
+                  {t(`${cr}.card_extra_hours.example_regular`, { to: std })}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  • שעות {Number(standardHours) + 1}-{Number(standardHours) + 2}: תוספת של 25%
+                  {t(`${cr}.card_extra_hours.example_extra_125`, { from: std + 1, to: std + 2 })}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  • מעל {Number(standardHours) + 2} שעות: תוספת של 50%
+                  {t(`${cr}.card_extra_hours.example_extra_150`, { from: std + 2 })}
                 </Typography>
               </Box>
-              
+
               <TimelineNote variant="tip">
-                שעות התקן הנוכחיות: {standardHours} שעות ליום
+                {t(`${cr}.card_extra_hours.tip`, { standardHours })}
               </TimelineNote>
             </RuleAccordion>
           </RuleCard>
 
-          <RuleCard title="💰 תוספות שכר לפי שעות היום">
+          <RuleCard title={t(`${cr}.card_salary_additions.title`)}>
             <Typography
               variant="body2"
               color="text.secondary"
               sx={{ mb: 2 }}
             >
-              תוספות השכר משתנות בהתאם לשעות היום בהן מתבצעת העבודה. התוספות מסומנות כ־"+" ומתווספות לשכר הבסיסי.
+              {t(`${cr}.card_salary_additions.sub_title`)}
             </Typography>
 
-            <RuleAccordion title="יום חול">
+            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_weekday.title`)}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                ביום חול רגיל, תוספות השכר תלויות בשעה בה מתבצעת העבודה. בנוסף, ייתכן חישוב שעות נוספות (ש״נ).
+                {t(`${cr}.card_salary_additions.accordion_weekday.sub_title`)}
               </Typography>
-              
-              <WorkDayTimeline title="תחילת יום">
+
+              <WorkDayTimeline title={t(`${cr}.card_salary_additions.accordion_weekday.timeline_start_label`)}>
                 <TimeSegment
                   from="00:00"
                   to="06:00"
@@ -135,13 +139,13 @@ export const CalculationRulesPage = () => {
                 <TimeSegment
                   from="06:00"
                   to="14:00"
-                  label="שכר בסיס"
+                  label={t(`${cr}.card_salary_additions.accordion_weekday.base_salary`)}
                   flex={8}
                   color="#e3f2fd"
                 />
               </WorkDayTimeline>
-              
-              <WorkDayTimeline title="המשך יום">
+
+              <WorkDayTimeline title={t(`${cr}.card_salary_additions.accordion_weekday.timeline_continue_label`)}>
                 <TimeSegment
                   from="14:00"
                   to="22:00"
@@ -158,18 +162,18 @@ export const CalculationRulesPage = () => {
                   crossDay
                 />
               </WorkDayTimeline>
-              
+
               <TimelineNote>
-                <div>* משמרת החוצה את חצות מחושבת כיום עבודה אחד.</div>
-                <div>** המשמרת ממשיכה ליום הבא.</div>
+                <div>{t(`${cr}.card_salary_additions.accordion_weekday.note_midnight`)}</div>
+                <div>{t(`${cr}.card_salary_additions.accordion_weekday.note_next_day`)}</div>
               </TimelineNote>
             </RuleAccordion>
 
-            <RuleAccordion title="שישי וערבי חג">
+            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_friday.title`)}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                בימי שישי וערבי חג התוספות גבוהות יותר, במיוחד לקראת כניסת השבת/חג.
+                {t(`${cr}.card_salary_additions.accordion_friday.sub_title`)}
               </Typography>
-              
+
               <WorkDayTimeline>
                 <TimeSegment
                   from="14:00"
@@ -194,24 +198,24 @@ export const CalculationRulesPage = () => {
                   crossDay
                 />
               </WorkDayTimeline>
-              
+
               <TimelineNote>
-                <div>* משמרת החוצה את חצות מחושבת כיום עבודה אחד.</div>
-                <div>** המשמרת ממשיכה ליום הבא.</div>
+                <div>{t(`${cr}.card_salary_additions.accordion_friday.note_midnight`)}</div>
+                <div>{t(`${cr}.card_salary_additions.accordion_friday.note_next_day`)}</div>
               </TimelineNote>
-              
+
               <TimelineNote variant="tip">
-                <div>• שעון קיץ – החל מ־18:00</div>
-                <div>• שעון חורף – החל מ־17:00</div>
-                <div>• הזיהוי מתבצע אוטומטית לפי התאריך.</div>
+                <div>{t(`${cr}.card_salary_additions.accordion_friday.tip_summer`)}</div>
+                <div>{t(`${cr}.card_salary_additions.accordion_friday.tip_winter`)}</div>
+                <div>{t(`${cr}.card_salary_additions.accordion_friday.tip_auto`)}</div>
               </TimelineNote>
             </RuleAccordion>
 
-            <RuleAccordion title="שבת וחג">
+            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_shabbat.title`)}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                בשבת ובחג משולם שכר שבת (בסיס + תוספת גבוהה), ללא חישוב שעות נוספות (ש״נ).
+                {t(`${cr}.card_salary_additions.accordion_shabbat.sub_title`)}
               </Typography>
-              
+
               <WorkDayTimeline>
                 <TimeSegment
                   from="06:00"
@@ -229,55 +233,55 @@ export const CalculationRulesPage = () => {
                   crossDay
                 />
               </WorkDayTimeline>
-              
+
               <TimelineNote>
-                <div>* משמרת החוצה את חצות מחושבת כיום עבודה אחד.</div>
-                <div>** המשמרת ממשיכה ליום הבא.</div>
+                <div>{t(`${cr}.card_salary_additions.accordion_shabbat.note_midnight`)}</div>
+                <div>{t(`${cr}.card_salary_additions.accordion_shabbat.note_next_day`)}</div>
               </TimelineNote>
             </RuleAccordion>
           </RuleCard>
 
-          <RuleCard title="🍽️ אש״ל וכלכלה">
+          <RuleCard title={t(`${cr}.card_meal_allowance.title`)}>
             <Typography
               variant="body2"
               color="text.secondary"
               sx={{ mb: 2 }}
             >
-              תשלומים עבור ארוחות - אש״ל (אוכל, שתייה, לינה) וכלכלה - המשולמים בהתאם לשעות העבודה ותנאי הזכאות.
+              {t(`${cr}.card_meal_allowance.sub_title`)}
             </Typography>
-            
-            <RuleAccordion title="תנאי זכאות אש״ל">
+
+            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_eligibility.title`)}>
               <Typography variant="body2" color="text.secondary">
-                אש״ל מחושב רק בימים בהם קיימת לפחות משמרת אחת בתפקיד, ונספרות רק שעות שבוצעו בפועל בתפקיד.
+                {t(`${cr}.card_meal_allowance.accordion_eligibility.description`)}
               </Typography>
             </RuleAccordion>
 
-            <RuleAccordion title="מדרגות אש״ל">
+            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_tiers.title`)}>
               <Table size="small">
                 <TableHead sx={{ bgcolor: "action.hover" }}>
                   <TableRow>
-                    <TableCell>סך שעות בתפקיד</TableCell>
-                    <TableCell align="center">מדרגה</TableCell>
-                    <TableCell align="center">נקודות</TableCell>
+                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_tiers.col_hours`)}</TableCell>
+                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_tiers.col_tier`)}</TableCell>
+                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_tiers.col_points`)}</TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
                   <TableRow>
-                    <TableCell>מעל 4 שעות</TableCell>
-                    <TableCell align="center">א׳</TableCell>
+                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_tiers.tier_a_hours`)}</TableCell>
+                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_tiers.tier_a_label`)}</TableCell>
                     <TableCell align="center">1</TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell>מעל 8 שעות</TableCell>
-                    <TableCell align="center">ב׳</TableCell>
+                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_tiers.tier_b_hours`)}</TableCell>
+                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_tiers.tier_b_label`)}</TableCell>
                     <TableCell align="center">2</TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell>מעל 12 שעות</TableCell>
-                    <TableCell align="center">ג׳</TableCell>
+                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_tiers.tier_c_hours`)}</TableCell>
+                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_tiers.tier_c_label`)}</TableCell>
                     <TableCell align="center">3</TableCell>
                   </TableRow>
                 </TableBody>
@@ -290,35 +294,35 @@ export const CalculationRulesPage = () => {
                 underline="hover"
                 sx={{ display: "block", mt: 2 }}
               >
-                לצפייה במסמך הרשמי באתר gov.il
+                {t(`${cr}.card_meal_allowance.accordion_tiers.official_doc_link`)}
               </Link>
             </RuleAccordion>
 
-            <RuleAccordion title="תעריפי כלכלה">
+            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_per_diem.title`)}>
               <Table size="small">
                 <TableHead sx={{ bgcolor: "action.hover" }}>
                   <TableRow>
-                    <TableCell>תנאי זכאות</TableCell>
-                    <TableCell align="center">עד ‎31.08.2024</TableCell>
-                    <TableCell align="center">מ־‎01.09.2024</TableCell>
+                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_per_diem.col_condition`)}</TableCell>
+                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_per_diem.col_until_2024`)}</TableCell>
+                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_per_diem.col_from_2024`)}</TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
                   <TableRow>
-                    <TableCell>לפחות 2 שעות נוספות</TableCell>
+                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_per_diem.row_overtime_2h`)}</TableCell>
                     <TableCell align="center">₪19.70</TableCell>
                     <TableCell align="center">₪21.10</TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell>לפחות 2 שעות נוספות (ללא הסכם ארוחות)</TableCell>
+                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_per_diem.row_overtime_2h_no_meal`)}</TableCell>
                     <TableCell align="center">₪20.70</TableCell>
                     <TableCell align="center">₪23.80</TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell>משמרת שלישית (לפחות 4 שעות)</TableCell>
+                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_per_diem.row_night_shift`)}</TableCell>
                     <TableCell align="center">₪13.50</TableCell>
                     <TableCell align="center">₪14.50</TableCell>
                   </TableRow>
@@ -332,34 +336,31 @@ export const CalculationRulesPage = () => {
                 underline="hover"
                 sx={{ display: "block", mt: 2 }}
               >
-                מקור הנתונים – malam-payroll.com
+                {t(`${cr}.card_meal_allowance.accordion_per_diem.source_link`)}
               </Link>
             </RuleAccordion>
           </RuleCard>
 
           {/* Disclaimer */}
-          <RuleCard title="ℹ️ מידע חשוב">
-            <RuleAccordion title="מגבלות בחירה">
+          <RuleCard title={t(`${cr}.card_important_info.title`)}>
+            <RuleAccordion title={t(`${cr}.card_important_info.accordion_limitations.title`)}>
               <Typography>
-                המערכת מאפשרת סימולציות ובדיקות חישוב החל מנובמבר 2015.
+                {t(`${cr}.card_important_info.accordion_limitations.text_1`)}
               </Typography>
               <Typography>
-                לא ניתן לבצע חישוב עבור חודשים עתידיים, מאחר ושינויים עתידיים
-                בתנאים, בתקנות או בהסכמים עשויים להשפיע על אופן החישוב, ונדרש
-                זמן היערכות בהתאם.
+                {t(`${cr}.card_important_info.accordion_limitations.text_2`)}
               </Typography>
               <Typography>
-                בשנה הנוכחית ניתן לבחור חודשים עד החודש הנוכחי בלבד, מאותה סיבה.
+                {t(`${cr}.card_important_info.accordion_limitations.text_3`)}
               </Typography>
             </RuleAccordion>
 
-            <RuleAccordion title="הבהרות">
+            <RuleAccordion title={t(`${cr}.card_important_info.accordion_disclaimers.title`)}>
               <Typography>
-                החישוב במערכת הינו להערכה בלבד ואינו מחליף דו״ח רשמי ו/או תלוש
-                שכר רשמי.
+                {t(`${cr}.card_important_info.accordion_disclaimers.text_1`)}
               </Typography>
               <Typography>
-                ייתכנו הבדלים בהתאם להסכמים אישיים או נהלים פנימיים.
+                {t(`${cr}.card_important_info.accordion_disclaimers.text_2`)}
               </Typography>
             </RuleAccordion>
           </RuleCard>

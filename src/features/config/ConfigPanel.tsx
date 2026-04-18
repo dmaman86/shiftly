@@ -16,6 +16,7 @@ import { useDebounce, useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { ConfigInput } from "./ConfigInput";
 import { SYSTEM_START_YEAR } from "@/constants";
+import { useTranslation } from "react-i18next";
 
 type ConfigPanelProps = {
   domain: DomainContextType;
@@ -23,6 +24,9 @@ type ConfigPanelProps = {
 };
 
 export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
+  const { t } = useTranslation();
+  const { t: tWT } = useTranslation("work-table");
+  const monthNames = tWT("months", { returnObjects: true }) as string[];
   const {
     year,
     month,
@@ -60,13 +64,13 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
   const parsedYear = Number(inputsValues.yearInput);
   const yearError = !isNaN(parsedYear) && parsedYear < SYSTEM_START_YEAR;
   const yearHelperText = yearError
-    ? `השנה המינימלית הנתמכת היא ${SYSTEM_START_YEAR}`
+    ? t("config.year_min_error", { year: SYSTEM_START_YEAR })
     : "";
 
   const helperTextBaseRate = (): string => {
     if (baseRate === 0) {
-      if (mode === "daily") return "יש להזין שכר שעתי להצגת שכר יומי או חודשי";
-      else return "חישוב שכר חודשי מחייב הגדרת שכר שעתי";
+      if (mode === "daily") return t("config.base_rate_helper_daily");
+      else return t("config.base_rate_helper_monthly");
     }
     return "";
   };
@@ -120,7 +124,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
           <Settings color="primary" fontSize="small" />
           <Typography variant="h6" fontWeight="bold">
-            הגדרות חישוב
+            {t("config.title")}
           </Typography>
         </Box>
         <Divider sx={{ mb: 3 }} />
@@ -143,7 +147,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                 >
                   <CalendarToday fontSize="small" color="primary" />
                   <Typography variant="subtitle1" fontWeight="bold">
-                    תאריך
+                    {t("config.date_section")}
                   </Typography>
                 </Box>
 
@@ -152,7 +156,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                     <ConfigInput
                       name="year"
                       value={inputsValues.yearInput}
-                      label="שנה"
+                      label={t("config.year_label")}
                       error={yearError}
                       helperText={yearHelperText}
                       onChange={updateInput("yearInput")}
@@ -165,9 +169,9 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                       disabled={availableMonths.length === 0}
                       fullWidth
                     >
-                      <InputLabel>חודש</InputLabel>
+                      <InputLabel>{t("config.month_label")}</InputLabel>
                       <Select
-                        label="חודש"
+                        label={t("config.month_label")}
                         value={(month - 1).toString()}
                         onChange={(e) =>
                           updateMonth(Number(e.target.value) + 1)
@@ -175,7 +179,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                       >
                         {availableMonths.map((m) => (
                           <MenuItem key={m.value} value={m.value}>
-                            {m.label}
+                            {monthNames[m.value]}
                           </MenuItem>
                         ))}
                       </Select>
@@ -200,8 +204,10 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                   >
                     <Info fontSize="small" color="info" />
                     <Typography variant="caption" color="info.dark">
-                      החישוב מבוסס על {monthResolver.getMonthName(month - 1)}{" "}
-                      {year}
+                      {t("config.calculation_based_on", {
+                        monthName: monthNames[month - 1],
+                        year,
+                      })}
                     </Typography>
                   </Box>
                 )}
@@ -225,7 +231,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                 >
                   <Payments fontSize="small" color="primary" />
                   <Typography variant="subtitle1" fontWeight="bold">
-                    פרמטרי עבודה
+                    {t("config.work_params_section")}
                   </Typography>
                 </Box>
 
@@ -234,8 +240,10 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                     <ConfigInput
                       name="standardHours"
                       value={inputsValues.standardHoursInput}
-                      label="שעות תקן"
-                      helperText="ברירת מחדל: 6.67"
+                      label={t("config.standard_hours_label")}
+                      helperText={t("config.standard_hours_helper", {
+                        standardHours,
+                      })}
                       onChange={updateInput("standardHoursInput")}
                     />
                   </Box>
@@ -244,7 +252,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                     <ConfigInput
                       name="baseRate"
                       value={inputsValues.baseRateInput}
-                      label="שכר שעתי"
+                      label={t("config.base_rate_label")}
                       helperText={helperTextBaseRate()}
                       error={baseRate === 0}
                       onChange={updateInput("baseRateInput")}

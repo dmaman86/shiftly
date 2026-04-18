@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Box, Checkbox, Chip, TableCell, TableRow, IconButton } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import AddIcon from "@mui/icons-material/Add";
 
@@ -11,7 +12,7 @@ import {
   WorkDayInfo,
   WorkDayMap,
 } from "@/domain";
-import { WorkDayStatus } from "@/constants";
+import { WorkDayStatus, HolidayKey } from "@/constants";
 import {
   ExpandedDayRow,
   isSameDayPayMap,
@@ -39,6 +40,9 @@ const DayRowComponent = ({
 }: DayRowProps) => {
   const { dateService } = domain.services;
   const { dayInfoResolver } = domain.resolvers;
+  const { t, i18n } = useTranslation("work-table");
+  const tHoliday = (key: string) =>
+    t(`holidays.${key}` as `holidays.${HolidayKey}`);
   const { baseRate, standardHours, year, month, addDay, removeDay } =
     useGlobalState();
   const { isSpecialFullDay } = useWorkDays();
@@ -120,10 +124,18 @@ const DayRowComponent = ({
                 }}
               >
                 <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5 }}>
-                  {dayInfoResolver.formatHebrewWorkDay(workDay)}
-                  {workDay.meta.holidayName && (
+                  {(() => {
+                    const days = t("days", { returnObjects: true }) as string[];
+                    const weekday = new Date(workDay.meta.date).getDay();
+                    const dayNumber = new Date(workDay.meta.date).toLocaleDateString(
+                      i18n.language === "he" ? "he-IL" : "en-US",
+                      { day: "2-digit" },
+                    );
+                    return `${days[weekday]}-${dayNumber}`;
+                  })()}
+                  {workDay.meta.holidayKey && (
                     <Chip
-                      label={workDay.meta.holidayName}
+                      label={tHoliday(workDay.meta.holidayKey)}
                       size="small"
                       color={dayInfoResolver.isSpecialFullDay(workDay) ? "warning" : "info"}
                       sx={{ height: 16, fontSize: "0.6rem", "& .MuiChip-label": { px: 0.5 } }}

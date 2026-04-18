@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { DomainContextType } from "@/app";
 import { MonthPayMap } from "@/domain";
 
@@ -15,15 +16,14 @@ type MonthlySalarySummaryParams = {
 export const useMonthlySalarySummary = ({
   domain,
 }: MonthlySalarySummaryParams) => {
-  const monthResolver = domain.resolvers.monthResolver;
+  const { t } = useTranslation("work-table");
+  const monthNames = t("months", { returnObjects: true }) as string[];
 
   const [sections, setSections] = useState<SalarySectionConfig[]>([]);
 
   const getMonthLabel = useCallback(
-    (year: number, month: number) => {
-      return `${monthResolver.getMonthName(month - 1)} ${year}`;
-    },
-    [monthResolver],
+    (year: number, month: number) => `${monthNames[month - 1]} ${year}`,
+    [monthNames],
   );
 
   const updateSections = useCallback(
@@ -33,7 +33,6 @@ export const useMonthlySalarySummary = ({
       month: number,
       baseRate: number,
     ) => {
-      // Resolve rates for the selected month/year
       const rateDiem = domain.resolvers.perDiemResolver.resolve({
         year,
         month,
@@ -43,19 +42,13 @@ export const useMonthlySalarySummary = ({
         month,
       });
 
-      // Convert domain to ViewModel
       const payVM = monthToPayBreakdownVM(globalBreakdown);
 
-      setSections(() => {
-        return buildSectionsSalary({
-          payVM,
-          baseRate,
-          allowanceRate,
-          rateDiem,
-        });
-      });
+      setSections(() =>
+        buildSectionsSalary({ payVM, baseRate, allowanceRate, rateDiem, t }),
+      );
     },
-    [domain],
+    [domain, t],
   );
 
   const [totals, setTotals] = useState<Record<string, number>>({});

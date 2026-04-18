@@ -86,6 +86,29 @@ export const headersTable: TableHeader[] = [
   },
 ];
 
+// Maps hebcal API English names → normalized i18n keys (used in work-table.json holidays.*)
+export const holidayKeyMap = {
+  "Rosh Hashana": "rosh_hashana",
+  "Rosh Hashana II": "rosh_hashana_2",
+  "Yom Kippur": "yom_kippur",
+  "Sukkot I": "sukkot",
+  "Shmini Atzeret": "shmini_atzeret",
+  "Pesach I": "pesach",
+  "Pesach VI (CH'M)": "pesach_6",
+  "Pesach VII": "pesach_7",
+  "Yom HaAtzma'ut": "yom_haatzmaut",
+  "Shavuot I": "shavuot",
+  "Erev Rosh Hashana": "erev_rosh_hashana",
+  "Erev Yom Kippur": "erev_yom_kippur",
+  "Erev Sukkot": "erev_sukkot",
+  "Erev Pesach": "erev_pesach",
+  "Erev Shavuot": "erev_shavuot",
+  "Yom HaZikaron": "yom_hazikaron",
+  "Sukkot VII (Hoshana Rabba)": "hoshana_rabba",
+} as const;
+
+export type HolidayKey = (typeof holidayKeyMap)[keyof typeof holidayKeyMap];
+
 export const hebrewHolidayNames: Record<string, string> = {
   "Rosh Hashana": "ראש השנה",
   "Rosh Hashana II": "ראש השנה ב׳",
