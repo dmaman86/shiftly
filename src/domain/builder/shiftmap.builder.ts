@@ -1,5 +1,4 @@
 import {
-  PerDiemShiftCalculator,
   Shift,
   ShiftMapBuilder,
   ShiftPayMap,
@@ -13,7 +12,6 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
   constructor(
     private readonly segmentBuilder: ShiftSegmentBuilder,
     private readonly shiftsCalculators: PayCalculationBundle,
-    private readonly perDiemShiftCalculator: PerDiemShiftCalculator,
     private readonly shiftService: ShiftService,
   ) {}
 
@@ -46,10 +44,10 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
       meta,
     });
 
-    const perDiemShift = this.perDiemShiftCalculator.calculate({
-      shift,
+    const perDiemShift = {
+      hours: totalHours,
       isFieldDutyShift,
-    });
+    };
 
     return {
       regular,

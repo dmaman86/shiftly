@@ -22,7 +22,6 @@ export const buildShiftLayer = ({
   const shiftMapBuilder = new DefaultShiftMapBuilder(
     shiftSegmentBuilder,
     shiftsCalculators,
-    calculators.perDiem.shift,
     shiftService,
   );
 

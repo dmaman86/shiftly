@@ -1,7 +1,6 @@
 import {
   DefaultPerDiemDayCalculator,
   DefaultPerDiemMonthCalculator,
-  DefaultPerDiemShiftCalculator,
   ExtraCalculator,
   LargeMealAllowanceCalculator,
   SmallMealAllowanceCalculator,
@@ -25,7 +24,6 @@ export const buildCalculators = (): Calculators => {
   const largeMealAllowanceCalculator = new LargeMealAllowanceCalculator();
   const smallMealAllowanceCalculator = new SmallMealAllowanceCalculator();
 
-  const perdiemShiftCalculator = new DefaultPerDiemShiftCalculator();
   const perDiemDayCalculator = new DefaultPerDiemDayCalculator();
   const perDiemMonthCalculator = new DefaultPerDiemMonthCalculator();
 
@@ -47,7 +45,6 @@ export const buildCalculators = (): Calculators => {
       small: smallMealAllowanceCalculator,
     },
     perDiem: {
-      shift: perdiemShiftCalculator,
       day: perDiemDayCalculator,
       month: perDiemMonthCalculator,
     },
