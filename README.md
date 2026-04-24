@@ -27,6 +27,18 @@ The project focuses not only on correctness, but on **clear domain modeling, arc
 
 ---
 
+## Motivation
+
+**Shiftly** was born from a recurring problem observed in a real government office environment.
+
+Workers track their time in **shifts** - a continuous block of hours with a clear start and end. But Israeli payslips don't work that way. They operate in **weighted segments:** overtime brackets that reset daily, Shabbat and holiday bonuses that kick in at specific hours, night premiums that split mid-way through.
+
+The result is a predictable source of confusion: employees receive a payslip they can't verify, and have no practical way to cross-check whether the numbers are correct.
+
+**Shiftly** bridges that gap. It takes shift input the way workers actually think - and calculates compensation based on **Israeli labor law:** overtime brackets, Shabbat and holiday bonuses, and night premiums - making the calculation **transparent and verifiable** for the person receiving the paycheck.
+
+---
+
 ## Core Design Principles
 
 The core principle behind Shiftly is that **calculation logic remains stable over time**.
@@ -34,7 +46,7 @@ The core principle behind Shiftly is that **calculation logic remains stable ove
 Salary rules do not change per implementation, but per **period context**.
 Dates, daylight saving time, hourly rates, per-diem rules, and allowances are treated as inputs rather than hardcoded logic.
 
-This makes is possible to **recalculate past months accurately** using the same calculation pipeline, simply by changing the contextual parameters - without modifying domain code.
+This makes it possible to **recalculate past months accurately** using the same calculation pipeline, simply by changing the contextual parameters - without modifying domain code.
 
 ---
 

@@ -17,15 +17,14 @@ import {
 } from "./types";
 import { MealAllowanceDayInfo } from "./bundles";
 
-export interface RegularCalculator
-  extends Calculator<
-    {
-      totalHours: number;
-      standardHours: number;
-      meta: WorkDayMeta;
-    },
-    RegularBreakdown
-  > {
+export interface RegularCalculator extends Calculator<
+  {
+    totalHours: number;
+    standardHours: number;
+    meta: WorkDayMeta;
+  },
+  RegularBreakdown
+> {
   createEmpty(): RegularBreakdown;
 }
 
@@ -33,11 +32,6 @@ export type PerDiemShiftParams = {
   shift: Shift;
   isFieldDutyShift: boolean;
 };
-
-export interface PerDiemShiftCalculator
-  extends Calculator<PerDiemShiftParams, PerDiemShiftInfo> {
-  createEmpty(): PerDiemShiftInfo;
-}
 
 // export type MonthPayMapReducer = Reducer<MonthPayMap, WorkDayMap>;
 
@@ -96,14 +90,13 @@ export type MealAllowanceRateResolver = Resolver<
   MealAllowanceRates
 >;
 
-export interface MealAllowanceLogicResolver
-  extends Resolver<
-    {
-      day: MealAllowanceDayInfo;
-      rates: MealAllowanceRates;
-    },
-    MealAllowance
-  > {
+export interface MealAllowanceLogicResolver extends Resolver<
+  {
+    day: MealAllowanceDayInfo;
+    rates: MealAllowanceRates;
+  },
+  MealAllowance
+> {
   createEmpty(): MealAllowance;
 }
 

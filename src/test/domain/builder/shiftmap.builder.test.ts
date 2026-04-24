@@ -6,7 +6,6 @@ import { DateService } from "@/domain/services/date.service";
 import { ExtraCalculator } from "@/domain/calculator/extra/extra.calculator";
 import { SpecialCalculator } from "@/domain/calculator/special/special.calculator";
 import { RegularByShiftCalculator } from "@/domain/calculator/regular/regularByShift.calculator";
-import { DefaultPerDiemShiftCalculator } from "@/domain/calculator/perdiem/perdiem-shift.calculator";
 import { ShiftSegmentResolver } from "@/domain/resolve/shiftSegment.resolver";
 import { WorkDayType } from "@/constants/fields.constant";
 import type { Shift, WorkDayMeta, PayCalculationBundle } from "@/domain";
@@ -17,7 +16,6 @@ describe("DefaultShiftMapBuilder", () => {
   let shiftService: ShiftService;
   let dateService: DateService;
   let calculators: PayCalculationBundle;
-  let perDiemCalculator: DefaultPerDiemShiftCalculator;
   let regularCalculator: RegularByShiftCalculator;
   let extraCalculator: ExtraCalculator;
   let specialCalculator: SpecialCalculator;
@@ -38,7 +36,6 @@ describe("DefaultShiftMapBuilder", () => {
     });
     extraCalculator = new ExtraCalculator();
     specialCalculator = new SpecialCalculator();
-    perDiemCalculator = new DefaultPerDiemShiftCalculator();
 
     calculators = {
       regular: regularCalculator,
@@ -54,7 +51,6 @@ describe("DefaultShiftMapBuilder", () => {
     builder = new DefaultShiftMapBuilder(
       segmentBuilder,
       calculators,
-      perDiemCalculator,
       shiftService
     );
   });
@@ -341,7 +337,7 @@ describe("DefaultShiftMapBuilder", () => {
       expect(result.perDiemShift.hours).toBe(8);
     });
 
-    it("should calculate per diem hours for cross-day shift (note: calculator limitation)", () => {
+    it("should use total shift duration for cross-day field duty shift", () => {
       const shift = createShift(22, 0, 6, 0, false);
       const meta = createMeta();
 
@@ -353,12 +349,8 @@ describe("DefaultShiftMapBuilder", () => {
       });
 
       expect(result.perDiemShift.isFieldDutyShift).toBe(true);
-      // Note: The DefaultPerDiemShiftCalculator has a known limitation
-      // It calculates hours using minutes from midnight, which gives negative
-      // results for cross-day shifts. This is expected behavior of the calculator.
-      // The totalHours from ShiftService correctly shows 8 hours.
       expect(result.totalHours).toBe(8);
-      expect(typeof result.perDiemShift.hours).toBe("number");
+      expect(result.perDiemShift.hours).toBe(8);
     });
   });
 
@@ -588,21 +580,19 @@ describe("DefaultShiftMapBuilder", () => {
       expect(callArgs.meta).toBe(meta);
     });
 
-    it("should call perDiemCalculator.calculate with correct params", () => {
-      const calcSpy = vi.spyOn(perDiemCalculator, "calculate");
-      
+    it("should map field duty info directly from total shift duration", () => {
       const shift = createShift(8, 0, 16, 0);
       const meta = createMeta();
 
-      builder.build({
+      const result = builder.build({
         shift,
         meta,
         standardHours: 8.75,
         isFieldDutyShift: true,
       });
 
-      expect(calcSpy).toHaveBeenCalledWith({
-        shift,
+      expect(result.perDiemShift).toEqual({
+        hours: 8,
         isFieldDutyShift: true,
       });
     });

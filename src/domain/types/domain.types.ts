@@ -13,7 +13,6 @@ import {
   FixedSegmentFactory,
   LargeMealAllowanceCalculator,
   SmallMealAllowanceCalculator,
-  DefaultPerDiemShiftCalculator,
   DefaultPerDiemDayCalculator,
   DefaultPerDiemMonthCalculator,
   DefaultShiftMapBuilder,
@@ -55,7 +54,6 @@ export interface Calculators {
     small: SmallMealAllowanceCalculator;
   };
   perDiem: {
-    shift: DefaultPerDiemShiftCalculator;
     day: DefaultPerDiemDayCalculator;
     month: DefaultPerDiemMonthCalculator;
   };

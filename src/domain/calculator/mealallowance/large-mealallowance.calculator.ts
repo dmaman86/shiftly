@@ -1,6 +1,6 @@
-import type { 
+import type {
   MealAllowanceEntry,
-  MealAllowanceCalcParams 
+  MealAllowanceCalcParams,
 } from "@/domain/types/data-shapes";
 import type { Calculator } from "@/domain/types/core-behaviors";
 
@@ -15,8 +15,7 @@ export class LargeMealAllowanceCalculator implements Calculator<
     if (totalHours < 10) return { points: 0, amount: 0 };
 
     if (hasMorning && hasNight) {
-      if (!isFieldDutyDay) return { points: 1, amount: rate };
-      return { points: 0, amount: 0 };
+      return { points: 1, amount: rate };
     }
 
     const isDayShift = hasMorning && !hasNight;

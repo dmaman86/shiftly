@@ -108,7 +108,7 @@ describe("LargeMealAllowanceCalculator", () => {
       });
     });
 
-    it("should return 0 for field duty day with morning and night", () => {
+    it("should return 1 for field duty day with morning and night", () => {
       const day: MealAllowanceDayInfo = {
         totalHours: 12,
         hasMorning: true,
@@ -119,8 +119,8 @@ describe("LargeMealAllowanceCalculator", () => {
       const result = calculator.calculate({ day, rate: 100 });
 
       expect(result).toEqual({
-        points: 0,
-        amount: 0,
+        points: 1,
+        amount: 100,
       });
     });
 
@@ -172,7 +172,7 @@ describe("LargeMealAllowanceCalculator", () => {
       });
     });
 
-    it("should return 0 for 24 hours field duty", () => {
+    it("should return 1 for 24 hours field duty", () => {
       const day: MealAllowanceDayInfo = {
         totalHours: 24,
         hasMorning: true,
@@ -183,8 +183,8 @@ describe("LargeMealAllowanceCalculator", () => {
       const result = calculator.calculate({ day, rate: 100 });
 
       expect(result).toEqual({
-        points: 0,
-        amount: 0,
+        points: 1,
+        amount: 100,
       });
     });
   });
@@ -488,7 +488,7 @@ describe("LargeMealAllowanceCalculator", () => {
       expect(result).toEqual({ points: 1, amount: 100 });
     });
 
-    it("RULE 3: 10+ hours, morning AND night, field duty -> 0", () => {
+    it("RULE 3: 10+ hours, morning AND night, field duty -> 1 point", () => {
       const result = calculator.calculate({
         day: {
           totalHours: 10,
@@ -498,7 +498,7 @@ describe("LargeMealAllowanceCalculator", () => {
         },
         rate: 100,
       });
-      expect(result).toEqual({ points: 0, amount: 0 });
+      expect(result).toEqual({ points: 1, amount: 100 });
     });
 
     it("RULE 4: 10+ hours, night only (no morning) -> 1 point (regardless of field duty)", () => {
