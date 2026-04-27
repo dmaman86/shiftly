@@ -1,32 +1,27 @@
 import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 
 import { useDomain } from "@/hooks";
+import { LanguageLayout } from "./LanguageLayout";
 
-// Lazy load pages for code splitting
 const DailyPage = lazy(() =>
-  import("@/pages").then((module) => ({ default: module.DailyPage })),
+  import("@/pages").then((m) => ({ default: m.DailyPage })),
 );
 const MonthlySummaryPage = lazy(() =>
-  import("@/pages").then((module) => ({ default: module.MonthlySummaryPage })),
+  import("@/pages").then((m) => ({ default: m.MonthlySummaryPage })),
 );
 const CalculationRulesPage = lazy(() =>
-  import("@/pages").then((module) => ({
-    default: module.CalculationRulesPage,
-  })),
+  import("@/pages").then((m) => ({ default: m.CalculationRulesPage })),
 );
 
-// Loading fallback component
+const RedirectToDaily = () => {
+  const { lang } = useParams<{ lang: string }>();
+  return <Navigate to={`/${lang}/daily`} replace />;
+};
+
 const PageLoader = () => (
-  <Box
-    sx={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      minHeight: "60vh",
-    }}
-  >
+  <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
     <CircularProgress />
   </Box>
 );
@@ -37,14 +32,13 @@ export const AppRoutes = () => {
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path="/daily" element={<DailyPage domain={domain} />} />
-        <Route
-          path="/monthly"
-          element={<MonthlySummaryPage domain={domain} />}
-        />
-        <Route path="/calculation-rules" element={<CalculationRulesPage />} />
-        <Route path="/" element={<Navigate to="/daily" replace />} />
-        <Route path="*" element={<Navigate to="/daily" replace />} />
+        <Route path="/:lang" element={<LanguageLayout />}>
+          <Route path="daily" element={<DailyPage domain={domain} />} />
+          <Route path="monthly" element={<MonthlySummaryPage domain={domain} />} />
+          <Route path="calculation-rules" element={<CalculationRulesPage />} />
+          <Route path="*" element={<RedirectToDaily />} />
+        </Route>
+        <Route index element={<Navigate to="/he/daily" replace />} />
       </Routes>
     </Suspense>
   );
