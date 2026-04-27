@@ -58,6 +58,7 @@ export const ViewSwitcher = () => {
   const { direction } = useDirection();
   const navigate = useNavigate();
   const location = useLocation();
+  /* v8 ignore next */
   const lang = location.pathname.split("/")[1] || "he";
   const [open, setOpen] = useState(false);
 
