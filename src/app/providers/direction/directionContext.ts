@@ -9,5 +9,6 @@ export type DirectionContextType = {
 
 export const DirectionContext = createContext<DirectionContextType>({
   direction: "rtl",
+  /* v8 ignore next */
   setDirection: () => {},
 });
