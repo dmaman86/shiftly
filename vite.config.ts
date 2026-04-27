@@ -4,7 +4,20 @@ import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: "redirect-base-no-slash",
+      configureServer(server) {
+        server.middlewares.use((req, _res, next) => {
+          if (req.url === "/shiftly") {
+            req.url = "/shiftly/";
+          }
+          next();
+        });
+      },
+    },
+  ],
   base: "/shiftly/",
   resolve: {
     alias: {

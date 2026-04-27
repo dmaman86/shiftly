@@ -4,10 +4,10 @@ export type Direction = "rtl" | "ltr";
 
 export type DirectionContextType = {
   direction: Direction;
-  toggleDirection: () => void;
+  setDirection: (d: Direction) => void;
 };
 
 export const DirectionContext = createContext<DirectionContextType>({
   direction: "rtl",
-  toggleDirection: () => {},
+  setDirection: () => {},
 });
