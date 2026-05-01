@@ -2,7 +2,7 @@ import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 
-import { useDomain } from "@/hooks";
+import { useDomain, usePageTracking } from "@/hooks";
 import { LanguageLayout } from "./LanguageLayout";
 
 const DailyPage = lazy(() =>
@@ -21,20 +21,31 @@ const RedirectToDaily = () => {
 };
 
 const PageLoader = () => (
-  <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "60vh",
+    }}
+  >
     <CircularProgress />
   </Box>
 );
 
 export const AppRoutes = () => {
   const domain = useDomain();
+  usePageTracking();
 
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
         <Route path="/:lang" element={<LanguageLayout />}>
           <Route path="daily" element={<DailyPage domain={domain} />} />
-          <Route path="monthly" element={<MonthlySummaryPage domain={domain} />} />
+          <Route
+            path="monthly"
+            element={<MonthlySummaryPage domain={domain} />}
+          />
           <Route path="calculation-rules" element={<CalculationRulesPage />} />
           <Route path="*" element={<RedirectToDaily />} />
         </Route>

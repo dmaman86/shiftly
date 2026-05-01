@@ -57,7 +57,7 @@
       "title": "Privacy & Data Usage",
       "paragraphs": [
         "The system does not store personal information, salary data, work hours, or user identification details.",
-        "The system does not perform user identification and does not use cookies for advertising or cross-site tracking purposes.",
+        "The system does not perform user identification and does not use cookies for advertising or cross-site tracking purposes, except for anonymous analytics session cookies.",
         "Basic anonymous usage analytics may be used (such as page views and general interactions) to improve calculation clarity and user experience.",
         "Collected data is aggregated and does not allow identification of a person, pay slip, or specific workplace."
       ]
