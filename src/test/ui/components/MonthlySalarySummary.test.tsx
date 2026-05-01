@@ -50,10 +50,10 @@ describe("MonthlySalarySummary", () => {
     vi.clearAllMocks();
     vi.stubGlobal(
       "IntersectionObserver",
-      vi.fn((callback) => {
+      function (callback: (entries: { isIntersecting: boolean }[]) => void) {
         observerCallback = callback;
         return { observe: mockObserve, disconnect: mockDisconnect };
-      }),
+      },
     );
   });
 
