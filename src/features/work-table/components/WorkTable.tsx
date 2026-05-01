@@ -21,6 +21,7 @@ import { useTranslation } from "react-i18next";
 import { useGlobalState } from "@/hooks";
 import { groupByShabbat } from "@/utils";
 import { headersTable } from "@/constants";
+import { analyticsService } from "@/services";
 import {
   ExpandedDayRow,
   DayRow,
@@ -72,9 +73,14 @@ export const WorkTable = ({
                 <Switch
                   size="small"
                   checked={viewMode === "expanded"}
-                  onChange={(e) =>
-                    onViewModeChange(e.target.checked ? "expanded" : "compact")
-                  }
+                  onChange={(e) => {
+                    const mode = e.target.checked ? "expanded" : "compact";
+                    onViewModeChange(mode);
+                    analyticsService.track({
+                      name: "view_mode_toggled",
+                      params: { mode },
+                    });
+                  }}
                   color="primary"
                 />
               }

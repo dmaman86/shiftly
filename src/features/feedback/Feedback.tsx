@@ -4,7 +4,7 @@ import { Box, Button, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { useAppSnackbar, useGlobalState } from "@/hooks";
-import { SalaryFeedback, sendSalaryFeedback } from "@/services";
+import { SalaryFeedback, analyticsService } from "@/services";
 
 export const Feedback = () => {
   const { t } = useTranslation();
@@ -14,11 +14,15 @@ export const Feedback = () => {
 
   const handleClick = useCallback(
     (value: SalaryFeedback) => {
-      sendSalaryFeedback(value, {
-        month,
-        year,
-        calculationType: pathname.includes("daily") ? "daily" : "monthly",
-        hasAllowances: baseRate > 0,
+      analyticsService.track({
+        name: "salary_calculation_feedback",
+        params: {
+          feedback: value,
+          month,
+          year,
+          calculationType: pathname.includes("/daily") ? "daily" : "monthly",
+          hasAllowances: baseRate > 0,
+        },
       });
       snackbar.success(t("feedback.success"));
     },

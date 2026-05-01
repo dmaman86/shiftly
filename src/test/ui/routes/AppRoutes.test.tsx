@@ -10,6 +10,7 @@ vi.mock("@/i18n", () => ({
 vi.mock("@/hooks", () => ({
   useDomain: () => ({}),
   useDirection: () => ({ direction: "rtl", setDirection: vi.fn() }),
+  usePageTracking: () => {},
 }));
 
 vi.mock("@/app/routes/LanguageLayout", async () => {

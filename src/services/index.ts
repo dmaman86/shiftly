@@ -1,5 +1,3 @@
 export { hebcalService } from "./hebcal/hebcal.service";
-export {
-  sendSalaryFeedback,
-  type SalaryFeedback,
-} from "./analytics/salaryFeedback.service";
+export { analyticsService } from "./analytics";
+export type { SalaryFeedback } from "./analytics";

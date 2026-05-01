@@ -1,4 +1,5 @@
 import React from "react";
+import { analyticsService } from "@/services";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -30,13 +31,14 @@ export class ErrorBoundary extends React.Component<
     }
 
     // Send to Google Analytics
-    if (typeof window.gtag === "function") {
-      window.gtag("event", "exception", {
+    analyticsService.track({
+      name: "exception",
+      params: {
         description: error.message,
         fatal: true,
         error_type: error.name,
-      });
-    }
+      },
+    });
 
     // Call custom error handler
     this.props.onError?.(error, errorInfo);

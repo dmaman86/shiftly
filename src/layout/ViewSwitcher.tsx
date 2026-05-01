@@ -19,6 +19,7 @@ import {
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useDirection } from "@/hooks";
+import { analyticsService } from "@/services";
 
 const navButtonBaseStyle = {
   color: "text.secondary",
@@ -64,7 +65,13 @@ export const ViewSwitcher = () => {
 
   const toggleLang = () => {
     const nextLang = lang === "he" ? "en" : "he";
-    navigate(location.pathname.replace(`/${lang}/`, `/${nextLang}/`));
+    navigate(
+      location.pathname.replace(`/${lang}/`, `/${nextLang}/`) + location.search,
+    );
+    analyticsService.track({
+      name: "language_toggled",
+      params: { lang: nextLang },
+    });
   };
 
   return (
@@ -94,12 +101,16 @@ export const ViewSwitcher = () => {
         </Box>
 
         {/* Language toggle */}
-        <Tooltip title={direction === "rtl" ? "Switch to English" : "עבור לעברית"}>
+        <Tooltip
+          title={direction === "rtl" ? "Switch to English" : "עבור לעברית"}
+        >
           <IconButton
             onClick={toggleLang}
             size="small"
             sx={{ mx: 1 }}
-            aria-label={direction === "rtl" ? "Switch to English" : "עבור לעברית"}
+            aria-label={
+              direction === "rtl" ? "Switch to English" : "עבור לעברית"
+            }
           >
             <TranslateIcon fontSize="small" />
           </IconButton>

@@ -1,9 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Typography, Box, Stack, Card, CardContent } from "@mui/material";
 
 import { DomainContextType } from "@/app";
-
+import { analyticsService } from "@/services";
 import { formatValue } from "@/utils";
 import {
   SummaryHeader,
@@ -19,6 +19,7 @@ export const MonthlySalarySummary = ({
   domain: DomainContextType;
 }) => {
   const { t } = useTranslation("work-table");
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   const { globalBreakdown, baseRate, year, month } = useGlobalState();
 
@@ -34,8 +35,29 @@ export const MonthlySalarySummary = ({
     updateSections(globalBreakdown, year, month, baseRate);
   }, [globalBreakdown, year, month, baseRate, updateSections]);
 
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          analyticsService.track({
+            name: "salary_summary_viewed",
+            params: { month, year },
+          });
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [month, year]);
+
   return (
-    <Card sx={{ mb: 3 }}>
+    <Card ref={sectionRef} sx={{ mb: 3 }}>
       <CardContent>
         <SummaryHeader
           title={t("salary_summary.title")}
