@@ -1,5 +1,7 @@
 import type { useTranslation } from "react-i18next";
-import { AccessTime, AddCircleOutline, Restaurant } from "@mui/icons-material";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { PayBreakdownViewModel, MealAllowanceRates } from "@/domain";
 
 import {
@@ -33,7 +35,7 @@ export const buildSectionsSalary = ({
   return [
     createBaseSectionFactory("base", {
       title: t("salary_summary.base_hours_title"),
-      icon: <AccessTime color="primary" />,
+      icon: <AccessTimeIcon color="primary" />,
       summaryLabel: t("salary_summary.base_hours_summary"),
       color: "#1976d2",
       payVM,
@@ -43,7 +45,7 @@ export const buildSectionsSalary = ({
 
     createExtraSectionFactory("extra", {
       title: t("salary_summary.extras_title"),
-      icon: <AddCircleOutline sx={{ color: "#ed6c02" }} />,
+      icon: <AddCircleOutlineIcon sx={{ color: "#ed6c02" }} />,
       summaryLabel: t("salary_summary.extras_summary"),
       color: "#ed6c02",
       payVM,
@@ -53,7 +55,7 @@ export const buildSectionsSalary = ({
 
     createAllowanceSectionFactory("allowance", {
       title: t("salary_summary.allowance_title"),
-      icon: <Restaurant sx={{ color: "#2e7d32" }} />,
+      icon: <RestaurantIcon sx={{ color: "#2e7d32" }} />,
       summaryLabel: t("salary_summary.allowance_summary"),
       color: "#2e7d32",
       payVM,

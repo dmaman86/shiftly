@@ -29,16 +29,9 @@ export default defineConfig({
       output: {
         manualChunks: {
           // React core libraries
-          "vendor-react": [
-            "react",
-            "react-dom",
-            "react-router-dom",
-          ],
+          "vendor-react": ["react", "react-dom", "react-router-dom"],
           // Redux state management
-          "vendor-redux": [
-            "@reduxjs/toolkit",
-            "react-redux",
-          ],
+          "vendor-redux": ["@reduxjs/toolkit", "react-redux"],
           // Material-UI core components
           "vendor-mui-core": [
             "@mui/material",
@@ -47,27 +40,18 @@ export default defineConfig({
             "@emotion/cache",
           ],
           // Material-UI icons (separate because it's large)
-          "vendor-mui-icons": [
-            "@mui/icons-material",
-          ],
+          "vendor-mui-icons": ["@mui/icons-material"],
           // Material-UI date pickers
           "vendor-mui-pickers": [
             "@mui/x-date-pickers",
-            "@mui/x-date-pickers-pro",
             "@date-io/date-fns",
             "date-fns",
           ],
           // Other UI libraries
-          "vendor-ui": [
-            "notistack",
-            "stylis",
-            "stylis-plugin-rtl",
-          ],
+          "vendor-ui": ["notistack", "stylis", "stylis-plugin-rtl"],
           // Utilities
-          "vendor-utils": [
-            "axios",
-            "uuid",
-          ],
+          "vendor-utils": ["axios"],
+          "vendor-i18n": ["i18next", "react-i18next"],
         },
       },
     },
@@ -79,6 +63,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",
     css: true,
+    exclude: ["node_modules", ".claude/**"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "json-summary", "html"],

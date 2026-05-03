@@ -18,9 +18,13 @@ vi.mock("@/app/routes/LanguageLayout", async () => {
   return { LanguageLayout: () => <Outlet /> };
 });
 
-vi.mock("@/pages", () => ({
+vi.mock("@/pages/DailyPage", () => ({
   DailyPage: () => <div>Daily Page</div>,
+}));
+vi.mock("@/pages/MonthlySummaryPage", () => ({
   MonthlySummaryPage: () => <div>Monthly Page</div>,
+}));
+vi.mock("@/pages/CalculationRulesPage", () => ({
   CalculationRulesPage: () => <div>Calculation Rules Page</div>,
 }));
 

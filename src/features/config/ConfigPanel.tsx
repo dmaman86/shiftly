@@ -11,7 +11,11 @@ import {
   CardContent,
   Stack,
 } from "@mui/material";
-import { Info, Settings, CalendarToday, Payments } from "@mui/icons-material";
+import InfoIcon from "@mui/icons-material/Info";
+import SettingsIcon from "@mui/icons-material/Settings";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import PaymentsIcon from "@mui/icons-material/Payments";
+
 import { useDebounce, useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { ConfigInput } from "./ConfigInput";
@@ -122,7 +126,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
       <CardContent>
         {/* Header */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-          <Settings color="primary" fontSize="small" />
+          <SettingsIcon color="primary" fontSize="small" />
           <Typography variant="h6" fontWeight="bold">
             {t("config.title")}
           </Typography>
@@ -145,7 +149,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                 <Box
                   sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
                 >
-                  <CalendarToday fontSize="small" color="primary" />
+                  <CalendarTodayIcon fontSize="small" color="primary" />
                   <Typography variant="subtitle1" fontWeight="bold">
                     {t("config.date_section")}
                   </Typography>
@@ -202,7 +206,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                       gap: 1,
                     }}
                   >
-                    <Info fontSize="small" color="info" />
+                    <InfoIcon fontSize="small" color="info" />
                     <Typography variant="caption" color="info.dark">
                       {t("config.calculation_based_on", {
                         monthName: monthNames[month - 1],
@@ -229,7 +233,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                 <Box
                   sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
                 >
-                  <Payments fontSize="small" color="primary" />
+                  <PaymentsIcon fontSize="small" color="primary" />
                   <Typography variant="subtitle1" fontWeight="bold">
                     {t("config.work_params_section")}
                   </Typography>

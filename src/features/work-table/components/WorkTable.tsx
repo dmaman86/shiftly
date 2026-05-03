@@ -15,7 +15,7 @@ import {
   FormControlLabel,
   Tooltip,
 } from "@mui/material";
-import { CalendarMonth } from "@mui/icons-material";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useTranslation } from "react-i18next";
 
 import { useGlobalState } from "@/hooks";
@@ -60,7 +60,7 @@ export const WorkTable = ({
       <CardContent>
         {/* Header */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-          <CalendarMonth color="primary" />
+          <CalendarMonthIcon color="primary" />
           <Typography variant="h6" fontWeight="bold">
             {t("table.month_hours_title", {
               monthName: monthNames[month - 1],
