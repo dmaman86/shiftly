@@ -6,13 +6,17 @@ import { useDomain, usePageTracking } from "@/hooks";
 import { LanguageLayout } from "./LanguageLayout";
 
 const DailyPage = lazy(() =>
-  import("@/pages").then((m) => ({ default: m.DailyPage })),
+  import("@/pages/DailyPage").then((m) => ({ default: m.DailyPage })),
 );
 const MonthlySummaryPage = lazy(() =>
-  import("@/pages").then((m) => ({ default: m.MonthlySummaryPage })),
+  import("@/pages/MonthlySummaryPage").then((m) => ({
+    default: m.MonthlySummaryPage,
+  })),
 );
 const CalculationRulesPage = lazy(() =>
-  import("@/pages").then((m) => ({ default: m.CalculationRulesPage })),
+  import("@/pages/CalculationRulesPage").then((m) => ({
+    default: m.CalculationRulesPage,
+  })),
 );
 
 const RedirectToDaily = () => {

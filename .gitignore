@@ -26,6 +26,7 @@ dist-ssr
 # Mac
 .DS_Store
 coverage/
+.claude/
 
 # Internal documentation (not for repo)
 DELEGATION_*.md

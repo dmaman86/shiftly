@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { Box, Checkbox, Chip, TableCell, TableRow, IconButton } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  Chip,
+  TableCell,
+  TableRow,
+  IconButton,
+} from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import AddIcon from "@mui/icons-material/Add";
@@ -72,7 +78,7 @@ const DayRowComponent = ({
   );
 
   const handleAddShift = useCallback(() => {
-    const id = uuidv4();
+    const id = crypto.randomUUID();
     const time = dateService.createDateWithTime(workDay.meta.date);
     const start: TimeFieldType = { date: time };
     const end: TimeFieldType = { date: time };
@@ -123,11 +129,20 @@ const DayRowComponent = ({
                   verticalAlign: "middle",
                 }}
               >
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0.5 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 0.5,
+                  }}
+                >
                   {(() => {
                     const days = t("days", { returnObjects: true }) as string[];
                     const weekday = new Date(workDay.meta.date).getDay();
-                    const dayNumber = new Date(workDay.meta.date).toLocaleDateString(
+                    const dayNumber = new Date(
+                      workDay.meta.date,
+                    ).toLocaleDateString(
                       i18n.language === "he" ? "he-IL" : "en-US",
                       { day: "2-digit" },
                     );
@@ -137,8 +152,16 @@ const DayRowComponent = ({
                     <Chip
                       label={tHoliday(workDay.meta.holidayKey)}
                       size="small"
-                      color={dayInfoResolver.isSpecialFullDay(workDay) ? "warning" : "info"}
-                      sx={{ height: 16, fontSize: "0.6rem", "& .MuiChip-label": { px: 0.5 } }}
+                      color={
+                        dayInfoResolver.isSpecialFullDay(workDay)
+                          ? "warning"
+                          : "info"
+                      }
+                      sx={{
+                        height: 16,
+                        fontSize: "0.6rem",
+                        "& .MuiChip-label": { px: 0.5 },
+                      }}
                     />
                   )}
                 </Box>
