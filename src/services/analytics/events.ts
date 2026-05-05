@@ -34,4 +34,16 @@ export type AnalyticsEvent =
   | {
       name: "page_view";
       params: { page_path: string; lang: "he" | "en" };
+    }
+  | {
+      name: "shift_added";
+      params: { month: number; year: number };
+    }
+  | {
+      name: "shift_saved";
+      params: { month: number; year: number };
+    }
+  | {
+      name: "shift_deleted";
+      params: { month: number; year: number };
     };
