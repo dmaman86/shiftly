@@ -30,6 +30,7 @@ import { dayToPayBreakdownVM } from "@/adapters";
 import { CompactDayRow } from "./rows/CompactDayRow";
 import { dayToCompactPayBreakdownVM } from "../mappers/dayToCompactPayBreakdownVM";
 import { withErrorBoundary } from "@/hoc";
+import { analyticsService } from "@/services/analytics";
 
 type DayRowProps = {
   domain: DomainContextType;
@@ -83,7 +84,8 @@ const DayRowComponent = ({
     const start: TimeFieldType = { date: time };
     const end: TimeFieldType = { date: time };
     addShift({ id, start, end, isDuty: false });
-  }, [workDay.meta.date, addShift, dateService]);
+    analyticsService.track({ name: "shift_added", params: { month, year } });
+  }, [workDay.meta.date, addShift, dateService, month, year]);
 
   useEffect(() => {
     const dateKey = workDay.meta.date;

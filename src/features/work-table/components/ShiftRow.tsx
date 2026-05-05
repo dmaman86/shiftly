@@ -7,13 +7,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { Shift, ShiftPayMap, TimeFieldType, WorkDayMeta } from "@/domain";
-import { useAppSnackbar } from "@/hooks";
+import { useAppSnackbar, useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
 import {
   ShiftTimeInput,
   ShiftTimeReadonly,
   useShift,
 } from "@/features/work-table";
+import { analyticsService } from "@/services/analytics";
 
 type ShiftRowProps = {
   domain: DomainContextType;
@@ -44,6 +45,7 @@ export const ShiftRow = ({
       standardHours,
     });
 
+  const { month, year } = useGlobalState();
   const snackbar = useAppSnackbar();
   const { t } = useTranslation("work-table");
 
@@ -84,7 +86,8 @@ export const ShiftRow = ({
       return;
     }
     setSaved(true);
-  }, [hasError, snackbar, setSaved, t]);
+    analyticsService.track({ name: "shift_saved", params: { month, year } });
+  }, [hasError, snackbar, setSaved, t, month, year]);
 
   const handleEdit = () => {
     setSaved(false);
@@ -229,7 +232,10 @@ export const ShiftRow = ({
             <Tooltip title={t("shift_row.tooltip_delete")}>
               <IconButton
                 size="small"
-                onClick={() => onRemove(shift.id)}
+                onClick={() => {
+                  onRemove(shift.id);
+                  analyticsService.track({ name: "shift_deleted", params: { month, year } });
+                }}
                 sx={{ p: 0.5 }}
               >
                 <DeleteIcon fontSize="small" color="error" />
