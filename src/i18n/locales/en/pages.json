@@ -3,7 +3,12 @@
     "title": "Daily Salary Calculator"
   },
   "monthly_summary_page": {
-    "title": "Monthly Salary Calculator"
+    "title": "Monthly Salary Calculator",
+    "subtitle": "Calculate your monthly salary without entering shifts — enter your hourly rate and number of hours for a quick estimate.",
+    "nav_hint_daily": "Want to calculate salary by shifts? Go to",
+    "nav_link_daily": "Daily Calculator",
+    "nav_hint_rules": "Want to understand how the calculation works? Go to",
+    "nav_link_rules": "Calculation Rules"
   },
   "calculation_rules_page": {
     "title": "Calculation Rules",

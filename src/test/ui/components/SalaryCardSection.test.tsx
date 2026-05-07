@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { renderWithTheme, screen, waitFor } from "@/test/ui/utils";
+import { renderWithProviders, screen, waitFor } from "@/test/ui/utils";
 import userEvent from "@testing-library/user-event";
 import { SalaryCardSection } from "@/features/salary-summary/components/SalaryCardSection";
 import { SalarySectionConfig } from "@/features/salary-summary/vm";
@@ -48,34 +48,34 @@ describe("SalaryCardSection", () => {
 
   describe("Basic Rendering", () => {
     it("should render card with title", () => {
-      renderWithTheme(<SalaryCardSection section={mockSection} />);
+      renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       expect(screen.getByText("Regular Pay")).toBeInTheDocument();
     });
 
     it("should render edit button", () => {
-      renderWithTheme(<SalaryCardSection section={mockSection} />);
+      renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const editButton = screen.getByRole("button");
       expect(editButton).toBeInTheDocument();
     });
 
     it("should render table with rows", () => {
-      const { container } = renderWithTheme(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const table = container.querySelector("table");
       expect(table).toBeInTheDocument();
     });
 
     it("should render summary row with total", () => {
-      renderWithTheme(<SalaryCardSection section={mockSection} />);
+      renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       expect(screen.getByText("Total Regular")).toBeInTheDocument();
       expect(screen.getByText("₪9250.00")).toBeInTheDocument();
     });
 
     it("should render table headers", () => {
-      renderWithTheme(<SalaryCardSection section={mockSection} />);
+      renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       expect(screen.getByText("סוג")).toBeInTheDocument();
       expect(screen.getByText("כמות")).toBeInTheDocument();
@@ -84,7 +84,7 @@ describe("SalaryCardSection", () => {
     });
 
     it("should render all data rows", () => {
-      renderWithTheme(<SalaryCardSection section={mockSection} />);
+      renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       expect(screen.getByText("100%")).toBeInTheDocument();
       expect(screen.getByText("125%")).toBeInTheDocument();
@@ -94,7 +94,7 @@ describe("SalaryCardSection", () => {
   describe("Edit Mode", () => {
     it("should toggle edit mode on button click", async () => {
       const user = userEvent.setup();
-      renderWithTheme(<SalaryCardSection section={mockSection} />);
+      renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const editButton = screen.getByRole("button");
       
@@ -111,7 +111,7 @@ describe("SalaryCardSection", () => {
 
     it("should change icon from edit to done", async () => {
       const user = userEvent.setup();
-      const { container } = renderWithTheme(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const editButton = screen.getByRole("button");
       
@@ -129,7 +129,7 @@ describe("SalaryCardSection", () => {
 
     it("should allow editing quantities in edit mode", async () => {
       const user = userEvent.setup();
-      renderWithTheme(<SalaryCardSection section={mockSection} />);
+      renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const editButton = screen.getByRole("button");
       await user.click(editButton);
@@ -147,7 +147,7 @@ describe("SalaryCardSection", () => {
     it("should call onTotalChange when initialized", () => {
       const handleTotalChange = vi.fn();
 
-      renderWithTheme(
+      renderWithProviders(
         <SalaryCardSection section={mockSection} onTotalChange={handleTotalChange} />
       );
 
@@ -159,7 +159,7 @@ describe("SalaryCardSection", () => {
       const user = userEvent.setup();
       const handleTotalChange = vi.fn();
 
-      renderWithTheme(
+      renderWithProviders(
         <SalaryCardSection section={mockSection} onTotalChange={handleTotalChange} />
       );
 
@@ -189,7 +189,7 @@ describe("SalaryCardSection", () => {
 
   describe("Table Structure", () => {
     it("should render proper table structure", () => {
-      const { container } = renderWithTheme(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const table = container.querySelector("table");
       const thead = table?.querySelector("thead");
@@ -200,7 +200,7 @@ describe("SalaryCardSection", () => {
     });
 
     it("should render correct number of data rows", () => {
-      const { container } = renderWithTheme(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const tbody = container.querySelector("tbody");
       const rows = tbody?.querySelectorAll("tr");
@@ -210,7 +210,7 @@ describe("SalaryCardSection", () => {
     });
 
     it("should highlight summary row", () => {
-      const { container } = renderWithTheme(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const tbody = container.querySelector("tbody");
       const rows = tbody?.querySelectorAll("tr");
@@ -223,7 +223,7 @@ describe("SalaryCardSection", () => {
 
   describe("Icon Rendering", () => {
     it("should render section icon", () => {
-      const { container } = renderWithTheme(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const icon = container.querySelector('[data-testid="WorkIcon"]');
       expect(icon).toBeInTheDocument();
@@ -233,7 +233,7 @@ describe("SalaryCardSection", () => {
   describe("Tooltips", () => {
     it("should show edit tooltip on hover", async () => {
       const user = userEvent.setup();
-      renderWithTheme(<SalaryCardSection section={mockSection} />);
+      renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const editButton = screen.getByRole("button");
       await user.hover(editButton);
@@ -246,7 +246,7 @@ describe("SalaryCardSection", () => {
 
     it("should show done tooltip when in edit mode", async () => {
       const user = userEvent.setup();
-      renderWithTheme(<SalaryCardSection section={mockSection} />);
+      renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const editButton = screen.getByRole("button");
       
@@ -269,7 +269,7 @@ describe("SalaryCardSection", () => {
         buildRows: () => [],
       };
 
-      renderWithTheme(<SalaryCardSection section={emptySection} />);
+      renderWithProviders(<SalaryCardSection section={emptySection} />);
 
       expect(screen.getByText("Regular Pay")).toBeInTheDocument();
       // formatValue returns empty string for 0, so displays as "₪"
@@ -282,7 +282,7 @@ describe("SalaryCardSection", () => {
         buildRows: () => [{ label: "100%", quantity: 160, rate: 50, total: 8000 }],
       };
 
-      renderWithTheme(<SalaryCardSection section={singleRowSection} />);
+      renderWithProviders(<SalaryCardSection section={singleRowSection} />);
 
       expect(screen.getByText("100%")).toBeInTheDocument();
       // ₪8000.00 appears twice: in row and in summary
@@ -298,7 +298,7 @@ describe("SalaryCardSection", () => {
         ],
       };
 
-      renderWithTheme(<SalaryCardSection section={zeroSection} />);
+      renderWithProviders(<SalaryCardSection section={zeroSection} />);
 
       // Should show dash for zero total in row
       expect(screen.getByText("—")).toBeInTheDocument();
@@ -308,7 +308,7 @@ describe("SalaryCardSection", () => {
 
     it("should handle multiple edits", async () => {
       const user = userEvent.setup();
-      renderWithTheme(<SalaryCardSection section={mockSection} />);
+      renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const editButton = screen.getByRole("button");
       

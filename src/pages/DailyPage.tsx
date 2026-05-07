@@ -5,10 +5,12 @@ import {
   CardContent,
   CardHeader,
   CircularProgress,
+  Link as MuiLink,
   Stack,
   Typography,
   Alert,
 } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -27,7 +29,7 @@ import {
 import { ApiResponse, TableViewMode } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
-import { hebcalService } from "@/services";
+import { hebcalService, analyticsService } from "@/services";
 import { ErrorBoundary, FeatureErrorFallback } from "@/layout";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
@@ -64,6 +66,14 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
         setError(undefined);
         return;
       }
+      analyticsService.track({
+        name: "exception",
+        params: {
+          description: error ?? "hebcal fetch failed",
+          fatal: false,
+          error_type: "hebcal_api_error",
+        },
+      });
       setError(error);
     },
     [year, month],
@@ -85,6 +95,47 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
               <Typography variant="h5" fontWeight="bold">
                 {t("page_title")}
               </Typography>
+            }
+            subheader={
+              <Stack spacing={0.5} alignItems="center" sx={{ mt: 0.5 }}>
+                <Typography variant="body2" color="text.secondary">
+                  {t("page_subtitle")}
+                </Typography>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  flexWrap="wrap"
+                  justifyContent="center"
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t("nav_hint_monthly")}
+                  </Typography>
+                  <MuiLink
+                    component={RouterLink}
+                    to="../monthly"
+                    variant="body2"
+                  >
+                    {t("nav_link_monthly")}
+                  </MuiLink>
+                </Stack>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  flexWrap="wrap"
+                  justifyContent="center"
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t("nav_hint_rules")}
+                  </Typography>
+                  <MuiLink
+                    component={RouterLink}
+                    to="../calculation-rules"
+                    variant="body2"
+                  >
+                    {t("nav_link_rules")}
+                  </MuiLink>
+                </Stack>
+              </Stack>
             }
             sx={{
               textAlign: "center",

@@ -1,5 +1,10 @@
 {
   "page_title": "Daily Salary Calculator",
+  "page_subtitle": "Calculate your daily and monthly salary by entering shifts — includes overtime, evening/night bonuses, Shabbat, and allowances. Enter your hourly rate to get started.",
+  "nav_hint_monthly": "Want to calculate monthly salary without entering shifts? Go to",
+  "nav_link_monthly": "Monthly Summary",
+  "nav_hint_rules": "Want to understand how the calculation works? Go to",
+  "nav_link_rules": "Calculation Rules",
   "feature_name_work_table": "Work Days Table",
   "feature_name_salary_summary": "Monthly Salary Summary",
   "daily_salary_header": "Daily Salary",
