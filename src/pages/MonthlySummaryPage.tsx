@@ -3,9 +3,11 @@ import {
   Card,
   CardContent,
   CardHeader,
+  Link as MuiLink,
   Stack,
   Typography,
 } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { DomainContextType } from "@/app";
@@ -29,6 +31,47 @@ export const MonthlySummaryPage = ({
               <Typography variant="h5" fontWeight="bold">
                 {t("monthly_summary_page.title")}
               </Typography>
+            }
+            subheader={
+              <Stack spacing={0.5} alignItems="center" sx={{ mt: 0.5 }}>
+                <Typography variant="body2" color="text.secondary">
+                  {t("monthly_summary_page.subtitle")}
+                </Typography>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  flexWrap="wrap"
+                  justifyContent="center"
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t("monthly_summary_page.nav_hint_daily")}
+                  </Typography>
+                  <MuiLink
+                    component={RouterLink}
+                    to="../daily"
+                    variant="body2"
+                  >
+                    {t("monthly_summary_page.nav_link_daily")}
+                  </MuiLink>
+                </Stack>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  flexWrap="wrap"
+                  justifyContent="center"
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t("monthly_summary_page.nav_hint_rules")}
+                  </Typography>
+                  <MuiLink
+                    component={RouterLink}
+                    to="../calculation-rules"
+                    variant="body2"
+                  >
+                    {t("monthly_summary_page.nav_link_rules")}
+                  </MuiLink>
+                </Stack>
+              </Stack>
             }
             sx={{
               textAlign: "center",

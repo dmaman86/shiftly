@@ -18,6 +18,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 import { useTranslation } from "react-i18next";
 import { formatValue } from "@/utils";
+import { useGlobalState } from "@/hooks";
+import { analyticsService } from "@/services";
 import {
   SalaryRow,
   SalarySectionConfig,
@@ -34,6 +36,7 @@ export const SalaryCardSection = ({
   onTotalChange,
 }: SalaryCardSectionProps) => {
   const { t } = useTranslation("work-table");
+  const { month, year } = useGlobalState();
   const [editMode, setEditMode] = useState(false);
 
   const table = usePayTableVM({ section });
@@ -67,7 +70,15 @@ export const SalaryCardSection = ({
         action={
           <Tooltip title={editMode ? t("salary_summary.edit_done") : t("salary_summary.edit_quantities")}>
             <IconButton
-              onClick={() => setEditMode(!editMode)}
+              onClick={() => {
+                if (!editMode) {
+                  analyticsService.track({
+                    name: "salary_section_edit_started",
+                    params: { section_id: section.id, month, year },
+                  });
+                }
+                setEditMode(!editMode);
+              }}
               size="small"
               color={editMode ? "primary" : "default"}
             >

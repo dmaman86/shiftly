@@ -46,4 +46,8 @@ export type AnalyticsEvent =
   | {
       name: "shift_deleted";
       params: { month: number; year: number };
+    }
+  | {
+      name: "salary_section_edit_started";
+      params: { section_id: string; month: number; year: number };
     };
