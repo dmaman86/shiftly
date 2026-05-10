@@ -50,4 +50,12 @@ export type AnalyticsEvent =
   | {
       name: "salary_section_edit_started";
       params: { section_id: string; month: number; year: number };
+    }
+  | {
+      name: "info_dialog_opened";
+      params: { dialog: "about" | "disclaimer" | "privacy" };
+    }
+  | {
+      name: "footer_link_clicked";
+      params: { target: "github" | "email" };
     };
