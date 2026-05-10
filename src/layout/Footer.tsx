@@ -10,6 +10,7 @@ import {
   type InfoDialogKey,
 } from "@/features";
 import { useDirection } from "@/hooks";
+import { analyticsService } from "@/services";
 
 const DIALOG_I18N_KEYS: Record<
   InfoDialogKey,
@@ -114,7 +115,13 @@ export const Footer = () => {
                       underline="hover"
                       color="textSecondary"
                       variant="body2"
-                      onClick={() => setOpenDialog(key)}
+                      onClick={() => {
+                        analyticsService.track({
+                          name: "info_dialog_opened",
+                          params: { dialog: key },
+                        });
+                        setOpenDialog(key);
+                      }}
                       sx={{
                         display: "flex",
                         alignItems: "center",
@@ -142,9 +149,13 @@ export const Footer = () => {
             <Stack direction="row" spacing={2}>
               <Link
                 component="button"
-                onClick={() =>
-                  window.open("https://github.com/dmaman86/shiftly", "_blank")
-                }
+                onClick={() => {
+                  analyticsService.track({
+                    name: "footer_link_clicked",
+                    params: { target: "github" },
+                  });
+                  window.open("https://github.com/dmaman86/shiftly", "_blank");
+                }}
                 underline="hover"
                 variant="body2"
                 color="textSecondary"
@@ -155,9 +166,13 @@ export const Footer = () => {
               </Link>
               <Link
                 component="button"
-                onClick={() =>
-                  (window.location.href = "mailto:dmaman86@gmail.com")
-                }
+                onClick={() => {
+                  analyticsService.track({
+                    name: "footer_link_clicked",
+                    params: { target: "email" },
+                  });
+                  window.location.href = "mailto:dmaman86@gmail.com";
+                }}
                 underline="hover"
                 variant="body2"
                 color="textSecondary"
