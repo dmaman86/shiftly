@@ -16,28 +16,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Setup Node.js environment
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
+      # Step 2: Setup Bun environment
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
 
       # Step 3: Install dependencies
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       # Step 4: Run TypeScript type checking
       - name: Run type check
-        run: npm run typecheck
+        run: bun run typecheck
 
       # Step 5: Run ESLint to check code quality
       - name: Run linter
-        run: npm run lint
+        run: bun run lint
 
       # Step 6: Run tests with coverage
       - name: Run tests with coverage
-        run: npm run test:coverage
+        run: bun run test:coverage
 
       # Step 7: Upload coverage to Codecov (PR comments)
       - name: Upload coverage to Codecov
