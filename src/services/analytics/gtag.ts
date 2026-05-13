@@ -15,5 +15,5 @@ export const loadGtag = () => {
     window.dataLayer!.push(arguments as never);
   };
   window.gtag("js", new Date());
-  window.gtag("config", GA_ID, { anonymize_ip: true });
+  window.gtag("config", GA_ID);
 };
