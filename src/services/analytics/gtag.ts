@@ -10,8 +10,9 @@ export const loadGtag = () => {
   document.head.appendChild(script);
 
   window.dataLayer = window.dataLayer || [];
-  window.gtag = (...args) => {
-    window.dataLayer!.push(args as never);
+  window.gtag = function () {
+    // eslint-disable-next-line prefer-rest-params
+    window.dataLayer!.push(arguments as never);
   };
   window.gtag("js", new Date());
   window.gtag("config", GA_ID, { anonymize_ip: true });
