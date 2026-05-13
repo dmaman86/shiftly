@@ -62,5 +62,10 @@
         "Collected data is aggregated and does not allow identification of a person, pay slip, or specific workplace."
       ]
     }
+  },
+  "cookie_consent": {
+    "message": "We use anonymous analytics cookies (Google Analytics) to improve the experience. Do you allow it?",
+    "accept": "Accept",
+    "reject": "Decline"
   }
 }
