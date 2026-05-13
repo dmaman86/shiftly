@@ -1,4 +1,3 @@
-// src/layout/CookieBanner.tsx
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useDirection } from "@/hooks";
