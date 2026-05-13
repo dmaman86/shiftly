@@ -58,4 +58,8 @@ export type AnalyticsEvent =
   | {
       name: "footer_link_clicked";
       params: { target: "github" | "email" };
+    }
+  | {
+      name: "calculation_rules_accordion_expanded";
+      params: { section: string };
     };

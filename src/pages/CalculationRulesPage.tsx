@@ -21,6 +21,7 @@ import {
   TimelineNote,
 } from "@/features";
 import { useGlobalState } from "@/hooks";
+import { analyticsService } from "@/services";
 
 export const CalculationRulesPage = () => {
   const { standardHours } = useGlobalState();
@@ -28,6 +29,9 @@ export const CalculationRulesPage = () => {
 
   const std = Number(standardHours);
   const cr = "calculation_rules_page";
+
+  const track = (section: string) =>
+    analyticsService.track({ name: "calculation_rules_accordion_expanded", params: { section } });
 
   return (
     <Container maxWidth="md" sx={{ mt: 2 }}>
@@ -68,7 +72,7 @@ export const CalculationRulesPage = () => {
               {t(`${cr}.card_extra_hours.sub_title`)}
             </Typography>
 
-            <RuleAccordion title={t(`${cr}.card_extra_hours.accordion_title`)}>
+            <RuleAccordion title={t(`${cr}.card_extra_hours.accordion_title`)} onExpand={() => track("extra_hours")}>
               <WorkDayTimeline>
                 <TimeSegment
                   from=""
@@ -123,7 +127,7 @@ export const CalculationRulesPage = () => {
               {t(`${cr}.card_salary_additions.sub_title`)}
             </Typography>
 
-            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_weekday.title`)}>
+            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_weekday.title`)} onExpand={() => track("salary_additions_weekday")}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t(`${cr}.card_salary_additions.accordion_weekday.sub_title`)}
               </Typography>
@@ -169,7 +173,7 @@ export const CalculationRulesPage = () => {
               </TimelineNote>
             </RuleAccordion>
 
-            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_friday.title`)}>
+            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_friday.title`)} onExpand={() => track("salary_additions_friday")}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t(`${cr}.card_salary_additions.accordion_friday.sub_title`)}
               </Typography>
@@ -211,7 +215,7 @@ export const CalculationRulesPage = () => {
               </TimelineNote>
             </RuleAccordion>
 
-            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_shabbat.title`)}>
+            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_shabbat.title`)} onExpand={() => track("salary_additions_shabbat")}>
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t(`${cr}.card_salary_additions.accordion_shabbat.sub_title`)}
               </Typography>
@@ -250,13 +254,13 @@ export const CalculationRulesPage = () => {
               {t(`${cr}.card_meal_allowance.sub_title`)}
             </Typography>
 
-            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_eligibility.title`)}>
+            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_eligibility.title`)} onExpand={() => track("meal_allowance_eligibility")}>
               <Typography variant="body2" color="text.secondary">
                 {t(`${cr}.card_meal_allowance.accordion_eligibility.description`)}
               </Typography>
             </RuleAccordion>
 
-            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_tiers.title`)}>
+            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_tiers.title`)} onExpand={() => track("meal_allowance_tiers")}>
               <Table size="small">
                 <TableHead sx={{ bgcolor: "action.hover" }}>
                   <TableRow>
@@ -298,7 +302,7 @@ export const CalculationRulesPage = () => {
               </Link>
             </RuleAccordion>
 
-            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_per_diem.title`)}>
+            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_per_diem.title`)} onExpand={() => track("meal_allowance_per_diem")}>
               <Table size="small">
                 <TableHead sx={{ bgcolor: "action.hover" }}>
                   <TableRow>
@@ -343,7 +347,7 @@ export const CalculationRulesPage = () => {
 
           {/* Disclaimer */}
           <RuleCard title={t(`${cr}.card_important_info.title`)}>
-            <RuleAccordion title={t(`${cr}.card_important_info.accordion_limitations.title`)}>
+            <RuleAccordion title={t(`${cr}.card_important_info.accordion_limitations.title`)} onExpand={() => track("important_info_limitations")}>
               <Typography>
                 {t(`${cr}.card_important_info.accordion_limitations.text_1`)}
               </Typography>
@@ -355,7 +359,7 @@ export const CalculationRulesPage = () => {
               </Typography>
             </RuleAccordion>
 
-            <RuleAccordion title={t(`${cr}.card_important_info.accordion_disclaimers.title`)}>
+            <RuleAccordion title={t(`${cr}.card_important_info.accordion_disclaimers.title`)} onExpand={() => track("important_info_disclaimers")}>
               <Typography>
                 {t(`${cr}.card_important_info.accordion_disclaimers.text_1`)}
               </Typography>
