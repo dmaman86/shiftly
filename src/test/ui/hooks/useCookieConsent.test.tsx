@@ -2,10 +2,14 @@ import { describe, it, expect, vi, beforeAll, beforeEach, afterAll } from "vites
 import { renderHook, act } from "@testing-library/react";
 
 vi.mock("@/services", () => ({
-  loadGtag: vi.fn(),
+  gtagService: {
+    load: vi.fn(),
+    grantConsent: vi.fn(),
+    initConsentMode: vi.fn(),
+  },
 }));
 
-import { loadGtag } from "@/services";
+import { gtagService } from "@/services";
 import { useCookieConsent } from "@/hooks/useCookieConsent";
 
 describe("useCookieConsent", () => {
@@ -14,9 +18,15 @@ describe("useCookieConsent", () => {
   beforeAll(() => {
     vi.stubGlobal("localStorage", {
       getItem: (key: string) => store[key] ?? null,
-      setItem: (key: string, value: string) => { store[key] = value; },
-      removeItem: (key: string) => { delete store[key]; },
-      clear: () => { store = {}; },
+      setItem: (key: string, value: string) => {
+        store[key] = value;
+      },
+      removeItem: (key: string) => {
+        delete store[key];
+      },
+      clear: () => {
+        store = {};
+      },
     });
   });
 
@@ -60,26 +70,31 @@ describe("useCookieConsent", () => {
     expect(store["cookie_consent"]).toBe("false");
   });
 
-  it("calls loadGtag when user accepts", () => {
+  it("calls gtagService.load() on mount", () => {
+    renderHook(() => useCookieConsent());
+    expect(gtagService.load).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls gtagService.grantConsent() when user accepts", () => {
     const { result } = renderHook(() => useCookieConsent());
     act(() => result.current.accept());
-    expect(loadGtag).toHaveBeenCalledTimes(1);
+    expect(gtagService.grantConsent).toHaveBeenCalledTimes(1);
   });
 
-  it("does not call loadGtag when consent is null on mount", () => {
+  it("does not call gtagService.grantConsent() when consent is null on mount", () => {
     renderHook(() => useCookieConsent());
-    expect(loadGtag).not.toHaveBeenCalled();
+    expect(gtagService.grantConsent).not.toHaveBeenCalled();
   });
 
-  it("does not call loadGtag when user rejects", () => {
+  it("does not call gtagService.grantConsent() when user rejects", () => {
     const { result } = renderHook(() => useCookieConsent());
     act(() => result.current.reject());
-    expect(loadGtag).not.toHaveBeenCalled();
+    expect(gtagService.grantConsent).not.toHaveBeenCalled();
   });
 
-  it("calls loadGtag on mount when previously accepted", () => {
+  it("calls gtagService.grantConsent() on mount when previously accepted", () => {
     store["cookie_consent"] = "true";
     renderHook(() => useCookieConsent());
-    expect(loadGtag).toHaveBeenCalledTimes(1);
+    expect(gtagService.grantConsent).toHaveBeenCalledTimes(1);
   });
 });

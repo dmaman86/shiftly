@@ -1,3 +1,3 @@
 export { analyticsService } from "./analytics.service";
 export type { AnalyticsEvent, SalaryFeedback } from "./events";
-export { loadGtag } from "./gtag";
+export { gtagService } from "./gtag";

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { loadGtag } from "@/services";
+import { gtagService } from "@/services";
 
 const CONSENT_KEY = "cookie_consent";
 
@@ -10,7 +10,13 @@ export const useCookieConsent = () => {
   });
 
   useEffect(() => {
-    if (consent) loadGtag();
+    gtagService.load();
+  }, []);
+
+  useEffect(() => {
+    if (consent === true) {
+      gtagService.grantConsent();
+    }
   }, [consent]);
 
   const accept = () => {
