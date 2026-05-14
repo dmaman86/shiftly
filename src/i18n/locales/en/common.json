@@ -58,14 +58,14 @@
       "paragraphs": [
         "The system does not store personal information, salary data, work hours, or user identification details.",
         "The system does not perform user identification and does not use cookies for advertising or cross-site tracking purposes.",
-        "Anonymous usage analytics (Google Analytics) are only activated if you explicitly accept the cookie consent banner. You may decline at any time — no analytics data will be collected.",
+        "Google Analytics is always loaded but operates without cookies in a privacy-preserving mode (Consent Mode v2). Full usage analytics are only enabled if you explicitly accept. You may decline at any time — no cookies or identifiable data will be collected.",
         "When analytics are enabled, only basic interactions are tracked (such as page views and general interactions) to improve calculation clarity and user experience. Google Analytics 4 automatically anonymizes IP addresses.",
         "Collected data is aggregated and does not allow identification of a person, pay slip, or specific workplace."
       ]
     }
   },
   "cookie_consent": {
-    "message": "We use anonymous analytics cookies (Google Analytics) to improve the experience. Do you allow it?",
+    "message": "We use Google Analytics to improve the experience. Without your consent, it runs in privacy-preserving mode — no cookies, no identifiers. Accept to enable full analytics.",
     "accept": "Accept",
     "reject": "Decline"
   }
