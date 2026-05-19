@@ -8,4 +8,3 @@ export { useAppSnackbar } from "./useAppSnackbar";
 export { useDebounce } from "./useDebounce";
 export { useDeviceType } from "./useDeviceType";
 export { usePageTracking } from "./usePageTracking";
-export { useCookieConsent } from "./useCookieConsent";
