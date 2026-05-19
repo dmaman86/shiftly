@@ -5,7 +5,7 @@ import { gtagService } from "@/services";
 import "@/i18n";
 import { App } from "./app";
 
-gtagService.initConsentMode();
+gtagService.load();
 
 const divRoot = document.querySelector("#root");
 const root = createRoot(divRoot!);
