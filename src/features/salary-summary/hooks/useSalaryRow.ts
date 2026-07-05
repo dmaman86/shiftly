@@ -1,56 +1,39 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { PayRowVM } from "../vm";
-import { useDebounce } from "@/hooks";
 
 type UseSalaryRowParams = {
   initialRow: PayRowVM;
   enabled: boolean;
+  delay?: number;
 };
 
-export const useSalaryRow = ({ initialRow, enabled }: UseSalaryRowParams) => {
+export const useSalaryRow = ({ initialRow, enabled, delay = 500 }: UseSalaryRowParams) => {
   const [row, setRow] = useState<PayRowVM>(initialRow);
+  const [inputValue, setInputValue] = useState<string>(initialRow.quantity.toString());
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [inputValue, setInputValue] = useState<string>(
-    initialRow.quantity.toString(),
+  const onInputChange = useCallback(
+    (raw: string) => {
+      setInputValue(raw);
+      if (!enabled) return;
+
+      if (timerRef.current !== null) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        const parsed = parseFloat(raw);
+        if (!isNaN(parsed) && parsed >= 0) {
+          setRow((prev) => {
+            if (parsed === prev.quantity) return prev;
+            return { ...prev, quantity: parsed, total: parsed * prev.rate };
+          });
+        }
+      }, delay);
+    },
+    [enabled, delay],
   );
 
-  const debouncedValue = useDebounce({ value: inputValue });
-
-  useEffect(() => {
-    setInputValue(initialRow.quantity.toString());
-    setRow(initialRow);
-  }, [initialRow]);
-
-  useEffect(() => {
-    if (!enabled) return;
-    const parsed = parseFloat(debouncedValue);
-    if (!isNaN(parsed) && parsed >= 0 && parsed !== row.quantity) {
-      setRow((prev) => {
-        const updated: PayRowVM = {
-          ...prev,
-          quantity: parsed,
-          total: parsed * prev.rate,
-        };
-        return updated;
-      });
-    }
-  }, [debouncedValue, enabled, row.quantity]);
-
   const updateRate = useCallback((newRate: number) => {
-    setRow((prev) => {
-      const updated: PayRowVM = {
-        ...prev,
-        rate: newRate,
-        total: prev.quantity * newRate,
-      };
-      return updated;
-    });
+    setRow((prev) => ({ ...prev, rate: newRate, total: prev.quantity * newRate }));
   }, []);
 
-  return {
-    row,
-    inputValue,
-    onInputChange: setInputValue,
-    updateRate,
-  };
+  return { row, inputValue, onInputChange, updateRate };
 };

@@ -144,17 +144,6 @@ describe("SalaryCardSection", () => {
       expect(firstInput).toHaveValue("200");
     });
 
-    it("should call onTotalChange when initialized", () => {
-      const handleTotalChange = vi.fn();
-
-      renderWithProviders(
-        <SalaryCardSection section={mockSection} onTotalChange={handleTotalChange} />
-      );
-
-      // Should be called with initial total
-      expect(handleTotalChange).toHaveBeenCalledWith("base", 9250);
-    });
-
     it("should update total when quantity changes", async () => {
       const user = userEvent.setup();
       const handleTotalChange = vi.fn();

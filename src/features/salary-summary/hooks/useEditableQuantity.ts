@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-
-import { useDebounce } from "@/hooks";
+import { useCallback, useRef, useState } from "react";
 
 type UseEditableQuantityParams = {
   value: number;
@@ -16,24 +14,23 @@ export const useEditableQuantity = ({
   onCommit,
 }: UseEditableQuantityParams) => {
   const [inputValue, setInputValue] = useState(value.toString());
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const debouncedValue = useDebounce({ value: inputValue, delay });
+  const onInputChange = useCallback(
+    (raw: string) => {
+      setInputValue(raw);
+      if (!enabled) return;
 
-  useEffect(() => {
-    setInputValue(value.toString());
-  }, [value]);
+      if (timerRef.current !== null) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => {
+        const parsed = parseFloat(raw);
+        if (!isNaN(parsed) && parsed >= 0 && parsed !== value) {
+          onCommit(parsed);
+        }
+      }, delay);
+    },
+    [enabled, delay, value, onCommit],
+  );
 
-  useEffect(() => {
-    if (!enabled) return;
-
-    const parsed = parseFloat(debouncedValue);
-    if (!isNaN(parsed) && parsed >= 0 && parsed !== value) {
-      onCommit(parsed);
-    }
-  }, [debouncedValue, enabled, onCommit, value]);
-
-  return {
-    inputValue,
-    onInputChange: setInputValue,
-  };
+  return { inputValue, onInputChange };
 };

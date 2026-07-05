@@ -68,7 +68,7 @@ export const WorkTableHeader = ({
 
           return (
             <TableCell
-              key={`group-${i}`}
+              key={`${header.label}-${header.viewMode}`}
               colSpan={span}
               rowSpan={header.children?.length ? 1 : (header.rowSpan ?? 2)}
               sx={{

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Card,
@@ -79,10 +79,6 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
     [year, month],
     cancelEndPoint,
   );
-
-  useEffect(() => {
-    setViewMode(isMobile ? "compact" : "expanded");
-  }, [isMobile]);
 
   const hasData = workDays.length > 0;
 

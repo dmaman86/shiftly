@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AxiosResponse } from "axios";
 import { ApiResponse } from "@/domain";
 import { resolveErrorMessage } from "@/utils";
@@ -10,42 +10,39 @@ interface AxiosCall {
 
 export const useFetch = () => {
   const [loading, setLoading] = useState(false);
-  let controller: AbortController;
+  const controllerRef = useRef<AbortController | undefined>(undefined);
 
-  const callEndPoint = async <T>(
-    axiosCall: AxiosCall,
-    adapter?: (raw: { date: string; title: string }[]) => T,
-  ): Promise<ApiResponse<T>> => {
-    if (axiosCall.controller) controller = axiosCall.controller;
+  const callEndPoint = useCallback(
+    async <T>(
+      axiosCall: AxiosCall,
+      adapter?: (raw: { date: string; title: string }[]) => T,
+    ): Promise<ApiResponse<T>> => {
+      if (axiosCall.controller) controllerRef.current = axiosCall.controller;
 
-    setLoading(true);
+      setLoading(true);
 
-    try {
-      const result = await axiosCall.call();
-      const rawItems: { date: string; title: string }[] = result.data.items;
+      try {
+        const result = await axiosCall.call();
+        const rawItems: { date: string; title: string }[] = result.data.items;
+        const data = adapter ? adapter(rawItems) : (rawItems as T);
+        return { data };
+      } catch (err: unknown) {
+        return { data: undefined as T, error: resolveErrorMessage(err) };
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
-      const data = adapter ? adapter(rawItems) : (rawItems as T);
-      return { data };
-    } catch (err: unknown) {
-      return {
-        data: undefined as T,
-        error: resolveErrorMessage(err),
-      };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const cancelEndPoint = () => {
+  const cancelEndPoint = useCallback(() => {
     setLoading(false);
-    if (controller) controller.abort();
-  };
+    controllerRef.current?.abort();
+  }, []);
 
   useEffect(() => {
-    return () => {
-      cancelEndPoint();
-    };
-  }, []);
+    return () => cancelEndPoint();
+  }, [cancelEndPoint]);
 
   return { loading, callEndPoint, cancelEndPoint };
 };

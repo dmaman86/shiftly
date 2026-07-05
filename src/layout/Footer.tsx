@@ -39,6 +39,8 @@ const DIALOG_I18N_KEYS: Record<
   },
 };
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export const Footer = () => {
   const { t } = useTranslation();
   const { direction } = useDirection();
@@ -78,7 +80,7 @@ export const Footer = () => {
             }}
           >
             <Typography variant="body2" color="textSecondary">
-              {t("footer.copyright", { year: new Date().getFullYear() })}
+              {t("footer.copyright", { year: CURRENT_YEAR })}
             </Typography>
           </Box>
 
