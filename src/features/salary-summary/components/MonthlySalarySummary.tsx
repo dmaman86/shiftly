@@ -10,7 +10,6 @@ import {
   SalaryCardSection,
   useMonthlySalarySummary,
 } from "@/features/salary-summary";
-
 import { useGlobalState } from "@/hooks";
 
 export const MonthlySalarySummary = ({
@@ -23,17 +22,13 @@ export const MonthlySalarySummary = ({
 
   const { globalBreakdown, baseRate, year, month } = useGlobalState();
 
-  const {
-    sections,
-    updateSections,
-    getMonthLabel,
-    handleTotalChange,
-    monthlyTotal,
-  } = useMonthlySalarySummary({ domain });
-
-  useEffect(() => {
-    updateSections(globalBreakdown, year, month, baseRate);
-  }, [globalBreakdown, year, month, baseRate, updateSections]);
+  const { sections, getMonthLabel, monthlyTotal } = useMonthlySalarySummary({
+    domain,
+    globalBreakdown,
+    year,
+    month,
+    baseRate,
+  });
 
   useEffect(() => {
     const el = sectionRef.current;
@@ -73,9 +68,8 @@ export const MonthlySalarySummary = ({
           <Box sx={{ flex: 1, width: "100%" }}>
             {sections.map((section) => (
               <SalaryCardSection
-                key={section.id}
+                key={`${section.id}-${year}-${month}`}
                 section={section}
-                onTotalChange={handleTotalChange}
               />
             ))}
 

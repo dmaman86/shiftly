@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Card,
   CardHeader,
@@ -41,18 +41,18 @@ export const SalaryCardSection = ({
 
   const table = usePayTableVM({ section });
 
-  useEffect(() => {
-    onTotalChange?.(section.id, table.total);
-  }, [table.total, onTotalChange, section.id]);
-
   const handleQuantityChange = (index: number, newQuantity: number) => {
     const row = table.rows[index];
+    const updatedRow = { ...row, quantity: newQuantity, total: newQuantity * row.rate };
+    table.updateRow(index, updatedRow);
 
-    table.updateRow(index, {
-      ...row,
-      quantity: newQuantity,
-      total: newQuantity * row.rate,
-    });
+    if (onTotalChange) {
+      const newTotal = table.rows.reduce(
+        (sum, r, i) => sum + (i === index ? updatedRow.total : r.total),
+        0,
+      );
+      onTotalChange(section.id, newTotal);
+    }
   };
 
   return (
@@ -116,7 +116,7 @@ export const SalaryCardSection = ({
           <TableBody>
             {table.rows.map((row, index) => (
               <SalaryRow
-                key={row.label}
+                key={`${row.label}-${month}-${year}`}
                 row={row}
                 editMode={editMode}
                 onQuantityChange={(val) => handleQuantityChange(index, val)}

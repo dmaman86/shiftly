@@ -128,8 +128,8 @@ export const WorkTable = ({
                 viewMode={viewMode}
               />
 
-              {groupByWeeks.map((group, index) => (
-                <TableBody key={index}>
+              {groupByWeeks.map((group) => (
+                <TableBody key={group[0].meta.date}>
                   {group.map((day, dayIndex) => {
                     const isLastInWeek = dayIndex === group.length - 1;
                     return (

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DomainContextType } from "@/app";
 import { MonthPayMap } from "@/domain";
@@ -6,67 +6,55 @@ import { MonthPayMap } from "@/domain";
 import { monthToPayBreakdownVM } from "@/adapters";
 import {
   buildSectionsSalary,
-  SalarySectionConfig,
+  calculateTotal,
 } from "@/features/salary-summary";
 
 type MonthlySalarySummaryParams = {
   domain: DomainContextType;
+  globalBreakdown: MonthPayMap;
+  year: number;
+  month: number;
+  baseRate: number;
 };
 
 export const useMonthlySalarySummary = ({
   domain,
+  globalBreakdown,
+  year,
+  month,
+  baseRate,
 }: MonthlySalarySummaryParams) => {
   const { t } = useTranslation("work-table");
   const monthNames = t("months", { returnObjects: true }) as string[];
 
-  const [sections, setSections] = useState<SalarySectionConfig[]>([]);
-
   const getMonthLabel = useCallback(
-    (year: number, month: number) => `${monthNames[month - 1]} ${year}`,
+    (y: number, m: number) => `${monthNames[m - 1]} ${y}`,
     [monthNames],
   );
 
-  const updateSections = useCallback(
-    (
-      globalBreakdown: MonthPayMap,
-      year: number,
-      month: number,
-      baseRate: number,
-    ) => {
-      const rateDiem = domain.resolvers.perDiemResolver.resolve({
-        year,
-        month,
-      });
-      const allowanceRate = domain.resolvers.mealAllowanceRateResolver.resolve({
-        year,
-        month,
-      });
+  const sections = useMemo(() => {
+    const rateDiem = domain.resolvers.perDiemResolver.resolve({ year, month });
+    const allowanceRate = domain.resolvers.mealAllowanceRateResolver.resolve({
+      year,
+      month,
+    });
+    const payVM = monthToPayBreakdownVM(globalBreakdown);
+    return buildSectionsSalary({ payVM, baseRate, allowanceRate, rateDiem, t });
+  }, [domain, globalBreakdown, year, month, baseRate, t]);
 
-      const payVM = monthToPayBreakdownVM(globalBreakdown);
+  const monthlyTotal = useMemo(() => {
+    return sections.reduce((sum, section) => {
+      const rows =
+        section.type === "allowance"
+          ? section.buildRows(
+              section.payVM,
+              section.allowanceRate,
+              section.rateDiem,
+            )
+          : section.buildRows(section.payVM, section.baseRate);
+      return sum + calculateTotal(rows);
+    }, 0);
+  }, [sections]);
 
-      setSections(() =>
-        buildSectionsSalary({ payVM, baseRate, allowanceRate, rateDiem, t }),
-      );
-    },
-    [domain, t],
-  );
-
-  const [totals, setTotals] = useState<Record<string, number>>({});
-
-  const handleTotalChange = useCallback((id: string, total: number) => {
-    setTotals((prev) => ({ ...prev, [id]: total }));
-  }, []);
-
-  const monthlyTotal = useMemo(
-    () => Object.values(totals).reduce((sum, val) => sum + val, 0),
-    [totals],
-  );
-
-  return {
-    sections,
-    updateSections,
-    getMonthLabel,
-    handleTotalChange,
-    monthlyTotal,
-  };
+  return { sections, getMonthLabel, monthlyTotal };
 };

@@ -26,8 +26,8 @@ export const ExpandedDayRow = ({
 
   return (
     <>
-      {[...Array(emptyStartCells)].map((_, i) => (
-        <TableCell key={`empty-${i}`} align="center" rowSpan={rowSpan} />
+      {Array.from({ length: emptyStartCells }, (_, i) => i).map((n) => (
+        <TableCell key={`empty-${n}`} align="center" rowSpan={rowSpan} />
       ))}
       <TableCell
         rowSpan={rowSpan}

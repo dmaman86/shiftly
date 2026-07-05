@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { Checkbox, IconButton, TableCell, Tooltip } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import SaveIcon from "@mui/icons-material/Save";
@@ -37,13 +37,8 @@ export const ShiftRow = ({
   onRemove,
 }: ShiftRowProps) => {
   const { dateService, shiftService } = domain.services;
-  const { localShift, update, toggleDuty, saved, setSaved, shiftEntry } =
-    useShift({
-      domain,
-      shift,
-      meta,
-      standardHours,
-    });
+  const { localShift, update, toggleDuty, saved, setSaved } =
+    useShift({ shift });
 
   const { month, year } = useGlobalState();
   const snackbar = useAppSnackbar();
@@ -85,17 +80,20 @@ export const ShiftRow = ({
       snackbar.warning(t("shift_row.cross_midnight_warning"));
       return;
     }
+    const payMap = domain.payMap.shiftMapBuilder.build({
+      shift: localShift,
+      meta,
+      standardHours,
+      isFieldDutyShift: localShift.isDuty,
+    });
     setSaved(true);
+    onShiftUpdate(localShift, payMap);
     analyticsService.track({ name: "shift_saved", params: { month, year } });
-  }, [hasError, snackbar, setSaved, t, month, year]);
+  }, [hasError, snackbar, t, domain, localShift, meta, standardHours, setSaved, onShiftUpdate, month, year]);
 
   const handleEdit = () => {
     setSaved(false);
   };
-
-  useEffect(() => {
-    if (shiftEntry.payMap) onShiftUpdate(shiftEntry.shift, shiftEntry.payMap);
-  }, [shiftEntry, onShiftUpdate]);
 
   return (
     <>

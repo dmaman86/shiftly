@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Card,
   FormControl,
@@ -16,11 +16,13 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PaymentsIcon from "@mui/icons-material/Payments";
 
-import { useDebounce, useGlobalState } from "@/hooks";
+import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { ConfigInput } from "./ConfigInput";
 import { SYSTEM_START_YEAR } from "@/constants";
 import { useTranslation } from "react-i18next";
+
+const DEBOUNCE_DELAY = 500;
 
 type ConfigPanelProps = {
   domain: DomainContextType;
@@ -42,26 +44,73 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
     updateBaseRate,
   } = useGlobalState();
 
+  const { monthResolver } = domain.resolvers;
+
   const [inputsValues, setInputsValues] = useState({
     yearInput: year.toString(),
     standardHoursInput: standardHours.toString(),
     baseRateInput: baseRate.toString(),
   });
 
-  const debouncedYear = useDebounce({
-    value: inputsValues.yearInput,
-    delay: 500,
-  });
-  const debouncedStandardHours = useDebounce({
-    value: inputsValues.standardHoursInput,
-    delay: 500,
-  });
-  const debouncedBaseRate = useDebounce({
-    value: inputsValues.baseRateInput,
-    delay: 500,
-  });
+  const yearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hoursTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const { monthResolver } = domain.resolvers;
+  const handleYearChange = useCallback(
+    (value: string) => {
+      setInputsValues((prev) => ({ ...prev, yearInput: value }));
+      if (yearTimerRef.current !== null) clearTimeout(yearTimerRef.current);
+      yearTimerRef.current = setTimeout(() => {
+        const parsed = Number(value);
+        if (
+          !isNaN(parsed) &&
+          parsed >= SYSTEM_START_YEAR &&
+          parsed <= monthResolver.getCurrentYear() &&
+          parsed !== year
+        ) {
+          updateYear(parsed);
+          updateMonth(monthResolver.resolveDefaultMonth(parsed));
+        }
+      }, DEBOUNCE_DELAY);
+    },
+    [year, monthResolver, updateYear, updateMonth],
+  );
+
+  const handleStandardHoursChange = useCallback(
+    (value: string) => {
+      setInputsValues((prev) => ({ ...prev, standardHoursInput: value }));
+      if (hoursTimerRef.current !== null) clearTimeout(hoursTimerRef.current);
+      hoursTimerRef.current = setTimeout(() => {
+        const parsed = Number(value);
+        if (!isNaN(parsed) && parsed >= 0 && parsed !== standardHours) {
+          updateStandardHours(parsed);
+        }
+      }, DEBOUNCE_DELAY);
+    },
+    [standardHours, updateStandardHours],
+  );
+
+  const handleBaseRateChange = useCallback(
+    (value: string) => {
+      setInputsValues((prev) => ({ ...prev, baseRateInput: value }));
+      if (rateTimerRef.current !== null) clearTimeout(rateTimerRef.current);
+      rateTimerRef.current = setTimeout(() => {
+        const parsed = Number(value);
+        if (!isNaN(parsed) && parsed >= 0 && parsed !== baseRate) {
+          updateBaseRate(parsed);
+        }
+      }, DEBOUNCE_DELAY);
+    },
+    [baseRate, updateBaseRate],
+  );
+
+  useEffect(() => {
+    setInputsValues({
+      yearInput: year.toString(),
+      standardHoursInput: standardHours.toString(),
+      baseRateInput: baseRate.toString(),
+    });
+  }, [year, standardHours, baseRate]);
 
   const availableMonths = monthResolver.getAvailableMonthOptions(year);
 
@@ -77,48 +126,6 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
       else return t("config.base_rate_helper_monthly");
     }
     return "";
-  };
-
-  useEffect(() => {
-    const parsedYear = Number(debouncedYear);
-    if (
-      !isNaN(parsedYear) &&
-      parsedYear >= SYSTEM_START_YEAR &&
-      parsedYear <= monthResolver.getCurrentYear() &&
-      parsedYear !== year
-    ) {
-      updateYear(parsedYear);
-      updateMonth(monthResolver.resolveDefaultMonth(parsedYear));
-    }
-  }, [debouncedYear, year, monthResolver, updateYear, updateMonth]);
-
-  useEffect(() => {
-    const parsed = Number(debouncedStandardHours);
-    if (!isNaN(parsed) && parsed >= 0 && parsed !== standardHours) {
-      updateStandardHours(parsed);
-    }
-  }, [debouncedStandardHours, standardHours, updateStandardHours]);
-
-  useEffect(() => {
-    const parsed = Number(debouncedBaseRate);
-    if (!isNaN(parsed) && parsed >= 0 && parsed !== baseRate) {
-      updateBaseRate(parsed);
-    }
-  }, [debouncedBaseRate, baseRate, updateBaseRate]);
-
-  useEffect(() => {
-    setInputsValues({
-      yearInput: year.toString(),
-      standardHoursInput: standardHours.toString(),
-      baseRateInput: baseRate.toString(),
-    });
-  }, [year, standardHours, baseRate]);
-
-  const updateInput = (key: keyof typeof inputsValues) => (value: string) => {
-    setInputsValues((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
   };
 
   return (
@@ -163,7 +170,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                       label={t("config.year_label")}
                       error={yearError}
                       helperText={yearHelperText}
-                      onChange={updateInput("yearInput")}
+                      onChange={handleYearChange}
                     />
                   </Box>
 
@@ -248,7 +255,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                       helperText={t("config.standard_hours_helper", {
                         standardHours,
                       })}
-                      onChange={updateInput("standardHoursInput")}
+                      onChange={handleStandardHoursChange}
                     />
                   </Box>
 
@@ -259,7 +266,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                       label={t("config.base_rate_label")}
                       helperText={helperTextBaseRate()}
                       error={baseRate === 0}
-                      onChange={updateInput("baseRateInput")}
+                      onChange={handleBaseRateChange}
                     />
                   </Box>
                 </Stack>
