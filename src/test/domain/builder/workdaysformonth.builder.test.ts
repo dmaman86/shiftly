@@ -4,6 +4,18 @@ import { HolidayResolverService } from "@/domain/resolve/holiday.resolver";
 import { WorkDayInfoResolver } from "@/domain/resolve/workdayinfo.resolver";
 import { DateService } from "@/domain/services/date.service";
 import { WorkDayType } from "@/constants/fields.constant";
+import { CalendarEventKind, type CalendarEvent } from "@/domain";
+import type { HolidayKey } from "@/constants";
+
+const paidHoliday = (holidayKey?: HolidayKey): CalendarEvent => ({
+  kind: CalendarEventKind.PaidHoliday,
+  holidayKey,
+});
+
+const partialHolidayStart = (holidayKey?: HolidayKey): CalendarEvent => ({
+  kind: CalendarEventKind.PartialHolidayStart,
+  holidayKey,
+});
 
 describe("DefaultWorkDaysForMonthBuilder", () => {
   let builder: DefaultWorkDaysForMonthBuilder;
@@ -189,7 +201,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
     it("should mark paid holidays as SpecialFull", () => {
       const eventMap = {
-        "2024-01-15": ["Rosh Hashana"],
+        "2024-01-15": [paidHoliday("rosh_hashana")],
       };
 
       const result = builder.build({
@@ -203,7 +215,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
     it("should mark Erev holidays as SpecialPartialStart", () => {
       const eventMap = {
-        "2024-01-15": ["Erev Pesach"],
+        "2024-01-15": [partialHolidayStart("erev_pesach")],
       };
 
       const result = builder.build({
@@ -217,7 +229,10 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
     it("should handle multiple holidays on same day", () => {
       const eventMap = {
-        "2024-01-15": ["Rosh Hashana", "Some other event"],
+        "2024-01-15": [
+          paidHoliday("rosh_hashana"),
+          partialHolidayStart("erev_pesach"),
+        ],
       };
 
       const result = builder.build({
@@ -258,7 +273,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
     it("should set crossDayContinuation for day before paid holiday", () => {
       const eventMap = {
-        "2024-01-16": ["Rosh Hashana"], // Tuesday
+        "2024-01-16": [paidHoliday("rosh_hashana")], // Tuesday
       };
 
       const result = builder.build({
@@ -273,7 +288,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
     it("should set crossDayContinuation for last day if next month starts with SpecialFull", () => {
       const eventMap = {
-        "2024-02-01": ["Rosh Hashana"], // First day of February is holiday
+        "2024-02-01": [paidHoliday("rosh_hashana")], // First day of February is holiday
       };
 
       const result = builder.build({
@@ -303,7 +318,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
     it("should handle crossDayContinuation for end of December", () => {
       const eventMap = {
-        "2025-01-01": ["Rosh Hashana"], // Next year
+        "2025-01-01": [paidHoliday("rosh_hashana")], // Next year
       };
 
       const result = builder.build({
@@ -409,7 +424,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
     it("should handle December to January transition", () => {
       const eventMap = {
-        "2025-01-01": ["Some Event"],
+        "2025-01-01": [],
       };
 
       const result = builder.build({
@@ -440,8 +455,8 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
     it("should handle eventMap with dates outside the month", () => {
       const eventMap = {
-        "2024-02-15": ["Some Event"], // Different month
-        "2024-01-15": ["Rosh Hashana"],
+        "2024-02-15": [], // Different month
+        "2024-01-15": [paidHoliday("rosh_hashana")],
       };
 
       const result = builder.build({
@@ -491,9 +506,9 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
     it("should handle month with holidays", () => {
       const eventMap = {
-        "2024-09-14": ["Rosh Hashana"],
-        "2024-09-15": ["Rosh Hashana II"],
-        "2024-09-13": ["Erev Rosh Hashana"],
+        "2024-09-14": [paidHoliday("rosh_hashana")],
+        "2024-09-15": [paidHoliday("rosh_hashana_2")],
+        "2024-09-13": [partialHolidayStart("erev_rosh_hashana")],
       };
 
       const result = builder.build({
@@ -512,10 +527,10 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
     it("should handle Passover month with multiple special days", () => {
       const eventMap = {
-        "2024-04-22": ["Erev Pesach"],
-        "2024-04-23": ["Pesach I"],
-        "2024-04-24": ["Pesach II"],
-        "2024-04-25": ["Pesach III (CH''M)"],
+        "2024-04-22": [partialHolidayStart("erev_pesach")],
+        "2024-04-23": [paidHoliday("pesach")],
+        "2024-04-24": [],
+        "2024-04-25": [],
       };
 
       const result = builder.build({
@@ -711,7 +726,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       const result = builder.build({
         year: 2024,
         month: 1,
-        eventMap: { "2024-01-15": ["Rosh Hashana"] },
+        eventMap: { "2024-01-15": [paidHoliday("rosh_hashana")] },
       });
 
       expect(result[14].meta.holidayKey).toBe("rosh_hashana");
@@ -721,7 +736,9 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       const result = builder.build({
         year: 2024,
         month: 1,
-        eventMap: { "2024-01-15": ["Erev Pesach"] },
+        eventMap: {
+          "2024-01-15": [partialHolidayStart("erev_pesach")],
+        },
       });
 
       expect(result[14].meta.holidayKey).toBe("erev_pesach");
@@ -750,27 +767,24 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       expect(result[5].meta.holidayKey).toBeUndefined();
     });
 
-    it("should resolve holidayKey via fuzzy prefix match when title has extra suffix", () => {
-      // "Rosh Hashana (Observed)" is not a direct key but starts with "Rosh Hashana"
+    it("should use the normalized holiday key from the event contract", () => {
       const result = builder.build({
         year: 2024,
         month: 1,
-        eventMap: { "2024-01-15": ["Rosh Hashana (Observed)"] },
+        eventMap: { "2024-01-15": [paidHoliday("rosh_hashana")] },
       });
 
-      // The fuzzy matcher should pick up "Rosh Hashana" prefix
       expect(result[14].meta.holidayKey).toBe("rosh_hashana");
     });
 
-    it("should return undefined holidayKey when event title has no matching holiday", () => {
+    it("should return undefined holidayKey when the event has no label metadata", () => {
       const result = builder.build({
         year: 2024,
         month: 1,
-        eventMap: { "2024-01-15": ["Some Unknown Event"] },
+        eventMap: { "2024-01-15": [paidHoliday()] },
       });
 
-      // typeDay would still be Regular (no known holiday resolver match)
-      // holidayKey should be undefined since no resolveHolidayKey match
+      expect(result[14].meta.typeDay).toBe(WorkDayType.SpecialFull);
       expect(result[14].meta.holidayKey).toBeUndefined();
     });
   });

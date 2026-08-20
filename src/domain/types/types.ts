@@ -59,10 +59,21 @@ export interface WorkDayInfo {
   hebrewDay: string;
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  error?: string;
+export enum CalendarEventKind {
+  PaidHoliday = "paid-holiday",
+  PartialHolidayStart = "partial-holiday-start",
 }
+
+export interface CalendarEvent {
+  kind: CalendarEventKind;
+  holidayKey?: HolidayKey;
+}
+
+export type CalendarEventMap = Record<string, CalendarEvent[]>;
+
+export type ApiResponse<T> =
+  | { data: T; error?: never }
+  | { data?: never; error: string };
 
 export interface DayInfoResolver {
   isSpecialFullDay(day: WorkDayInfo): boolean;

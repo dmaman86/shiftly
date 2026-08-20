@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { WorkDayInfo } from "@/domain";
+import { CalendarEventMap, WorkDayInfo } from "@/domain";
 import { domain } from "@/app";
 
 export type WorkDaysState = {
@@ -25,7 +25,7 @@ export const workDaysSlice = createSlice({
       actions: PayloadAction<{
         year: number;
         month: number;
-        eventMap: Record<string, string[]>;
+        eventMap: CalendarEventMap;
       }>,
     ) => {
       const { year, month, eventMap } = actions.payload;

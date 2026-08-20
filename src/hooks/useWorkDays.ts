@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { setWorkDays } from "@/redux/states/workDaysSlice";
 import { WorkDayType } from "@/constants";
+import { CalendarEventMap } from "@/domain";
 
 export const useWorkDays = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -13,7 +14,7 @@ export const useWorkDays = () => {
   const generate = (
     year: number,
     month: number,
-    eventMap: Record<string, string[]>,
+    eventMap: CalendarEventMap,
   ) => {
     dispatch(setWorkDays({ year, month, eventMap }));
   };

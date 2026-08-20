@@ -15,17 +15,6 @@ export const monthNames = [
   "דצמבר",
 ];
 
-export const PAID_HOLIDAYS = [
-  "Rosh Hashana",
-  "Rosh Hashana II",
-  "Yom Kippur",
-  "Sukkot I",
-  "Shmini Atzeret",
-  "Pesach I",
-  "Yom HaAtzma'ut",
-  "Shavuot I",
-];
-
 export enum Weekend {
   FRIDAY = 5,
   SATURDAY = 6,
