@@ -11,7 +11,7 @@ export class SmallMealAllowanceCalculator implements Calculator<
   calculate(params: MealAllowanceCalcParams): MealAllowanceEntry {
     const { day, rate } = params;
 
-    if (day.hasNight) return { points: 1, amount: rate };
+    if (day.nightHours > 4) return { points: 1, amount: rate };
 
     return { points: 0, amount: 0 };
   }

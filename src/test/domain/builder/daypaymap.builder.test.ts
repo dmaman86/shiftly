@@ -461,8 +461,11 @@ describe("DefaultDayPayMapBuilder", () => {
   });
 
   describe("build - Meal Allowance calculation", () => {
-    it("should give large meal for 10+ hour shift without night hours (non-field duty)", () => {
-      const shifts = [createShiftPayMap(10, 10, 0, 0, 0, 0, false)];
+    it("should use the total hours from all shifts in the day", () => {
+      const shifts = [
+        createShiftPayMap(9, 9),
+        createShiftPayMap(11, 11),
+      ];
 
       const result = builder.build({
         shifts,
@@ -477,26 +480,8 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(result.mealAllowance.small.points).toBe(0);
     });
 
-    it("should treat shift with < 4 night hours as day shift (no small meal for 8h)", () => {
-      const shifts = [createShiftPayMap(8, 6, 0, 2, 0, 0, false)];
-
-      const result = builder.build({
-        shifts,
-        status: WorkDayStatus.normal,
-        meta: createMeta(),
-        standardHours: 8.75,
-        year: 2024,
-        month: 1,
-      });
-
-      // Night hours < 4, so treated as day shift (hasMorning=true, hasNight=false)
-      // 8-hour day shift doesn't qualify for small meal (needs 10+ hours)
-      expect(result.mealAllowance.small.points).toBe(0);
-      expect(result.mealAllowance.large.points).toBe(0);
-    });
-
-    it("should not give meal for short shifts", () => {
-      const shifts = [createShiftPayMap(6, 6, 0, 0, 0, 0, false)];
+    it("should not give a large allowance at exactly 10 daily hours", () => {
+      const shifts = [createShiftPayMap(10, 10)];
 
       const result = builder.build({
         shifts,
@@ -511,8 +496,8 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(result.mealAllowance.small.points).toBe(0);
     });
 
-    it("should classify shift with 4+ night hours correctly", () => {
-      const shifts = [createShiftPayMap(12, 6, 0, 6, 0, 0, false)];
+    it("should give a large allowance above 10 daily hours outside field duty", () => {
+      const shifts = [createShiftPayMap(10.01, 10.01)];
 
       const result = builder.build({
         shifts,
@@ -523,48 +508,12 @@ describe("DefaultDayPayMapBuilder", () => {
         month: 1,
       });
 
-      // Has significant night hours, should get large meal
       expect(result.mealAllowance.large.points).toBe(1);
-    });
-
-    it("should not give large meal for field duty day shift", () => {
-      const shifts = [createShiftPayMap(10, 10, 0, 0, 0, 0, true)];
-
-      const result = builder.build({
-        shifts,
-        status: WorkDayStatus.normal,
-        meta: createMeta(),
-        standardHours: 8.75,
-        year: 2024,
-        month: 1,
-      });
-
-      // Field duty day shift shouldn't get large meal
-      expect(result.mealAllowance.large.points).toBe(0);
-    });
-  });
-
-  describe("build - classifyMealAllowanceDayInfo logic", () => {
-    it("should classify as day shift with < 4 night hours (no meal for 8h)", () => {
-      const shifts = [createShiftPayMap(8, 6, 0, 2, 0, 0, false)];
-
-      const result = builder.build({
-        shifts,
-        status: WorkDayStatus.normal,
-        meta: createMeta(),
-        standardHours: 8.75,
-        year: 2024,
-        month: 1,
-      });
-
-      // With < 4 night hours, should be treated as day shift (hasMorning=true, hasNight=false)
-      // 8-hour day shift needs to be 10+ hours to qualify for meal allowance
       expect(result.mealAllowance.small.points).toBe(0);
-      expect(result.mealAllowance.large.points).toBe(0);
     });
 
-    it("should classify as night shift with 4+ night hours", () => {
-      const shifts = [createShiftPayMap(10, 4, 0, 6, 0, 0, false)];
+    it("should not give a large allowance on a field duty day", () => {
+      const shifts = [createShiftPayMap(19, 14, 0, 5, 0, 0, true)];
 
       const result = builder.build({
         shifts,
@@ -575,11 +524,43 @@ describe("DefaultDayPayMapBuilder", () => {
         month: 1,
       });
 
-      // With 6 night hours, should have night classification
-      expect(result.mealAllowance.large.points).toBe(1);
+      expect(result.mealAllowance.large.points).toBe(0);
+      expect(result.mealAllowance.small.points).toBe(1);
     });
 
-    it("should include shabbat200 in night hours calculation (Shabbat: no meal)", () => {
+    it("should not give a small allowance at exactly 4 night hours", () => {
+      const shifts = [createShiftPayMap(8, 4, 0, 4)];
+
+      const result = builder.build({
+        shifts,
+        status: WorkDayStatus.normal,
+        meta: createMeta(),
+        standardHours: 8.75,
+        year: 2024,
+        month: 1,
+      });
+
+      expect(result.mealAllowance.large.points).toBe(0);
+      expect(result.mealAllowance.small.points).toBe(0);
+    });
+
+    it("should give a small allowance above 4 night hours", () => {
+      const shifts = [createShiftPayMap(8, 3.99, 0, 4.01)];
+
+      const result = builder.build({
+        shifts,
+        status: WorkDayStatus.normal,
+        meta: createMeta(),
+        standardHours: 8.75,
+        year: 2024,
+        month: 1,
+      });
+
+      expect(result.mealAllowance.large.points).toBe(0);
+      expect(result.mealAllowance.small.points).toBe(1);
+    });
+
+    it("should include 200% special hours in the daily night total", () => {
       const shifts = [createShiftPayMap(8, 0, 0, 2, 0, 4, false)];
 
       const result = builder.build({
@@ -591,14 +572,11 @@ describe("DefaultDayPayMapBuilder", () => {
         month: 1,
       });
 
-      // 2 hours50 + 4 shabbat200 = 6 night hours (hasNight=true)
-      // But total hours is only 8, and for night shift needs 10+ for large meal
-      // Night shifts should get large meal for 10+ hours or small meal otherwise
       expect(result.mealAllowance.small.points).toBe(1);
       expect(result.mealAllowance.large.points).toBe(0);
     });
 
-    it("should calculate hasMorning based on ratio (total/night >= 2)", () => {
+    it("should prioritize the large allowance when both conditions are met", () => {
       const shifts = [createShiftPayMap(12, 6, 0, 6, 0, 0, false)];
 
       const result = builder.build({
@@ -610,9 +588,8 @@ describe("DefaultDayPayMapBuilder", () => {
         month: 1,
       });
 
-      // 12 total / 6 night = 2, so hasMorning should be true
-      // With both morning and night, non-field duty should get large meal
       expect(result.mealAllowance.large.points).toBe(1);
+      expect(result.mealAllowance.small.points).toBe(0);
     });
   });
 

@@ -53,7 +53,6 @@ export type MealAllowanceMonthBundle = {
 
 export type MealAllowanceDayInfo = {
   totalHours: number;
-  hasMorning: boolean;
-  hasNight: boolean;
+  nightHours: number;
   isFieldDutyDay: boolean;
 };
