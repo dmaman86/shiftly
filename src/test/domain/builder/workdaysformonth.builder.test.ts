@@ -12,7 +12,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
   let dateService: DateService;
 
   beforeEach(() => {
-    dateService = new DateService();
+    dateService = new DateService("Asia/Jerusalem");
     holidayResolver = new HolidayResolverService();
     workDayInfoResolver = new WorkDayInfoResolver();
     

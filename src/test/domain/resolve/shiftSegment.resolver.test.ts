@@ -2,12 +2,13 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { ShiftSegmentResolver } from "@/domain/resolve/shiftSegment.resolver";
 import type { Point, WorkDayMeta } from "@/domain/types/types";
 import { WorkDayType } from "@/constants/fields.constant";
+import { DateService } from "@/domain/services/date.service";
 
 describe("ShiftSegmentResolver", () => {
   let resolver: ShiftSegmentResolver;
 
   beforeEach(() => {
-    resolver = new ShiftSegmentResolver();
+    resolver = new ShiftSegmentResolver(new DateService("Asia/Jerusalem"));
   });
 
   describe("resolve - Regular Day", () => {

@@ -4,10 +4,11 @@ import { PayCalculationBundle } from "../types/bundles";
 import { BuildShiftLayerParams, ShiftLayer } from "../types/domain.types";
 
 export const buildShiftLayer = ({
+  dateService,
   shiftService,
   calculators,
 }: BuildShiftLayerParams): ShiftLayer => {
-  const segmentResolver = new ShiftSegmentResolver();
+  const segmentResolver = new ShiftSegmentResolver(dateService);
   const shiftSegmentBuilder = new ShiftSegmentBuilder(
     segmentResolver,
     shiftService,

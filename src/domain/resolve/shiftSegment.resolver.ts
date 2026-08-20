@@ -1,6 +1,7 @@
 import { WorkDayType } from "@/constants";
 import type { LabeledSegmentRange, Point, WorkDayMeta } from "@/domain/types/types";
 import type { Resolver } from "@/domain/types/core-behaviors";
+import type { DateService } from "@/domain/services/date.service";
 
 export class ShiftSegmentResolver implements Resolver<
   {
@@ -27,7 +28,7 @@ export class ShiftSegmentResolver implements Resolver<
     hours200: 2.0,
   };
 
-  constructor() {}
+  constructor(private readonly dateService: DateService) {}
 
   resolve(params: { point: Point; meta: WorkDayMeta }): LabeledSegmentRange[] {
     const { point, meta } = params;
@@ -44,12 +45,6 @@ export class ShiftSegmentResolver implements Resolver<
     })();
 
     return this.findSegments(point, source);
-  }
-
-  private getSpecialStartMinutes(date: string): number {
-    const offsetMinutes = new Date(date).getTimezoneOffset();
-    const specialStart = -offsetMinutes / 60 === 3 ? 18 : 17;
-    return specialStart * 60;
   }
 
   private getRegularMap(): LabeledSegmentRange[] {
@@ -87,7 +82,7 @@ export class ShiftSegmentResolver implements Resolver<
   }
 
   private getSpecialPartialMap(date: string): LabeledSegmentRange[] {
-    const specialStart = this.getSpecialStartMinutes(date);
+    const specialStart = this.dateService.getSpecialStartMinutes(date);
 
     return [
       {

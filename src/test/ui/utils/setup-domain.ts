@@ -2,7 +2,9 @@ import { vi, beforeAll } from "vitest";
 import { buildPayMapPipeline } from "@/domain";
 
 // Initialize domain pipeline once for all tests
-const pipelineInstance = buildPayMapPipeline();
+const pipelineInstance = buildPayMapPipeline({
+  timeZone: "Asia/Jerusalem",
+});
 
 // Mock the domain module before any tests run
 beforeAll(() => {

@@ -28,6 +28,10 @@ export interface CoreServices {
   shiftService: ShiftService;
 }
 
+export interface DomainConfig {
+  timeZone: string;
+}
+
 export interface Resolvers {
   holidayResolver: HolidayResolverService;
   workDayInfoResolver: WorkDayInfoResolver;
@@ -60,6 +64,7 @@ export interface Calculators {
 }
 
 export interface BuildShiftLayerParams {
+  dateService: DateService;
   shiftService: ShiftService;
   calculators: Calculators;
 }
