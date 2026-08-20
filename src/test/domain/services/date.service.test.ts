@@ -5,7 +5,7 @@ describe("DateService", () => {
   let service: DateService;
 
   beforeEach(() => {
-    service = new DateService();
+    service = new DateService("Asia/Jerusalem");
   });
 
   describe("getMinutesFromMidnight", () => {
@@ -508,45 +508,27 @@ describe("DateService", () => {
   });
 
   describe("getSpecialStartMinutes", () => {
-    it("should return correct minutes based on timezone offset", () => {
-      const date = "2025-01-15";
-      const result = service.getSpecialStartMinutes(date);
-
-      // Result depends on local timezone offset
-      // Should be either 1020 (17:00) or 1080 (18:00)
-      expect([1020, 1080]).toContain(result);
+    it("should return 17:00 during Israel standard time", () => {
+      expect(service.getSpecialStartMinutes("2025-01-15")).toBe(17 * 60);
     });
 
-    it("should calculate based on timezone offset formula", () => {
-      const date = "2025-06-15";
-      const testDate = new Date(date);
-      const offsetMinutes = testDate.getTimezoneOffset();
-      const expectedHour = -offsetMinutes / 60 === 3 ? 18 : 17;
-      const expectedMinutes = expectedHour * 60;
-
-      const result = service.getSpecialStartMinutes(date);
-
-      expect(result).toBe(expectedMinutes);
+    it("should return 18:00 during Israel daylight saving time", () => {
+      expect(service.getSpecialStartMinutes("2025-06-15")).toBe(18 * 60);
     });
 
-    it("should handle date string format", () => {
-      const date = "2025-06-15";
-      const result = service.getSpecialStartMinutes(date);
+    it("should handle date-only and ISO inputs consistently", () => {
+      const dateOnlyResult = service.getSpecialStartMinutes("2025-06-15");
+      const isoResult = service.getSpecialStartMinutes(
+        "2025-06-15T00:00:00.000Z",
+      );
 
-      // Result should be either 1020 or 1080 minutes
-      expect(result).toBeGreaterThanOrEqual(1020);
-      expect(result).toBeLessThanOrEqual(1080);
-      expect([1020, 1080]).toContain(result);
+      expect(dateOnlyResult).toBe(isoResult);
     });
 
-    it("should be consistent for same date", () => {
-      const date1 = "2025-01-15";
-      const date2 = "2025-01-15";
-
-      const result1 = service.getSpecialStartMinutes(date1);
-      const result2 = service.getSpecialStartMinutes(date2);
-
-      expect(result1).toBe(result2);
+    it("should reject invalid dates", () => {
+      expect(() => service.getSpecialStartMinutes("invalid-date")).toThrow(
+        'Invalid date: "invalid-date"',
+      );
     });
   });
 

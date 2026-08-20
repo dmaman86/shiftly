@@ -1,8 +1,8 @@
 import { DateService, ShiftService } from "@/domain/services";
-import { CoreServices } from "../types/domain.types";
+import { CoreServices, DomainConfig } from "../types/domain.types";
 
-export const buildCoreServices = (): CoreServices => {
-  const dateService = new DateService();
+export const buildCoreServices = (config: DomainConfig): CoreServices => {
+  const dateService = new DateService(config.timeZone);
   const shiftService = new ShiftService(dateService);
 
   return {

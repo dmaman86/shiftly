@@ -10,19 +10,10 @@ export class LargeMealAllowanceCalculator implements Calculator<
 > {
   calculate(params: MealAllowanceCalcParams): MealAllowanceEntry {
     const { day, rate } = params;
-    const { totalHours, hasMorning, hasNight, isFieldDutyDay } = day;
 
-    if (totalHours < 10) return { points: 0, amount: 0 };
-
-    if (hasMorning && hasNight) {
+    if (day.totalHours > 10 && !day.isFieldDutyDay) {
       return { points: 1, amount: rate };
     }
-
-    const isDayShift = hasMorning && !hasNight;
-
-    if (!isDayShift) return { points: 1, amount: rate };
-
-    if (isDayShift && !isFieldDutyDay) return { points: 1, amount: rate };
 
     return { points: 0, amount: 0 };
   }

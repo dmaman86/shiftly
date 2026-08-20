@@ -22,7 +22,7 @@ describe("DefaultShiftMapBuilder", () => {
 
   beforeEach(() => {
     // Setup services
-    dateService = new DateService();
+    dateService = new DateService("Asia/Jerusalem");
     shiftService = new ShiftService(dateService);
     
     // Setup calculators
@@ -44,7 +44,7 @@ describe("DefaultShiftMapBuilder", () => {
     };
 
     // Setup segment builder
-    const segmentResolver = new ShiftSegmentResolver();
+    const segmentResolver = new ShiftSegmentResolver(dateService);
     segmentBuilder = new ShiftSegmentBuilder(segmentResolver, shiftService);
 
     // Create builder

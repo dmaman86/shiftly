@@ -1,5 +1,4 @@
 import {
-  MonthPayMap,
   Reducer,
   WorkDayMap,
   WorkDayReducerBundle,
@@ -9,7 +8,7 @@ import {
 export class WorkDayMonthReducer implements Reducer<WorkPayPart, WorkDayMap> {
   constructor(private readonly workDay: WorkDayReducerBundle) {}
 
-  createEmpty() {
+  createEmpty(): WorkPayPart {
     return {
       regular: this.workDay.regular.createEmpty(),
       extra: this.workDay.extra.createEmpty(),
@@ -17,7 +16,7 @@ export class WorkDayMonthReducer implements Reducer<WorkPayPart, WorkDayMap> {
     };
   }
 
-  accumulate(base: MonthPayMap, add: WorkDayMap) {
+  accumulate(base: WorkPayPart, add: WorkDayMap): WorkPayPart {
     return {
       regular: this.workDay.regular.accumulate(
         base.regular,
@@ -31,7 +30,7 @@ export class WorkDayMonthReducer implements Reducer<WorkPayPart, WorkDayMap> {
     };
   }
 
-  subtract(base: MonthPayMap, sub: WorkDayMap) {
+  subtract(base: WorkPayPart, sub: WorkDayMap): WorkPayPart {
     return {
       regular: this.workDay.regular.subtract(base.regular, sub.workMap.regular),
       extra: this.workDay.extra.subtract(base.extra, sub.workMap.extra),

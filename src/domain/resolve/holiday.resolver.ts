@@ -1,47 +1,25 @@
 import { Weekend, WorkDayType } from "@/constants";
-import { HolidayResolver } from "@/domain";
+import {
+  CalendarEventKind,
+  type CalendarEvent,
+  type HolidayResolver,
+} from "@/domain";
 
 export class HolidayResolverService implements HolidayResolver {
-  private readonly paidHolidays = [
-    "Rosh Hashana",
-    "Rosh Hashana II",
-    "Yom Kippur",
-    "Sukkot I",
-    "Shmini Atzeret",
-    "Pesach I",
-    "Pesach VII",
-    "Yom HaAtzma'ut",
-    "Shavuot I",
-  ];
+  resolve(params: { weekday: number; events: CalendarEvent[] }): WorkDayType {
+    const { weekday, events } = params;
 
-  private isPaidHoliday(eventTitles: string[]): boolean {
-    return eventTitles.some(
-      (e) => this.paidHolidays.includes(e) || e.startsWith("Rosh Hashana"),
-    );
-  }
-
-  private readonly partialStartEvents = [
-    "Erev Rosh Hashana",
-    "Erev Yom Kippur",
-    "Erev Sukkot",
-    "Erev Pesach",
-    "Erev Shavuot",
-    "Yom HaZikaron",
-    "Sukkot VII (Hoshana Rabba)",
-    "Pesach VI (CH'M)",
-  ];
-
-  private isPartialStart(eventTitles: string[]): boolean {
-    return eventTitles.some((e) => this.partialStartEvents.includes(e));
-  }
-
-  resolve(params: { weekday: number; eventTitles: string[] }): WorkDayType {
-    const { weekday, eventTitles } = params;
-
-    if (weekday === Weekend.SATURDAY || this.isPaidHoliday(eventTitles))
+    if (
+      weekday === Weekend.SATURDAY ||
+      events.some((event) => event.kind === CalendarEventKind.PaidHoliday)
+    )
       return WorkDayType.SpecialFull;
 
-    if (this.isPartialStart(eventTitles) || weekday === Weekend.FRIDAY)
+    if (
+      events.some(
+        (event) => event.kind === CalendarEventKind.PartialHolidayStart,
+      ) || weekday === Weekend.FRIDAY
+    )
       return WorkDayType.SpecialPartialStart;
 
     return WorkDayType.Regular;

@@ -26,7 +26,7 @@ import {
   useWorkDays,
   useAsync,
 } from "@/hooks";
-import { ApiResponse, TableViewMode } from "@/domain";
+import { ApiResponse, CalendarEventMap, TableViewMode } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
 import { hebcalService, analyticsService } from "@/services";
@@ -50,10 +50,10 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
 
   const { loading, callEndPoint, cancelEndPoint } = useFetch();
 
-  useAsync<ApiResponse<Record<string, string[]>>>(
+  useAsync<ApiResponse<CalendarEventMap>>(
     () => {
       const { startDate, endDate } = dateService.getDatesRange(year, month);
-      return callEndPoint<Record<string, string[]>>(
+      return callEndPoint<CalendarEventMap>(
         call.getData(startDate, endDate),
         buildEventMap,
       );

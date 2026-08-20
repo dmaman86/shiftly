@@ -150,13 +150,14 @@ export const Footer = () => {
           >
             <Stack direction="row" spacing={2}>
               <Link
-                component="button"
+                href="https://github.com/dmaman86/shiftly"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => {
                   analyticsService.track({
                     name: "footer_link_clicked",
                     params: { target: "github" },
                   });
-                  window.open("https://github.com/dmaman86/shiftly", "_blank");
                 }}
                 underline="hover"
                 variant="body2"
@@ -167,13 +168,12 @@ export const Footer = () => {
                 GitHub Repo
               </Link>
               <Link
-                component="button"
+                href="mailto:dmaman86@gmail.com"
                 onClick={() => {
                   analyticsService.track({
                     name: "footer_link_clicked",
                     params: { target: "email" },
                   });
-                  window.location.href = "mailto:dmaman86@gmail.com";
                 }}
                 underline="hover"
                 variant="body2"

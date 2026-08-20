@@ -3,20 +3,17 @@ import {
   WorkDayInfo,
   WorkDayInfoResolver,
   DateService,
+  CalendarEvent,
+  CalendarEventMap,
 } from "@/domain";
-import {
-  WorkDayType,
-  hebrewHolidayNames,
-  holidayKeyMap,
-  HolidayKey,
-} from "@/constants";
+import { WorkDayType } from "@/constants";
 
 export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
   private readonly hebrewDays = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
 
   constructor(
     private readonly holidayResolver: {
-      resolve(params: { weekday: number; eventTitles: string[] }): WorkDayType;
+      resolve(params: { weekday: number; events: CalendarEvent[] }): WorkDayType;
     },
     private readonly workDayInfoResolver: WorkDayInfoResolver,
     private readonly dateService: DateService,
@@ -25,29 +22,11 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
   build(params: {
     year: number;
     month: number;
-    eventMap: Record<string, string[]>;
+    eventMap: CalendarEventMap;
   }): WorkDayInfo[] {
     const { year, month, eventMap } = params;
     const daysInMonth = this.dateService.getDaysInMonth(year, month);
     const workDays: WorkDayInfo[] = [];
-
-    const sortedHolidayKeys = Object.keys(hebrewHolidayNames).sort(
-      (a, b) => b.length - a.length,
-    );
-    const holidayKeyMapLoose = holidayKeyMap as Record<
-      string,
-      HolidayKey | undefined
-    >;
-    const resolveHolidayKey = (title: string): HolidayKey | undefined => {
-      const directKey = holidayKeyMapLoose[title];
-      if (directKey) return directKey;
-      const matchedApiKey = sortedHolidayKeys.find((k) => {
-        if (!title.startsWith(k)) return false;
-        const nextChar = title[k.length];
-        return nextChar === undefined || nextChar === " ";
-      });
-      return matchedApiKey ? holidayKeyMapLoose[matchedApiKey] : undefined;
-    };
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month - 1, day);
@@ -55,13 +34,13 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
       const weekday = date.getDay(); // 0 (Sun) to 6 (Sat)
 
       const hebrewDay = this.hebrewDays[weekday];
-      const eventTitles = eventMap[formattedDate] || [];
+      const events = eventMap[formattedDate] || [];
 
-      const typeDay = this.holidayResolver.resolve({ weekday, eventTitles });
+      const typeDay = this.holidayResolver.resolve({ weekday, events });
 
       const holidayKey =
         typeDay !== WorkDayType.Regular
-          ? eventTitles.map(resolveHolidayKey).find(Boolean)
+          ? events.map((event) => event.holidayKey).find(Boolean)
           : undefined;
 
       const row: WorkDayInfo = {
@@ -87,7 +66,7 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
 
     const nextDayType = this.holidayResolver.resolve({
       weekday: nextMonthDate.getDay(),
-      eventTitles: nextDayEvents,
+      events: nextDayEvents,
     });
     workDays[workDays.length - 1].meta.crossDayContinuation =
       nextDayType === WorkDayType.SpecialFull;

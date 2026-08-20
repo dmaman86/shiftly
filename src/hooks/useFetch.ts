@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AxiosResponse } from "axios";
+import type { AxiosResponse } from "axios";
 import { ApiResponse } from "@/domain";
 import { resolveErrorMessage } from "@/utils";
 
 interface AxiosCall {
-  call: () => Promise<AxiosResponse>;
+  call: () => Promise<AxiosResponse<unknown>>;
   controller?: AbortController;
 }
 
@@ -15,7 +15,7 @@ export const useFetch = () => {
   const callEndPoint = useCallback(
     async <T>(
       axiosCall: AxiosCall,
-      adapter?: (raw: { date: string; title: string }[]) => T,
+      adapter?: (raw: unknown) => T,
     ): Promise<ApiResponse<T>> => {
       if (axiosCall.controller) controllerRef.current = axiosCall.controller;
 
@@ -23,11 +23,10 @@ export const useFetch = () => {
 
       try {
         const result = await axiosCall.call();
-        const rawItems: { date: string; title: string }[] = result.data.items;
-        const data = adapter ? adapter(rawItems) : (rawItems as T);
+        const data = adapter ? adapter(result.data) : (result.data as T);
         return { data };
       } catch (err: unknown) {
-        return { data: undefined as T, error: resolveErrorMessage(err) };
+        return { error: resolveErrorMessage(err) };
       } finally {
         setLoading(false);
       }

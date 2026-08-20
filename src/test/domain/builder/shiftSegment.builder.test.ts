@@ -14,9 +14,9 @@ describe("ShiftSegmentBuilder", () => {
   let dateService: DateService;
 
   beforeEach(() => {
-    dateService = new DateService();
+    dateService = new DateService("Asia/Jerusalem");
     shiftService = new ShiftService(dateService);
-    segmentResolver = new ShiftSegmentResolver();
+    segmentResolver = new ShiftSegmentResolver(dateService);
     builder = new ShiftSegmentBuilder(segmentResolver, shiftService);
   });
 

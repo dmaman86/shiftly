@@ -12,6 +12,7 @@ import {
 import {
   MealAllowanceRates,
   PerDiemShiftInfo,
+  CalendarEvent,
   WorkDayInfo,
   WorkDayMeta,
 } from "./types";
@@ -61,7 +62,7 @@ export type WorkDaysForMonthBuilder = Builder<
   {
     year: number;
     month: number;
-    eventMap: Record<string, string[]>;
+    eventMap: Record<string, CalendarEvent[]>;
   },
   WorkDayInfo[]
 >;
@@ -69,7 +70,7 @@ export type WorkDaysForMonthBuilder = Builder<
 export type HolidayResolver = Resolver<
   {
     weekday: number;
-    eventTitles: string[];
+    events: CalendarEvent[];
   },
   WorkDayType
 >;
