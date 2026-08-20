@@ -5,10 +5,10 @@
 [![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://dmaman86.github.io/shiftly/?utm_source=github&utm_medium=readme)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dmaman86/shiftly)
 ![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?logo=vite&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 ![Redux](https://img.shields.io/badge/Redux_Toolkit-2.11.0-764ABC?logo=redux&logoColor=white)
 ![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
-![Vitest](https://img.shields.io/badge/Vitest-4.0.16-6E9F18?logo=vitest&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
@@ -207,12 +207,12 @@ Slices מרכזיים:
 
 - **React** 19.2.3
 - **TypeScript** 5.7.2
-- **Vite** 6.2.0
+- **Vite** 8
 
 ### State וניווט
 
 - **Redux Toolkit** 2.11.0
-- **React Router** 7.11.0
+- **React Router** 7
 
 ### UI ועיצוב
 
@@ -227,7 +227,7 @@ Slices מרכזיים:
 
 ### בדיקות
 
-- **Vitest** 4.0.16
+- **Vitest** 4
 - **Testing Library** (React, Jest-DOM, User Event)
 
 ---
@@ -384,16 +384,16 @@ Shiftly משתמשת ב־**Vitest** לבדיקות יחידה ואינטגרצי
 
 ```bash
 # הרצת בדיקות במצב watch
-npm run test
+bun run test
 
 # הרצת בדיקות עם ממשק UI
-npm run test:ui
+bun run test:ui
 
 # הרצת בדיקות עם כיסוי קוד
-npm run test:coverage
+bun run test:coverage
 
 # הרצת בדיקות במצב CI (הרצה חד־פעמית)
-npm run test:ci
+bun run test:ci
 ```
 
 ### כיסוי בדיקות
@@ -411,11 +411,15 @@ npm run test:ci
 
 ## התחלה מהירה
 
+Shiftly תומכת ב־Node.js 24 וב־Bun 1.3.14 ומעלה בסדרת 1.x. גרסת Node.js המדויקת של ה־CI מוגדרת בקובץ `.nvmrc`, וגרסת Bun מוגדרת ב־`package.json`.
+
 ```bash
 git clone https://github.com/dmaman86/shiftly.git
 cd shiftly
-npm install
-npm run dev
+nvm install
+nvm use
+bun install --frozen-lockfile
+bun run dev
 ```
 
 כניסה ל־`http://localhost:5173/shiftly` בדפדפן.
