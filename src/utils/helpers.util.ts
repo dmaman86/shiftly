@@ -16,6 +16,12 @@ export const subtractValues = (a: number, b: number): number => {
   return Math.max(a - b, 0);
 };
 
+export const calculateActualHours = (
+  totalHours: number,
+  sickHours: number,
+  vacationHours: number,
+): number => Math.max(totalHours - sickHours - vacationHours, 0);
+
 export const groupByShabbat = (workDays: WorkDayInfo[]): WorkDayInfo[][] => {
   const groups: WorkDayInfo[][] = [];
   let current: WorkDayInfo[] = [];

@@ -1,9 +1,15 @@
 import { MonthPayMap, PayBreakdownViewModel } from "@/domain";
+import { calculateActualHours } from "@/utils";
 
 export const monthToPayBreakdownVM = (
   month: MonthPayMap,
 ): PayBreakdownViewModel => ({
   totalHours: month.totalHours,
+  actualHours: calculateActualHours(
+    month.totalHours,
+    month.hours100Sick.hours,
+    month.hours100Vacation.hours,
+  ),
 
   regular: month.regular,
   extra: month.extra,

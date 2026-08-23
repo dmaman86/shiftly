@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { filterHeadersByViewMode } from "../helpers";
 
 type HeaderKey =
-  | "day" | "sick" | "vacation" | "hours" | "total_hours"
+  | "day" | "sick" | "vacation" | "hours" | "total_hours" | "actual_hours"
   | "regular" | "extras" | "overtime" | "shabbat" | "absence"
   | "meal_allowance" | "meal_per_diem" | "large" | "small"
   | "shabbat_eve_bonus" | "entry" | "exit";
@@ -15,6 +15,7 @@ const HEADER_KEY_MAP: Record<string, HeaderKey> = {
   "חופש": "vacation",
   "שעות": "hours",
   "סך שעות": "total_hours",
+  "סך שעות בפועל": "actual_hours",
   "רגילות": "regular",
   "תוספות": "extras",
   "ש״נ": "overtime",

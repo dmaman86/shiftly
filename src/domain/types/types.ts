@@ -90,6 +90,7 @@ export enum Mode {
 
 export type PayBreakdownViewModel = {
   totalHours: number;
+  actualHours: number;
 
   regular: RegularBreakdown;
   extra: ExtraBreakdown;
@@ -111,6 +112,7 @@ export type PayBreakdownViewModel = {
 
 export type CompactPayBreakdownVM = {
   totalHours: number;
+  actualHours: number;
   regularHours: number;
   extraHours: number;
   dailySalary?: number;

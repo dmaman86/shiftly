@@ -31,6 +31,12 @@ export const CompactDayRow = ({
         rowSpan={rowSpan}
         sx={{ ...baseCellSx(isFooter), ...rightBorderIfNotFooter(isFooter) }}
       >
+        {formatValue(breakdown.actualHours)}
+      </TableCell>
+      <TableCell
+        rowSpan={rowSpan}
+        sx={{ ...baseCellSx(isFooter), ...rightBorderIfNotFooter(isFooter) }}
+      >
         {formatValue(breakdown.regularHours)}
       </TableCell>
       <TableCell
