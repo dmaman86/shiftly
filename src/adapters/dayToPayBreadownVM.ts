@@ -1,9 +1,15 @@
 import { WorkDayMap, PayBreakdownViewModel } from "@/domain";
+import { calculateActualHours } from "@/utils";
 
 export const dayToPayBreakdownVM = (
   day: WorkDayMap,
 ): PayBreakdownViewModel => ({
   totalHours: day.totalHours,
+  actualHours: calculateActualHours(
+    day.totalHours,
+    day.hours100Sick.hours,
+    day.hours100Vacation.hours,
+  ),
 
   regular: day.workMap.regular,
   extra: day.workMap.extra,

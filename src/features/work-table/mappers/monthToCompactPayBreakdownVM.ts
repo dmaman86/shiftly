@@ -1,6 +1,6 @@
 import { CompactPayBreakdownVM, MonthPayMap } from "@/domain";
 import { monthToPayBreakdownVM } from "./monthToPayBreakdownVM";
-import { computeTotalPay } from "@/utils";
+import { calculateActualHours, computeTotalPay } from "@/utils";
 
 export const monthToCompactPayBreakdownVM = (
   month: MonthPayMap,
@@ -20,6 +20,11 @@ export const monthToCompactPayBreakdownVM = (
 
   return {
     totalHours,
+    actualHours: calculateActualHours(
+      totalHours,
+      month.hours100Sick.hours,
+      month.hours100Vacation.hours,
+    ),
     regularHours,
     extraHours,
     dailySalary,

@@ -47,6 +47,7 @@ export const headersTable: TableHeader[] = [
     viewMode: "both",
   },
   { label: "סך שעות", rowSpan: 2, viewMode: "both" },
+  { label: "סך שעות בפועל", rowSpan: 2, viewMode: "both" },
   { label: "רגילות", rowSpan: 2, viewMode: "compact" },
   { label: "תוספות", rowSpan: 2, viewMode: "compact" },
   {

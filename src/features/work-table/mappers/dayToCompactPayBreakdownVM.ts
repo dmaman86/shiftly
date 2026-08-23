@@ -1,6 +1,6 @@
 import { CompactPayBreakdownVM, WorkDayMap } from "@/domain";
 import { dayToPayBreakdownVM } from "./dayToPayBreakdownVM";
-import { computeTotalPay } from "@/utils";
+import { calculateActualHours, computeTotalPay } from "@/utils";
 
 export const dayToCompactPayBreakdownVM = (
   day: WorkDayMap,
@@ -18,6 +18,11 @@ export const dayToCompactPayBreakdownVM = (
 
   return {
     totalHours: day.totalHours,
+    actualHours: calculateActualHours(
+      day.totalHours,
+      day.hours100Sick.hours,
+      day.hours100Vacation.hours,
+    ),
     regularHours,
     extraHours,
     dailySalary,
