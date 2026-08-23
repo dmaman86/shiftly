@@ -9,7 +9,7 @@
 ![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+[![CI](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml/badge.svg)](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
 [![codecov](https://codecov.io/gh/dmaman86/shiftly/branch/main/graph/badge.svg)](https://codecov.io/gh/dmaman86/shiftly)
 ![License](https://img.shields.io/badge/license-MIT-blue)
@@ -221,7 +221,7 @@ Create specific calculator instances:
 
 ### Data & Services
 
-- **Axios** 1.9.0 (HTTP client)
+- **Axios** 1.18.1 (HTTP client)
 - **date-fns** 4.1.0 (date manipulation)
 - **Hebcal API** (holiday detection)
 
