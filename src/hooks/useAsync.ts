@@ -1,31 +1,28 @@
-import { useEffect, useRef, DependencyList } from "react";
+import { useEffect, useEffectEvent, type DependencyList } from "react";
 
 export const useAsync = <T>(
   asyncRequest: () => Promise<T>,
+  deps: DependencyList,
   onResult: (response: T) => void,
-  deps: DependencyList = [],
   cleanup?: () => void,
 ) => {
-  const asyncRequestRef = useRef(asyncRequest);
-  const onResultRef = useRef(onResult);
-  const cleanupRef = useRef(cleanup);
+  const asyncRequestEvent = useEffectEvent(asyncRequest);
+  const onResultEvent = useEffectEvent(onResult);
+  const cleanupEvent = useEffectEvent(() => cleanup?.());
 
-  asyncRequestRef.current = asyncRequest;
-  onResultRef.current = onResult;
-  cleanupRef.current = cleanup;
-
-  // deps controls WHEN to fire; refs ensure no stale closures on the callbacks.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     let isActive = true;
 
-    asyncRequestRef.current().then((result) => {
-      if (isActive) onResultRef.current(result);
+    void asyncRequestEvent().then((result) => {
+      if (isActive) onResultEvent(result);
     });
 
     return () => {
       isActive = false;
-      cleanupRef.current?.();
+      cleanupEvent();
     };
+
+    // Dependencies are statically validated at useAsync call sites.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
 };

@@ -32,12 +32,13 @@ import { DomainContextType } from "@/app";
 import { hebcalService, analyticsService } from "@/services";
 import { ErrorBoundary, FeatureErrorFallback } from "@/layout";
 
+const calendarApi = hebcalService();
+
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const { t } = useTranslation("work-table");
   const { dateService } = domain.services;
   const { isMobile } = useDeviceType();
 
-  const call = hebcalService();
   const { year, month, baseRate, reset } = useGlobalState();
 
   const { workDays, generate } = useWorkDays();
@@ -50,33 +51,41 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
 
   const { loading, callEndPoint, cancelEndPoint } = useFetch();
 
+  const handleCalendarResult = ({
+    data,
+    error,
+  }: ApiResponse<CalendarEventMap>) => {
+    if (data) {
+      generate(year, month, data);
+      reset();
+      setError(undefined);
+      return;
+    }
+
+    const description = error ?? "hebcal fetch failed";
+
+    analyticsService.track({
+      name: "exception",
+      params: {
+        description,
+        fatal: false,
+        error_type: "hebcal_api_error",
+      },
+    });
+
+    setError(description);
+  };
+
   useAsync<ApiResponse<CalendarEventMap>>(
     () => {
       const { startDate, endDate } = dateService.getDatesRange(year, month);
       return callEndPoint<CalendarEventMap>(
-        call.getData(startDate, endDate),
+        calendarApi.getData(startDate, endDate),
         buildEventMap,
       );
     },
-    ({ data, error }) => {
-      if (data) {
-        // console.log(data);
-        generate(year, month, data);
-        reset();
-        setError(undefined);
-        return;
-      }
-      analyticsService.track({
-        name: "exception",
-        params: {
-          description: error ?? "hebcal fetch failed",
-          fatal: false,
-          error_type: "hebcal_api_error",
-        },
-      });
-      setError(error);
-    },
-    [year, month],
+    [dateService, year, month, callEndPoint],
+    handleCalendarResult,
     cancelEndPoint,
   );
 
