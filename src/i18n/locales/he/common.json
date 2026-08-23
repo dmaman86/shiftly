@@ -19,6 +19,7 @@
     "standard_hours_helper": "ברירת מחדל: {{standardHours}}",
     "base_rate_label": "שכר שעתי",
     "year_min_error": "השנה המינימלית הנתמכת היא {{year}}",
+    "year_max_error": "השנה המקסימלית הנתמכת היא {{year}}",
     "base_rate_helper_daily": "יש להזין שכר שעתי להצגת שכר יומי או חודשי",
     "base_rate_helper_monthly": "חישוב שכר חודשי מחייב הגדרת שכר שעתי",
     "calculation_based_on": "החישוב מבוסס על {{monthName}} {{year}}"

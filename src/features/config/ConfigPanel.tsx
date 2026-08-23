@@ -114,11 +114,18 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
 
   const availableMonths = monthResolver.getAvailableMonthOptions(year);
 
+  const currentYear = monthResolver.getCurrentYear();
   const parsedYear = Number(inputsValues.yearInput);
-  const yearError = !isNaN(parsedYear) && parsedYear < SYSTEM_START_YEAR;
-  const yearHelperText = yearError
+  const yearBelowMinimum =
+    !Number.isNaN(parsedYear) && parsedYear < SYSTEM_START_YEAR;
+  const yearAboveMaximum =
+    !Number.isNaN(parsedYear) && parsedYear > currentYear;
+  const yearError = yearBelowMinimum || yearAboveMaximum;
+  const yearHelperText = yearBelowMinimum
     ? t("config.year_min_error", { year: SYSTEM_START_YEAR })
-    : "";
+    : yearAboveMaximum
+      ? t("config.year_max_error", { year: currentYear })
+      : "";
 
   const helperTextBaseRate = (): string => {
     if (baseRate === 0) {

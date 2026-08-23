@@ -1,5 +1,12 @@
-import { describe, it, expect } from "vitest";
-import { renderWithProviders, screen, createMockGlobalState, waitFor } from "@/test/ui/utils";
+import { describe, it, expect, vi } from "vitest";
+import {
+  act,
+  createMockGlobalState,
+  fireEvent,
+  renderWithProviders,
+  screen,
+  waitFor,
+} from "@/test/ui/utils";
 import userEvent from "@testing-library/user-event";
 import { ConfigPanel } from "@/features/config/ConfigPanel";
 import { pipelineInstance } from "@/test/ui/utils/setup-domain";
@@ -235,6 +242,45 @@ describe("ConfigPanel", () => {
         // Year error is shown through helperText, just verify input exists
         expect(input).toBeInTheDocument();
       }, { timeout: 200 });
+    });
+
+    it("should show an error for a year after the current year", () => {
+      vi.useFakeTimers();
+
+      try {
+        const currentYear = mockDomain.resolvers.monthResolver.getCurrentYear();
+        const { store } = renderWithProviders(
+          <ConfigPanel domain={mockDomain} />,
+          {
+            preloadedState: {
+              global: createMockGlobalState({
+                config: {
+                  year: 2024,
+                  month: 1,
+                  standardHours: 6.67,
+                  baseRate: 50,
+                },
+              }),
+            },
+          },
+        );
+
+        const yearInput = screen.getByLabelText("שנה");
+        fireEvent.change(yearInput, {
+          target: { value: String(currentYear + 1) },
+        });
+
+        expect(
+          screen.getByText(`השנה המקסימלית הנתמכת היא ${currentYear}`),
+        ).toBeInTheDocument();
+        expect(yearInput).toHaveAttribute("aria-invalid", "true");
+
+        act(() => vi.advanceTimersByTime(500));
+
+        expect(store.getState().global.config.year).toBe(2024);
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it("should show helper text for zero base rate in daily mode", () => {
