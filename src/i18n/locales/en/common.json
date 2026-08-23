@@ -19,6 +19,7 @@
     "standard_hours_helper": "Default: 6.67",
     "base_rate_label": "Hourly Rate",
     "year_min_error": "Minimum supported year is {{year}}",
+    "year_max_error": "Maximum supported year is {{year}}",
     "base_rate_helper_daily": "Enter hourly rate to display daily or monthly salary",
     "base_rate_helper_monthly": "Monthly salary calculation requires setting hourly rate",
     "calculation_based_on": "Calculation based on {{monthName}} {{year}}"
