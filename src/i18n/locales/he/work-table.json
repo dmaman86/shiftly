@@ -24,7 +24,7 @@
     "meal_per_diem": "כלכלה",
     "large": "גדולה",
     "small": "קטנה",
-    "shabbat_eve_bonus": "ז. שבת",
+    "shabbat_credit": "זכות שבת",
     "entry": "כניסה",
     "exit": "יציאה"
   },
@@ -67,7 +67,9 @@
     "hint_add_shift": "לחץ על ➕ להוספת משמרת",
     "hint_cross_midnight": "סמן ✅ למשמרת שחוצה את חצות",
     "hint_duty_shift": "לחץ על 🚗 לסימון משמרת בתפקיד (זכאות אש״ל)",
-    "hint_save_shift": "לחץ על 💾 לשמירת שינויים ועדכון שכר"
+    "hint_save_shift": "לחץ על 💾 לשמירת שינויים ועדכון שכר",
+    "shabbat_credit_summary": "זכות שבת — נצברו: {{earned}}, נוצלו: {{used}}, לא נוצלו: {{unused}}.",
+    "shabbat_credit_unused_note": "שעות זכות שבת שלא נוצלו אינן נכללות בסך השעות או בחישוב השכר."
   },
   "shift_row": {
     "cross_midnight_warning": "זוהתה משמרת החוצה את חצות. יש לסמן \"חוצה יום\" לפני שמירה.",
@@ -99,7 +101,7 @@
   },
   "pay_labels": {
     "regular_100": "100%",
-    "shabbat_bonus_100": "שבת תוספת 100%",
+    "shabbat_bonus_100": "זכות שבת",
     "sick": "מחלה",
     "vacation": "חופש",
     "night_50": "תוספת לילה (50%)",

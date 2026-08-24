@@ -5,10 +5,14 @@ import { calculateActualHours, computeTotalPay } from "@/utils";
 export const dayToCompactPayBreakdownVM = (
   day: WorkDayMap,
   baseRate: number,
+  shabbatCreditHours: number,
 ): CompactPayBreakdownVM => {
   const dailySalary =
     baseRate > 0
-      ? computeTotalPay(dayToPayBreakdownVM(day), baseRate)
+      ? computeTotalPay(
+          dayToPayBreakdownVM(day, shabbatCreditHours),
+          baseRate,
+        )
       : undefined;
 
   const regularHours = day.workMap.regular.hours100.hours;
@@ -17,7 +21,7 @@ export const dayToCompactPayBreakdownVM = (
     day.workMap.regular.hours125.hours + day.workMap.regular.hours150.hours;
 
   return {
-    totalHours: day.totalHours,
+    totalHours: day.totalHours + shabbatCreditHours,
     actualHours: calculateActualHours(
       day.totalHours,
       day.hours100Sick.hours,

@@ -426,7 +426,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
       // Fixed segments
       expect(emptyMonth).toHaveProperty("hours100Sick");
       expect(emptyMonth).toHaveProperty("hours100Vacation");
-      expect(emptyMonth).toHaveProperty("extra100Shabbat");
+      expect(emptyMonth).toHaveProperty("earnedShabbatCredit");
 
       // Allowances
       expect(emptyMonth).toHaveProperty("perDiem");

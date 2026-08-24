@@ -33,7 +33,7 @@ export type WorkDayReducerBundle = {
 export type FixedSegmentBundle = {
   sick: FixedSegmentFactory;
   vacation: FixedSegmentFactory;
-  extraShabbat: FixedSegmentFactory;
+  earnedShabbatCredit: FixedSegmentFactory;
 };
 
 export type PerDiemBundle = {

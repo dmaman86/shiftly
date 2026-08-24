@@ -19,7 +19,7 @@ export const buildCalculators = (): Calculators => {
 
   const sickCalculator = new FixedSegmentFactory();
   const vacationCalculator = new FixedSegmentFactory();
-  const extraShabbatCalculator = new FixedSegmentFactory();
+  const earnedShabbatCreditCalculator = new FixedSegmentFactory();
 
   const largeMealAllowanceCalculator = new LargeMealAllowanceCalculator();
   const smallMealAllowanceCalculator = new SmallMealAllowanceCalculator();
@@ -38,7 +38,7 @@ export const buildCalculators = (): Calculators => {
     fixedSegments: {
       sick: sickCalculator,
       vacation: vacationCalculator,
-      extraShabbat: extraShabbatCalculator,
+      earnedShabbatCredit: earnedShabbatCreditCalculator,
     },
     mealAllowance: {
       large: largeMealAllowanceCalculator,

@@ -1,10 +1,15 @@
-import { WorkDayMap, PayBreakdownViewModel } from "@/domain";
+import {
+  applyShabbatCreditToSegment,
+  WorkDayMap,
+  PayBreakdownViewModel,
+} from "@/domain";
 import { calculateActualHours } from "@/utils";
 
 export const dayToPayBreakdownVM = (
   day: WorkDayMap,
+  shabbatCreditHours: number,
 ): PayBreakdownViewModel => ({
-  totalHours: day.totalHours,
+  totalHours: day.totalHours + shabbatCreditHours,
   actualHours: calculateActualHours(
     day.totalHours,
     day.hours100Sick.hours,
@@ -17,7 +22,10 @@ export const dayToPayBreakdownVM = (
 
   hours100Sick: day.hours100Sick,
   hours100Vacation: day.hours100Vacation,
-  extra100Shabbat: day.extra100Shabbat,
+  appliedShabbatCredit: applyShabbatCreditToSegment(
+    day.earnedShabbatCredit,
+    shabbatCreditHours,
+  ),
 
   perDiemPoints: day.perDiem.diemInfo.points,
   perDiemAmount: day.perDiem.diemInfo.amount,

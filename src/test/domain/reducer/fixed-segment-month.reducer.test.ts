@@ -21,7 +21,7 @@ describe("FixedSegmentMonthReducer", () => {
           hours,
         })),
       } as unknown as FixedSegmentFactory,
-      extraShabbat: {
+      earnedShabbatCredit: {
         create: vi.fn((hours: number): Segment => ({
           percent: 1.5,
           hours,
@@ -38,7 +38,7 @@ describe("FixedSegmentMonthReducer", () => {
       expect(result).toEqual({
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       });
     });
 
@@ -47,7 +47,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       expect(mockBundle.sick.create).toHaveBeenCalledWith(0);
       expect(mockBundle.vacation.create).toHaveBeenCalledWith(0);
-      expect(mockBundle.extraShabbat.create).toHaveBeenCalledWith(0);
+      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(0);
     });
 
     it("should return a new object each time", () => {
@@ -63,7 +63,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       expect(result).toHaveProperty("hours100Sick");
       expect(result).toHaveProperty("hours100Vacation");
-      expect(result).toHaveProperty("extra100Shabbat");
+      expect(result).toHaveProperty("earnedShabbatCredit");
     });
 
     it("should have percent and hours in each segment", () => {
@@ -73,8 +73,8 @@ describe("FixedSegmentMonthReducer", () => {
       expect(result.hours100Sick).toHaveProperty("hours");
       expect(result.hours100Vacation).toHaveProperty("percent");
       expect(result.hours100Vacation).toHaveProperty("hours");
-      expect(result.extra100Shabbat).toHaveProperty("percent");
-      expect(result.extra100Shabbat).toHaveProperty("hours");
+      expect(result.earnedShabbatCredit).toHaveProperty("percent");
+      expect(result.earnedShabbatCredit).toHaveProperty("hours");
     });
   });
 
@@ -83,12 +83,12 @@ describe("FixedSegmentMonthReducer", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
       const add: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
@@ -101,12 +101,12 @@ describe("FixedSegmentMonthReducer", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 16 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
       const add: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
@@ -119,87 +119,87 @@ describe("FixedSegmentMonthReducer", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
       const add: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 5 },
+        earnedShabbatCredit: { percent: 1.5, hours: 5 },
       };
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
-      expect(mockBundle.extraShabbat.create).toHaveBeenCalledWith(15);
-      expect(result.extra100Shabbat.hours).toBe(15);
+      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(15);
+      expect(result.earnedShabbatCredit.hours).toBe(15);
     });
 
     it("should accumulate all segments simultaneously", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 16 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
       const add: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 5 },
+        earnedShabbatCredit: { percent: 1.5, hours: 5 },
       };
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
       expect(result.hours100Sick.hours).toBe(16);
       expect(result.hours100Vacation.hours).toBe(24);
-      expect(result.extra100Shabbat.hours).toBe(15);
+      expect(result.earnedShabbatCredit.hours).toBe(15);
     });
 
     it("should handle accumulating empty segments", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 16 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
       const add = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       } as Partial<WorkDayMap>;
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
       expect(result.hours100Sick.hours).toBe(8);
       expect(result.hours100Vacation.hours).toBe(16);
-      expect(result.extra100Shabbat.hours).toBe(10);
+      expect(result.earnedShabbatCredit.hours).toBe(10);
     });
 
     it("should handle accumulating to empty base", () => {
       const base = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       } as Partial<MonthPayMap>;
       const add: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 16 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
       expect(result.hours100Sick.hours).toBe(8);
       expect(result.hours100Vacation.hours).toBe(16);
-      expect(result.extra100Shabbat.hours).toBe(10);
+      expect(result.earnedShabbatCredit.hours).toBe(10);
     });
 
     it("should handle decimal hours", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 7.5 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
       const add: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 4.5 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
 
       reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
@@ -211,19 +211,19 @@ describe("FixedSegmentMonthReducer", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 10 },
         hours100Vacation: { percent: 1, hours: 20 },
-        extra100Shabbat: { percent: 1.5, hours: 30 },
+        earnedShabbatCredit: { percent: 1.5, hours: 30 },
       };
       const add: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 5 },
         hours100Vacation: { percent: 1, hours: 10 },
-        extra100Shabbat: { percent: 1.5, hours: 15 },
+        earnedShabbatCredit: { percent: 1.5, hours: 15 },
       };
 
       reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
       expect(mockBundle.sick.create).toHaveBeenCalledWith(15);
       expect(mockBundle.vacation.create).toHaveBeenCalledWith(30);
-      expect(mockBundle.extraShabbat.create).toHaveBeenCalledWith(45);
+      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(45);
     });
   });
 
@@ -232,12 +232,12 @@ describe("FixedSegmentMonthReducer", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 16 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
       const sub: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
@@ -250,12 +250,12 @@ describe("FixedSegmentMonthReducer", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 24 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
       const sub: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
@@ -268,49 +268,49 @@ describe("FixedSegmentMonthReducer", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 15 },
+        earnedShabbatCredit: { percent: 1.5, hours: 15 },
       };
       const sub: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 5 },
+        earnedShabbatCredit: { percent: 1.5, hours: 5 },
       };
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
-      expect(mockBundle.extraShabbat.create).toHaveBeenCalledWith(10);
-      expect(result.extra100Shabbat.hours).toBe(10);
+      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(10);
+      expect(result.earnedShabbatCredit.hours).toBe(10);
     });
 
     it("should subtract all segments simultaneously", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 16 },
         hours100Vacation: { percent: 1, hours: 24 },
-        extra100Shabbat: { percent: 1.5, hours: 15 },
+        earnedShabbatCredit: { percent: 1.5, hours: 15 },
       };
       const sub: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 5 },
+        earnedShabbatCredit: { percent: 1.5, hours: 5 },
       };
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
       expect(result.hours100Sick.hours).toBe(8);
       expect(result.hours100Vacation.hours).toBe(16);
-      expect(result.extra100Shabbat.hours).toBe(10);
+      expect(result.earnedShabbatCredit.hours).toBe(10);
     });
 
     it("should not go below zero for any segment", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 5 },
         hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 3 },
+        earnedShabbatCredit: { percent: 1.5, hours: 3 },
       };
       const sub: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 10 },
         hours100Vacation: { percent: 1, hours: 20 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
@@ -319,58 +319,58 @@ describe("FixedSegmentMonthReducer", () => {
       expect(result.hours100Sick.hours).toBe(0);
       expect(mockBundle.vacation.create).toHaveBeenCalledWith(0);
       expect(result.hours100Vacation.hours).toBe(0);
-      expect(mockBundle.extraShabbat.create).toHaveBeenCalledWith(0);
-      expect(result.extra100Shabbat.hours).toBe(0);
+      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(0);
+      expect(result.earnedShabbatCredit.hours).toBe(0);
     });
 
     it("should handle subtracting empty segments", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 16 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
       const sub = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       } as Partial<WorkDayMap>;
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
       expect(result.hours100Sick.hours).toBe(8);
       expect(result.hours100Vacation.hours).toBe(16);
-      expect(result.extra100Shabbat.hours).toBe(10);
+      expect(result.earnedShabbatCredit.hours).toBe(10);
     });
 
     it("should handle subtracting from empty base", () => {
       const base = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       } as Partial<MonthPayMap>;
       const sub: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 16 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
       expect(result.hours100Sick.hours).toBe(0);
       expect(result.hours100Vacation.hours).toBe(0);
-      expect(result.extra100Shabbat.hours).toBe(0);
+      expect(result.earnedShabbatCredit.hours).toBe(0);
     });
 
     it("should handle decimal hours with Math.max", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 7.5 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
       const sub: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 3.5 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
 
       reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
@@ -382,19 +382,19 @@ describe("FixedSegmentMonthReducer", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 2 },
         hours100Vacation: { percent: 1, hours: 3 },
-        extra100Shabbat: { percent: 1.5, hours: 1 },
+        earnedShabbatCredit: { percent: 1.5, hours: 1 },
       };
       const sub: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 5 },
         hours100Vacation: { percent: 1, hours: 10 },
-        extra100Shabbat: { percent: 1.5, hours: 5 },
+        earnedShabbatCredit: { percent: 1.5, hours: 5 },
       };
 
       reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
       expect(mockBundle.sick.create).toHaveBeenCalledWith(0);
       expect(mockBundle.vacation.create).toHaveBeenCalledWith(0);
-      expect(mockBundle.extraShabbat.create).toHaveBeenCalledWith(0);
+      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(0);
     });
   });
 
@@ -405,7 +405,7 @@ describe("FixedSegmentMonthReducer", () => {
       const sickDay: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
 
       for (let i = 0; i < 3; i++) {
@@ -421,7 +421,7 @@ describe("FixedSegmentMonthReducer", () => {
       const vacationDay: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
 
       for (let i = 0; i < 5; i++) {
@@ -437,14 +437,14 @@ describe("FixedSegmentMonthReducer", () => {
       const shabbatDay: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
 
       for (let i = 0; i < 4; i++) {
         monthTotal = reducer.accumulate(monthTotal as MonthPayMap, shabbatDay as WorkDayMap);
       }
 
-      expect(monthTotal.extra100Shabbat.hours).toBe(40);
+      expect(monthTotal.earnedShabbatCredit.hours).toBe(40);
     });
 
     it("should handle mixed segment types in month", () => {
@@ -453,56 +453,56 @@ describe("FixedSegmentMonthReducer", () => {
       monthTotal = reducer.accumulate(monthTotal as MonthPayMap, {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       } as WorkDayMap);
 
       monthTotal = reducer.accumulate(monthTotal as MonthPayMap, {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       } as WorkDayMap);
 
       monthTotal = reducer.accumulate(monthTotal as MonthPayMap, {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       } as WorkDayMap);
 
       expect(monthTotal.hours100Sick.hours).toBe(8);
       expect(monthTotal.hours100Vacation.hours).toBe(8);
-      expect(monthTotal.extra100Shabbat.hours).toBe(10);
+      expect(monthTotal.earnedShabbatCredit.hours).toBe(10);
     });
 
     it("should handle day removal from month", () => {
       const monthTotal: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 24 },
         hours100Vacation: { percent: 1, hours: 40 },
-        extra100Shabbat: { percent: 1.5, hours: 20 },
+        earnedShabbatCredit: { percent: 1.5, hours: 20 },
       };
 
       const removedDay: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       };
 
       const result = reducer.subtract(monthTotal as MonthPayMap, removedDay as WorkDayMap);
 
       expect(result.hours100Sick.hours).toBe(16);
       expect(result.hours100Vacation.hours).toBe(40);
-      expect(result.extra100Shabbat.hours).toBe(20);
+      expect(result.earnedShabbatCredit.hours).toBe(20);
     });
 
     it("should handle accumulate then subtract to return to original", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 16 },
         hours100Vacation: { percent: 1, hours: 32 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
       const delta: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 5 },
+        earnedShabbatCredit: { percent: 1.5, hours: 5 },
       };
 
       const accumulated = reducer.accumulate(base as MonthPayMap, delta as WorkDayMap);
@@ -510,7 +510,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       expect(result.hours100Sick.hours).toBe(16);
       expect(result.hours100Vacation.hours).toBe(32);
-      expect(result.extra100Shabbat.hours).toBe(10);
+      expect(result.earnedShabbatCredit.hours).toBe(10);
     });
   });
 
@@ -519,12 +519,12 @@ describe("FixedSegmentMonthReducer", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 16 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
       const add: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 5 },
+        earnedShabbatCredit: { percent: 1.5, hours: 5 },
       };
 
       vi.clearAllMocks();
@@ -533,7 +533,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       expect(mockBundle.sick.create).toHaveBeenCalled();
       expect(mockBundle.vacation.create).toHaveBeenCalled();
-      expect(mockBundle.extraShabbat.create).toHaveBeenCalled();
+      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalled();
     });
 
     it("should respect factory return values", () => {
@@ -558,7 +558,7 @@ describe("FixedSegmentMonthReducer", () => {
             hours,
           }),
         } as unknown as FixedSegmentFactory,
-        extraShabbat: {
+        earnedShabbatCredit: {
           create: (hours: number): Segment => ({
             percent: 1.5,
             hours,
@@ -579,33 +579,33 @@ describe("FixedSegmentMonthReducer", () => {
       const add = {
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       } as Partial<WorkDayMap>;
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
       expect(result.hours100Sick.hours).toBe(0);
       expect(result.hours100Vacation.hours).toBe(0);
-      expect(result.extra100Shabbat.hours).toBe(0);
+      expect(result.earnedShabbatCredit.hours).toBe(0);
     });
 
     it("should handle very large values", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 1000 },
         hours100Vacation: { percent: 1, hours: 2000 },
-        extra100Shabbat: { percent: 1.5, hours: 3000 },
+        earnedShabbatCredit: { percent: 1.5, hours: 3000 },
       };
       const add: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 500 },
         hours100Vacation: { percent: 1, hours: 1000 },
-        extra100Shabbat: { percent: 1.5, hours: 1500 },
+        earnedShabbatCredit: { percent: 1.5, hours: 1500 },
       };
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
       expect(result.hours100Sick.hours).toBe(1500);
       expect(result.hours100Vacation.hours).toBe(3000);
-      expect(result.extra100Shabbat.hours).toBe(4500);
+      expect(result.earnedShabbatCredit.hours).toBe(4500);
     });
 
     it("should handle precision with repeated operations", () => {
@@ -615,7 +615,7 @@ describe("FixedSegmentMonthReducer", () => {
         result = reducer.accumulate(result as MonthPayMap, {
           hours100Sick: { percent: 1, hours: 0.1 },
           hours100Vacation: { percent: 1, hours: 0.1 },
-          extra100Shabbat: { percent: 1.5, hours: 0.1 },
+          earnedShabbatCredit: { percent: 1.5, hours: 0.1 },
         } as WorkDayMap);
       }
 
@@ -630,7 +630,7 @@ describe("FixedSegmentMonthReducer", () => {
       const result = reducer.createEmpty();
 
       expect(Object.keys(result).sort()).toEqual([
-        "extra100Shabbat",
+        "earnedShabbatCredit",
         "hours100Sick",
         "hours100Vacation",
       ]);
@@ -641,12 +641,12 @@ describe("FixedSegmentMonthReducer", () => {
       const base: Partial<MonthPayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 16 },
-        extra100Shabbat: { percent: 1.5, hours: 10 },
+        earnedShabbatCredit: { percent: 1.5, hours: 10 },
       };
       const add: Partial<WorkDayMap> = {
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 8 },
-        extra100Shabbat: { percent: 1.5, hours: 5 },
+        earnedShabbatCredit: { percent: 1.5, hours: 5 },
       };
 
       const accumulated = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
@@ -655,7 +655,7 @@ describe("FixedSegmentMonthReducer", () => {
       [empty, accumulated, subtracted].forEach((result) => {
         expect(result).toHaveProperty("hours100Sick");
         expect(result).toHaveProperty("hours100Vacation");
-        expect(result).toHaveProperty("extra100Shabbat");
+        expect(result).toHaveProperty("earnedShabbatCredit");
         expect(result.hours100Sick).toHaveProperty("percent");
         expect(result.hours100Sick).toHaveProperty("hours");
       });

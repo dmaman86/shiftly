@@ -15,7 +15,7 @@ export const buildBasePayRows = (
 ): PayRowVM[] => {
   const baseMap: Record<string, Segment> = {
     [t("pay_labels.regular_100")]: payVM.regular.hours100,
-    [t("pay_labels.shabbat_bonus_100")]: payVM.extra100Shabbat,
+    [t("pay_labels.shabbat_bonus_100")]: payVM.appliedShabbatCredit,
     [t("pay_labels.sick")]: payVM.hours100Sick,
     [t("pay_labels.vacation")]: payVM.hours100Vacation,
   };

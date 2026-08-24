@@ -64,7 +64,7 @@ export const ExpandedDayRow = ({
         {formatValue(breakdown.special.shabbat200.hours)}
       </TableCell>
       <TableCell rowSpan={rowSpan} sx={{ ...baseCellSx(isFooter) }}>
-        {formatValue(breakdown.extra100Shabbat.hours)}
+        {formatValue(breakdown.appliedShabbatCredit.hours)}
       </TableCell>
 
       <TableCell rowSpan={rowSpan} sx={{ ...baseCellSx(isFooter) }}>

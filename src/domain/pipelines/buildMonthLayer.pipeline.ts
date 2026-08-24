@@ -19,7 +19,7 @@ export const buildMonthLayer = ({
   const fixedSegmentBundle: FixedSegmentBundle = {
     sick: calculators.fixedSegments.sick,
     vacation: calculators.fixedSegments.vacation,
-    extraShabbat: calculators.fixedSegments.extraShabbat,
+    earnedShabbatCredit: calculators.fixedSegments.earnedShabbatCredit,
   };
 
   const workPayMonthReducer = new WorkDayMonthReducer(workPay);

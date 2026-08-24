@@ -23,6 +23,7 @@ import {
   useDeviceType,
   useFetch,
   useGlobalState,
+  useShabbatCreditAllocation,
   useWorkDays,
   useAsync,
 } from "@/hooks";
@@ -42,6 +43,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const { year, month, baseRate, reset } = useGlobalState();
 
   const { workDays, generate } = useWorkDays();
+  const shabbatCreditAllocation = useShabbatCreditAllocation();
 
   const [error, setError] = useState<string | undefined>(undefined);
 
@@ -173,6 +175,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                     workDays={workDays}
                     viewMode={viewMode}
                     onViewModeChange={setViewMode}
+                    shabbatCreditAllocation={shabbatCreditAllocation}
                   />
                 </ErrorBoundary>
               )}

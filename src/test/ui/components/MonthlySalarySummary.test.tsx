@@ -18,6 +18,7 @@ vi.mock("@/hooks", () => ({
     year: 2025,
     month: 1,
   }),
+  useShabbatCreditAllocation: () => ({ usedHours: 0 }),
 }));
 
 vi.mock("@/features/salary-summary", () => ({

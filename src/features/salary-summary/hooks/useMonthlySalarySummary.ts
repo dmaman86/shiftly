@@ -15,6 +15,7 @@ type MonthlySalarySummaryParams = {
   year: number;
   month: number;
   baseRate: number;
+  shabbatCreditHours: number;
 };
 
 export const useMonthlySalarySummary = ({
@@ -23,6 +24,7 @@ export const useMonthlySalarySummary = ({
   year,
   month,
   baseRate,
+  shabbatCreditHours,
 }: MonthlySalarySummaryParams) => {
   const { t } = useTranslation("work-table");
   const monthNames = t("months", { returnObjects: true }) as string[];
@@ -38,9 +40,20 @@ export const useMonthlySalarySummary = ({
       year,
       month,
     });
-    const payVM = monthToPayBreakdownVM(globalBreakdown);
+    const payVM = monthToPayBreakdownVM(
+      globalBreakdown,
+      shabbatCreditHours,
+    );
     return buildSectionsSalary({ payVM, baseRate, allowanceRate, rateDiem, t });
-  }, [domain, globalBreakdown, year, month, baseRate, t]);
+  }, [
+    domain,
+    globalBreakdown,
+    year,
+    month,
+    baseRate,
+    shabbatCreditHours,
+    t,
+  ]);
 
   const monthlyTotal = useMemo(() => {
     return sections.reduce((sum, section) => {

@@ -16,6 +16,7 @@ describe("SalaryCardSection", () => {
     type: "base",
     payVM: {
       totalHours: 180,
+      actualHours: 180,
       regular: {
         hours100: { percent: 100, hours: 160 },
         hours125: { percent: 125, hours: 20 },
@@ -31,7 +32,7 @@ describe("SalaryCardSection", () => {
       },
       hours100Sick: { percent: 100, hours: 0 },
       hours100Vacation: { percent: 100, hours: 0 },
-      extra100Shabbat: { percent: 100, hours: 0 },
+      appliedShabbatCredit: { percent: 100, hours: 0 },
       perDiemPoints: 0,
       perDiemAmount: 0,
       largePoints: 0,

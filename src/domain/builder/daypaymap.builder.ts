@@ -37,7 +37,7 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
     status: WorkDayStatus;
     standardHours: number;
   }): WorkDayMap {
-    const { sick, vacation, extraShabbat } = this.fixedSegments;
+    const { sick, vacation, earnedShabbatCredit } = this.fixedSegments;
     const { calculator } = this.perDiem;
 
     const hoursSick =
@@ -56,7 +56,7 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
       },
       hours100Sick: sick.create(hoursSick),
       hours100Vacation: vacation.create(hoursVacation),
-      extra100Shabbat: extraShabbat.create(0),
+      earnedShabbatCredit: earnedShabbatCredit.create(0),
       perDiem: calculator.calculate({ shifts: [], rate: 0 }),
       totalHours: params.standardHours,
       mealAllowance: init.mealAllowance,
@@ -149,8 +149,8 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
       workMap: { regular, extra, special, totalHours },
       hours100Sick: this.fixedSegments.sick.create(0),
       hours100Vacation: this.fixedSegments.vacation.create(0),
-      extra100Shabbat:
-        this.fixedSegments.extraShabbat.create(totalExtraShabbat),
+      earnedShabbatCredit:
+        this.fixedSegments.earnedShabbatCredit.create(totalExtraShabbat),
       perDiem,
       totalHours,
       mealAllowance,

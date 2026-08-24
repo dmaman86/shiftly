@@ -43,7 +43,7 @@ describe("DefaultDayPayMapBuilder", () => {
     fixedSegments = {
       sick: new FixedSegmentFactory(),
       vacation: new FixedSegmentFactory(),
-      extraShabbat: new FixedSegmentFactory(),
+      earnedShabbatCredit: new FixedSegmentFactory(),
     };
 
     // Setup per diem
@@ -276,7 +276,7 @@ describe("DefaultDayPayMapBuilder", () => {
 
       expect(result.workMap.special.shabbat150.hours).toBe(6);
       expect(result.workMap.special.shabbat200.hours).toBe(4);
-      expect(result.extra100Shabbat.hours).toBe(10);
+      expect(result.earnedShabbatCredit.hours).toBe(10);
     });
 
     it("should handle double shift (two 8-hour shifts)", () => {
@@ -312,7 +312,7 @@ describe("DefaultDayPayMapBuilder", () => {
       });
 
       expect(result.workMap.special.shabbat150.hours).toBe(8);
-      expect(result.extra100Shabbat.hours).toBe(8);
+      expect(result.earnedShabbatCredit.hours).toBe(8);
     });
 
     it("should subtract special hours from regular calculation", () => {
@@ -349,7 +349,7 @@ describe("DefaultDayPayMapBuilder", () => {
 
       expect(result.workMap.special.shabbat150.hours).toBe(2);
       expect(result.workMap.extra.hours20.hours).toBe(2);
-      expect(result.extra100Shabbat.hours).toBe(2);
+      expect(result.earnedShabbatCredit.hours).toBe(2);
     });
   });
 
@@ -721,7 +721,7 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(result).toHaveProperty("workMap");
       expect(result).toHaveProperty("hours100Sick");
       expect(result).toHaveProperty("hours100Vacation");
-      expect(result).toHaveProperty("extra100Shabbat");
+      expect(result).toHaveProperty("earnedShabbatCredit");
       expect(result).toHaveProperty("perDiem");
       expect(result).toHaveProperty("totalHours");
       expect(result).toHaveProperty("mealAllowance");
@@ -761,8 +761,8 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(result.hours100Sick).toHaveProperty("hours");
       expect(result.hours100Vacation).toHaveProperty("percent");
       expect(result.hours100Vacation).toHaveProperty("hours");
-      expect(result.extra100Shabbat).toHaveProperty("percent");
-      expect(result.extra100Shabbat).toHaveProperty("hours");
+      expect(result.earnedShabbatCredit).toHaveProperty("percent");
+      expect(result.earnedShabbatCredit).toHaveProperty("hours");
     });
 
     it("should have valid perDiem structure", () => {
@@ -817,7 +817,7 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(result.totalHours).toBeGreaterThanOrEqual(0);
       expect(result.hours100Sick.hours).toBeGreaterThanOrEqual(0);
       expect(result.hours100Vacation.hours).toBeGreaterThanOrEqual(0);
-      expect(result.extra100Shabbat.hours).toBeGreaterThanOrEqual(0);
+      expect(result.earnedShabbatCredit.hours).toBeGreaterThanOrEqual(0);
       expect(result.perDiem.diemInfo.points).toBeGreaterThanOrEqual(0);
       expect(result.mealAllowance.large.points).toBeGreaterThanOrEqual(0);
       expect(result.mealAllowance.small.points).toBeGreaterThanOrEqual(0);
@@ -934,7 +934,7 @@ describe("DefaultDayPayMapBuilder", () => {
         month: 1,
       });
 
-      expect(result.extra100Shabbat.hours).toBe(12);
+      expect(result.earnedShabbatCredit.hours).toBe(12);
       expect(result.workMap.regular.hours100.hours).toBe(0);
     });
 
@@ -1046,7 +1046,7 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(vacationResult.hours100Sick.hours).toBe(0);
     });
 
-    it("should have extra100Shabbat matching total special hours", () => {
+    it("should have earnedShabbatCredit matching total special hours", () => {
       const shifts = [createShiftPayMap(10, 0, 0, 0, 6, 4)];
 
       const result = builder.build({
@@ -1062,7 +1062,7 @@ describe("DefaultDayPayMapBuilder", () => {
         result.workMap.special.shabbat150.hours + 
         result.workMap.special.shabbat200.hours;
       
-      expect(result.extra100Shabbat.hours).toBe(totalSpecial);
+      expect(result.earnedShabbatCredit.hours).toBe(totalSpecial);
     });
 
     it("should not have both large and small meal allowance", () => {

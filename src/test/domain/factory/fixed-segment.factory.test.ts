@@ -217,8 +217,8 @@ describe("FixedSegmentFactory", () => {
 
   describe("use cases - extra Shabbat", () => {
     it("should create a segment for extra Shabbat hours", () => {
-      const extraShabbatHours = 8;
-      const segment = factory.create(extraShabbatHours);
+      const earnedShabbatCreditHours = 8;
+      const segment = factory.create(earnedShabbatCreditHours);
 
       expect(segment).toEqual({
         percent: 1,
@@ -227,8 +227,8 @@ describe("FixedSegmentFactory", () => {
     });
 
     it("should create a segment for partial extra Shabbat hours", () => {
-      const extraShabbatHours = 4;
-      const segment = factory.create(extraShabbatHours);
+      const earnedShabbatCreditHours = 4;
+      const segment = factory.create(earnedShabbatCreditHours);
 
       expect(segment).toEqual({
         percent: 1,
