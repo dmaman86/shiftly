@@ -98,7 +98,7 @@ export type PayBreakdownViewModel = {
 
   hours100Sick: Segment;
   hours100Vacation: Segment;
-  extra100Shabbat: Segment;
+  appliedShabbatCredit: Segment;
 
   perDiemPoints: number;
   perDiemAmount: number;

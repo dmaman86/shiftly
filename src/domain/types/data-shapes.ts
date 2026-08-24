@@ -81,7 +81,7 @@ export interface WorkDayMap {
   workMap: BasePayMap;
   hours100Sick: Segment;
   hours100Vacation: Segment;
-  extra100Shabbat: Segment;
+  earnedShabbatCredit: Segment;
   perDiem: DailyPerDiemInfo;
   mealAllowance: MealAllowance;
   totalHours: number;
@@ -91,7 +91,7 @@ export interface WorkDayMap {
 export interface MonthPayMap {
   hours100Sick: Segment;
   hours100Vacation: Segment;
-  extra100Shabbat: Segment;
+  earnedShabbatCredit: Segment;
   perDiem: PerDiemInfo;
   mealAllowance: MealAllowance;
   regular: RegularBreakdown;

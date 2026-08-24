@@ -64,8 +64,8 @@ export const headersTable: TableHeader[] = [
   },
   {
     label: "תוספות",
-    children: ["ז. שבת ", "20%", "50%"],
-    widths: [64, 64, 64],
+    children: ["זכות שבת", "20%", "50%"],
+    widths: [96, 64, 64],
     viewMode: "expanded",
   },
   {

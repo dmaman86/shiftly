@@ -7,7 +7,7 @@ type HeaderKey =
   | "day" | "sick" | "vacation" | "hours" | "total_hours" | "actual_hours"
   | "regular" | "extras" | "overtime" | "shabbat" | "absence"
   | "meal_allowance" | "meal_per_diem" | "large" | "small"
-  | "shabbat_eve_bonus" | "entry" | "exit";
+  | "shabbat_credit" | "entry" | "exit";
 
 const HEADER_KEY_MAP: Record<string, HeaderKey> = {
   "יום": "day",
@@ -25,7 +25,7 @@ const HEADER_KEY_MAP: Record<string, HeaderKey> = {
   "כלכלה": "meal_per_diem",
   "גדולה": "large",
   "קטנה": "small",
-  "ז. שבת ": "shabbat_eve_bonus",
+  "זכות שבת": "shabbat_credit",
   "כניסה": "entry",
   "יציאה": "exit",
 };

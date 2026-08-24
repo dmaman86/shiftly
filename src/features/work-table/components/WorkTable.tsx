@@ -10,6 +10,7 @@ import {
   Box,
   Card,
   CardContent,
+  Alert,
   Divider,
   Switch,
   FormControlLabel,
@@ -30,7 +31,11 @@ import {
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
 import { monthToPayBreakdownVM } from "@/adapters";
-import { TableViewMode, WorkDayInfo } from "@/domain";
+import {
+  ShabbatCreditAllocation,
+  TableViewMode,
+  WorkDayInfo,
+} from "@/domain";
 import { CompactDayRow } from "./rows/CompactDayRow";
 
 type WorkTableProps = {
@@ -38,6 +43,7 @@ type WorkTableProps = {
   workDays: WorkDayInfo[];
   viewMode: TableViewMode;
   onViewModeChange: (mode: TableViewMode) => void;
+  shabbatCreditAllocation: ShabbatCreditAllocation;
 };
 
 export const WorkTable = ({
@@ -45,6 +51,7 @@ export const WorkTable = ({
   workDays,
   viewMode,
   onViewModeChange,
+  shabbatCreditAllocation,
 }: WorkTableProps) => {
   const { year, month, baseRate, globalBreakdown } = useGlobalState();
   const { t } = useTranslation("work-table");
@@ -139,6 +146,11 @@ export const WorkTable = ({
                         workDay={day}
                         isLastInWeek={isLastInWeek}
                         viewMode={viewMode}
+                        shabbatCreditHours={
+                          shabbatCreditAllocation.appliedHoursByDate[
+                            day.meta.date
+                          ] ?? 0
+                        }
                       />
                     );
                   })}
@@ -163,13 +175,17 @@ export const WorkTable = ({
                       breakdown={monthToCompactPayBreakdownVM(
                         globalBreakdown,
                         baseRate,
+                        shabbatCreditAllocation.usedHours,
                       )}
                       isFooter
                       emptyStartCells={7}
                     />
                   ) : (
                     <ExpandedDayRow
-                      breakdown={monthToPayBreakdownVM(globalBreakdown)}
+                      breakdown={monthToPayBreakdownVM(
+                        globalBreakdown,
+                        shabbatCreditAllocation.usedHours,
+                      )}
                       baseRate={baseRate}
                       isFooter
                       emptyStartCells={7}
@@ -180,6 +196,25 @@ export const WorkTable = ({
             </Table>
           </TableContainer>
         </Paper>
+        {shabbatCreditAllocation.earnedHours > 0 && (
+          <Alert
+            severity={
+              shabbatCreditAllocation.unusedHours > 0 ? "warning" : "info"
+            }
+            sx={{ mt: 2 }}
+          >
+            {t("table.shabbat_credit_summary", {
+              earned: shabbatCreditAllocation.earnedHours.toFixed(2),
+              used: shabbatCreditAllocation.usedHours.toFixed(2),
+              unused: shabbatCreditAllocation.unusedHours.toFixed(2),
+            })}
+            {shabbatCreditAllocation.unusedHours > 0 && (
+              <Typography variant="body2">
+                {t("table.shabbat_credit_unused_note")}
+              </Typography>
+            )}
+          </Alert>
+        )}
         <Box
           sx={{
             mt: 2,

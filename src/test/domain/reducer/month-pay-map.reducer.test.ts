@@ -68,17 +68,17 @@ describe("MonthPayMapReducer", () => {
       createEmpty: vi.fn(() => ({
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
       })),
       accumulate: vi.fn((base, add) => ({
         hours100Sick: { percent: 1, hours: base.hours100Sick.hours + add.hours100Sick.hours },
         hours100Vacation: { percent: 1, hours: base.hours100Vacation.hours + add.hours100Vacation.hours },
-        extra100Shabbat: { percent: 1.5, hours: base.extra100Shabbat.hours + add.extra100Shabbat.hours },
+        earnedShabbatCredit: { percent: 1.5, hours: base.earnedShabbatCredit.hours + add.earnedShabbatCredit.hours },
       })),
       subtract: vi.fn((base, sub) => ({
         hours100Sick: { percent: 1, hours: Math.max(0, base.hours100Sick.hours - sub.hours100Sick.hours) },
         hours100Vacation: { percent: 1, hours: Math.max(0, base.hours100Vacation.hours - sub.hours100Vacation.hours) },
-        extra100Shabbat: { percent: 1.5, hours: Math.max(0, base.extra100Shabbat.hours - sub.extra100Shabbat.hours) },
+        earnedShabbatCredit: { percent: 1.5, hours: Math.max(0, base.earnedShabbatCredit.hours - sub.earnedShabbatCredit.hours) },
       })),
     } as unknown as FixedSegmentMonthReducer;
 
@@ -129,7 +129,7 @@ describe("MonthPayMapReducer", () => {
       expect(result).toHaveProperty("special");
       expect(result).toHaveProperty("hours100Sick");
       expect(result).toHaveProperty("hours100Vacation");
-      expect(result).toHaveProperty("extra100Shabbat");
+      expect(result).toHaveProperty("earnedShabbatCredit");
       expect(result).toHaveProperty("perDiem");
       expect(result).toHaveProperty("mealAllowance");
       expect(result).toHaveProperty("totalHours");
@@ -175,7 +175,7 @@ describe("MonthPayMapReducer", () => {
 
       expect(result.hours100Sick).toEqual({ percent: 1, hours: 0 });
       expect(result.hours100Vacation).toEqual({ percent: 1, hours: 0 });
-      expect(result.extra100Shabbat).toEqual({ percent: 1.5, hours: 0 });
+      expect(result.earnedShabbatCredit).toEqual({ percent: 1.5, hours: 0 });
     });
 
     it("should include perDiem from perDiem reducer", () => {
@@ -223,7 +223,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -261,7 +261,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -301,7 +301,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -341,7 +341,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: true,
           diemInfo: { tier: "A" as const, points: 1, amount: 36.3 },
@@ -384,7 +384,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -427,7 +427,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -474,7 +474,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -514,7 +514,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -552,7 +552,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -592,7 +592,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 8 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -634,7 +634,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: true,
           diemInfo: { tier: "A" as const, points: 1, amount: 36.3 },
@@ -679,7 +679,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -722,7 +722,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: false,
           diemInfo: { tier: null, points: 0, amount: 0 },
@@ -779,7 +779,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: true,
           diemInfo: { tier: "A" as const, points: 1, amount: 36.3 },
@@ -822,7 +822,7 @@ describe("MonthPayMapReducer", () => {
         },
         hours100Sick: { percent: 1, hours: 0 },
         hours100Vacation: { percent: 1, hours: 0 },
-        extra100Shabbat: { percent: 1.5, hours: 0 },
+        earnedShabbatCredit: { percent: 1.5, hours: 0 },
         perDiem: {
           isFieldDutyDay: true,
           diemInfo: { tier: "A" as const, points: 1, amount: 36.3 },
@@ -854,7 +854,7 @@ describe("MonthPayMapReducer", () => {
         "special",
         "hours100Sick",
         "hours100Vacation",
-        "extra100Shabbat",
+        "earnedShabbatCredit",
         "perDiem",
         "mealAllowance",
         "totalHours",
@@ -876,7 +876,7 @@ describe("MonthPayMapReducer", () => {
       // From fixed
       expect(result.hours100Sick).toBeDefined();
       expect(result.hours100Vacation).toBeDefined();
-      expect(result.extra100Shabbat).toBeDefined();
+      expect(result.earnedShabbatCredit).toBeDefined();
     });
 
     it("should properly nest perDiem and mealAllowance", () => {

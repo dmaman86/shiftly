@@ -51,7 +51,7 @@ export interface Calculators {
   fixedSegments: {
     sick: FixedSegmentFactory;
     vacation: FixedSegmentFactory;
-    extraShabbat: FixedSegmentFactory;
+    earnedShabbatCredit: FixedSegmentFactory;
   };
   mealAllowance: {
     large: LargeMealAllowanceCalculator;

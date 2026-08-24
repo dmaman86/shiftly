@@ -7,7 +7,7 @@ export class FixedSegmentMonthReducer {
     return {
       hours100Sick: this.fixed.sick.create(0),
       hours100Vacation: this.fixed.vacation.create(0),
-      extra100Shabbat: this.fixed.extraShabbat.create(0),
+      earnedShabbatCredit: this.fixed.earnedShabbatCredit.create(0),
     };
   }
 
@@ -19,8 +19,8 @@ export class FixedSegmentMonthReducer {
       hours100Vacation: this.fixed.vacation.create(
         base.hours100Vacation.hours + add.hours100Vacation.hours,
       ),
-      extra100Shabbat: this.fixed.extraShabbat.create(
-        base.extra100Shabbat.hours + add.extra100Shabbat.hours,
+      earnedShabbatCredit: this.fixed.earnedShabbatCredit.create(
+        base.earnedShabbatCredit.hours + add.earnedShabbatCredit.hours,
       ),
     };
   }
@@ -33,8 +33,8 @@ export class FixedSegmentMonthReducer {
       hours100Vacation: this.fixed.vacation.create(
         Math.max(0, base.hours100Vacation.hours - sub.hours100Vacation.hours),
       ),
-      extra100Shabbat: this.fixed.extraShabbat.create(
-        Math.max(0, base.extra100Shabbat.hours - sub.extra100Shabbat.hours),
+      earnedShabbatCredit: this.fixed.earnedShabbatCredit.create(
+        Math.max(0, base.earnedShabbatCredit.hours - sub.earnedShabbatCredit.hours),
       ),
     };
   }

@@ -7,3 +7,8 @@ export { BaseRegularCalculator } from "./regular/baseRegular.calculator.ts";
 export { RegularByDayCalculator } from "./regular/regularByDay.calculator.ts";
 export { RegularByShiftCalculator } from "./regular/regularByShift.calculator.ts";
 export { SpecialCalculator } from "./special/special.calculator.ts";
+export {
+  allocateShabbatCredit,
+  applyShabbatCreditToSegment,
+} from "./shabbat-credit.calculator.ts";
+export type { ShabbatCreditAllocation } from "./shabbat-credit.calculator.ts";

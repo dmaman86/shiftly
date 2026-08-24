@@ -37,6 +37,7 @@ type DayRowProps = {
   workDay: WorkDayInfo;
   isLastInWeek?: boolean;
   viewMode: TableViewMode;
+  shabbatCreditHours: number;
 };
 
 const DayRowComponent = ({
@@ -44,6 +45,7 @@ const DayRowComponent = ({
   workDay,
   isLastInWeek,
   viewMode,
+  shabbatCreditHours,
 }: DayRowProps) => {
   const { dateService } = domain.services;
   const { dayInfoResolver } = domain.resolvers;
@@ -279,12 +281,19 @@ const DayRowComponent = ({
           {index === 0 &&
             (viewMode === "compact" ? (
               <CompactDayRow
-                breakdown={dayToCompactPayBreakdownVM(dayPayMap, baseRate)}
+                breakdown={dayToCompactPayBreakdownVM(
+                  dayPayMap,
+                  baseRate,
+                  shabbatCreditHours,
+                )}
                 rowSpan={shiftCount}
               />
             ) : (
               <ExpandedDayRow
-                breakdown={dayToPayBreakdownVM(dayPayMap)}
+                breakdown={dayToPayBreakdownVM(
+                  dayPayMap,
+                  shabbatCreditHours,
+                )}
                 baseRate={baseRate}
                 rowSpan={shiftCount}
               />

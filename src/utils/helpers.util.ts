@@ -76,7 +76,7 @@ export const computeTotalPay = (
     ...Object.values(workPayMap.special),
     workPayMap.hours100Sick,
     workPayMap.hours100Vacation,
-    workPayMap.extra100Shabbat,
+    workPayMap.appliedShabbatCredit,
   ];
 
   const basePay =
