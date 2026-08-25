@@ -1,26 +1,25 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Box,
   Checkbox,
   Chip,
+  Collapse,
   TableCell,
   TableRow,
   IconButton,
+  Tooltip,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import AddIcon from "@mui/icons-material/Add";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 import { useGlobalState, useWorkDays } from "@/hooks";
-import {
-  TableViewMode,
-  TimeFieldType,
-  WorkDayInfo,
-  WorkDayMap,
-} from "@/domain";
+import { TimeFieldType, WorkDayInfo, WorkDayMap } from "@/domain";
 import { WorkDayStatus, HolidayKey } from "@/constants";
 import {
-  ExpandedDayRow,
+  DayDetails,
   isSameDayPayMap,
   ShiftRow,
   useDay,
@@ -36,7 +35,6 @@ type DayRowProps = {
   domain: DomainContextType;
   workDay: WorkDayInfo;
   isLastInWeek?: boolean;
-  viewMode: TableViewMode;
   shabbatCreditHours: number;
 };
 
@@ -44,7 +42,6 @@ const DayRowComponent = ({
   domain,
   workDay,
   isLastInWeek,
-  viewMode,
   shabbatCreditHours,
 }: DayRowProps) => {
   const { dateService } = domain.services;
@@ -55,6 +52,7 @@ const DayRowComponent = ({
   const { baseRate, standardHours, year, month, addDay, removeDay } =
     useGlobalState();
   const { isSpecialFullDay } = useWorkDays();
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const {
     status,
@@ -109,17 +107,20 @@ const DayRowComponent = ({
 
   const shifts = Object.values(shiftEntries);
   const shiftCount = Math.max(shifts.length, 1);
+  const detailsId = `day-details-${workDay.meta.date}`;
+  const expandedBreakdown = dayToPayBreakdownVM(dayPayMap, shabbatCreditHours);
+  const compactBreakdown = dayToCompactPayBreakdownVM(
+    dayPayMap,
+    baseRate,
+    shabbatCreditHours,
+  );
+  const columnCount = baseRate > 0 ? 13 : 12;
 
   return (
     <>
       {(shifts.length ? shifts : [null]).map((item, index) => (
         <TableRow
           key={item?.shift.id ?? `${workDay.meta.date}-empty`}
-          sx={
-            isLastInWeek
-              ? { "& td": { borderBottom: "1px solid black" } }
-              : undefined
-          }
         >
           {index === 0 && (
             <>
@@ -175,11 +176,15 @@ const DayRowComponent = ({
                 rowSpan={shiftCount}
                 sx={{
                   textAlign: "center",
-                  width: 48,
+                  width: 40,
+                  minWidth: 40,
+                  maxWidth: 40,
+                  p: 0.25,
                   verticalAlign: "middle",
                 }}
               >
                 <Checkbox
+                  size="small"
                   checked={status === WorkDayStatus.sick}
                   onChange={(e) =>
                     handleStatusChanged(
@@ -188,7 +193,10 @@ const DayRowComponent = ({
                         : WorkDayStatus.normal,
                     )
                   }
-                  sx={{ display: specialFullDay ? "none" : "inline-flex" }}
+                  sx={{
+                    display: specialFullDay ? "none" : "inline-flex",
+                    p: 0.5,
+                  }}
                 />
               </TableCell>
 
@@ -197,11 +205,15 @@ const DayRowComponent = ({
                 sx={{
                   borderRight: "1px solid black",
                   textAlign: "center",
-                  width: 48,
+                  width: 40,
+                  minWidth: 40,
+                  maxWidth: 40,
+                  p: 0.25,
                   verticalAlign: "middle",
                 }}
               >
                 <Checkbox
+                  size="small"
                   checked={status === WorkDayStatus.vacation}
                   onChange={(e) =>
                     handleStatusChanged(
@@ -210,7 +222,10 @@ const DayRowComponent = ({
                         : WorkDayStatus.normal,
                     )
                   }
-                  sx={{ display: specialFullDay ? "none" : "inline-flex" }}
+                  sx={{
+                    display: specialFullDay ? "none" : "inline-flex",
+                    p: 0.5,
+                  }}
                 />
               </TableCell>
 
@@ -270,36 +285,70 @@ const DayRowComponent = ({
               <TableCell
                 sx={{
                   borderRight: "1px solid black",
-                  width: 180,
-                  maxWidth: 180,
+                  width: 112,
+                  maxWidth: 112,
                   px: 0,
                   verticalAlign: "middle",
                 }}
               ></TableCell>
             </>
           )}
-          {index === 0 &&
-            (viewMode === "compact" ? (
+          {index === 0 && (
+            <>
               <CompactDayRow
-                breakdown={dayToCompactPayBreakdownVM(
-                  dayPayMap,
-                  baseRate,
-                  shabbatCreditHours,
-                )}
+                breakdown={compactBreakdown}
                 rowSpan={shiftCount}
               />
-            ) : (
-              <ExpandedDayRow
-                breakdown={dayToPayBreakdownVM(
-                  dayPayMap,
-                  shabbatCreditHours,
-                )}
-                baseRate={baseRate}
+              <TableCell
                 rowSpan={shiftCount}
-              />
-            ))}
+                sx={{ minWidth: 48, p: 0.5, verticalAlign: "middle" }}
+              >
+                <Tooltip
+                  title={
+                    detailsOpen ? t("day_details.hide") : t("day_details.show")
+                  }
+                >
+                  <IconButton
+                    size="small"
+                    aria-label={
+                      detailsOpen
+                        ? t("day_details.hide")
+                        : t("day_details.show")
+                    }
+                    aria-expanded={detailsOpen}
+                    aria-controls={detailsId}
+                    onClick={() => setDetailsOpen((open) => !open)}
+                  >
+                    {detailsOpen ? (
+                      <KeyboardArrowUpIcon />
+                    ) : (
+                      <KeyboardArrowDownIcon />
+                    )}
+                  </IconButton>
+                </Tooltip>
+              </TableCell>
+            </>
+          )}
         </TableRow>
       ))}
+      <TableRow>
+        <TableCell
+          colSpan={columnCount}
+          sx={{
+            border: 0,
+            borderBottom: isLastInWeek ? "1px solid black" : 0,
+            p: 0,
+          }}
+        >
+          <Collapse in={detailsOpen} timeout="auto" unmountOnExit>
+            <DayDetails
+              breakdown={expandedBreakdown}
+              id={detailsId}
+              showAbsence={!specialFullDay}
+            />
+          </Collapse>
+        </TableCell>
+      </TableRow>
     </>
   );
 };

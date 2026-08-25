@@ -26,7 +26,8 @@
     "small": "קטנה",
     "shabbat_credit": "זכות שבת",
     "entry": "כניסה",
-    "exit": "יציאה"
+    "exit": "יציאה",
+    "details": "פרטים"
   },
   "months": [
     "ינואר",
@@ -70,6 +71,12 @@
     "hint_save_shift": "לחץ על 💾 לשמירת שינויים ועדכון שכר",
     "shabbat_credit_summary": "זכות שבת — נצברו: {{earned}}, נוצלו: {{used}}, לא נוצלו: {{unused}}.",
     "shabbat_credit_unused_note": "שעות זכות שבת שלא נוצלו אינן נכללות בסך השעות או בחישוב השכר."
+  },
+  "day_details": {
+    "show": "הצג פרטי יום",
+    "hide": "הסתר פרטי יום",
+    "region_label": "פירוט שכר יומי",
+    "points": "נקודות"
   },
   "shift_row": {
     "cross_midnight_warning": "זוהתה משמרת החוצה את חצות. יש לסמן \"חוצה יום\" לפני שמירה.",

@@ -39,15 +39,15 @@ export enum WorkDayType {
 
 export const headersTable: TableHeader[] = [
   { label: "יום", viewMode: "both", rowSpan: 2 },
-  { label: "", children: ["מחלה", "חופש"], widths: [48, 48], viewMode: "both" },
+  { label: "", children: ["מחלה", "חופש"], widths: [40, 40], viewMode: "both" },
   {
     label: "שעות",
     children: ["", "כניסה", "יציאה", ""],
-    widths: [48, 96, 96, 120],
+    widths: [48, 96, 96, 112],
     viewMode: "both",
   },
-  { label: "סך שעות", rowSpan: 2, viewMode: "both" },
   { label: "סך שעות בפועל", rowSpan: 2, viewMode: "both" },
+  { label: "סך שעות", rowSpan: 2, viewMode: "both" },
   { label: "רגילות", rowSpan: 2, viewMode: "compact" },
   { label: "תוספות", rowSpan: 2, viewMode: "compact" },
   {

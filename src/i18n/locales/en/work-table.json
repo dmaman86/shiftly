@@ -26,7 +26,8 @@
     "small": "Small",
     "shabbat_credit": "Shabbat Credit",
     "entry": "In",
-    "exit": "Out"
+    "exit": "Out",
+    "details": "Details"
   },
   "months": [
     "January",
@@ -70,6 +71,12 @@
     "hint_save_shift": "Click 💾 to save changes and update salary",
     "shabbat_credit_summary": "Shabbat credit — earned: {{earned}}, used: {{used}}, unused: {{unused}}.",
     "shabbat_credit_unused_note": "Unused Shabbat credit is not included in total hours or salary."
+  },
+  "day_details": {
+    "show": "Show day details",
+    "hide": "Hide day details",
+    "region_label": "Day pay breakdown",
+    "points": "Points"
   },
   "shift_row": {
     "cross_midnight_warning": "A shift crossing midnight was detected. Please check \"cross day\" before saving.",

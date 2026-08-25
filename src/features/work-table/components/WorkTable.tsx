@@ -12,9 +12,7 @@ import {
   CardContent,
   Alert,
   Divider,
-  Switch,
-  FormControlLabel,
-  Tooltip,
+  TableCell,
 } from "@mui/material";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useTranslation } from "react-i18next";
@@ -22,35 +20,24 @@ import { useTranslation } from "react-i18next";
 import { useGlobalState } from "@/hooks";
 import { groupByShabbat } from "@/utils";
 import { headersTable } from "@/constants";
-import { analyticsService } from "@/services";
 import {
-  ExpandedDayRow,
   DayRow,
   WorkTableHeader,
   monthToCompactPayBreakdownVM,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
-import { monthToPayBreakdownVM } from "@/adapters";
-import {
-  ShabbatCreditAllocation,
-  TableViewMode,
-  WorkDayInfo,
-} from "@/domain";
+import { ShabbatCreditAllocation, WorkDayInfo } from "@/domain";
 import { CompactDayRow } from "./rows/CompactDayRow";
 
 type WorkTableProps = {
   domain: DomainContextType;
   workDays: WorkDayInfo[];
-  viewMode: TableViewMode;
-  onViewModeChange: (mode: TableViewMode) => void;
   shabbatCreditAllocation: ShabbatCreditAllocation;
 };
 
 export const WorkTable = ({
   domain,
   workDays,
-  viewMode,
-  onViewModeChange,
   shabbatCreditAllocation,
 }: WorkTableProps) => {
   const { year, month, baseRate, globalBreakdown } = useGlobalState();
@@ -74,31 +61,6 @@ export const WorkTable = ({
               year,
             })}
           </Typography>
-          <Tooltip title={t("table.toggle_view_tooltip")}>
-            <FormControlLabel
-              control={
-                <Switch
-                  size="small"
-                  checked={viewMode === "expanded"}
-                  onChange={(e) => {
-                    const mode = e.target.checked ? "expanded" : "compact";
-                    onViewModeChange(mode);
-                    analyticsService.track({
-                      name: "view_mode_toggled",
-                      params: { mode },
-                    });
-                  }}
-                  color="primary"
-                />
-              }
-              label={
-                <Typography variant="body2">
-                  {t("table.toggle_view_label")}
-                </Typography>
-              }
-              labelPlacement="start"
-            />
-          </Tooltip>
         </Box>
         <Divider sx={{ mb: 2 }} />
         {/* Table */}
@@ -132,7 +94,7 @@ export const WorkTable = ({
               <WorkTableHeader
                 headers={headersTable}
                 baseRate={baseRate}
-                viewMode={viewMode}
+                viewMode="compact"
               />
 
               {groupByWeeks.map((group) => (
@@ -145,7 +107,6 @@ export const WorkTable = ({
                         key={day.meta.date}
                         workDay={day}
                         isLastInWeek={isLastInWeek}
-                        viewMode={viewMode}
                         shabbatCreditHours={
                           shabbatCreditAllocation.appliedHoursByDate[
                             day.meta.date
@@ -170,27 +131,16 @@ export const WorkTable = ({
                     },
                   }}
                 >
-                  {viewMode === "compact" ? (
-                    <CompactDayRow
-                      breakdown={monthToCompactPayBreakdownVM(
-                        globalBreakdown,
-                        baseRate,
-                        shabbatCreditAllocation.usedHours,
-                      )}
-                      isFooter
-                      emptyStartCells={7}
-                    />
-                  ) : (
-                    <ExpandedDayRow
-                      breakdown={monthToPayBreakdownVM(
-                        globalBreakdown,
-                        shabbatCreditAllocation.usedHours,
-                      )}
-                      baseRate={baseRate}
-                      isFooter
-                      emptyStartCells={7}
-                    />
-                  )}
+                  <CompactDayRow
+                    breakdown={monthToCompactPayBreakdownVM(
+                      globalBreakdown,
+                      baseRate,
+                      shabbatCreditAllocation.usedHours,
+                    )}
+                    isFooter
+                    emptyStartCells={7}
+                  />
+                  <TableCell />
                 </TableRow>
               </TableFooter>
             </Table>

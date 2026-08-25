@@ -33,13 +33,13 @@ export const ExpandedDayRow = ({
         rowSpan={rowSpan}
         sx={{ ...baseCellSx(isFooter), ...rightBorderIfNotFooter(isFooter) }}
       >
-        {formatValue(breakdown.totalHours)}
+        {formatValue(breakdown.actualHours)}
       </TableCell>
       <TableCell
         rowSpan={rowSpan}
         sx={{ ...baseCellSx(isFooter), ...rightBorderIfNotFooter(isFooter) }}
       >
-        {formatValue(breakdown.actualHours)}
+        {formatValue(breakdown.totalHours)}
       </TableCell>
       <TableCell rowSpan={rowSpan} sx={{ ...baseCellSx(isFooter) }}>
         {formatValue(breakdown.regular.hours100.hours)}
