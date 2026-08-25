@@ -109,6 +109,24 @@ export const WorkTableHeader = ({
             {t("daily_salary_header")}
           </TableCell>
         )}
+
+        {viewMode === "compact" && (
+          <TableCell
+            rowSpan={2}
+            sx={{
+              fontWeight: "bold",
+              minWidth: 48,
+              borderTop: "1px solid black",
+              borderBottom: "1px solid black",
+              borderRight: "1px solid black",
+              textAlign: "center",
+              verticalAlign: "middle",
+              p: 0.5,
+            }}
+          >
+            {t("headers.details")}
+          </TableCell>
+        )}
       </TableRow>
 
       {/* Row 2: Sub-headers */}

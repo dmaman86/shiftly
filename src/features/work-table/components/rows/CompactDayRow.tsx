@@ -25,13 +25,13 @@ export const CompactDayRow = ({
         rowSpan={rowSpan}
         sx={{ ...baseCellSx(isFooter), ...rightBorderIfNotFooter(isFooter) }}
       >
-        {formatValue(breakdown.totalHours)}
+        {formatValue(breakdown.actualHours)}
       </TableCell>
       <TableCell
         rowSpan={rowSpan}
         sx={{ ...baseCellSx(isFooter), ...rightBorderIfNotFooter(isFooter) }}
       >
-        {formatValue(breakdown.actualHours)}
+        {formatValue(breakdown.totalHours)}
       </TableCell>
       <TableCell
         rowSpan={rowSpan}

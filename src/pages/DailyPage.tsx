@@ -20,14 +20,13 @@ import {
   Feedback,
 } from "@/features";
 import {
-  useDeviceType,
   useFetch,
   useGlobalState,
   useShabbatCreditAllocation,
   useWorkDays,
   useAsync,
 } from "@/hooks";
-import { ApiResponse, CalendarEventMap, TableViewMode } from "@/domain";
+import { ApiResponse, CalendarEventMap } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
 import { hebcalService, analyticsService } from "@/services";
@@ -38,18 +37,12 @@ const calendarApi = hebcalService();
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const { t } = useTranslation("work-table");
   const { dateService } = domain.services;
-  const { isMobile } = useDeviceType();
-
   const { year, month, baseRate, reset } = useGlobalState();
 
   const { workDays, generate } = useWorkDays();
   const shabbatCreditAllocation = useShabbatCreditAllocation();
 
   const [error, setError] = useState<string | undefined>(undefined);
-
-  const [viewMode, setViewMode] = useState<TableViewMode>(
-    isMobile ? "compact" : "expanded",
-  );
 
   const { loading, callEndPoint, cancelEndPoint } = useFetch();
 
@@ -173,8 +166,6 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                   <WorkTable
                     domain={domain}
                     workDays={workDays}
-                    viewMode={viewMode}
-                    onViewModeChange={setViewMode}
                     shabbatCreditAllocation={shabbatCreditAllocation}
                   />
                 </ErrorBoundary>

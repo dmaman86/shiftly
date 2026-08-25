@@ -1,4 +1,5 @@
 export { ExpandedDayRow } from "./rows/ExpandedPayRow";
+export { DayDetails } from "./DayDetails";
 export { DayRow } from "./DayRow";
 export { WorkTable } from "./WorkTable";
 export { WorkTableHeader } from "./WorkTableHeader";
