@@ -442,19 +442,19 @@ End time is next day; system asks to confirm crossing day.
 
 ### Breakdown Summaries
 
-#### Daily Breakdown - Expanded View
+#### Daily Breakdown - Desktop View
 
 Detailed breakdown showing all calculation components for a single day.
 
-|                     Breakdown Summary 1                      |                     Breakdown Summary 2                      |
-| :----------------------------------------------------------: | :----------------------------------------------------------: |
-| ![Breakdown Day 1](./.github/assets/breakdown-summary-1.png) | ![Breakdown Day 2](./.github/assets/breakdown-summary-2.png) |
+|                              Collapsed Details                              |                              Expanded Details                              |
+| :-------------------------------------------------------------------------: | :------------------------------------------------------------------------: |
+| ![Desktop breakdown with collapsed details](./.github/assets/breakdown-summary-1.png) | ![Desktop breakdown with expanded details](./.github/assets/breakdown-summary-2.png) |
 
-#### Daily Breakdown - Compact View
+#### Daily Breakdown - Mobile View
 
-Condensed view for quick daily salary overview.
-
-![Breakdown Compact Summary](./.github/assets/breakdown-compact-summary.png)
+|                             Collapsed Details                             |                             Expanded Details                             |
+| :-----------------------------------------------------------------------: | :----------------------------------------------------------------------: |
+| ![Mobile breakdown with collapsed details](./.github/assets/breakdown-mobile-1.png) | ![Mobile breakdown with expanded details](./.github/assets/breakdown-mobile-2.png) |
 
 #### Monthly Summary
 
