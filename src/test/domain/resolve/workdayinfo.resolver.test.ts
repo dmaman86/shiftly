@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { WorkDayInfoResolver } from "@/domain/resolve/workdayinfo.resolver";
+import { DateService } from "@/domain/services/date.service";
 import { WorkDayType } from "@/constants/fields.constant";
 import type { WorkDayInfo } from "@/domain/types/types";
 
@@ -7,7 +8,7 @@ describe("WorkDayInfoResolver", () => {
   let resolver: WorkDayInfoResolver;
 
   beforeEach(() => {
-    resolver = new WorkDayInfoResolver();
+    resolver = new WorkDayInfoResolver(new DateService("Asia/Jerusalem"));
   });
 
   // Helper function to create WorkDayInfo
@@ -312,7 +313,7 @@ describe("WorkDayInfoResolver", () => {
         "א"
       );
 
-      const result = resolver.formatHebrewWorkDay(day);
+      const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result).toBe("א-01");
     });
@@ -325,7 +326,7 @@ describe("WorkDayInfoResolver", () => {
         "ב"
       );
 
-      const result = resolver.formatHebrewWorkDay(day);
+      const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result).toBe("ב-15");
     });
@@ -338,7 +339,7 @@ describe("WorkDayInfoResolver", () => {
         "ו"
       );
 
-      const result = resolver.formatHebrewWorkDay(day);
+      const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result).toBe("ו-05");
     });
@@ -351,7 +352,7 @@ describe("WorkDayInfoResolver", () => {
         "ש"
       );
 
-      const result = resolver.formatHebrewWorkDay(day);
+      const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result).toBe("ש-06");
     });
@@ -376,7 +377,7 @@ describe("WorkDayInfoResolver", () => {
           hebrewDays[index]
         );
 
-        const result = resolver.formatHebrewWorkDay(day);
+        const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
         expect(result).toMatch(new RegExp(`^${hebrewDays[index]}-\\d{2}$`));
       });
@@ -390,7 +391,7 @@ describe("WorkDayInfoResolver", () => {
         "ו"
       );
 
-      const result = resolver.formatHebrewWorkDay(day);
+      const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result).toBe("ו-05");
       expect(result).toMatch(/^.+-\d{2}$/);
@@ -404,7 +405,7 @@ describe("WorkDayInfoResolver", () => {
         "ה"
       );
 
-      const result = resolver.formatHebrewWorkDay(day);
+      const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result).toBe("ה-25");
     });
@@ -417,20 +418,20 @@ describe("WorkDayInfoResolver", () => {
         "ד"
       );
 
-      const result = resolver.formatHebrewWorkDay(day);
+      const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result).toBe("ד-31");
     });
 
-    it("should format Hebrew day with ISO date string", () => {
+    it("should format Hebrew day for a mid-month date", () => {
       const day = createWorkDayInfo(
-        "2024-01-15T00:00:00.000Z",
+        "2024-01-15",
         WorkDayType.Regular,
         false,
         "ב"
       );
 
-      const result = resolver.formatHebrewWorkDay(day);
+      const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result).toMatch(/^ב-\d{2}$/);
     });
@@ -449,8 +450,8 @@ describe("WorkDayInfoResolver", () => {
         "ד"
       );
 
-      const result1 = resolver.formatHebrewWorkDay(day1);
-      const result2 = resolver.formatHebrewWorkDay(day2);
+      const result1 = resolver.formatHebrewWorkDay(day1, day1.hebrewDay);
+      const result2 = resolver.formatHebrewWorkDay(day2, day2.hebrewDay);
 
       expect(result1).toBe("ד-14");
       expect(result2).toBe("ד-25");
@@ -464,10 +465,35 @@ describe("WorkDayInfoResolver", () => {
         "ה"
       );
 
-      const result = resolver.formatHebrewWorkDay(day);
+      const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result).toMatch(/^.+-\d{2}$/);
       expect(result.split("-")).toHaveLength(2);
+    });
+
+    it("uses the given weekday label instead of day.hebrewDay, so a non-Hebrew locale renders its own weekday abbreviation", () => {
+      const day = createWorkDayInfo(
+        "2024-01-10",
+        WorkDayType.Regular,
+        false,
+        "ד"
+      );
+
+      const result = resolver.formatHebrewWorkDay(day, "We");
+
+      expect(result).toBe("We-10");
+    });
+
+    it("formats the day number the same way regardless of which weekday label is passed", () => {
+      const day = createWorkDayInfo(
+        "2024-01-31",
+        WorkDayType.Regular,
+        false,
+        "ד"
+      );
+
+      expect(resolver.formatHebrewWorkDay(day, day.hebrewDay)).toBe("ד-31");
+      expect(resolver.formatHebrewWorkDay(day, "We")).toBe("We-31");
     });
   });
 
@@ -480,7 +506,7 @@ describe("WorkDayInfoResolver", () => {
         "ה"
       );
 
-      const result = resolver.formatHebrewWorkDay(day);
+      const result = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result).toBe("ה-29");
     });
@@ -493,7 +519,7 @@ describe("WorkDayInfoResolver", () => {
         "א"
       );
 
-      expect(resolver.formatHebrewWorkDay(day)).toBe("א-01");
+      expect(resolver.formatHebrewWorkDay(day, day.hebrewDay)).toBe("א-01");
       expect(resolver.isSpecialFullDay(day)).toBe(false);
       expect(resolver.isPartialHolidayStart(day)).toBe(false);
       expect(resolver.hasCrossDayContinuation(day)).toBe(false);
@@ -507,7 +533,7 @@ describe("WorkDayInfoResolver", () => {
         "ג"
       );
 
-      expect(resolver.formatHebrewWorkDay(day)).toBe("ג-31");
+      expect(resolver.formatHebrewWorkDay(day, day.hebrewDay)).toBe("ג-31");
       expect(resolver.isSpecialFullDay(day)).toBe(false);
       expect(resolver.isPartialHolidayStart(day)).toBe(false);
       expect(resolver.hasCrossDayContinuation(day)).toBe(false);
@@ -562,7 +588,7 @@ describe("WorkDayInfoResolver", () => {
       expect(resolver.isSpecialFullDay(friday)).toBe(false);
       expect(resolver.isPartialHolidayStart(friday)).toBe(true);
       expect(resolver.hasCrossDayContinuation(friday)).toBe(true);
-      expect(resolver.formatHebrewWorkDay(friday)).toBe("ו-05");
+      expect(resolver.formatHebrewWorkDay(friday, friday.hebrewDay)).toBe("ו-05");
     });
 
     it("should handle typical Shabbat (Saturday)", () => {
@@ -576,7 +602,7 @@ describe("WorkDayInfoResolver", () => {
       expect(resolver.isSpecialFullDay(saturday)).toBe(true);
       expect(resolver.isPartialHolidayStart(saturday)).toBe(false);
       expect(resolver.hasCrossDayContinuation(saturday)).toBe(false);
-      expect(resolver.formatHebrewWorkDay(saturday)).toBe("ש-06");
+      expect(resolver.formatHebrewWorkDay(saturday, saturday.hebrewDay)).toBe("ש-06");
     });
 
     it("should handle typical weekday (Monday)", () => {
@@ -590,7 +616,7 @@ describe("WorkDayInfoResolver", () => {
       expect(resolver.isSpecialFullDay(monday)).toBe(false);
       expect(resolver.isPartialHolidayStart(monday)).toBe(false);
       expect(resolver.hasCrossDayContinuation(monday)).toBe(false);
-      expect(resolver.formatHebrewWorkDay(monday)).toBe("ב-01");
+      expect(resolver.formatHebrewWorkDay(monday, monday.hebrewDay)).toBe("ב-01");
     });
 
     it("should handle Erev Pesach scenario", () => {
@@ -604,7 +630,7 @@ describe("WorkDayInfoResolver", () => {
       expect(resolver.isSpecialFullDay(erevPesach)).toBe(false);
       expect(resolver.isPartialHolidayStart(erevPesach)).toBe(true);
       expect(resolver.hasCrossDayContinuation(erevPesach)).toBe(true);
-      expect(resolver.formatHebrewWorkDay(erevPesach)).toBe("ב-22");
+      expect(resolver.formatHebrewWorkDay(erevPesach, erevPesach.hebrewDay)).toBe("ב-22");
     });
 
     it("should handle Pesach I scenario", () => {
@@ -618,7 +644,7 @@ describe("WorkDayInfoResolver", () => {
       expect(resolver.isSpecialFullDay(pesach)).toBe(true);
       expect(resolver.isPartialHolidayStart(pesach)).toBe(false);
       expect(resolver.hasCrossDayContinuation(pesach)).toBe(false);
-      expect(resolver.formatHebrewWorkDay(pesach)).toBe("ג-23");
+      expect(resolver.formatHebrewWorkDay(pesach, pesach.hebrewDay)).toBe("ג-23");
     });
 
     it("should handle regular Thursday before regular Friday", () => {
@@ -632,7 +658,7 @@ describe("WorkDayInfoResolver", () => {
       expect(resolver.isSpecialFullDay(thursday)).toBe(false);
       expect(resolver.isPartialHolidayStart(thursday)).toBe(false);
       expect(resolver.hasCrossDayContinuation(thursday)).toBe(false);
-      expect(resolver.formatHebrewWorkDay(thursday)).toBe("ה-04");
+      expect(resolver.formatHebrewWorkDay(thursday, thursday.hebrewDay)).toBe("ה-04");
     });
 
     it("should handle crossDayShift scenario starting Thursday night", () => {
@@ -646,7 +672,7 @@ describe("WorkDayInfoResolver", () => {
       expect(resolver.isSpecialFullDay(thursday)).toBe(false);
       expect(resolver.isPartialHolidayStart(thursday)).toBe(false);
       expect(resolver.hasCrossDayContinuation(thursday)).toBe(true);
-      expect(resolver.formatHebrewWorkDay(thursday)).toBe("ה-04");
+      expect(resolver.formatHebrewWorkDay(thursday, thursday.hebrewDay)).toBe("ה-04");
     });
   });
 
@@ -659,9 +685,9 @@ describe("WorkDayInfoResolver", () => {
         "ו"
       );
 
-      const result1 = resolver.formatHebrewWorkDay(day);
-      const result2 = resolver.formatHebrewWorkDay(day);
-      const result3 = resolver.formatHebrewWorkDay(day);
+      const result1 = resolver.formatHebrewWorkDay(day, day.hebrewDay);
+      const result2 = resolver.formatHebrewWorkDay(day, day.hebrewDay);
+      const result3 = resolver.formatHebrewWorkDay(day, day.hebrewDay);
 
       expect(result1).toBe(result2);
       expect(result2).toBe(result3);
@@ -688,13 +714,13 @@ describe("WorkDayInfoResolver", () => {
         "ב"
       );
 
-      resolver.formatHebrewWorkDay(day);
+      resolver.formatHebrewWorkDay(day, day.hebrewDay);
       resolver.isSpecialFullDay(day);
       resolver.isPartialHolidayStart(day);
       resolver.hasCrossDayContinuation(day);
 
       // Should still work correctly after multiple calls
-      expect(resolver.formatHebrewWorkDay(day)).toBe("ב-15");
+      expect(resolver.formatHebrewWorkDay(day, day.hebrewDay)).toBe("ב-15");
       expect(resolver.isSpecialFullDay(day)).toBe(false);
     });
   });
@@ -711,7 +737,7 @@ describe("WorkDayInfoResolver", () => {
       expect(resolver.isSpecialFullDay(day)).toBe(false);
       expect(resolver.isPartialHolidayStart(day)).toBe(false);
       expect(resolver.hasCrossDayContinuation(day)).toBe(false);
-      expect(resolver.formatHebrewWorkDay(day)).toBe("ד-10");
+      expect(resolver.formatHebrewWorkDay(day, day.hebrewDay)).toBe("ד-10");
     });
 
     it("should correctly evaluate all methods for SpecialPartialStart day", () => {
@@ -725,7 +751,7 @@ describe("WorkDayInfoResolver", () => {
       expect(resolver.isSpecialFullDay(day)).toBe(false);
       expect(resolver.isPartialHolidayStart(day)).toBe(true);
       expect(resolver.hasCrossDayContinuation(day)).toBe(true);
-      expect(resolver.formatHebrewWorkDay(day)).toBe("ו-12");
+      expect(resolver.formatHebrewWorkDay(day, day.hebrewDay)).toBe("ו-12");
     });
 
     it("should correctly evaluate all methods for SpecialFull day", () => {
@@ -739,7 +765,7 @@ describe("WorkDayInfoResolver", () => {
       expect(resolver.isSpecialFullDay(day)).toBe(true);
       expect(resolver.isPartialHolidayStart(day)).toBe(false);
       expect(resolver.hasCrossDayContinuation(day)).toBe(false);
-      expect(resolver.formatHebrewWorkDay(day)).toBe("ש-13");
+      expect(resolver.formatHebrewWorkDay(day, day.hebrewDay)).toBe("ש-13");
     });
   });
 });

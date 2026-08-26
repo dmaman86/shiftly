@@ -20,10 +20,6 @@ export type AnalyticsEvent =
       };
     }
   | {
-      name: "view_mode_toggled";
-      params: { mode: "compact" | "expanded" };
-    }
-  | {
       name: "salary_summary_viewed";
       params: { month: number; year: number };
     }

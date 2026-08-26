@@ -43,6 +43,14 @@ export class DateService {
     return format(date, "yyyy-MM-dd");
   }
 
+  getWeekday(date: string): number {
+    return this.createDateWithTime(date).getDay();
+  }
+
+  getDayOfMonth(date: string): string {
+    return format(this.createDateWithTime(date), "dd");
+  }
+
   createDateWithTime(
     day: string,
     hours: number = 0,

@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 
 import { PayBreakdownViewModel } from "@/domain";
 import { formatValue } from "@/utils";
+import { breakdownToDetailGroups, DetailGroupData } from "../mappers";
 
 type DayDetailsProps = {
   breakdown: PayBreakdownViewModel;
@@ -18,21 +19,7 @@ type DayDetailsProps = {
   showAbsence?: boolean;
 };
 
-type DetailItem = {
-  label: string;
-  value: number;
-};
-
-type DetailSection = {
-  items: DetailItem[];
-  label: string;
-};
-
-type DetailGroupProps = {
-  items?: DetailItem[];
-  sections?: DetailSection[];
-  title?: string;
-};
+type DetailGroupProps = Omit<DetailGroupData, "key">;
 
 const DetailGroup = ({ items = [], sections, title }: DetailGroupProps) => {
   const columns = sections
@@ -122,71 +109,7 @@ export const DayDetails = ({
 }: DayDetailsProps) => {
   const { t } = useTranslation("work-table");
 
-  const groups: DetailGroupProps[] = [
-    {
-      title: t("headers.overtime"),
-      items: [
-        { label: "100%", value: breakdown.regular.hours100.hours },
-        { label: "125%", value: breakdown.regular.hours125.hours },
-        { label: "150%", value: breakdown.regular.hours150.hours },
-      ],
-    },
-    {
-      title: t("headers.shabbat"),
-      items: [
-        { label: "150%", value: breakdown.special.shabbat150.hours },
-        { label: "200%", value: breakdown.special.shabbat200.hours },
-        {
-          label: t("headers.shabbat_credit"),
-          value: breakdown.appliedShabbatCredit.hours,
-        },
-      ],
-    },
-    {
-      title: t("headers.extras"),
-      items: [
-        { label: "20%", value: breakdown.extra.hours20.hours },
-        { label: "50%", value: breakdown.extra.hours50.hours },
-      ],
-    },
-    ...(showAbsence
-      ? [
-          {
-            title: t("headers.absence"),
-            items: [
-              {
-                label: t("headers.sick"),
-                value: breakdown.hours100Sick.hours,
-              },
-              {
-                label: t("headers.vacation"),
-                value: breakdown.hours100Vacation.hours,
-              },
-            ],
-          },
-        ]
-      : []),
-    {
-      sections: [
-        {
-          label: t("headers.meal_allowance"),
-          items: [
-            {
-              label: t("day_details.points"),
-              value: breakdown.perDiemPoints,
-            },
-          ],
-        },
-        {
-          label: t("headers.meal_per_diem"),
-          items: [
-            { label: t("headers.large"), value: breakdown.largePoints },
-            { label: t("headers.small"), value: breakdown.smallPoints },
-          ],
-        },
-      ],
-    },
-  ];
+  const groups = breakdownToDetailGroups(breakdown, t, showAbsence);
   const primaryGroups = groups.slice(0, 2);
   const secondaryGroups = groups.slice(2);
 
@@ -216,13 +139,8 @@ export const DayDetails = ({
           },
         }}
       >
-        {primaryGroups.map((group) => (
-          <DetailGroup
-            key={
-              group.title ?? group.sections?.map((section) => section.label).join("-")
-            }
-            {...group}
-          />
+        {primaryGroups.map(({ key, ...group }) => (
+          <DetailGroup key={key} {...group} />
         ))}
       </Box>
       <Box
@@ -235,13 +153,8 @@ export const DayDetails = ({
           },
         }}
       >
-        {secondaryGroups.map((group) => (
-          <DetailGroup
-            key={
-              group.title ?? group.sections?.map((section) => section.label).join("-")
-            }
-            {...group}
-          />
+        {secondaryGroups.map(({ key, ...group }) => (
+          <DetailGroup key={key} {...group} />
         ))}
       </Box>
     </Box>

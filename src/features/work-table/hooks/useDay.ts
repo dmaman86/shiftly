@@ -1,8 +1,8 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
-import { WorkDayStatus } from "@/constants";
 import { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
 import { DomainContextType } from "@/app";
+import { useWorkTableDayState } from "./useWorkTableDayState";
 
 type UseDayProps = {
   domain: DomainContextType;
@@ -12,13 +12,6 @@ type UseDayProps = {
   month: number;
 };
 
-type ShiftEntry = {
-  shift: Shift;
-  payMap: ShiftPayMap | null;
-};
-
-type ShiftEntries = Record<string, ShiftEntry>;
-
 export const useDay = ({
   domain,
   meta,
@@ -27,10 +20,8 @@ export const useDay = ({
   month,
 }: UseDayProps) => {
   const daymapBuilder = domain.payMap.dayPayMapBuilder;
-
-  const [shiftEntries, setShiftEntries] = useState<ShiftEntries>({});
-
-  const [status, setStatus] = useState<WorkDayStatus>(WorkDayStatus.normal);
+  const { status, setStatus, shiftEntries, setShiftEntries } =
+    useWorkTableDayState(meta.date);
 
   const addShift = useCallback((shift: Shift) => {
     setShiftEntries((prev) => {
@@ -40,7 +31,7 @@ export const useDay = ({
       };
       return next;
     });
-  }, []);
+  }, [setShiftEntries]);
 
   const updateShift = useCallback((shift: Shift, payMap: ShiftPayMap) => {
     setShiftEntries((prev) => {
@@ -50,7 +41,7 @@ export const useDay = ({
       };
       return next;
     });
-  }, []);
+  }, [setShiftEntries]);
 
   const removeShift = useCallback((id: string) => {
     setShiftEntries((prev) => {
@@ -59,7 +50,7 @@ export const useDay = ({
 
       return copy;
     });
-  }, []);
+  }, [setShiftEntries]);
 
   const dayPayMap = useMemo(() => {
     const payMaps = Object.values(shiftEntries)

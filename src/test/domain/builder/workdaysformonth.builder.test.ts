@@ -26,7 +26,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
   beforeEach(() => {
     dateService = new DateService("Asia/Jerusalem");
     holidayResolver = new HolidayResolverService();
-    workDayInfoResolver = new WorkDayInfoResolver();
+    workDayInfoResolver = new WorkDayInfoResolver(dateService);
     
     builder = new DefaultWorkDaysForMonthBuilder(
       holidayResolver,

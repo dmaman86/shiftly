@@ -63,14 +63,14 @@
   },
   "table": {
     "month_hours_title": "שעות חודש {{monthName}} {{year}}",
-    "toggle_view_tooltip": "החלף בין תצוגה מצומצמת למלאה",
-    "toggle_view_label": "תצוגה מלאה",
     "hint_add_shift": "לחץ על ➕ להוספת משמרת",
     "hint_cross_midnight": "סמן ✅ למשמרת שחוצה את חצות",
     "hint_duty_shift": "לחץ על 🚗 לסימון משמרת בתפקיד (זכאות אש״ל)",
     "hint_save_shift": "לחץ על 💾 לשמירת שינויים ועדכון שכר",
     "shabbat_credit_summary": "זכות שבת — נצברו: {{earned}}, נוצלו: {{used}}, לא נוצלו: {{unused}}.",
-    "shabbat_credit_unused_note": "שעות זכות שבת שלא נוצלו אינן נכללות בסך השעות או בחישוב השכר."
+    "shabbat_credit_unused_note": "שעות זכות שבת שלא נוצלו אינן נכללות בסך השעות או בחישוב השכר.",
+    "add_shift_label": "הוסף משמרת",
+    "total_gross_label": "סה״כ ברוטו"
   },
   "day_details": {
     "show": "הצג פרטי יום",

@@ -360,12 +360,17 @@ Shiftly כוללת שתי תצוגות חישוב עיקריות:
   ![Cross Day Warning](./.github/assets/cross-day-warning.png)
   ![Cross Day](./.github/assets/shift-save.png)
 
-**סיכום פירוק יומי - מורחב**
-![Breakdown Day 1](./.github/assets/breakdown-summary-1.png)
-![Breakdown Day 2](./.github/assets/breakdown-summary-2.png)
+**סיכום פירוט יומי - תצוגת מחשב**
 
-**סיכום פירוק יומי - קומפקטי**
-![Breakdown Compact](./.github/assets/breakdown-compact-summary.png)
+|                                 פרטים סגורים                                  |                                 פרטים מורחבים                                  |
+| :----------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
+| ![פירוט יומי במחשב עם פרטים סגורים](./.github/assets/breakdown-summary-1.png) | ![פירוט יומי במחשב עם פרטים מורחבים](./.github/assets/breakdown-summary-2.png) |
+
+**סיכום פירוט יומי - תצוגת מובייל**
+
+|                                פרטים סגורים                                 |                                פרטים מורחבים                                 |
+| :---------------------------------------------------------------------------: | :----------------------------------------------------------------------------: |
+| ![פירוט יומי במובייל עם פרטים סגורים](./.github/assets/breakdown-mobile-1.png) | ![פירוט יומי במובייל עם פרטים מורחבים](./.github/assets/breakdown-mobile-2.png) |
 
 **סיכום חודשי**
 ![Monthly Summary](./.github/assets/monthly-summary.png)
