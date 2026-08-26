@@ -1,6 +1,6 @@
 import { WorkDayType, HolidayKey } from "@/constants";
 
-export type TableViewMode = "compact" | "expanded" | "both";
+export type TableViewMode = "compact" | "both";
 
 import {
   DailyPerDiemInfo,
@@ -79,7 +79,7 @@ export interface DayInfoResolver {
   isSpecialFullDay(day: WorkDayInfo): boolean;
   isPartialHolidayStart(day: WorkDayInfo): boolean;
   hasCrossDayContinuation(day: WorkDayInfo): boolean;
-  formatHebrewWorkDay(day: WorkDayInfo): string;
+  formatHebrewWorkDay(day: WorkDayInfo, weekdayLabel: string): string;
 }
 
 export enum Mode {

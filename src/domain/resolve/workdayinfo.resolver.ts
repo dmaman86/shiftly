@@ -1,7 +1,10 @@
 import { WorkDayType } from "@/constants";
 import { DayInfoResolver, WorkDayInfo } from "@/domain";
+import { DateService } from "@/domain/services/date.service";
 
 export class WorkDayInfoResolver implements DayInfoResolver {
+  constructor(private readonly dateService: DateService) {}
+
   isSpecialFullDay(day: WorkDayInfo): boolean {
     return day.meta.typeDay === WorkDayType.SpecialFull;
   }
@@ -14,10 +17,8 @@ export class WorkDayInfoResolver implements DayInfoResolver {
     return day.meta.crossDayContinuation === true;
   }
 
-  formatHebrewWorkDay(day: WorkDayInfo): string {
-    const dayNumber = new Date(day.meta.date).toLocaleDateString("he-IL", {
-      day: "2-digit",
-    });
-    return `${day.hebrewDay}-${dayNumber}`;
+  formatHebrewWorkDay(day: WorkDayInfo, weekdayLabel: string): string {
+    const dayNumber = this.dateService.getDayOfMonth(day.meta.date);
+    return `${weekdayLabel}-${dayNumber}`;
   }
 }

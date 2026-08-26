@@ -63,14 +63,14 @@
   },
   "table": {
     "month_hours_title": "{{monthName}} {{year}} Hours",
-    "toggle_view_tooltip": "Toggle between compact and full view",
-    "toggle_view_label": "Full view",
     "hint_add_shift": "Click ➕ to add a shift",
     "hint_cross_midnight": "Check ✅ for shifts crossing midnight",
     "hint_duty_shift": "Click 🚗 to mark a duty shift (meal allowance eligibility)",
     "hint_save_shift": "Click 💾 to save changes and update salary",
     "shabbat_credit_summary": "Shabbat credit — earned: {{earned}}, used: {{used}}, unused: {{unused}}.",
-    "shabbat_credit_unused_note": "Unused Shabbat credit is not included in total hours or salary."
+    "shabbat_credit_unused_note": "Unused Shabbat credit is not included in total hours or salary.",
+    "add_shift_label": "Add shift",
+    "total_gross_label": "Total gross"
   },
   "day_details": {
     "show": "Show day details",

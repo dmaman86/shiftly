@@ -50,41 +50,6 @@ export const headersTable: TableHeader[] = [
   { label: "סך שעות", rowSpan: 2, viewMode: "both" },
   { label: "רגילות", rowSpan: 2, viewMode: "compact" },
   { label: "תוספות", rowSpan: 2, viewMode: "compact" },
-  {
-    label: "ש״נ",
-    children: ["100%", "125%", "150%"],
-    widths: [64, 64, 64],
-    viewMode: "expanded",
-  },
-  {
-    label: "שבת",
-    children: ["150%", "200%"],
-    widths: [64, 64],
-    viewMode: "expanded",
-  },
-  {
-    label: "תוספות",
-    children: ["זכות שבת", "20%", "50%"],
-    widths: [96, 64, 64],
-    viewMode: "expanded",
-  },
-  {
-    label: "היעדרות",
-    children: ["מחלה", "חופש"],
-    widths: [64, 64],
-    viewMode: "expanded",
-  },
-  {
-    label: "אש״ל",
-    rowSpan: 2,
-    viewMode: "expanded",
-  },
-  {
-    label: "כלכלה",
-    children: ["גדולה", "קטנה"],
-    widths: [64, 64],
-    viewMode: "expanded",
-  },
 ];
 
 export type HolidayKey =

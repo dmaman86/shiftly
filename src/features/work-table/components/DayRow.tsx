@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Checkbox,
@@ -15,21 +15,17 @@ import AddIcon from "@mui/icons-material/Add";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
-import { useGlobalState, useWorkDays } from "@/hooks";
-import { TimeFieldType, WorkDayInfo, WorkDayMap } from "@/domain";
-import { WorkDayStatus, HolidayKey } from "@/constants";
+import { WorkDayInfo } from "@/domain";
+import { WorkDayStatus, HolidayKey, headersTable } from "@/constants";
 import {
+  CompactDayRow,
+  countTableColumns,
   DayDetails,
-  isSameDayPayMap,
   ShiftRow,
-  useDay,
+  useDayController,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
-import { dayToPayBreakdownVM } from "@/adapters";
-import { CompactDayRow } from "./rows/CompactDayRow";
-import { dayToCompactPayBreakdownVM } from "../mappers/dayToCompactPayBreakdownVM";
 import { withErrorBoundary } from "@/hoc";
-import { analyticsService } from "@/services/analytics";
 
 type DayRowProps = {
   domain: DomainContextType;
@@ -46,75 +42,33 @@ const DayRowComponent = ({
 }: DayRowProps) => {
   const { dateService } = domain.services;
   const { dayInfoResolver } = domain.resolvers;
-  const { t, i18n } = useTranslation("work-table");
+  const { t } = useTranslation("work-table");
   const tHoliday = (key: string) =>
     t(`holidays.${key}` as `holidays.${HolidayKey}`);
-  const { baseRate, standardHours, year, month, addDay, removeDay } =
-    useGlobalState();
-  const { isSpecialFullDay } = useWorkDays();
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   const {
     status,
-    setStatus,
-    dayPayMap,
-    shiftEntries,
-    setShiftEntries,
-    addShift,
+    isEditable,
+    specialFullDay,
+    shifts,
     updateShift,
     removeShift,
-  } = useDay({ domain, meta: workDay.meta, standardHours, year, month });
+    handleStatusChanged,
+    handleAddShift,
+    expandedBreakdown,
+    compactBreakdown,
+    standardHours,
+    baseRate,
+  } = useDayController({ domain, workDay, shabbatCreditHours });
 
-  const prevDayPayMapRef = useRef<WorkDayMap | null>(null);
-
-  const specialFullDay = isSpecialFullDay(workDay.meta.date);
-  const isEditable = status === WorkDayStatus.normal;
-
-  const handleStatusChanged = useCallback(
-    (newStatus: WorkDayStatus) => {
-      setStatus(newStatus);
-      setShiftEntries({});
-    },
-    [setStatus, setShiftEntries],
-  );
-
-  const handleAddShift = useCallback(() => {
-    const id = crypto.randomUUID();
-    const time = dateService.createDateWithTime(workDay.meta.date);
-    const start: TimeFieldType = { date: time };
-    const end: TimeFieldType = { date: time };
-    addShift({ id, start, end, isDuty: false });
-    analyticsService.track({ name: "shift_added", params: { month, year } });
-  }, [workDay.meta.date, addShift, dateService, month, year]);
-
-  useEffect(() => {
-    const dateKey = workDay.meta.date;
-    const prev = prevDayPayMapRef.current;
-
-    if (dayPayMap.totalHours === 0) {
-      if (prev) {
-        removeDay(dateKey);
-        prevDayPayMapRef.current = null;
-      }
-      return;
-    }
-
-    if (!prev || !isSameDayPayMap(prev, dayPayMap)) {
-      addDay(dateKey, dayPayMap);
-      prevDayPayMapRef.current = dayPayMap;
-    }
-  }, [dayPayMap, workDay.meta.date, addDay, removeDay]);
-
-  const shifts = Object.values(shiftEntries);
   const shiftCount = Math.max(shifts.length, 1);
   const detailsId = `day-details-${workDay.meta.date}`;
-  const expandedBreakdown = dayToPayBreakdownVM(dayPayMap, shabbatCreditHours);
-  const compactBreakdown = dayToCompactPayBreakdownVM(
-    dayPayMap,
-    baseRate,
-    shabbatCreditHours,
-  );
-  const columnCount = baseRate > 0 ? 13 : 12;
+  const columnCount = countTableColumns(headersTable, "compact", baseRate);
+
+  const days = t("days", { returnObjects: true }) as string[];
+  const weekdayLabel = days[dateService.getWeekday(workDay.meta.date)];
+  const dayLabel = dayInfoResolver.formatHebrewWorkDay(workDay, weekdayLabel);
 
   return (
     <>
@@ -142,26 +96,12 @@ const DayRowComponent = ({
                     gap: 0.5,
                   }}
                 >
-                  {(() => {
-                    const days = t("days", { returnObjects: true }) as string[];
-                    const weekday = new Date(workDay.meta.date).getDay();
-                    const dayNumber = new Date(
-                      workDay.meta.date,
-                    ).toLocaleDateString(
-                      i18n.language === "he" ? "he-IL" : "en-US",
-                      { day: "2-digit" },
-                    );
-                    return `${days[weekday]}-${dayNumber}`;
-                  })()}
+                  {dayLabel}
                   {workDay.meta.holidayKey && (
                     <Chip
                       label={tHoliday(workDay.meta.holidayKey)}
                       size="small"
-                      color={
-                        dayInfoResolver.isSpecialFullDay(workDay)
-                          ? "warning"
-                          : "info"
-                      }
+                      color={specialFullDay ? "warning" : "info"}
                       sx={{
                         height: 16,
                         fontSize: "0.6rem",

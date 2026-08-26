@@ -13,21 +13,25 @@ import {
   Alert,
   Divider,
   TableCell,
+  Stack,
 } from "@mui/material";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useTranslation } from "react-i18next";
 
-import { useGlobalState } from "@/hooks";
+import { useDeviceType, useGlobalState } from "@/hooks";
 import { groupByShabbat } from "@/utils";
 import { headersTable } from "@/constants";
 import {
+  CompactDayRow,
+  DayCard,
   DayRow,
+  MonthSummaryCard,
   WorkTableHeader,
+  WorkTableDayStateProvider,
   monthToCompactPayBreakdownVM,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
 import { ShabbatCreditAllocation, WorkDayInfo } from "@/domain";
-import { CompactDayRow } from "./rows/CompactDayRow";
 
 type WorkTableProps = {
   domain: DomainContextType;
@@ -41,6 +45,7 @@ export const WorkTable = ({
   shabbatCreditAllocation,
 }: WorkTableProps) => {
   const { year, month, baseRate, globalBreakdown } = useGlobalState();
+  const { isMobile } = useDeviceType();
   const { t } = useTranslation("work-table");
   const monthNames = t("months", { returnObjects: true }) as string[];
 
@@ -48,6 +53,12 @@ export const WorkTable = ({
   // Note: groupByShabbat is O(n) with n=30, very fast (~0.01ms)
   // useMemo here prevents recreation on every render, but the gain is minimal
   const groupByWeeks = useMemo(() => groupByShabbat(workDays), [workDays]);
+
+  const monthBreakdown = monthToCompactPayBreakdownVM(
+    globalBreakdown,
+    baseRate,
+    shabbatCreditAllocation.usedHours,
+  );
 
   return (
     <Card sx={{ mb: 3 }}>
@@ -63,89 +74,107 @@ export const WorkTable = ({
           </Typography>
         </Box>
         <Divider sx={{ mb: 2 }} />
-        {/* Table */}
-        <Paper variant="outlined" sx={{ borderRadius: 2, overflow: "hidden" }}>
-          <TableContainer
-            sx={{
-              maxHeight: {
-                xs: "70vh",
-                sm: 600,
-              },
-              overflowY: "auto",
-              WebkitOverflowScrolling: "touch",
-            }}
-          >
-            <Table
-              stickyHeader
-              size="small"
-              sx={{
-                "& th": {
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  backgroundColor: (theme) => theme.palette.grey[100],
-                  borderBottom: "2px solid",
-                  borderColor: "divider",
-                },
-                "& td": {
-                  textAlign: "center",
-                },
-              }}
-            >
-              <WorkTableHeader
-                headers={headersTable}
-                baseRate={baseRate}
-                viewMode="compact"
-              />
 
-              {groupByWeeks.map((group) => (
-                <TableBody key={group[0].meta.date}>
-                  {group.map((day, dayIndex) => {
-                    const isLastInWeek = dayIndex === group.length - 1;
-                    return (
-                      <DayRow
-                        domain={domain}
-                        key={day.meta.date}
-                        workDay={day}
-                        isLastInWeek={isLastInWeek}
-                        shabbatCreditHours={
-                          shabbatCreditAllocation.appliedHoursByDate[
-                            day.meta.date
-                          ] ?? 0
-                        }
-                      />
-                    );
-                  })}
-                </TableBody>
+        <WorkTableDayStateProvider key={`${year}-${month}`}>
+          {isMobile ? (
+            <Stack spacing={1.5}>
+              {workDays.map((day) => (
+                <DayCard
+                  key={day.meta.date}
+                  domain={domain}
+                  workDay={day}
+                  shabbatCreditHours={
+                    shabbatCreditAllocation.appliedHoursByDate[day.meta.date] ??
+                    0
+                  }
+                />
               ))}
-
-              <TableFooter>
-                <TableRow
+              <MonthSummaryCard breakdown={monthBreakdown} />
+            </Stack>
+          ) : (
+            <Paper
+              variant="outlined"
+              sx={{ borderRadius: 2, overflow: "hidden" }}
+            >
+              <TableContainer
+                sx={{
+                  maxHeight: {
+                    xs: "70vh",
+                    sm: 600,
+                  },
+                  overflowY: "auto",
+                  WebkitOverflowScrolling: "touch",
+                }}
+              >
+                <Table
+                  stickyHeader
+                  size="small"
                   sx={{
-                    position: "sticky",
-                    bottom: 0,
-                    backgroundColor: "#f0f0f0",
-                    zIndex: 2,
-                    "& td": {
+                    "& th": {
+                      textAlign: "center",
                       fontWeight: "bold",
-                      borderTop: "3px solid",
+                      backgroundColor: (theme) => theme.palette.grey[100],
+                      borderBottom: "2px solid",
+                      borderColor: "divider",
+                    },
+                    "& td": {
+                      textAlign: "center",
                     },
                   }}
                 >
-                  <CompactDayRow
-                    breakdown={monthToCompactPayBreakdownVM(
-                      globalBreakdown,
-                      baseRate,
-                      shabbatCreditAllocation.usedHours,
-                    )}
-                    isFooter
-                    emptyStartCells={7}
+                  <WorkTableHeader
+                    headers={headersTable}
+                    baseRate={baseRate}
+                    viewMode="compact"
                   />
-                  <TableCell />
-                </TableRow>
-              </TableFooter>
-            </Table>
-          </TableContainer>
-        </Paper>
+
+                  {groupByWeeks.map((group) => (
+                    <TableBody key={group[0].meta.date}>
+                      {group.map((day, dayIndex) => {
+                        const isLastInWeek = dayIndex === group.length - 1;
+                        return (
+                          <DayRow
+                            domain={domain}
+                            key={day.meta.date}
+                            workDay={day}
+                            isLastInWeek={isLastInWeek}
+                            shabbatCreditHours={
+                              shabbatCreditAllocation.appliedHoursByDate[
+                                day.meta.date
+                              ] ?? 0
+                            }
+                          />
+                        );
+                      })}
+                    </TableBody>
+                  ))}
+
+                  <TableFooter>
+                    <TableRow
+                      sx={{
+                        position: "sticky",
+                        bottom: 0,
+                        backgroundColor: "#f0f0f0",
+                        zIndex: 2,
+                        "& td": {
+                          fontWeight: "bold",
+                          borderTop: "3px solid",
+                        },
+                      }}
+                    >
+                      <CompactDayRow
+                        breakdown={monthBreakdown}
+                        isFooter
+                        emptyStartCells={7}
+                      />
+                      <TableCell />
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </TableContainer>
+            </Paper>
+          )}
+        </WorkTableDayStateProvider>
         {shabbatCreditAllocation.earnedHours > 0 && (
           <Alert
             severity={

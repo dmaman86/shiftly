@@ -11,7 +11,7 @@ import { DomainConfig, PayMapPipeline } from "./types/domain.types";
 export const buildPayMapPipeline = (config: DomainConfig): PayMapPipeline => {
   const services = buildCoreServices(config);
 
-  const resolvers = buildResolvers();
+  const resolvers = buildResolvers(services.dateService);
 
   const calculators = buildCalculators();
 

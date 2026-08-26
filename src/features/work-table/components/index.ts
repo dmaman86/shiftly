@@ -1,4 +1,3 @@
-export { ExpandedDayRow } from "./rows/ExpandedPayRow";
 export { DayDetails } from "./DayDetails";
 export { DayRow } from "./DayRow";
 export { WorkTable } from "./WorkTable";
@@ -6,3 +5,6 @@ export { WorkTableHeader } from "./WorkTableHeader";
 export { ShiftRow } from "./ShiftRow";
 export { ShiftTimeInput } from "./ShiftTimeInput";
 export { ShiftTimeReadonly } from "./ShiftTimeReadonly";
+export { CompactDayRow } from "./rows/CompactDayRow";
+export { DayCard } from "./cards/DayCard";
+export { MonthSummaryCard } from "./cards/MonthSummaryCard";
