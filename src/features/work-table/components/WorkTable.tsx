@@ -28,6 +28,7 @@ import {
   MonthSummaryCard,
   WorkTableHeader,
   WorkTableDayStateProvider,
+  WorkTableDayStateHydrator,
   monthToCompactPayBreakdownVM,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
@@ -76,6 +77,7 @@ export const WorkTable = ({
         <Divider sx={{ mb: 2 }} />
 
         <WorkTableDayStateProvider key={`${year}-${month}`}>
+          <WorkTableDayStateHydrator domain={domain} workDays={workDays} />
           {isMobile ? (
             <Stack spacing={1.5}>
               {workDays.map((day) => (

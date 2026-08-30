@@ -27,11 +27,22 @@ export type WorkTableDayStateAction =
       type: "setShiftEntries";
       dateKey: string;
       value: SetStateAction<ShiftEntries>;
+    }
+  | {
+      type: "hydrate";
+      state: WorkTableDayState;
     };
 
 export type WorkTableDayStateContextValue = {
   state: WorkTableDayState;
   dispatch: Dispatch<WorkTableDayStateAction>;
+  // True once hydration has resolved for this month (or immediately stays
+  // false forever in guest mode, where nothing writes anyway). Consumers that
+  // persist to Supabase must wait for this - otherwise the pre-hydration
+  // default state looks like a real user change and gets written, racing
+  // against the hydrated value's own sync.
+  hydrated: boolean;
+  setHydrated: Dispatch<SetStateAction<boolean>>;
 };
 
 export const emptyDayState: DayEditingState = {
@@ -46,6 +57,8 @@ export const workTableDayStateReducer = (
   state: WorkTableDayState,
   action: WorkTableDayStateAction,
 ): WorkTableDayState => {
+  if (action.type === "hydrate") return action.state;
+
   const currentDayState = state[action.dateKey] ?? emptyDayState;
 
   if (action.type === "setStatus") {
