@@ -6,3 +6,4 @@ export * from "./info-dialog";
 
 export * from "./workday-timeline";
 export * from "./feedback";
+export * from "./auth";

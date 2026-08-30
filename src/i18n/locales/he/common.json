@@ -31,6 +31,14 @@
     "not_sure": "לא בטוח",
     "success": "תודה! המשוב נקלט"
   },
+  "auth": {
+    "sign_in_benefit": "ההתחברות חינמית — היא שומרת את המשמרות וההגדרות שלך, ומאפשרת גישה אליהן מכל מכשיר.",
+    "sign_in_with_google": "המשך עם Google",
+    "sign_out": "התנתקות",
+    "loading": "טוען חשבון...",
+    "initialization_error": "לא ניתן לטעון את החשבון. יש לנסות שוב.",
+    "sign_out_success": "התנתקת בהצלחה."
+  },
   "actions": {
     "try_again": "נסה שוב",
     "refresh_page": "רענן דף",

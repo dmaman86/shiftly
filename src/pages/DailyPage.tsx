@@ -15,17 +15,13 @@ import { useTranslation } from "react-i18next";
 
 import {
   WorkTable,
+  AuthControls,
   ConfigPanel,
   MonthlySalarySummary,
   Feedback,
-} from "@/features";
-import {
-  useFetch,
-  useGlobalState,
   useShabbatCreditAllocation,
-  useWorkDays,
-  useAsync,
-} from "@/hooks";
+} from "@/features";
+import { useFetch, useGlobalState, useWorkDays, useAsync } from "@/hooks";
 import { ApiResponse, CalendarEventMap } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
@@ -135,6 +131,9 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                     {t("nav_link_rules")}
                   </MuiLink>
                 </Stack>
+                <Box sx={{ pt: 1 }}>
+                  <AuthControls />
+                </Box>
               </Stack>
             }
             sx={{

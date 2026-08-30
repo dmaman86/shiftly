@@ -8,9 +8,35 @@ import type { Direction } from "@/app/providers/direction/directionContext";
 type MockDirection = { direction: Direction; setDirection: ReturnType<typeof vi.fn> };
 
 const mockDirection: MockDirection = { direction: "rtl", setDirection: vi.fn() };
+const mockAuthState = {
+  user: null as { email?: string } | null,
+  isLoading: false,
+  initializationError: null,
+};
+const mockSnackbar = {
+  success: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  warning: vi.fn(),
+};
+
+vi.mock("@/services/supabase/supabase.client", () => ({
+  supabase: {
+    auth: {
+      signOut: vi.fn(),
+    },
+  },
+}));
 
 vi.mock("@/hooks", () => ({
   useDirection: () => mockDirection,
+  useAuth: () => mockAuthState,
+  useAppSnackbar: () => mockSnackbar,
+  useFetch: () => ({
+    loading: false,
+    callEndPoint: (endpoint: { call: () => Promise<unknown> }) => endpoint.call(),
+    cancelEndPoint: vi.fn(),
+  }),
 }));
 
 const LocationTracker = () => {
@@ -29,6 +55,7 @@ const renderAtPath = (path: string) =>
 describe("ViewSwitcher", () => {
   beforeEach(() => {
     mockDirection.direction = "rtl";
+    mockAuthState.user = null;
     vi.clearAllMocks();
   });
 
@@ -61,6 +88,16 @@ describe("ViewSwitcher", () => {
     it("renders mobile menu button", () => {
       renderAtPath("/he/daily");
       expect(screen.getByRole("button", { name: "Open navigation menu" })).toBeInTheDocument();
+    });
+
+    it("renders sign out only when a user is authenticated", () => {
+      mockAuthState.user = { email: "worker@example.com" };
+
+      renderAtPath("/he/daily");
+
+      expect(screen.getByRole("button", { name: "התנתקות" })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "התחברות" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "הרשמה" })).not.toBeInTheDocument();
     });
   });
 

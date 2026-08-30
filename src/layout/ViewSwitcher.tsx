@@ -20,6 +20,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useDirection } from "@/hooks";
 import { analyticsService } from "@/services";
+import { AuthControls } from "@/features/auth";
 
 const navButtonBaseStyle = {
   color: "text.secondary",
@@ -99,6 +100,8 @@ export const ViewSwitcher = () => {
             {t("nav.calculation_rules")}
           </NavItem>
         </Box>
+
+        <AuthControls display="account" />
 
         {/* Language toggle */}
         <Tooltip

@@ -17,6 +17,10 @@ vi.mock("@/app/providers/snackbar/AppSnackbarProvider", () => ({
   AppSnackbarProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+vi.mock("@/app/providers/auth/AuthProvider", () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 import { AppProviders } from "@/app/providers/AppProviders";
 
 describe("AppProviders", () => {

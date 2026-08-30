@@ -31,6 +31,14 @@
     "not_sure": "Not sure",
     "success": "Thank you! Feedback received"
   },
+  "auth": {
+    "sign_in_benefit": "Sign in for free to save your shifts and settings, and access them from any device.",
+    "sign_in_with_google": "Continue with Google",
+    "sign_out": "Sign out",
+    "loading": "Loading account...",
+    "initialization_error": "Your account session could not be loaded. Please try again.",
+    "sign_out_success": "You are signed out."
+  },
   "actions": {
     "try_again": "Try Again",
     "refresh_page": "Refresh Page",

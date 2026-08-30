@@ -11,7 +11,12 @@ import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { DomainContextType } from "@/app";
-import { ConfigPanel, MonthlySalarySummary, Feedback } from "@/features";
+import {
+  AuthControls,
+  ConfigPanel,
+  MonthlySalarySummary,
+  Feedback,
+} from "@/features";
 import { ErrorBoundary, FeatureErrorFallback } from "@/layout";
 
 export const MonthlySummaryPage = ({
@@ -71,6 +76,9 @@ export const MonthlySummaryPage = ({
                     {t("monthly_summary_page.nav_link_rules")}
                   </MuiLink>
                 </Stack>
+                <Box sx={{ pt: 1 }}>
+                  <AuthControls />
+                </Box>
               </Stack>
             }
             sx={{
