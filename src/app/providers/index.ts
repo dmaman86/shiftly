@@ -5,3 +5,6 @@ export { DomainContext } from "./domain/domainContext";
 export { AppSnackbarContext } from "./snackbar/snackbarContext";
 export { DirectionContext } from "./direction/directionContext";
 export type { Direction } from "./direction/directionContext";
+export { AuthProvider } from "./auth/AuthProvider";
+export { AuthContext } from "./auth/authContext";
+export type { AuthContextValue } from "./auth/authContext";

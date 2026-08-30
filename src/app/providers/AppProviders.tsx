@@ -6,7 +6,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 import { store } from "@/redux/store";
-import { DomainProvider, AppSnackbarProvider } from "@/app/providers";
+import { AuthProvider, DomainProvider, AppSnackbarProvider } from "@/app/providers";
 
 import createCache from "@emotion/cache";
 import rtlPlugin from "stylis-plugin-rtl";
@@ -40,12 +40,14 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
         <CacheProvider value={direction === "rtl" ? rtlCache : ltrCache}>
           <ThemeProvider theme={theme}>
             <AppSnackbarProvider>
-              <DomainProvider>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <CssBaseline />
-                  {children}
-                </LocalizationProvider>
-              </DomainProvider>
+              <AuthProvider>
+                <DomainProvider>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <CssBaseline />
+                    {children}
+                  </LocalizationProvider>
+                </DomainProvider>
+              </AuthProvider>
             </AppSnackbarProvider>
           </ThemeProvider>
         </CacheProvider>

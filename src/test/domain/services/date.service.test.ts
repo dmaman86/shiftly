@@ -413,6 +413,16 @@ describe("DateService", () => {
     });
   });
 
+  describe("getPreviousMonth", () => {
+    it("returns the prior month within the same year", () => {
+      expect(service.getPreviousMonth(2025, 6)).toEqual({ year: 2025, month: 5 });
+    });
+
+    it("handles the year boundary (January -> December of the prior year)", () => {
+      expect(service.getPreviousMonth(2025, 1)).toEqual({ year: 2024, month: 12 });
+    });
+  });
+
   describe("getDaysInMonth", () => {
     it("should return 31 for January", () => {
       const result = service.getDaysInMonth(2025, 1);

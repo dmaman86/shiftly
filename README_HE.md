@@ -9,6 +9,7 @@
 ![Redux](https://img.shields.io/badge/Redux_Toolkit-2.11.0-764ABC?logo=redux&logoColor=white)
 ![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-2.112.4-3ECF8E?logo=supabase&logoColor=white)
 
 [![CI](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml/badge.svg)](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
@@ -68,6 +69,28 @@
 - פירוט חודשי מצטבר
 - חישוב אינקרמנטלי (הוספה / עדכון / הסרה של משמרות)
 - ממשק משתמש ריאקטיבי לחלוטין
+- התחברות אופציונלית עם Google ושמירת נתונים בין מכשירים
+
+---
+
+## אימות ושמירת נתונים
+
+Shiftly פועלת במלואה **גם ללא חשבון** — הכל רץ בזיכרון, ושום דבר לא נשמר.
+
+התחברות עם **חשבון Google** (דרך Supabase Auth) שומרת בנוסף את הנתונים שלך ב-Supabase, מקושרים לחשבון שלך, כך שהם נשארים זמינים בין הפעלות ובין מכשירים:
+
+- **הגדרות חודשיות** — שנה, חודש, שעות תקן, שכר שעתי
+- **סטטוס יום** — סימון מחלה / חופשה לכל יום
+- **משמרות** — שעת התחלה, סיום ודגל תפקיד לכל משמרת שנשמרה
+- **העברת זכות שבת** — שעות זכות שבת שלא נוצלו עוברות לחודש הבא במקום להיעלם
+
+| טבלה | שומרת |
+| --- | --- |
+| `monthly_configs` | הגדרות לכל (משתמש, שנה, חודש), וגם יתרת זכות השבת המועברת |
+| `work_days` | סטטוס לכל (משתמש, תאריך) (`sick` / `vacation`) — שורה חסרה משמעה `normal` |
+| `shifts` | משמרות שנשמרו לכל משתמש, עם התאריך על כל שורה לצורך שאילתות ישירות |
+
+שלוש הטבלאות מוגנות באמצעות Row Level Security של Postgres: כל משתמש יכול לקרוא ולכתוב רק את השורות שלו. הסכמה נמצאת ב-`supabase/migrations/`.
 
 ---
 
@@ -243,6 +266,7 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 - **Axios** 1.18.1 (HTTP client)
 - **date-fns** 4.1.0 (טיפול בתאריכים)
 - **Hebcal API** (זיהוי חגים)
+- **Supabase** 2.112.4 (התחברות Google + שמירת נתונים ב-Postgres)
 
 ### בדיקות
 
@@ -258,6 +282,7 @@ src/
 ├── app/              # מעטפת האפליקציה
 │   ├── domain/       # אתחול וחיבור הדומיין
 │   ├── providers/    # ספקי Context
+│   │   └── auth/     # Context ו-Provider לאימות Supabase
 │   └── routes/       # הגדרות ניתוב
 ├── domain/           # לוגיקה עסקית (בלתי תלויה בפריימוורקים)
 │   ├── builder/      # בוני מבני דומיין
@@ -274,11 +299,12 @@ src/
 │   └── types/        # הגדרות טיפוסים
 ├── adapters/         # המרת דומיין ל־UI
 ├── features/         # מודולי UI ספציפיים
+│   ├── auth/         # ממשק התחברות Google
 │   ├── calculation-rules/
-│   ├── config/
+│   ├── config/       # פאנל הגדרות + סנכרון שמירת קונפיג חודשי
 │   ├── info-dialog/
 │   ├── salary-summary/
-│   ├── work-table/
+│   ├── work-table/   # טבלת עבודה + סנכרון שמירת סטטוס יום ומשמרות
 │   └── workday-timeline/
 ├── hooks/            # React hooks (שכבת תיאום)
 ├── hoc/              # רכיבי Higher-order
@@ -288,9 +314,16 @@ src/
 │   └── states/       # Redux slices
 ├── services/         # שירותים חיצוניים
 │   ├── analytics/    # שירות משוב שכר
-│   └── hebcal/       # אינטגרציה עם API חגים
+│   ├── hebcal/       # אינטגרציה עם API חגים
+│   ├── supabase/     # קליינט Supabase
+│   ├── monthlyConfig/# שמירת קונפיג חודשי
+│   ├── workDay/      # שמירת סטטוס יום
+│   └── shift/        # שמירת משמרות
 ├── constants/        # קבועי אפליקציה
 └── utils/            # עזרי שירות
+
+supabase/
+└── migrations/       # סכמת Postgres (טבלאות, מדיניות RLS)
 ```
 
 ---
@@ -447,6 +480,19 @@ bun run dev
 ```
 
 כניסה ל־`http://localhost:5173/shiftly` בדפדפן.
+
+### הגדרת Supabase (אופציונלי)
+
+מצב אורח עובד בלי שום הגדרה — שום דבר לא נשמר, ואין צורך בחשבון.
+
+כדי להפעיל התחברות עם Google ושמירת נתונים בין מכשירים, צרו קובץ `.env.local` עם פרטי הפרויקט שלכם ב-Supabase:
+
+```bash
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+```
+
+לאחר מכן הריצו את קבצי ה-SQL תחת `supabase/migrations/`, לפי הסדר, ב-SQL Editor של פרויקט ה-Supabase שלכם, כדי ליצור את הטבלאות `monthly_configs`, `work_days` ו-`shifts` עם מדיניות ה-Row Level Security שלהן.
 
 ---
 

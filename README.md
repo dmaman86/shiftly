@@ -8,6 +8,7 @@
 ![Redux](https://img.shields.io/badge/Redux_Toolkit-2.11.0-764ABC?logo=redux&logoColor=white)
 ![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-2.112.4-3ECF8E?logo=supabase&logoColor=white)
 
 [![CI](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml/badge.svg)](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
@@ -67,6 +68,28 @@ This makes it possible to **recalculate past months accurately** using the same 
 - Monthly aggregated breakdown
 - Incremental recalculation (add / update / remove shifts)
 - Fully reactive UI
+- Optional Google sign-in with cross-device data persistence
+
+---
+
+## Authentication & Data Persistence
+
+Shiftly works fully **without an account** — everything runs in memory, and nothing is stored anywhere.
+
+Signing in with a **Google account** (via Supabase Auth) additionally persists your data to Supabase, tied to your account, so it carries over across sessions and devices:
+
+- **Monthly configuration** — year, month, standard hours, hourly rate
+- **Day status** — sick / vacation marks per day
+- **Shifts** — start, end, and duty flag for each saved shift
+- **Shabbat credit carry-over** — unused Shabbat credit hours roll forward to the next month instead of being lost
+
+| Table | Stores |
+| --- | --- |
+| `monthly_configs` | Per-(user, year, month) settings, plus the running Shabbat-credit carry-over balance |
+| `work_days` | Per-(user, date) status (`sick` / `vacation`) — a missing row means `normal` |
+| `shifts` | Per-user saved shifts, with the date denormalized onto each row for direct querying |
+
+All three tables are protected by Postgres Row Level Security: each user can only read or write their own rows. The schema lives in `supabase/migrations/`.
 
 ---
 
@@ -243,6 +266,7 @@ Create specific calculator instances:
 - **Axios** 1.18.1 (HTTP client)
 - **date-fns** 4.1.0 (date manipulation)
 - **Hebcal API** (holiday detection)
+- **Supabase** 2.112.4 (Google OAuth + Postgres persistence)
 
 ### Testing
 
@@ -301,6 +325,19 @@ bun run dev
 
 Visit `http://localhost:5173/shiftly` in your browser.
 
+### Supabase Setup (optional)
+
+Guest mode works with no setup at all — nothing is persisted, no account required.
+
+To enable Google sign-in and cross-device data persistence, create a `.env.local` file with your Supabase project's credentials:
+
+```bash
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+```
+
+Then run the SQL files under `supabase/migrations/`, in order, in your Supabase project's SQL Editor to create the `monthly_configs`, `work_days`, and `shifts` tables with their Row Level Security policies.
+
 ---
 
 ## Project Structure
@@ -310,6 +347,7 @@ src/
 ├── app/              # Application shell
 │   ├── domain/       # Domain instance & wiring
 │   ├── providers/    # Context providers
+│   │   └── auth/     # Supabase auth context & provider
 │   └── routes/       # Route configuration
 ├── domain/           # Business logic (framework-agnostic)
 │   ├── builder/      # Domain structure builders
@@ -326,11 +364,12 @@ src/
 │   └── types/        # Type definitions
 ├── adapters/         # Domain -> UI view models
 ├── features/         # Feature-specific UI modules
+│   ├── auth/         # Google sign-in UI
 │   ├── calculation-rules/
-│   ├── config/
+│   ├── config/       # Config panel + monthly-config persistence sync
 │   ├── info-dialog/
 │   ├── salary-summary/
-│   ├── work-table/
+│   ├── work-table/   # Work table + day-status/shift persistence sync
 │   └── workday-timeline/
 ├── hooks/            # React hooks (orchestration layer)
 ├── hoc/              # Higher-order components
@@ -340,9 +379,16 @@ src/
 │   └── states/       # Redux slices
 ├── services/         # External services
 │   ├── analytics/    # Salary feedback service
-│   └── hebcal/       # Holiday API integration
+│   ├── hebcal/       # Holiday API integration
+│   ├── supabase/     # Supabase client
+│   ├── monthlyConfig/# Monthly config persistence
+│   ├── workDay/      # Day status persistence
+│   └── shift/        # Shift persistence
 ├── constants/        # Application constants
 └── utils/            # Helper utilities
+
+supabase/
+└── migrations/       # Postgres schema (tables, RLS policies)
 ```
 
 ---

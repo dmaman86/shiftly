@@ -28,6 +28,7 @@ import {
   MonthSummaryCard,
   WorkTableHeader,
   WorkTableDayStateProvider,
+  WorkTableDayStateHydrator,
   monthToCompactPayBreakdownVM,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
@@ -76,6 +77,7 @@ export const WorkTable = ({
         <Divider sx={{ mb: 2 }} />
 
         <WorkTableDayStateProvider key={`${year}-${month}`}>
+          <WorkTableDayStateHydrator domain={domain} workDays={workDays} />
           {isMobile ? (
             <Stack spacing={1.5}>
               {workDays.map((day) => (
@@ -175,13 +177,20 @@ export const WorkTable = ({
             </Paper>
           )}
         </WorkTableDayStateProvider>
-        {shabbatCreditAllocation.earnedHours > 0 && (
+        {shabbatCreditAllocation.totalAvailableHours > 0 && (
           <Alert
             severity={
               shabbatCreditAllocation.unusedHours > 0 ? "warning" : "info"
             }
             sx={{ mt: 2 }}
           >
+            {shabbatCreditAllocation.carriedOverHours > 0 && (
+              <Typography variant="body2">
+                {t("table.shabbat_credit_carried_over", {
+                  hours: shabbatCreditAllocation.carriedOverHours.toFixed(2),
+                })}
+              </Typography>
+            )}
             {t("table.shabbat_credit_summary", {
               earned: shabbatCreditAllocation.earnedHours.toFixed(2),
               used: shabbatCreditAllocation.usedHours.toFixed(2),

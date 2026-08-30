@@ -66,6 +66,10 @@ export class DateService {
     return new Date(nextYear, nextMonth - 1, 1);
   }
 
+  getPreviousMonth(year: number, month: number): { year: number; month: number } {
+    return month === 1 ? { year: year - 1, month: 12 } : { year, month: month - 1 };
+  }
+
   getDaysInMonth(year: number, month: number): number {
     return new Date(year, month, 0).getDate();
   }

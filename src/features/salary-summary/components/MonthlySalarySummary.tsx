@@ -9,8 +9,9 @@ import {
   SummaryHeader,
   SalaryCardSection,
   useMonthlySalarySummary,
+  useShabbatCreditAllocation,
 } from "@/features/salary-summary";
-import { useGlobalState, useShabbatCreditAllocation } from "@/hooks";
+import { useGlobalState } from "@/hooks";
 
 export const MonthlySalarySummary = ({ domain }: {
   domain: DomainContextType;

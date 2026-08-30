@@ -31,6 +31,14 @@
     "not_sure": "Not sure",
     "success": "Thank you! Feedback received"
   },
+  "auth": {
+    "sign_in_benefit": "Sign in for free to save your shifts and settings, and access them from any device.",
+    "sign_in_with_google": "Continue with Google",
+    "sign_out": "Sign out",
+    "loading": "Loading account...",
+    "initialization_error": "Your account session could not be loaded. Please try again.",
+    "sign_out_success": "You are signed out."
+  },
   "actions": {
     "try_again": "Try Again",
     "refresh_page": "Refresh Page",
@@ -57,11 +65,11 @@
     "privacy": {
       "title": "Privacy & Data Usage",
       "paragraphs": [
-        "The system does not store personal information, salary data, work hours, or user identification details.",
-        "The system does not perform user identification and does not use cookies for advertising or cross-site tracking purposes.",
+        "The system supports optional sign-in through your Google account. If you sign in, Supabase processes your email address, your Google account identifier, and session metadata to manage your account.",
+        "If you sign in, your shifts, day statuses (sick, vacation), and monthly settings (standard hours, hourly rate) are stored remotely in Supabase and are associated with your account — this data is not anonymous. If you do not sign in, nothing is stored remotely and everything is lost when you close or refresh the page. The system does not use cookies for advertising or cross-site tracking purposes.",
         "This site uses Google Analytics, a product by Google that helps website owners understand how visitors engage with their sites. When you visit, your browser automatically sends certain data to Google, including the page URL and your IP address.",
         "Google Analytics uses cookies — text files placed on your device — to analyze how visitors use the site. The information collected through cookies is transmitted to and stored on Google's servers. Google uses this data to evaluate site usage, compile activity reports, and provide other services related to site and internet usage.",
-        "Only basic interactions are tracked (such as page views and general interactions) to improve calculation clarity and user experience. Google Analytics 4 automatically anonymizes IP addresses. Collected data is aggregated and does not allow identification of a person, pay slip, or specific workplace.",
+        "Only basic interactions are tracked (such as page views and general interactions) to improve calculation clarity and user experience. Google Analytics 4 automatically anonymizes IP addresses, and this tracking stays anonymous whether or not you are signed in — it is never linked to your account or identity. Collected data is aggregated and does not allow identification of a person, pay slip, or specific workplace.",
         "You may disable cookies through your browser settings, though some site features may not be available as a result. By continuing to browse this site, you consent to the collection of data by Google as described above."
       ]
     }

@@ -8,6 +8,7 @@ import { dayToPayBreakdownVM } from "@/adapters";
 import { analyticsService } from "@/services/analytics";
 import { useDay } from "./useDay";
 import { useSyncDayToGlobalState } from "./useSyncDayToGlobalState";
+import { useSyncDayToStorage } from "./useSyncDayToStorage";
 import { dayToCompactPayBreakdownVM } from "../mappers/dayToCompactPayBreakdownVM";
 
 type UseDayControllerProps = {
@@ -47,6 +48,12 @@ export const useDayController = ({
     dayPayMap,
     addDay,
     removeDay,
+  });
+
+  useSyncDayToStorage({
+    dateKey: workDay.meta.date,
+    status,
+    shiftEntries,
   });
 
   const specialFullDay = isSpecialFullDay(workDay.meta.date);

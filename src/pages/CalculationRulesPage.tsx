@@ -19,6 +19,7 @@ import {
   TimeSegment,
   WorkDayTimeline,
   TimelineNote,
+  AuthControls,
 } from "@/features";
 import { useGlobalState } from "@/hooks";
 import { analyticsService } from "@/services";
@@ -59,6 +60,9 @@ export const CalculationRulesPage = () => {
             >
               {t(`${cr}.sub_title`)}
             </Typography>
+            <Box sx={{ mt: 1.5 }}>
+              <AuthControls />
+            </Box>
           </Box>
           <Divider sx={{ mt: 3 }} />
 

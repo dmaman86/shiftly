@@ -18,7 +18,6 @@ vi.mock("@/hooks", () => ({
     year: 2025,
     month: 1,
   }),
-  useShabbatCreditAllocation: () => ({ usedHours: 0 }),
 }));
 
 vi.mock("@/features/salary-summary", () => ({
@@ -31,6 +30,7 @@ vi.mock("@/features/salary-summary", () => ({
     handleTotalChange: vi.fn(),
     monthlyTotal: 5000,
   }),
+  useShabbatCreditAllocation: () => ({ usedHours: 0 }),
 }));
 
 vi.mock("@/utils", () => ({

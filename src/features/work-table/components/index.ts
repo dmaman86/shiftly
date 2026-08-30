@@ -8,3 +8,5 @@ export { ShiftTimeReadonly } from "./ShiftTimeReadonly";
 export { CompactDayRow } from "./rows/CompactDayRow";
 export { DayCard } from "./cards/DayCard";
 export { MonthSummaryCard } from "./cards/MonthSummaryCard";
+export { WorkTableDayStateProvider } from "./WorkTableDayStateProvider";
+export { WorkTableDayStateHydrator } from "./WorkTableDayStateHydrator";

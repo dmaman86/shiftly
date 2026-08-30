@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toApiResponse } from "@/utils";
 
 export const hebcalService = () => {
   const loadAbort = () => new AbortController();
@@ -23,7 +24,7 @@ export const hebcalService = () => {
     const controller = loadAbort();
     const url = buildUrl(start, end);
     return {
-      call: () => axios.get<unknown>(url, { signal: controller.signal }),
+      call: () => toApiResponse(axios.get<unknown>(url, { signal: controller.signal })),
       controller,
     };
   };
