@@ -67,8 +67,9 @@
     "hint_cross_midnight": "סמן ✅ למשמרת שחוצה את חצות",
     "hint_duty_shift": "לחץ על 🚗 לסימון משמרת בתפקיד (זכאות אש״ל)",
     "hint_save_shift": "לחץ על 💾 לשמירת שינויים ועדכון שכר",
+    "shabbat_credit_carried_over": "הועברו מהחודש הקודם: {{hours}} שעות.",
     "shabbat_credit_summary": "זכות שבת — נצברו: {{earned}}, נוצלו: {{used}}, לא נוצלו: {{unused}}.",
-    "shabbat_credit_unused_note": "שעות זכות שבת שלא נוצלו אינן נכללות בסך השעות או בחישוב השכר.",
+    "shabbat_credit_unused_note": "שעות זכות שבת שלא נוצלו אינן נכללות בסך השעות או בחישוב השכר של החודש הנוכחי — הן יועברו לחודש הבא.",
     "add_shift_label": "הוסף משמרת",
     "total_gross_label": "סה״כ ברוטו"
   },
