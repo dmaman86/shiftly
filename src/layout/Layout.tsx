@@ -1,7 +1,10 @@
 import { Footer, ViewSwitcher } from "@/layout";
 import { Box } from "@mui/material";
+import { useMonthlyConfigSync } from "@/features/config";
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
+  useMonthlyConfigSync();
+
   return (
     <Box
       sx={{

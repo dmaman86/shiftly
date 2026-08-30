@@ -1,0 +1,1 @@
+export { useMonthlyConfigSync } from "./useMonthlyConfigSync";

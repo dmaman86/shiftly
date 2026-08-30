@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
 
@@ -33,33 +34,51 @@ export const useGlobalState = () => {
     (state: RootState) => state.global.dailyPayMaps,
   );
 
-  const updateYear = (year: number) => {
-    dispatch(setYear(year));
-  };
+  const updateYear = useCallback(
+    (year: number) => {
+      dispatch(setYear(year));
+    },
+    [dispatch],
+  );
 
-  const updateMonth = (month: number) => {
-    dispatch(setMonth(month));
-  };
+  const updateMonth = useCallback(
+    (month: number) => {
+      dispatch(setMonth(month));
+    },
+    [dispatch],
+  );
 
-  const updateStandardHours = (hours: number) => {
-    dispatch(setStandardHours(hours));
-  };
+  const updateStandardHours = useCallback(
+    (hours: number) => {
+      dispatch(setStandardHours(hours));
+    },
+    [dispatch],
+  );
 
-  const updateBaseRate = (rate: number) => {
-    dispatch(setBaseRate(rate));
-  };
+  const updateBaseRate = useCallback(
+    (rate: number) => {
+      dispatch(setBaseRate(rate));
+    },
+    [dispatch],
+  );
 
-  const addDay = (dateKey: string, dayPayMap: WorkDayMap) => {
-    dispatch(addDayPayMap({ dateKey, dayPayMap }));
-  };
+  const addDay = useCallback(
+    (dateKey: string, dayPayMap: WorkDayMap) => {
+      dispatch(addDayPayMap({ dateKey, dayPayMap }));
+    },
+    [dispatch],
+  );
 
-  const removeDay = (dateKey: string) => {
-    dispatch(removeDayPayMap(dateKey));
-  };
+  const removeDay = useCallback(
+    (dateKey: string) => {
+      dispatch(removeDayPayMap(dateKey));
+    },
+    [dispatch],
+  );
 
-  const reset = () => {
+  const reset = useCallback(() => {
     dispatch(resetGlobal());
-  };
+  }, [dispatch]);
 
   return {
     // state
