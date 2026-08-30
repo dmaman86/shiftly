@@ -70,10 +70,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   useAsync<ApiResponse<CalendarEventMap>>(
     () => {
       const { startDate, endDate } = dateService.getDatesRange(year, month);
-      return callEndPoint<CalendarEventMap>(
-        calendarApi.getData(startDate, endDate),
-        buildEventMap,
-      );
+      return callEndPoint(calendarApi.getData(startDate, endDate), buildEventMap);
     },
     [dateService, year, month, callEndPoint],
     handleCalendarResult,
