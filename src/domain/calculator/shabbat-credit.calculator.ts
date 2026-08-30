@@ -8,7 +8,9 @@ type ShabbatCreditDayPayMap = Pick<
 >;
 
 export type ShabbatCreditAllocation = {
+  carriedOverHours: number;
   earnedHours: number;
+  totalAvailableHours: number;
   usedHours: number;
   unusedHours: number;
   appliedHoursByDate: Record<string, number>;
@@ -18,13 +20,16 @@ export const allocateShabbatCredit = (params: {
   workDays: ReadonlyArray<Pick<WorkDayInfo, "meta">>;
   dailyPayMaps: Readonly<Record<string, ShabbatCreditDayPayMap>>;
   standardHours: number;
+  carriedOverHours?: number;
 }): ShabbatCreditAllocation => {
+  const carriedOverHours = params.carriedOverHours ?? 0;
   const earnedHours = Object.values(params.dailyPayMaps).reduce(
     (total, day) => total + day.earnedShabbatCredit.hours,
     0,
   );
+  const totalAvailableHours = carriedOverHours + earnedHours;
 
-  let remainingHours = earnedHours;
+  let remainingHours = totalAvailableHours;
   const appliedHoursByDate: Record<string, number> = {};
 
   const chronologicalDays = [...params.workDays].sort((a, b) =>
@@ -51,8 +56,10 @@ export const allocateShabbatCredit = (params: {
   }
 
   return {
+    carriedOverHours,
     earnedHours,
-    usedHours: earnedHours - remainingHours,
+    totalAvailableHours,
+    usedHours: totalAvailableHours - remainingHours,
     unusedHours: remainingHours,
     appliedHoursByDate,
   };

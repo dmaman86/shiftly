@@ -35,7 +35,9 @@ describe("allocateShabbatCredit", () => {
     });
 
     expect(result).toEqual({
+      carriedOverHours: 0,
       earnedHours: 10,
+      totalAvailableHours: 10,
       usedHours: 10,
       unusedHours: 0,
       appliedHoursByDate: {
@@ -43,6 +45,24 @@ describe("allocateShabbatCredit", () => {
         "2026-08-03": 2,
       },
     });
+  });
+
+  it("adds carried-over hours from a previous month to the available pool", () => {
+    const result = allocateShabbatCredit({
+      workDays: [createWorkDay("2026-08-02")],
+      dailyPayMaps: {
+        "2026-08-02": createPayMap(5),
+      },
+      standardHours: 8,
+      carriedOverHours: 3.5,
+    });
+
+    expect(result.carriedOverHours).toBe(3.5);
+    expect(result.earnedHours).toBe(0);
+    expect(result.totalAvailableHours).toBe(3.5);
+    expect(result.usedHours).toBe(3);
+    expect(result.unusedHours).toBe(0.5);
+    expect(result.appliedHoursByDate).toEqual({ "2026-08-02": 3 });
   });
 
   it("does not apply credit to holidays or days already at standard hours", () => {
