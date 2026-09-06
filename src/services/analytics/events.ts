@@ -57,5 +57,12 @@ export type AnalyticsEvent =
     }
   | {
       name: "calculation_rules_accordion_expanded";
-      params: { section: string };
+      params: {
+        section: string;
+        open_method?: "manual" | "deep_link";
+      };
+    }
+  | {
+      name: "calculation_example_link_clicked";
+      params: { source: "daily" | "monthly" };
     };

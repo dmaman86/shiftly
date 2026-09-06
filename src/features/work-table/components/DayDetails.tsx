@@ -17,6 +17,7 @@ type DayDetailsProps = {
   breakdown: PayBreakdownViewModel;
   id: string;
   showAbsence?: boolean;
+  showAllowances?: boolean;
 };
 
 type DetailGroupProps = Omit<DetailGroupData, "key">;
@@ -106,10 +107,16 @@ export const DayDetails = ({
   breakdown,
   id,
   showAbsence = true,
+  showAllowances = true,
 }: DayDetailsProps) => {
   const { t } = useTranslation("work-table");
 
-  const groups = breakdownToDetailGroups(breakdown, t, showAbsence);
+  const groups = breakdownToDetailGroups(
+    breakdown,
+    t,
+    showAbsence,
+    showAllowances,
+  );
   const primaryGroups = groups.slice(0, 2);
   const secondaryGroups = groups.slice(2);
 

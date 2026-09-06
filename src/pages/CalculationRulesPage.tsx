@@ -13,6 +13,7 @@ import {
   CardContent,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import {
   RuleAccordion,
   RuleCard,
@@ -20,13 +21,16 @@ import {
   WorkDayTimeline,
   TimelineNote,
   AuthControls,
+  CalculationExampleCard,
 } from "@/features";
-import { useGlobalState } from "@/hooks";
+import { useDomain, useGlobalState } from "@/hooks";
 import { analyticsService } from "@/services";
 
 export const CalculationRulesPage = () => {
+  const domain = useDomain();
   const { standardHours } = useGlobalState();
   const { t } = useTranslation("pages");
+  const { hash } = useLocation();
 
   const std = Number(standardHours);
   const cr = "calculation_rules_page";
@@ -65,6 +69,11 @@ export const CalculationRulesPage = () => {
             </Box>
           </Box>
           <Divider sx={{ mt: 3 }} />
+
+          <CalculationExampleCard
+            defaultExpanded={hash === "#interactive-example"}
+            domain={domain}
+          />
 
           {/* Daily time split */}
           <RuleCard title={t(`${cr}.card_extra_hours.title`)}>

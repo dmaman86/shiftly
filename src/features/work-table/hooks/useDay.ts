@@ -1,6 +1,11 @@
 import { useCallback, useMemo } from "react";
 
-import { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
+import {
+  calculateDayFromShifts,
+  Shift,
+  ShiftPayMap,
+  WorkDayMeta,
+} from "@/domain";
 import { DomainContextType } from "@/app";
 import { useWorkTableDayState } from "./useWorkTableDayState";
 
@@ -53,19 +58,30 @@ export const useDay = ({
   }, [setShiftEntries]);
 
   const dayPayMap = useMemo(() => {
-    const payMaps = Object.values(shiftEntries)
-      .map((entry) => entry.payMap)
-      .filter((pm): pm is ShiftPayMap => pm !== null);
+    const savedShifts = Object.values(shiftEntries)
+      .filter((entry) => entry.payMap !== null)
+      .map((entry) => entry.shift);
 
-    return daymapBuilder.build({
-      shifts: payMaps,
-      status,
+    return calculateDayFromShifts({
+      dayPayMapBuilder: daymapBuilder,
       meta,
-      standardHours,
-      year,
       month,
-    });
-  }, [shiftEntries, status, meta, standardHours, year, month, daymapBuilder]);
+      shifts: savedShifts,
+      shiftMapBuilder: domain.payMap.shiftMapBuilder,
+      standardHours,
+      status,
+      year,
+    }).dayPayMap;
+  }, [
+    shiftEntries,
+    status,
+    meta,
+    standardHours,
+    year,
+    month,
+    daymapBuilder,
+    domain.payMap.shiftMapBuilder,
+  ]);
 
   return {
     status,

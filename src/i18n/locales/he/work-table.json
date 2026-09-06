@@ -5,6 +5,8 @@
   "nav_link_monthly": "חישוב חודשי",
   "nav_hint_rules": "רוצה להבין את אופן החישוב? עבור ל",
   "nav_link_rules": "כללי החישוב",
+  "nav_hint_example": "רוצה לנסות חישוב עם המשמרות שלך? עבור ל",
+  "nav_link_example": "דוגמת חישוב אינטראקטיבית",
   "feature_name_work_table": "טבלת ימי עבודה",
   "feature_name_salary_summary": "סיכום שכר חודשי",
   "daily_salary_header": "שכר יומי",

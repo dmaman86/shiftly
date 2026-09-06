@@ -12,3 +12,4 @@ export {
   applyShabbatCreditToSegment,
 } from "./shabbat-credit.calculator.ts";
 export type { ShabbatCreditAllocation } from "./shabbat-credit.calculator.ts";
+export { calculateDayFromShifts } from "./day-from-shifts.calculator.ts";

@@ -23,6 +23,7 @@ export const breakdownToDetailGroups = (
   breakdown: PayBreakdownViewModel,
   t: Translate,
   showAbsence: boolean,
+  showAllowances = true,
 ): DetailGroupData[] => [
   {
     key: "overtime",
@@ -68,22 +69,29 @@ export const breakdownToDetailGroups = (
         },
       ]
     : []),
-  {
-    key: "meal",
-    sections: [
-      {
-        label: t("headers.meal_allowance"),
-        items: [
-          { label: t("day_details.points"), value: breakdown.perDiemPoints },
-        ],
-      },
-      {
-        label: t("headers.meal_per_diem"),
-        items: [
-          { label: t("headers.large"), value: breakdown.largePoints },
-          { label: t("headers.small"), value: breakdown.smallPoints },
-        ],
-      },
-    ],
-  },
+  ...(showAllowances
+    ? [
+        {
+          key: "meal",
+          sections: [
+            {
+              label: t("headers.meal_allowance"),
+              items: [
+                {
+                  label: t("day_details.points"),
+                  value: breakdown.perDiemPoints,
+                },
+              ],
+            },
+            {
+              label: t("headers.meal_per_diem"),
+              items: [
+                { label: t("headers.large"), value: breakdown.largePoints },
+                { label: t("headers.small"), value: breakdown.smallPoints },
+              ],
+            },
+          ],
+        },
+      ]
+    : []),
 ];
