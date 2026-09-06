@@ -19,6 +19,7 @@ import PaymentsIcon from "@mui/icons-material/Payments";
 import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { ConfigInput } from "./ConfigInput";
+import { WorkParametersInputs } from "./WorkParametersInputs";
 import { SYSTEM_START_YEAR } from "@/constants";
 import { useTranslation } from "react-i18next";
 
@@ -36,29 +37,19 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
   const {
     year,
     month,
-    standardHours,
-    baseRate,
     updateYear,
     updateMonth,
-    updateStandardHours,
-    updateBaseRate,
   } = useGlobalState();
 
   const { monthResolver } = domain.resolvers;
 
-  const [inputsValues, setInputsValues] = useState({
-    yearInput: year.toString(),
-    standardHoursInput: standardHours.toString(),
-    baseRateInput: baseRate.toString(),
-  });
+  const [yearInput, setYearInput] = useState(year.toString());
 
   const yearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hoursTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const rateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleYearChange = useCallback(
     (value: string) => {
-      setInputsValues((prev) => ({ ...prev, yearInput: value }));
+      setYearInput(value);
       if (yearTimerRef.current !== null) clearTimeout(yearTimerRef.current);
       yearTimerRef.current = setTimeout(() => {
         const parsed = Number(value);
@@ -76,46 +67,14 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
     [year, monthResolver, updateYear, updateMonth],
   );
 
-  const handleStandardHoursChange = useCallback(
-    (value: string) => {
-      setInputsValues((prev) => ({ ...prev, standardHoursInput: value }));
-      if (hoursTimerRef.current !== null) clearTimeout(hoursTimerRef.current);
-      hoursTimerRef.current = setTimeout(() => {
-        const parsed = Number(value);
-        if (!isNaN(parsed) && parsed >= 0 && parsed !== standardHours) {
-          updateStandardHours(parsed);
-        }
-      }, DEBOUNCE_DELAY);
-    },
-    [standardHours, updateStandardHours],
-  );
-
-  const handleBaseRateChange = useCallback(
-    (value: string) => {
-      setInputsValues((prev) => ({ ...prev, baseRateInput: value }));
-      if (rateTimerRef.current !== null) clearTimeout(rateTimerRef.current);
-      rateTimerRef.current = setTimeout(() => {
-        const parsed = Number(value);
-        if (!isNaN(parsed) && parsed >= 0 && parsed !== baseRate) {
-          updateBaseRate(parsed);
-        }
-      }, DEBOUNCE_DELAY);
-    },
-    [baseRate, updateBaseRate],
-  );
-
   useEffect(() => {
-    setInputsValues({
-      yearInput: year.toString(),
-      standardHoursInput: standardHours.toString(),
-      baseRateInput: baseRate.toString(),
-    });
-  }, [year, standardHours, baseRate]);
+    setYearInput(year.toString());
+  }, [year]);
 
   const availableMonths = monthResolver.getAvailableMonthOptions(year);
 
   const currentYear = monthResolver.getCurrentYear();
-  const parsedYear = Number(inputsValues.yearInput);
+  const parsedYear = Number(yearInput);
   const yearBelowMinimum =
     !Number.isNaN(parsedYear) && parsedYear < SYSTEM_START_YEAR;
   const yearAboveMaximum =
@@ -126,14 +85,6 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
     : yearAboveMaximum
       ? t("config.year_max_error", { year: currentYear })
       : "";
-
-  const helperTextBaseRate = (): string => {
-    if (baseRate === 0) {
-      if (mode === "daily") return t("config.base_rate_helper_daily");
-      else return t("config.base_rate_helper_monthly");
-    }
-    return "";
-  };
 
   return (
     <Card sx={{ mb: 3 }}>
@@ -173,7 +124,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                   <Box sx={{ flex: 1 }}>
                     <ConfigInput
                       name="year"
-                      value={inputsValues.yearInput}
+                      value={yearInput}
                       label={t("config.year_label")}
                       error={yearError}
                       helperText={yearHelperText}
@@ -254,28 +205,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                 </Box>
 
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                  <Box sx={{ flex: 1 }}>
-                    <ConfigInput
-                      name="standardHours"
-                      value={inputsValues.standardHoursInput}
-                      label={t("config.standard_hours_label")}
-                      helperText={t("config.standard_hours_helper", {
-                        standardHours,
-                      })}
-                      onChange={handleStandardHoursChange}
-                    />
-                  </Box>
-
-                  <Box sx={{ flex: 1 }}>
-                    <ConfigInput
-                      name="baseRate"
-                      value={inputsValues.baseRateInput}
-                      label={t("config.base_rate_label")}
-                      helperText={helperTextBaseRate()}
-                      error={baseRate === 0}
-                      onChange={handleBaseRateChange}
-                    />
-                  </Box>
+                  <WorkParametersInputs mode={mode} />
                 </Stack>
               </CardContent>
             </Card>

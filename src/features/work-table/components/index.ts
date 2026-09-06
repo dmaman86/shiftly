@@ -5,6 +5,7 @@ export { WorkTableHeader } from "./WorkTableHeader";
 export { ShiftRow } from "./ShiftRow";
 export { ShiftTimeInput } from "./ShiftTimeInput";
 export { ShiftTimeReadonly } from "./ShiftTimeReadonly";
+export { ShiftEditorFields } from "./ShiftEditorFields";
 export { CompactDayRow } from "./rows/CompactDayRow";
 export { DayCard } from "./cards/DayCard";
 export { MonthSummaryCard } from "./cards/MonthSummaryCard";
