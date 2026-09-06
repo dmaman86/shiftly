@@ -18,6 +18,7 @@ import {
   Feedback,
 } from "@/features";
 import { ErrorBoundary, FeatureErrorFallback } from "@/layout";
+import { analyticsService } from "@/services";
 
 export const MonthlySummaryPage = ({
   domain,
@@ -74,6 +75,29 @@ export const MonthlySummaryPage = ({
                     variant="body2"
                   >
                     {t("monthly_summary_page.nav_link_rules")}
+                  </MuiLink>
+                </Stack>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  flexWrap="wrap"
+                  justifyContent="center"
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t("monthly_summary_page.nav_hint_example")}
+                  </Typography>
+                  <MuiLink
+                    component={RouterLink}
+                    to="../calculation-rules#interactive-example"
+                    variant="body2"
+                    onClick={() =>
+                      analyticsService.track({
+                        name: "calculation_example_link_clicked",
+                        params: { source: "monthly" },
+                      })
+                    }
+                  >
+                    {t("monthly_summary_page.nav_link_example")}
                   </MuiLink>
                 </Stack>
                 <Box sx={{ pt: 1 }}>

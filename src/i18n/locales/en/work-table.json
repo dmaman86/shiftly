@@ -5,6 +5,8 @@
   "nav_link_monthly": "Monthly Summary",
   "nav_hint_rules": "Want to understand how the calculation works? Go to",
   "nav_link_rules": "Calculation Rules",
+  "nav_hint_example": "Want to try your own shifts? Go to",
+  "nav_link_example": "Interactive Calculation Example",
   "feature_name_work_table": "Work Days Table",
   "feature_name_salary_summary": "Monthly Salary Summary",
   "daily_salary_header": "Daily Salary",

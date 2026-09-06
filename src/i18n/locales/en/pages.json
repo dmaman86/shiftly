@@ -8,11 +8,33 @@
     "nav_hint_daily": "Want to calculate salary by shifts? Go to",
     "nav_link_daily": "Daily Calculator",
     "nav_hint_rules": "Want to understand how the calculation works? Go to",
-    "nav_link_rules": "Calculation Rules"
+    "nav_link_rules": "Calculation Rules",
+    "nav_hint_example": "Want to try your own shifts? Go to",
+    "nav_link_example": "Interactive Calculation Example"
   },
   "calculation_rules_page": {
     "title": "Calculation Rules",
-    "sub_title": "This screen displays the calculation rules and data used by the system to calculate hours and bonuses. The information is shown for transparency and cannot be edited.",
+    "sub_title": "This screen displays the rules and data used to calculate hours and bonuses, including an interactive example for checking the calculation.",
+    "example": {
+      "title": "🧮 Interactive Calculation Example",
+      "description": "Choose a day type and enter one or more shifts to see how hours and bonuses are calculated.",
+      "day_type": "Day type",
+      "day_types": {
+        "regular": "Weekday",
+        "special_partial_start": "Shabbat/holiday eve",
+        "special_full": "Shabbat/holiday"
+      },
+      "special_start_notice": "According to the current Israel time, the Shabbat/holiday start time used in this calculation is {{time}}.",
+      "shift": "Shift {{number}}",
+      "cross_day": "Crosses day",
+      "remove_shift": "Remove shift",
+      "add_shift": "Add shift",
+      "invalid_shift": "The exit time must be later than the entry time. If the shift ends the following day, mark it as crossing the day.",
+      "shift_contribution": "Shift breakdown · {{hours}} actual hours",
+      "day_total": "Daily total · {{hours}} actual hours",
+      "daily_pay": "Estimated daily pay",
+      "shabbat_credit_notice": "{{hours}} Shabbat credit hours were earned. These hours are paid against missing hours on weekdays or Shabbat/holiday eves, up to the daily standard. Any unused balance is accrued and carried over to the next month."
+    },
     "card_extra_hours": {
       "title": "🕒 Overtime (OT)",
       "sub_title": "Overtime calculation is done in three payment tiers, based on the number of hours worked per day.",
