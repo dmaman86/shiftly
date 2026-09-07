@@ -1,11 +1,7 @@
-import { useCallback } from "react";
-import { useTranslation } from "react-i18next";
+import { useCallback, useState } from "react";
 
 import { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
-import { useAppSnackbar, useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
-import { analyticsService } from "@/services/analytics";
-import { useShift } from "./useShift";
 import { useShiftControls } from "./useShiftControls";
 
 type UseShiftEditorProps = {
@@ -18,7 +14,8 @@ type UseShiftEditorProps = {
 
 /**
  * Editing behavior shared by every presentation of a shift (desktop row,
- * mobile card): draft state, cross-midnight validation, save/edit toggling.
+ * mobile card): draft state, validation, and immediate calculation updates.
+ * Invalid drafts remain local and never replace the last valid shift.
  */
 export const useShiftEditor = ({
   domain,
@@ -27,56 +24,33 @@ export const useShiftEditor = ({
   standardHours,
   onShiftUpdate,
 }: UseShiftEditorProps) => {
-  const { localShift, replace, saved, setSaved } = useShift({
-    shift,
-  });
+  const [localShift, setLocalShift] = useState(shift);
+
+  const updateShift = useCallback(
+    (nextShift: Shift) => {
+      setLocalShift(nextShift);
+
+      if (!domain.services.shiftService.isValidShiftDuration(nextShift)) return;
+
+      const payMap = domain.payMap.shiftMapBuilder.build({
+        shift: nextShift,
+        meta,
+        standardHours,
+        isFieldDutyShift: nextShift.isDuty,
+      });
+      onShiftUpdate(nextShift, payMap);
+    },
+    [domain, meta, standardHours, onShiftUpdate],
+  );
+
   const controls = useShiftControls({
     ...domain.services,
-    onChange: replace,
+    onChange: updateShift,
     shift: localShift,
   });
 
-  const { month, year } = useGlobalState();
-  const snackbar = useAppSnackbar();
-  const { t } = useTranslation("work-table");
-
-  const handleSave = useCallback(() => {
-    if (controls.hasError) {
-      snackbar.warning(t("shift_row.cross_midnight_warning"));
-      return;
-    }
-    const payMap = domain.payMap.shiftMapBuilder.build({
-      shift: localShift,
-      meta,
-      standardHours,
-      isFieldDutyShift: localShift.isDuty,
-    });
-    setSaved(true);
-    onShiftUpdate(localShift, payMap);
-    analyticsService.track({ name: "shift_saved", params: { month, year } });
-  }, [
-    controls.hasError,
-    snackbar,
-    t,
-    domain,
-    localShift,
-    meta,
-    standardHours,
-    setSaved,
-    onShiftUpdate,
-    month,
-    year,
-  ]);
-
-  const handleEdit = () => {
-    setSaved(false);
-  };
-
   return {
     localShift,
-    saved,
     ...controls,
-    handleSave,
-    handleEdit,
   };
 };

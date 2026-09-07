@@ -3,6 +3,7 @@ export { useWorkDays } from "./useWorkDays";
 export { useDirection } from "./useDirection";
 export { useFetch } from "./useFetch";
 export { useGlobalState } from "./useGlobalState";
+export { useGlobalBreakdown } from "./useGlobalBreakdown";
 export { useDomain } from "./useDomain";
 export { useAppSnackbar } from "./useAppSnackbar";
 export { useDebounce } from "./useDebounce";

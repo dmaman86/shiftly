@@ -1,8 +1,5 @@
 import type { GlobalState } from "@/redux/states/globalSlice";
 import type { WorkDaysState } from "@/redux/states/workDaysSlice";
-import { pipelineInstance } from "./setup-domain";
-
-const { payMap } = pipelineInstance;
 
 /**
  * Factory to create mock GlobalState for testing
@@ -19,9 +16,6 @@ export function createMockGlobalState(
       ...overrides?.config,
     },
     dailyPayMaps: overrides?.dailyPayMaps ?? {},
-    globalBreakdown:
-      overrides?.globalBreakdown ??
-      payMap.monthPayMapCalculator.createEmpty(),
   };
 }
 

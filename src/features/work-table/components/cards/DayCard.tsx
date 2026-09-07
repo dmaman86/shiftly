@@ -17,7 +17,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { WorkDayInfo } from "@/domain";
 import { WorkDayStatus, HolidayKey } from "@/constants";
 import { DomainContextType } from "@/app";
-import { withErrorBoundary } from "@/hoc";
 import { formatValue } from "@/utils";
 import { useDayController } from "@/features/work-table";
 import { ShiftCard } from "./ShiftCard";
@@ -30,7 +29,7 @@ type DayCardProps = {
   shabbatCreditHours: number;
 };
 
-const DayCardComponent = ({ domain, workDay, shabbatCreditHours }: DayCardProps) => {
+export const DayCard = ({ domain, workDay, shabbatCreditHours }: DayCardProps) => {
   const { dateService } = domain.services;
   const { dayInfoResolver } = domain.resolvers;
   const { t } = useTranslation("work-table");
@@ -219,7 +218,3 @@ const DayCardComponent = ({ domain, workDay, shabbatCreditHours }: DayCardProps)
     </Card>
   );
 };
-
-export const DayCard = withErrorBoundary(DayCardComponent, {
-  componentName: "DayCard",
-});

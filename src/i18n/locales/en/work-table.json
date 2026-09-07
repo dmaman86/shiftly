@@ -68,7 +68,7 @@
     "hint_add_shift": "Click ➕ to add a shift",
     "hint_cross_midnight": "Check ✅ for shifts crossing midnight",
     "hint_duty_shift": "Click 🚗 to mark a duty shift (meal allowance eligibility)",
-    "hint_save_shift": "Click 💾 to save changes and update salary",
+    "hint_auto_update": "Valid changes update your salary automatically",
     "shabbat_credit_carried_over": "Carried over from last month: {{hours}} hours.",
     "shabbat_credit_summary": "Shabbat credit — earned: {{earned}}, used: {{used}}, unused: {{unused}}.",
     "shabbat_credit_unused_note": "Unused Shabbat credit hours are not included in this month's total hours or salary — they carry over to next month.",
@@ -82,12 +82,9 @@
     "points": "Points"
   },
   "shift_row": {
-    "cross_midnight_warning": "A shift crossing midnight was detected. Please check \"cross day\" before saving.",
     "tooltip_cross_day_error": "⚠️ Mark as cross-day — end time is before start time",
     "tooltip_cross_day": "Cross day",
     "tooltip_duty": "Duty shift",
-    "tooltip_save": "Save",
-    "tooltip_edit": "Edit",
     "tooltip_delete": "Delete"
   },
   "holidays": {

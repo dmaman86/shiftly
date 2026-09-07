@@ -1,15 +1,32 @@
 import React from "react";
 import { analyticsService } from "@/services";
+import { DefaultErrorFallback } from "./DefaultErrorFallback";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
   fallback?: (error: Error, reset: () => void) => React.ReactNode;
   onError?: (error: Error, errorInfo: React.ErrorInfo) => void;
+  fatal?: boolean;
+  errorContext?: string;
+  resetKeys?: readonly unknown[];
 }
 
 interface ErrorBoundaryState {
   error: Error | null;
 }
+
+const resetKeysChanged = (
+  previousKeys: readonly unknown[] | undefined,
+  currentKeys: readonly unknown[] | undefined,
+): boolean => {
+  if (previousKeys === currentKeys) return false;
+  if (!previousKeys || !currentKeys) return true;
+  if (previousKeys.length !== currentKeys.length) return true;
+
+  return previousKeys.some(
+    (previousKey, index) => !Object.is(previousKey, currentKeys[index]),
+  );
+};
 
 export class ErrorBoundary extends React.Component<
   ErrorBoundaryProps,
@@ -35,13 +52,25 @@ export class ErrorBoundary extends React.Component<
       name: "exception",
       params: {
         description: error.message,
-        fatal: true,
+        fatal: this.props.fatal ?? false,
         error_type: error.name,
+        ...(this.props.errorContext && {
+          error_context: this.props.errorContext,
+        }),
       },
     });
 
     // Call custom error handler
     this.props.onError?.(error, errorInfo);
+  }
+
+  componentDidUpdate(previousProps: ErrorBoundaryProps): void {
+    if (
+      this.state.error &&
+      resetKeysChanged(previousProps.resetKeys, this.props.resetKeys)
+    ) {
+      this.resetError();
+    }
   }
 
   resetError = (): void => {
@@ -56,7 +85,7 @@ export class ErrorBoundary extends React.Component<
       if (fallback) {
         return fallback(error, this.resetError);
       }
-      return null;
+      return <DefaultErrorFallback resetError={this.resetError} />;
     }
 
     return children;

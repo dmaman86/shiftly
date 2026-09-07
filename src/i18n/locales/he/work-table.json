@@ -68,7 +68,7 @@
     "hint_add_shift": "לחץ על ➕ להוספת משמרת",
     "hint_cross_midnight": "סמן ✅ למשמרת שחוצה את חצות",
     "hint_duty_shift": "לחץ על 🚗 לסימון משמרת בתפקיד (זכאות אש״ל)",
-    "hint_save_shift": "לחץ על 💾 לשמירת שינויים ועדכון שכר",
+    "hint_auto_update": "שינויים תקינים מעדכנים את חישוב השכר אוטומטית",
     "shabbat_credit_carried_over": "הועברו מהחודש הקודם: {{hours}} שעות.",
     "shabbat_credit_summary": "זכות שבת — נצברו: {{earned}}, נוצלו: {{used}}, לא נוצלו: {{unused}}.",
     "shabbat_credit_unused_note": "שעות זכות שבת שלא נוצלו אינן נכללות בסך השעות או בחישוב השכר של החודש הנוכחי — הן יועברו לחודש הבא.",
@@ -82,12 +82,9 @@
     "points": "נקודות"
   },
   "shift_row": {
-    "cross_midnight_warning": "זוהתה משמרת החוצה את חצות. יש לסמן \"חוצה יום\" לפני שמירה.",
     "tooltip_cross_day_error": "⚠️ יש לסמן חוצה יום - שעת סיום לפני שעת התחלה",
     "tooltip_cross_day": "חוצה יום",
     "tooltip_duty": "משמרת בתפקיד",
-    "tooltip_save": "שמור",
-    "tooltip_edit": "ערוך",
     "tooltip_delete": "מחק"
   },
   "holidays": {

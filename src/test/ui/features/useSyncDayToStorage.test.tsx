@@ -37,14 +37,14 @@ vi.mock("@/services", () => ({
 
 import { useSyncDayToStorage } from "@/features/work-table/hooks/useSyncDayToStorage";
 
-const buildShiftEntry = (id: string, saved: boolean) => ({
+const buildShiftEntry = (id: string, valid: boolean, endHour = 16) => ({
   shift: {
     id,
     start: { date: new Date("2026-08-10T08:00:00") },
-    end: { date: new Date("2026-08-10T16:00:00") },
+    end: { date: new Date(`2026-08-10T${endHour}:00:00`) },
     isDuty: false,
   },
-  payMap: saved ? ({ totalHours: 8 } as never) : null,
+  payMap: valid ? ({ totalHours: 8 } as never) : null,
 });
 
 const hydratedWrapper =
@@ -140,32 +140,97 @@ describe("useSyncDayToStorage", () => {
     );
   });
 
-  it("upserts a shift once it has been saved", async () => {
-    authMock.user = { id: "user-1" };
-    const { rerender } = renderHook((props) => useSyncDayToStorage(props), {
-      wrapper: hydratedWrapper(true),
-      initialProps: {
-        dateKey: "2026-08-10",
-        status: WorkDayStatus.normal,
-        shiftEntries: {} as ShiftEntries,
-      },
-    });
+  it("debounces a valid shift upsert", async () => {
+    vi.useFakeTimers();
 
-    const savedEntry = buildShiftEntry("shift-1", true);
-    await act(async () => {
-      rerender({
-        dateKey: "2026-08-10",
-        status: WorkDayStatus.normal,
-        shiftEntries: { "shift-1": savedEntry },
+    try {
+      authMock.user = { id: "user-1" };
+      const { rerender } = renderHook((props) => useSyncDayToStorage(props), {
+        wrapper: hydratedWrapper(true),
+        initialProps: {
+          dateKey: "2026-08-10",
+          status: WorkDayStatus.normal,
+          shiftEntries: {} as ShiftEntries,
+        },
       });
-      await Promise.resolve();
-    });
 
-    expect(shiftServiceMock.upsert).toHaveBeenCalledWith(
-      "user-1",
-      "2026-08-10",
-      savedEntry.shift,
-    );
+      const validEntry = buildShiftEntry("shift-1", true);
+      await act(async () => {
+        rerender({
+          dateKey: "2026-08-10",
+          status: WorkDayStatus.normal,
+          shiftEntries: { "shift-1": validEntry },
+        });
+      });
+
+      expect(shiftServiceMock.upsert).not.toHaveBeenCalled();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(600);
+      });
+
+      expect(shiftServiceMock.upsert).toHaveBeenCalledWith(
+        "user-1",
+        "2026-08-10",
+        validEntry.shift,
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("coalesces rapid valid changes into the latest upsert", async () => {
+    vi.useFakeTimers();
+
+    try {
+      authMock.user = { id: "user-1" };
+      const { rerender } = renderHook((props) => useSyncDayToStorage(props), {
+        wrapper: hydratedWrapper(true),
+        initialProps: {
+          dateKey: "2026-08-10",
+          status: WorkDayStatus.normal,
+          shiftEntries: {} as ShiftEntries,
+        },
+      });
+      const firstEntry = buildShiftEntry("shift-1", true, 16);
+      const latestEntry = buildShiftEntry("shift-1", true, 17);
+
+      await act(async () => {
+        rerender({
+          dateKey: "2026-08-10",
+          status: WorkDayStatus.normal,
+          shiftEntries: { "shift-1": firstEntry },
+        });
+      });
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(300);
+        rerender({
+          dateKey: "2026-08-10",
+          status: WorkDayStatus.normal,
+          shiftEntries: { "shift-1": latestEntry },
+        });
+      });
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(599);
+      });
+
+      expect(shiftServiceMock.upsert).not.toHaveBeenCalled();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1);
+      });
+
+      expect(shiftServiceMock.upsert).toHaveBeenCalledOnce();
+      expect(shiftServiceMock.upsert).toHaveBeenCalledWith(
+        "user-1",
+        "2026-08-10",
+        latestEntry.shift,
+      );
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("does not persist a draft shift that hasn't been saved yet", async () => {

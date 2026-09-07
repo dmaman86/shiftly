@@ -17,6 +17,7 @@ export type AnalyticsEvent =
         description: string;
         fatal: boolean;
         error_type: string;
+        error_context?: string;
       };
     }
   | {
@@ -33,10 +34,6 @@ export type AnalyticsEvent =
     }
   | {
       name: "shift_added";
-      params: { month: number; year: number };
-    }
-  | {
-      name: "shift_saved";
       params: { month: number; year: number };
     }
   | {

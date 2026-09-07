@@ -7,40 +7,36 @@ import {
 } from "@mui/material";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
 import type { Shift } from "@/domain";
 import { ShiftTimeInput } from "./ShiftTimeInput";
-import { ShiftTimeReadonly } from "./ShiftTimeReadonly";
 
 type ShiftEditorFieldsProps = {
+  additionalActions?: ReactNode;
   crossDay: boolean;
   crossDayLabel?: string;
   disabled: boolean;
-  endMinutes: number;
   hasError: boolean;
   onChange: (field: "start" | "end", value: Date | null) => void;
   onToggleDuty: () => void;
   onToggleNextDay: (checked: boolean) => void;
-  saved?: boolean;
   shift: Shift;
   showLabels?: boolean;
-  startMinutes: number;
 };
 
 export const ShiftEditorFields = ({
+  additionalActions,
   crossDay,
   crossDayLabel,
   disabled,
-  endMinutes,
   hasError,
   onChange,
   onToggleDuty,
   onToggleNextDay,
-  saved = false,
   shift,
   showLabels = true,
-  startMinutes,
 }: ShiftEditorFieldsProps) => {
   const { t } = useTranslation("work-table");
   const crossDayControl = (
@@ -72,66 +68,71 @@ export const ShiftEditorFields = ({
       />
     </Tooltip>
   );
-
-  return (
-    <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
-      {!saved ? (
-        <>
-          <ShiftTimeInput
-            label={showLabels ? t("headers.entry") : ""}
-            value={shift.start.date}
-            onChange={(value) => onChange("start", value)}
-            disabled={disabled}
-          />
-          <ShiftTimeInput
-            label={showLabels ? t("headers.exit") : ""}
-            value={shift.end.date}
-            onChange={(value) => onChange("end", value)}
-            disabled={disabled}
-            error={hasError}
-          />
-        </>
+  const editorActions = !disabled && (
+    <>
+      {crossDayLabel ? (
+        <FormControlLabel
+          control={crossDayControl}
+          label={crossDayLabel}
+          sx={{ m: 0 }}
+        />
       ) : (
-        <>
-          <ShiftTimeReadonly
-            label={showLabels ? t("headers.entry") : ""}
-            minutes={startMinutes}
-          />
-          <ShiftTimeReadonly
-            label={showLabels ? t("headers.exit") : ""}
-            minutes={endMinutes}
-          />
-        </>
+        crossDayControl
       )}
 
-      {!saved && !disabled &&
-        (crossDayLabel ? (
-          <FormControlLabel
-            control={crossDayControl}
-            label={crossDayLabel}
-            sx={{ m: 0 }}
-          />
-        ) : (
-          crossDayControl
-        ))}
+      <Tooltip title={t("shift_row.tooltip_duty")}>
+        <span>
+          <IconButton size="small" onClick={onToggleDuty} sx={{ p: 0.75 }}>
+            {shift.isDuty ? (
+              <DirectionsCarIcon fontSize="small" color="primary" />
+            ) : (
+              <DirectionsCarOutlinedIcon fontSize="small" />
+            )}
+          </IconButton>
+        </span>
+      </Tooltip>
+    </>
+  );
 
-      {!disabled && (
-        <Tooltip title={t("shift_row.tooltip_duty")}>
-          <span>
-            <IconButton
-              size="small"
-              onClick={onToggleDuty}
-              disabled={saved}
-              sx={{ p: 0.75 }}
-            >
-              {shift.isDuty ? (
-                <DirectionsCarIcon fontSize="small" color="primary" />
-              ) : (
-                <DirectionsCarOutlinedIcon fontSize="small" />
-              )}
-            </IconButton>
-          </span>
-        </Tooltip>
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: 1,
+        ...(additionalActions && { width: "100%" }),
+      }}
+    >
+      <ShiftTimeInput
+        label={showLabels ? t("headers.entry") : ""}
+        value={shift.start.date}
+        onChange={(value) => onChange("start", value)}
+        disabled={disabled}
+      />
+      <ShiftTimeInput
+        label={showLabels ? t("headers.exit") : ""}
+        value={shift.end.date}
+        onChange={(value) => onChange("end", value)}
+        disabled={disabled}
+        error={hasError}
+      />
+
+      {additionalActions && !disabled ? (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            flexBasis: "100%",
+            flexWrap: "nowrap",
+          }}
+        >
+          {editorActions}
+          {additionalActions}
+        </Box>
+      ) : (
+        editorActions
       )}
     </Box>
   );

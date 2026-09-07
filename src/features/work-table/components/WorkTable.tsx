@@ -18,7 +18,7 @@ import {
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { useTranslation } from "react-i18next";
 
-import { useDeviceType, useGlobalState } from "@/hooks";
+import { useDeviceType, useGlobalBreakdown, useGlobalState } from "@/hooks";
 import { groupByShabbat } from "@/utils";
 import { headersTable } from "@/constants";
 import {
@@ -33,6 +33,7 @@ import {
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
 import { ShabbatCreditAllocation, WorkDayInfo } from "@/domain";
+import { FeatureBoundary } from "@/layout";
 
 type WorkTableProps = {
   domain: DomainContextType;
@@ -45,7 +46,10 @@ export const WorkTable = ({
   workDays,
   shabbatCreditAllocation,
 }: WorkTableProps) => {
-  const { year, month, baseRate, globalBreakdown } = useGlobalState();
+  const { year, month, baseRate } = useGlobalState();
+  const globalBreakdown = useGlobalBreakdown(
+    domain.payMap.monthPayMapCalculator,
+  );
   const { isMobile } = useDeviceType();
   const { t } = useTranslation("work-table");
   const monthNames = t("months", { returnObjects: true }) as string[];
@@ -81,15 +85,22 @@ export const WorkTable = ({
           {isMobile ? (
             <Stack spacing={1.5}>
               {workDays.map((day) => (
-                <DayCard
+                <FeatureBoundary
                   key={day.meta.date}
-                  domain={domain}
-                  workDay={day}
-                  shabbatCreditHours={
-                    shabbatCreditAllocation.appliedHoursByDate[day.meta.date] ??
-                    0
-                  }
-                />
+                  featureName={t("feature_name_work_table")}
+                  errorContext="DayCard"
+                  resetKeys={[day.meta.date]}
+                >
+                  <DayCard
+                    domain={domain}
+                    workDay={day}
+                    shabbatCreditHours={
+                      shabbatCreditAllocation.appliedHoursByDate[
+                        day.meta.date
+                      ] ?? 0
+                    }
+                  />
+                </FeatureBoundary>
               ))}
               <MonthSummaryCard breakdown={monthBreakdown} />
             </Stack>
@@ -135,17 +146,23 @@ export const WorkTable = ({
                       {group.map((day, dayIndex) => {
                         const isLastInWeek = dayIndex === group.length - 1;
                         return (
-                          <DayRow
-                            domain={domain}
+                          <FeatureBoundary
                             key={day.meta.date}
-                            workDay={day}
-                            isLastInWeek={isLastInWeek}
-                            shabbatCreditHours={
-                              shabbatCreditAllocation.appliedHoursByDate[
-                                day.meta.date
-                              ] ?? 0
-                            }
-                          />
+                            featureName={t("feature_name_work_table")}
+                            errorContext="DayRow"
+                            resetKeys={[day.meta.date]}
+                          >
+                            <DayRow
+                              domain={domain}
+                              workDay={day}
+                              isLastInWeek={isLastInWeek}
+                              shabbatCreditHours={
+                                shabbatCreditAllocation.appliedHoursByDate[
+                                  day.meta.date
+                                ] ?? 0
+                              }
+                            />
+                          </FeatureBoundary>
                         );
                       })}
                     </TableBody>
@@ -238,7 +255,7 @@ export const WorkTable = ({
             color="text.secondary"
             sx={{ fontStyle: "italic" }}
           >
-            {t("table.hint_save_shift")}
+            {t("table.hint_auto_update")}
           </Typography>
         </Box>
       </CardContent>

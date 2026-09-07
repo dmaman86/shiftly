@@ -1,17 +1,15 @@
-import { Alert, Button, Box } from "@mui/material";
+import { Alert, Box, Button } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-interface FeatureErrorFallbackProps {
+interface DefaultErrorFallbackProps {
   resetError: () => void;
-  featureName: string;
 }
 
-export const FeatureErrorFallback = ({
+export const DefaultErrorFallback = ({
   resetError,
-  featureName,
-}: FeatureErrorFallbackProps) => {
+}: DefaultErrorFallbackProps) => {
   const { t } = useTranslation("errors");
-  const { t: tc } = useTranslation();
+  const { t: translateCommon } = useTranslation();
 
   return (
     <Box p={2}>
@@ -19,11 +17,11 @@ export const FeatureErrorFallback = ({
         severity="error"
         action={
           <Button color="inherit" size="small" onClick={resetError}>
-            {tc("actions.try_again")}
+            {translateCommon("actions.try_again")}
           </Button>
         }
       >
-        {t("feature_load", { featureName })}
+        {t("unexpected")}
       </Alert>
     </Box>
   );

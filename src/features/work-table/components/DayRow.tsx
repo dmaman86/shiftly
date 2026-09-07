@@ -25,7 +25,6 @@ import {
   useDayController,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
-import { withErrorBoundary } from "@/hoc";
 
 type DayRowProps = {
   domain: DomainContextType;
@@ -34,7 +33,7 @@ type DayRowProps = {
   shabbatCreditHours: number;
 };
 
-const DayRowComponent = ({
+export const DayRow = ({
   domain,
   workDay,
   isLastInWeek,
@@ -292,7 +291,3 @@ const DayRowComponent = ({
     </>
   );
 };
-
-export const DayRow = withErrorBoundary(DayRowComponent, {
-  componentName: "DayRow",
-});

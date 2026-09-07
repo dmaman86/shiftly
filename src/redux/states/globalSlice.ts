@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-import { MonthPayMap, WorkDayMap } from "@/domain";
-import { domain } from "@/app";
+import { WorkDayMap } from "@/domain";
 
 export interface GlobalState {
   config: {
@@ -11,10 +10,8 @@ export interface GlobalState {
     month: number;
   };
   dailyPayMaps: Record<string, WorkDayMap>;
-  globalBreakdown: MonthPayMap;
 }
 
-const { payMap } = domain;
 const now = new Date();
 const initialYear = now.getFullYear();
 const initialMonth = now.getMonth() + 1;
@@ -27,11 +24,9 @@ const initialState: GlobalState = {
     month: initialMonth,
   },
   dailyPayMaps: {},
-  globalBreakdown: payMap.monthPayMapCalculator.createEmpty(),
 };
 
 const resetMonthData = (state: GlobalState) => {
-  state.globalBreakdown = payMap.monthPayMapCalculator.createEmpty();
   state.dailyPayMaps = {};
 };
 
@@ -56,38 +51,16 @@ export const globalSlice = createSlice({
       state.config.baseRate = action.payload;
     },
 
-    addDayPayMap: (
+    setDayPayMap: (
       state,
       action: PayloadAction<{ dateKey: string; dayPayMap: WorkDayMap }>,
     ) => {
       const { dateKey, dayPayMap } = action.payload;
-      const prev = state.dailyPayMaps[dateKey];
-
-      if (prev) {
-        state.globalBreakdown = payMap.monthPayMapCalculator.subtract(
-          state.globalBreakdown,
-          prev,
-        );
-      }
-
-      state.globalBreakdown = payMap.monthPayMapCalculator.accumulate(
-        state.globalBreakdown,
-        dayPayMap,
-      );
-
       state.dailyPayMaps[dateKey] = dayPayMap;
     },
 
     removeDayPayMap: (state, action: PayloadAction<string>) => {
       const dateKey = action.payload;
-      const prev = state.dailyPayMaps[dateKey];
-
-      if (!prev) return;
-
-      state.globalBreakdown = payMap.monthPayMapCalculator.subtract(
-        state.globalBreakdown,
-        prev,
-      );
       delete state.dailyPayMaps[dateKey];
     },
 
@@ -102,7 +75,7 @@ export const {
   setMonth,
   setStandardHours,
   setBaseRate,
-  addDayPayMap,
+  setDayPayMap,
   removeDayPayMap,
   resetGlobal,
 } = globalSlice.actions;

@@ -6,7 +6,7 @@ import { isSameDayPayMap } from "../helpers";
 type UseSyncDayToGlobalStateProps = {
   dateKey: string;
   dayPayMap: WorkDayMap;
-  addDay: (dateKey: string, dayPayMap: WorkDayMap) => void;
+  updateDayPayMap: (dateKey: string, dayPayMap: WorkDayMap) => void;
   removeDay: (dateKey: string) => void;
 };
 
@@ -17,7 +17,7 @@ type UseSyncDayToGlobalStateProps = {
 export const useSyncDayToGlobalState = ({
   dateKey,
   dayPayMap,
-  addDay,
+  updateDayPayMap,
   removeDay,
 }: UseSyncDayToGlobalStateProps) => {
   const prevDayPayMapRef = useRef<WorkDayMap | null>(null);
@@ -34,8 +34,8 @@ export const useSyncDayToGlobalState = ({
     }
 
     if (!prev || !isSameDayPayMap(prev, dayPayMap)) {
-      addDay(dateKey, dayPayMap);
+      updateDayPayMap(dateKey, dayPayMap);
       prevDayPayMapRef.current = dayPayMap;
     }
-  }, [dayPayMap, dateKey, addDay, removeDay]);
+  }, [dayPayMap, dateKey, updateDayPayMap, removeDay]);
 };
