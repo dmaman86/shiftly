@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 
 vi.mock("@/redux/store", () => ({
@@ -27,6 +27,10 @@ describe("AppProviders", () => {
   beforeEach(() => {
     document.documentElement.dir = "";
     document.documentElement.lang = "";
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("renders children", () => {
@@ -59,6 +63,25 @@ describe("AppProviders", () => {
   it("sets document dir to ltr for English path", async () => {
     Object.defineProperty(window, "location", {
       value: { pathname: "/en/daily" },
+      writable: true,
+    });
+
+    render(
+      <AppProviders>
+        <div>Child</div>
+      </AppProviders>
+    );
+
+    await waitFor(() => {
+      expect(document.documentElement.dir).toBe("ltr");
+      expect(document.documentElement.lang).toBe("en");
+    });
+  });
+
+  it("sets document dir to ltr for English behind the production base path", async () => {
+    vi.stubEnv("BASE_URL", "/shiftly/");
+    Object.defineProperty(window, "location", {
+      value: { pathname: "/shiftly/en/daily" },
       writable: true,
     });
 

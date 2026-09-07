@@ -11,7 +11,7 @@ import {
   useMonthlySalarySummary,
   useShabbatCreditAllocation,
 } from "@/features/salary-summary";
-import { useGlobalState } from "@/hooks";
+import { useGlobalBreakdown, useGlobalState } from "@/hooks";
 
 export const MonthlySalarySummary = ({ domain }: {
   domain: DomainContextType;
@@ -19,7 +19,10 @@ export const MonthlySalarySummary = ({ domain }: {
   const { t } = useTranslation("work-table");
   const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { globalBreakdown, baseRate, year, month } = useGlobalState();
+  const { baseRate, year, month } = useGlobalState();
+  const globalBreakdown = useGlobalBreakdown(
+    domain.payMap.monthPayMapCalculator,
+  );
   const shabbatCreditAllocation = useShabbatCreditAllocation();
 
   const { sections, getMonthLabel, monthlyTotal } = useMonthlySalarySummary({

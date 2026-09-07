@@ -119,13 +119,11 @@ const CalculationExampleShift = ({
               crossDay={controls.crossDay}
               crossDayLabel={t("calculation_rules_page.example.cross_day")}
               disabled={false}
-              endMinutes={controls.endMinutes}
               hasError={controls.hasError}
               onChange={controls.handleChange}
               onToggleDuty={controls.toggleDuty}
               onToggleNextDay={controls.handleToggleNextDay}
               shift={shift}
-              startMinutes={controls.startMinutes}
             />
             <Tooltip title={t("calculation_rules_page.example.remove_shift")}>
               <span>

@@ -1,8 +1,6 @@
 import { Box, IconButton, Tooltip } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import SaveIcon from "@mui/icons-material/Save";
-import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
@@ -34,15 +32,10 @@ export const ShiftCard = ({
   const { month, year } = useGlobalState();
   const {
     localShift,
-    saved,
     crossDay,
-    startMinutes,
-    endMinutes,
     hasError,
     handleChange,
     handleToggleNextDay,
-    handleSave,
-    handleEdit,
     toggleDuty,
   } = useShiftEditor({ domain, shift, meta, standardHours, onShiftUpdate });
 
@@ -61,40 +54,7 @@ export const ShiftCard = ({
       }}
     >
       <ShiftEditorFields
-        crossDay={crossDay}
-        disabled={!isEditable}
-        endMinutes={endMinutes}
-        hasError={hasError}
-        onChange={handleChange}
-        onToggleDuty={toggleDuty}
-        onToggleNextDay={handleToggleNextDay}
-        saved={saved}
-        shift={localShift}
-        startMinutes={startMinutes}
-      />
-
-      {isEditable && (
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Tooltip
-            title={
-              !saved ? t("shift_row.tooltip_save") : t("shift_row.tooltip_edit")
-            }
-          >
-            <span>
-              <IconButton
-                size="small"
-                onClick={() => (saved ? handleEdit() : handleSave())}
-                sx={{ p: 0.75 }}
-              >
-                {saved ? (
-                  <EditIcon fontSize="small" color="info" />
-                ) : (
-                  <SaveIcon fontSize="small" color="primary" />
-                )}
-              </IconButton>
-            </span>
-          </Tooltip>
-
+        additionalActions={
           <Tooltip title={t("shift_row.tooltip_delete")}>
             <IconButton
               size="small"
@@ -110,8 +70,15 @@ export const ShiftCard = ({
               <DeleteIcon fontSize="small" color="error" />
             </IconButton>
           </Tooltip>
-        </Box>
-      )}
+        }
+        crossDay={crossDay}
+        disabled={!isEditable}
+        hasError={hasError}
+        onChange={handleChange}
+        onToggleDuty={toggleDuty}
+        onToggleNextDay={handleToggleNextDay}
+        shift={localShift}
+      />
     </Box>
   );
 };

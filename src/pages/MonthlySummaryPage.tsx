@@ -17,7 +17,8 @@ import {
   MonthlySalarySummary,
   Feedback,
 } from "@/features";
-import { ErrorBoundary, FeatureErrorFallback } from "@/layout";
+import { useGlobalState } from "@/hooks";
+import { FeatureBoundary } from "@/layout";
 import { analyticsService } from "@/services";
 
 export const MonthlySummaryPage = ({
@@ -27,6 +28,7 @@ export const MonthlySummaryPage = ({
 }) => {
   const { t } = useTranslation("pages");
   const { t: tWT } = useTranslation("work-table");
+  const { year, month } = useGlobalState();
 
   return (
     <Box component="section" sx={{ mt: 2 }}>
@@ -113,17 +115,13 @@ export const MonthlySummaryPage = ({
             <Stack spacing={3}>
               <ConfigPanel domain={domain} mode={"monthly"} />
 
-              <ErrorBoundary
-                fallback={(error, reset) => (
-                  <FeatureErrorFallback
-                    featureName={tWT("feature_name_salary_summary")}
-                    error={error}
-                    resetError={reset}
-                  />
-                )}
+              <FeatureBoundary
+                featureName={tWT("feature_name_salary_summary")}
+                errorContext="MonthlySalarySummary"
+                resetKeys={[year, month]}
               >
                 <MonthlySalarySummary domain={domain} />
-              </ErrorBoundary>
+              </FeatureBoundary>
               <Feedback />
             </Stack>
           </CardContent>

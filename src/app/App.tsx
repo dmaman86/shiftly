@@ -6,23 +6,22 @@ import { ErrorBoundary, ErrorFallback, Layout } from "@/layout";
 
 export const App = () => {
   return (
-    <ErrorBoundary
-      fallback={(error, reset) => (
-        <ErrorFallback error={error} resetError={reset} />
-      )}
-      onError={(error, errorInfo) => {
-        // Global error logging
-        console.error("Global error caught: ", error);
-        console.error("Error info: ", errorInfo);
-      }}
-    >
-      <BrowserRouter basename="/shiftly">
+    <BrowserRouter basename="/shiftly">
+      <ErrorBoundary
+        fatal
+        fallback={(_, reset) => <ErrorFallback resetError={reset} />}
+        onError={(error, errorInfo) => {
+          // Global error logging
+          console.error("Global error caught: ", error);
+          console.error("Error info: ", errorInfo);
+        }}
+      >
         <AppProviders>
           <Layout>
             <AppRoutes />
           </Layout>
         </AppProviders>
-      </BrowserRouter>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </BrowserRouter>
   );
 };

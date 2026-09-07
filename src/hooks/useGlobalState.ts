@@ -7,7 +7,7 @@ import {
   setMonth,
   setStandardHours,
   setBaseRate,
-  addDayPayMap,
+  setDayPayMap,
   removeDayPayMap,
   resetGlobal,
 } from "@/redux/states/globalSlice";
@@ -24,14 +24,6 @@ export const useGlobalState = () => {
   );
   const baseRate = useSelector(
     (state: RootState) => state.global.config.baseRate,
-  );
-
-  const globalBreakdown = useSelector(
-    (state: RootState) => state.global.globalBreakdown,
-  );
-
-  const dailyPayMaps = useSelector(
-    (state: RootState) => state.global.dailyPayMaps,
   );
 
   const updateYear = useCallback(
@@ -62,9 +54,9 @@ export const useGlobalState = () => {
     [dispatch],
   );
 
-  const addDay = useCallback(
+  const updateDayPayMap = useCallback(
     (dateKey: string, dayPayMap: WorkDayMap) => {
-      dispatch(addDayPayMap({ dateKey, dayPayMap }));
+      dispatch(setDayPayMap({ dateKey, dayPayMap }));
     },
     [dispatch],
   );
@@ -86,15 +78,12 @@ export const useGlobalState = () => {
     month,
     standardHours,
     baseRate,
-    globalBreakdown,
-    dailyPayMaps,
-
     // actions
     updateYear,
     updateMonth,
     updateStandardHours,
     updateBaseRate,
-    addDay,
+    updateDayPayMap,
     removeDay,
     reset,
   };

@@ -28,7 +28,7 @@ export const useDayController = ({
   shabbatCreditHours,
 }: UseDayControllerProps) => {
   const { dateService } = domain.services;
-  const { baseRate, standardHours, year, month, addDay, removeDay } =
+  const { baseRate, standardHours, year, month, updateDayPayMap, removeDay } =
     useGlobalState();
   const { isSpecialFullDay } = useWorkDays();
 
@@ -46,7 +46,7 @@ export const useDayController = ({
   useSyncDayToGlobalState({
     dateKey: workDay.meta.date,
     dayPayMap,
-    addDay,
+    updateDayPayMap,
     removeDay,
   });
 

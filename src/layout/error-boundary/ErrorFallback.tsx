@@ -1,15 +1,19 @@
 import { Box, Button, Typography, Paper, Alert } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
+import { resolveLanguageFromPathname } from "@/i18n/language";
 
 interface ErrorFallbackProps {
-  error: Error;
   resetError: () => void;
 }
 
-export const ErrorFallback = ({ error, resetError }: ErrorFallbackProps) => {
-  const { t } = useTranslation("errors");
+export const ErrorFallback = ({ resetError }: ErrorFallbackProps) => {
+  const { t, i18n } = useTranslation("errors");
   const { t: tc } = useTranslation();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const language = resolveLanguageFromPathname(pathname, "/");
 
   return (
     <Box
@@ -18,7 +22,7 @@ export const ErrorFallback = ({ error, resetError }: ErrorFallbackProps) => {
       alignItems="center"
       minHeight="50vh"
       p={3}
-      dir="rtl"
+      dir={i18n.dir(language)}
     >
       <Paper elevation={3} sx={{ p: 4, maxWidth: 600, width: "100%" }}>
         <Box display="flex" alignItems="center" gap={2} mb={2}>
@@ -30,39 +34,13 @@ export const ErrorFallback = ({ error, resetError }: ErrorFallbackProps) => {
 
         <Alert severity="error" sx={{ mb: 2 }}>
           <Typography variant="body2" fontWeight="medium">
-            {error.message || t("unexpected")}
+            {t("unexpected")}
           </Typography>
         </Alert>
 
         <Typography variant="body2" color="text.secondary">
           {t("apology")}
         </Typography>
-
-        {import.meta.env.DEV && error.stack && (
-          <Paper
-            elevation={0}
-            sx={{
-              mt: 2,
-              p: 2,
-              backgroundColor: "grey.100",
-              overflow: "auto",
-              maxHeight: 200,
-            }}
-          >
-            <Typography
-              variant="caption"
-              component="pre"
-              sx={{
-                fontSize: "0.7rem",
-                fontFamily: "monospace",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}
-            >
-              {error.stack}
-            </Typography>
-          </Paper>
-        )}
 
         <Box mt={3} display="flex" gap={2} flexWrap="wrap">
           <Button variant="contained" color="primary" onClick={resetError}>
@@ -73,7 +51,7 @@ export const ErrorFallback = ({ error, resetError }: ErrorFallbackProps) => {
           </Button>
           <Button
             variant="text"
-            onClick={() => (window.location.href = "/shiftly")}
+            onClick={() => navigate(`/${language}/daily`, { replace: true })}
           >
             {tc("actions.back_to_home")}
           </Button>

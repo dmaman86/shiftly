@@ -13,11 +13,11 @@ vi.mock("react-i18next", () => ({
 
 vi.mock("@/hooks", () => ({
   useGlobalState: () => ({
-    globalBreakdown: {},
     baseRate: 100,
     year: 2025,
     month: 1,
   }),
+  useGlobalBreakdown: () => ({}),
 }));
 
 vi.mock("@/features/salary-summary", () => ({
@@ -40,7 +40,9 @@ vi.mock("@/utils", () => ({
 import { analyticsService } from "@/services";
 import { MonthlySalarySummary } from "@/features/salary-summary/components/MonthlySalarySummary";
 
-const mockDomain = {} as never;
+const mockDomain = {
+  payMap: { monthPayMapCalculator: {} },
+} as never;
 
 describe("MonthlySalarySummary", () => {
   let observerCallback: (entries: { isIntersecting: boolean }[]) => void;

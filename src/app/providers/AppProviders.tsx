@@ -12,11 +12,16 @@ import createCache from "@emotion/cache";
 import rtlPlugin from "stylis-plugin-rtl";
 import { createTheme } from "@mui/material/styles";
 
+import { resolveLanguageFromPathname } from "@/i18n/language";
 import { DirectionContext, type Direction } from "./direction/directionContext";
 
 const getInitialDirection = (): Direction => {
-  const lang = window.location.pathname.split("/")[1];
-  return lang === "en" ? "ltr" : "rtl";
+  const language = resolveLanguageFromPathname(
+    window.location.pathname,
+    import.meta.env.BASE_URL,
+  );
+
+  return language === "en" ? "ltr" : "rtl";
 };
 
 const ltrCache = createCache({ key: "mui-ltr" });

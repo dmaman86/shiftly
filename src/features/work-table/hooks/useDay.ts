@@ -58,7 +58,7 @@ export const useDay = ({
   }, [setShiftEntries]);
 
   const dayPayMap = useMemo(() => {
-    const savedShifts = Object.values(shiftEntries)
+    const validShifts = Object.values(shiftEntries)
       .filter((entry) => entry.payMap !== null)
       .map((entry) => entry.shift);
 
@@ -66,7 +66,7 @@ export const useDay = ({
       dayPayMapBuilder: daymapBuilder,
       meta,
       month,
-      shifts: savedShifts,
+      shifts: validShifts,
       shiftMapBuilder: domain.payMap.shiftMapBuilder,
       standardHours,
       status,

@@ -26,7 +26,7 @@ import { ApiResponse, CalendarEventMap } from "@/domain";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
 import { hebcalService, analyticsService } from "@/services";
-import { ErrorBoundary, FeatureErrorFallback } from "@/layout";
+import { FeatureBoundary } from "@/layout";
 
 const calendarApi = hebcalService();
 
@@ -173,36 +173,28 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
               )}
 
               {!loading && !error && hasData && (
-                <ErrorBoundary
-                  fallback={(error, reset) => (
-                    <FeatureErrorFallback
-                      featureName={t("feature_name_work_table")}
-                      error={error}
-                      resetError={reset}
-                    />
-                  )}
+                <FeatureBoundary
+                  featureName={t("feature_name_work_table")}
+                  errorContext="WorkTable"
+                  resetKeys={[year, month]}
                 >
                   <WorkTable
                     domain={domain}
                     workDays={workDays}
                     shabbatCreditAllocation={shabbatCreditAllocation}
                   />
-                </ErrorBoundary>
+                </FeatureBoundary>
               )}
 
               {baseRate > 0 && (
                 <>
-                  <ErrorBoundary
-                    fallback={(error, reset) => (
-                      <FeatureErrorFallback
-                        featureName={t("feature_name_salary_summary")}
-                        error={error}
-                        resetError={reset}
-                      />
-                    )}
+                  <FeatureBoundary
+                    featureName={t("feature_name_salary_summary")}
+                    errorContext="MonthlySalarySummary"
+                    resetKeys={[year, month]}
                   >
                     <MonthlySalarySummary domain={domain} />
-                  </ErrorBoundary>
+                  </FeatureBoundary>
                   <Feedback />
                 </>
               )}

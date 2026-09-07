@@ -10,9 +10,12 @@ import enCommon from "./locales/en/common.json";
 import enErrors from "./locales/en/errors.json";
 import enPages from "./locales/en/pages.json";
 import enWorkTable from "./locales/en/work-table.json";
+import { resolveLanguageFromPathname } from "./language";
 
-const pathLang = window.location.pathname.split("/")[1];
-const activeLanguage = pathLang === "en" ? "en" : "he";
+const activeLanguage = resolveLanguageFromPathname(
+  window.location.pathname,
+  import.meta.env.BASE_URL,
+);
 
 i18n.use(initReactI18next).init({
   lng: activeLanguage,
