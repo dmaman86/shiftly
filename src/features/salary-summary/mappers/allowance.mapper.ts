@@ -12,37 +12,44 @@ export const createPayRow = ({
   label,
   quantity,
   rate,
+  tooltip,
 }: {
   label: string;
   quantity: number;
   rate: number;
+  tooltip?: string;
 }): PayRowVM => ({
   label,
   quantity,
   rate,
   total: quantity * rate,
+  tooltip,
 });
 
 export const mapPerDiemToPayRow = (
   points: number,
   rate: number,
   label: string,
+  tooltip?: string,
 ): PayRowVM =>
   createPayRow({
     label,
     quantity: points,
     rate,
+    tooltip,
   });
 
 export const mapMealAllowanceToPayRow = (
   entry: MealAllowanceEntry,
   rate: number,
   label: string,
+  tooltip?: string,
 ): PayRowVM =>
   createPayRow({
     label,
     quantity: entry.points,
     rate,
+    tooltip,
   });
 
 export const mapAllowanceRows = ({
@@ -58,7 +65,22 @@ export const mapAllowanceRows = ({
   rateDiem: number;
   t: TranslateFn;
 }): PayRowVM[] => [
-  mapPerDiemToPayRow(perDiem.points, rateDiem, t("pay_labels.per_diem")),
-  mapMealAllowanceToPayRow(mealAllowance.large, rates.large, t("pay_labels.meal_large")),
-  mapMealAllowanceToPayRow(mealAllowance.small, rates.small, t("pay_labels.meal_small")),
+  mapPerDiemToPayRow(
+    perDiem.points,
+    rateDiem,
+    t("pay_labels.per_diem"),
+    t("headers.meal_allowance"),
+  ),
+  mapMealAllowanceToPayRow(
+    mealAllowance.large,
+    rates.large,
+    t("pay_labels.meal_large"),
+    t("pay_labels.meal_large_short"),
+  ),
+  mapMealAllowanceToPayRow(
+    mealAllowance.small,
+    rates.small,
+    t("pay_labels.meal_small"),
+    t("pay_labels.meal_small_short"),
+  ),
 ];
