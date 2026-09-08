@@ -7,6 +7,7 @@
 ![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 ![Redux](https://img.shields.io/badge/Redux_Toolkit-2.11.0-764ABC?logo=redux&logoColor=white)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?logo=reactquery&logoColor=white)
 ![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-2.112.4-3ECF8E?logo=supabase&logoColor=white)
@@ -92,6 +93,10 @@ Shiftly פועלת במלואה **גם ללא חשבון** — הכל רץ בז�
 
 שלוש הטבלאות מוגנות באמצעות Row Level Security של Postgres: כל משתמש יכול לקרוא ולכתוב רק את השורות שלו. הסכמה נמצאת ב-`supabase/migrations/`.
 
+נתוני טבלת העבודה של משתמש מחובר נטענים באמצעות TanStack Query, עם מפתח מטמון המופרד לפי משתמש, שנה וחודש. העריכה זמינה רק לאחר השלמת הטעינה הראשונית, ובמקרה של כשל מוצגת פעולה מפורשת לניסיון חוזר. מעבר בין חשבונות מאפס את מצב העריכה לפני טעינת נתוני החשבון הבא.
+
+שינויים תקינים במשמרת נשמרים לאחר השהיה קצרה. פעולות כתיבה עבור אותו משתמש ואותו יום מתבצעות לפי הסדר, כדי שעדכון מאוחר לא יעקוף מחיקה שבוצעה אחריו. טיוטות עם שעות לא תקינות נשארות מקומיות עד לתיקונן.
+
 ---
 
 ## סקירת ארכיטקטורה
@@ -138,9 +143,11 @@ Shiftly מבוססת על עקרונות **Clean Architecture**, עם הפרדה
 שכבת תיאום דקה בין ה-UI, הדומיין וה-state.
 אינה מכילה לוגיקה עסקית.
 
-### ניהול מצב (Redux)
+### ניהול מצב
 
-- ניהול מצב גלובלי וחודשי
+- **Redux Toolkit** מנהל את מצב החישוב הגלובלי ואת הצבירה החודשית
+- **React Context** מחזיק את מצב העריכה הנוכחי של טבלת העבודה
+- **TanStack Query** מתאם קריאות וכתיבות מאומתות של טבלת העבודה מול Supabase
 - לוגיקה add / subtract דטרמיניסטית
 - ללא חישוב מחדש מלא בכל שינוי
 
@@ -254,6 +261,7 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 ### State וניווט
 
 - **Redux Toolkit** 2.11.0
+- **TanStack Query** 5 (סנכרון מצב שרת עבור משתמשים מחוברים)
 - **React Router** 7
 
 ### UI ועיצוב
@@ -451,6 +459,19 @@ bun run test:coverage
 
 # הרצת בדיקות במצב CI (הרצה חד־פעמית)
 bun run test:ci
+```
+
+### בדיקות איכות ובניית גרסת Production
+
+```bash
+# בדיקת טיפוסים של האפליקציה ושל הגדרות Vite
+bun run typecheck
+
+# הרצת ניתוח סטטי
+bun run lint
+
+# יצירת חבילת production בתיקייה dist/
+bun run build
 ```
 
 ### כיסוי בדיקות
