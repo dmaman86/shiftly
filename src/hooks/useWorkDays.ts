@@ -1,23 +1,41 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
 
-import { AppDispatch, RootState } from "@/redux/store";
-import { setWorkDays } from "@/redux/states/workDaysSlice";
 import { WorkDayType } from "@/constants";
-import { CalendarEventMap } from "@/domain";
+import { buildEventMap } from "@/adapters";
+import { DomainContextType } from "@/app";
+import { hebcalService, analyticsService } from "@/services";
+import { useGlobalState } from "./useGlobalState";
 
-export const useWorkDays = () => {
-  const dispatch = useDispatch<AppDispatch>();
+const calendarApi = hebcalService();
 
-  // core array of WorkDayInfo
-  const workDays = useSelector((state: RootState) => state.workDays.workDays);
+export const useWorkDays = (domain: DomainContextType) => {
+  const { year, month } = useGlobalState();
+  const { dateService } = domain.services;
 
-  const generate = (
-    year: number,
-    month: number,
-    eventMap: CalendarEventMap,
-  ) => {
-    dispatch(setWorkDays({ year, month, eventMap }));
-  };
+  const query = useQuery({
+    queryKey: ["workDays", year, month],
+    queryFn: async () => {
+      const { startDate, endDate } = dateService.getDatesRange(year, month);
+      const result = await calendarApi.getData(startDate, endDate).call();
+
+      if (result.error) {
+        analyticsService.track({
+          name: "exception",
+          params: {
+            description: result.error,
+            fatal: false,
+            error_type: "hebcal_api_error",
+          },
+        });
+        throw new Error(result.error);
+      }
+
+      const eventMap = buildEventMap(result.data);
+      return domain.payMap.workDaysMonthBuilder.build({ year, month, eventMap });
+    },
+  });
+
+  const workDays = query.data ?? [];
 
   const getDayInfo = (date: string) =>
     workDays.find((d) => d.meta.date === date);
@@ -39,7 +57,8 @@ export const useWorkDays = () => {
 
   return {
     workDays,
-    generate,
+    isLoading: query.isLoading,
+    error: query.error,
     getDayInfo,
     isSpecialFullDay,
     isPartialHolidayDay,

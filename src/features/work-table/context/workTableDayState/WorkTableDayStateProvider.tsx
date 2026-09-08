@@ -3,7 +3,7 @@ import { ReactNode, useMemo, useReducer, useState } from "react";
 import {
   WorkTableDayStateContext,
   workTableDayStateReducer,
-} from "@/features/work-table/hooks/workTableDayStateContext";
+} from "./workTableDayStateContext";
 
 type WorkTableDayStateProviderProps = {
   children: ReactNode;

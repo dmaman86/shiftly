@@ -37,19 +37,72 @@ export enum WorkDayType {
   SpecialFull = "SpecialFull",
 }
 
+/**
+ * Single source of truth for the work table's column widths — read by
+ * WorkTableHeader (via headersTable's `widths` below) and by the body row
+ * components (DayRow, ShiftRow, CompactDayRow) that render the matching
+ * cells, so the header and body can't silently drift out of sync the way
+ * they previously did (header defaulted to a generic width while each body
+ * cell hardcoded its own number separately).
+ */
+export const tableColumnWidths = {
+  day: 96,
+  sickVacation: 50,
+  addShift: 48,
+  entry: 96,
+  exit: 96,
+  actions: 112,
+  compactStat: 90,
+} as const;
+
 export const headersTable: TableHeader[] = [
-  { label: "יום", viewMode: "both", rowSpan: 2 },
-  { label: "", children: ["מחלה", "חופש"], widths: [40, 40], viewMode: "both" },
+  {
+    label: "יום",
+    widths: [tableColumnWidths.day],
+    viewMode: "both",
+    rowSpan: 2,
+  },
+  {
+    label: "",
+    children: ["מחלה", "חופש"],
+    widths: [tableColumnWidths.sickVacation, tableColumnWidths.sickVacation],
+    viewMode: "both",
+  },
   {
     label: "שעות",
     children: ["", "כניסה", "יציאה", ""],
-    widths: [48, 96, 96, 112],
+    widths: [
+      tableColumnWidths.addShift,
+      tableColumnWidths.entry,
+      tableColumnWidths.exit,
+      tableColumnWidths.actions,
+    ],
     viewMode: "both",
   },
-  { label: "סך שעות בפועל", rowSpan: 2, viewMode: "both" },
-  { label: "סך שעות", rowSpan: 2, viewMode: "both" },
-  { label: "רגילות", rowSpan: 2, viewMode: "compact" },
-  { label: "תוספות", rowSpan: 2, viewMode: "compact" },
+  {
+    label: "סך שעות בפועל",
+    widths: [tableColumnWidths.compactStat],
+    viewMode: "both",
+    rowSpan: 2,
+  },
+  {
+    label: "סך שעות לתשלום",
+    widths: [tableColumnWidths.compactStat],
+    viewMode: "both",
+    rowSpan: 2,
+  },
+  {
+    label: "רגילות",
+    widths: [tableColumnWidths.compactStat],
+    viewMode: "compact",
+    rowSpan: 2,
+  },
+  {
+    label: "תוספות",
+    widths: [tableColumnWidths.compactStat],
+    viewMode: "compact",
+    rowSpan: 2,
+  },
 ];
 
 export type HolidayKey =

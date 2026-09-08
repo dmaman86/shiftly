@@ -5,7 +5,7 @@ import { WorkDayStatus } from "@/constants";
 import {
   useWorkTableDayState,
 } from "@/features/work-table/hooks/useWorkTableDayState";
-import { WorkTableDayStateProvider } from "@/features/work-table/components/WorkTableDayStateProvider";
+import { WorkTableDayStateProvider } from "@/features/work-table/context/workTableDayState/WorkTableDayStateProvider";
 import { renderPure, screen, userEvent } from "@/test/ui/utils";
 
 const dateKey = "2026-08-26";

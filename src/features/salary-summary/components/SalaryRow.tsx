@@ -1,4 +1,5 @@
-import { TableCell, TableRow, TextField, Typography } from "@mui/material";
+import { Box, TableCell, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 import { formatValue } from "@/utils";
 import { PayRowVM, useEditableQuantity } from "@/features/salary-summary";
 
@@ -21,7 +22,37 @@ export const SalaryRow = ({
 
   return (
     <TableRow hover>
-      <TableCell sx={{ py: 1 }}>{row.label}</TableCell>
+      <TableCell sx={{ py: 1 }}>
+        {row.label}
+        {row.tooltip && (
+          <Tooltip title={row.tooltip}>
+            {/* Padding + negative margin extends the touch/click target well
+                past the icon's visual bounds (info icons are otherwise far
+                below the ~44px minimum recommended for touch) without
+                affecting the row's layout. */}
+            <Box
+              component="span"
+              sx={{
+                display: "inline-flex",
+                alignItems: "center",
+                verticalAlign: "middle",
+                p: 1,
+                mt: -1,
+                mr: -1,
+                mb: -1,
+                ml: -0.5,
+              }}
+            >
+              <InfoIcon
+                sx={{
+                  fontSize: "0.9rem",
+                  color: "text.disabled",
+                }}
+              />
+            </Box>
+          </Tooltip>
+        )}
+      </TableCell>
       <TableCell align="center">
         {editMode ? (
           <TextField

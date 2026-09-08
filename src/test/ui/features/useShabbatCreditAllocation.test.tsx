@@ -31,17 +31,19 @@ const monthlyConfigServiceMock = vi.hoisted(() => ({
 }));
 
 const reduxStateMock = vi.hoisted(() => ({
-  workDays: { workDays: [] as unknown[] },
   global: {
     dailyPayMaps: {} as Record<string, unknown>,
     config: { standardHours: 8 },
   },
 }));
 
+const workDaysMock = vi.hoisted(() => ({ workDays: [] as unknown[] }));
+
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => authMock }));
 vi.mock("@/hooks/useGlobalState", () => ({ useGlobalState: () => globalStateMock }));
 vi.mock("@/hooks/useAppSnackbar", () => ({ useAppSnackbar: () => snackbarMock }));
 vi.mock("@/hooks/useDomain", () => ({ useDomain: () => domainMock }));
+vi.mock("@/hooks/useWorkDays", () => ({ useWorkDays: () => workDaysMock }));
 vi.mock("@/services", () => ({ monthlyConfigService: () => monthlyConfigServiceMock }));
 vi.mock("react-redux", () => ({
   useSelector: (selector: (state: typeof reduxStateMock) => unknown) =>
@@ -55,7 +57,7 @@ describe("useShabbatCreditAllocation", () => {
     authMock.user = null;
     globalStateMock.year = 2026;
     globalStateMock.month = 9;
-    reduxStateMock.workDays.workDays = [];
+    workDaysMock.workDays = [];
     reduxStateMock.global.dailyPayMaps = {};
     snackbarMock.error.mockReset();
     monthlyConfigServiceMock.fetch.mockReset();

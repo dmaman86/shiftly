@@ -4,30 +4,44 @@ import { useTranslation } from "react-i18next";
 import { filterHeadersByViewMode } from "../helpers";
 
 type HeaderKey =
-  | "day" | "sick" | "vacation" | "hours" | "total_hours" | "actual_hours"
-  | "regular" | "extras" | "overtime" | "shabbat" | "absence"
-  | "meal_allowance" | "meal_per_diem" | "large" | "small"
-  | "shabbat_credit" | "entry" | "exit";
+  | "day"
+  | "sick"
+  | "vacation"
+  | "hours"
+  | "total_hours"
+  | "actual_hours"
+  | "regular"
+  | "extras"
+  | "overtime"
+  | "shabbat"
+  | "absence"
+  | "meal_allowance"
+  | "meal_per_diem"
+  | "large"
+  | "small"
+  | "shabbat_credit"
+  | "entry"
+  | "exit";
 
 const HEADER_KEY_MAP: Record<string, HeaderKey> = {
-  "יום": "day",
-  "מחלה": "sick",
-  "חופש": "vacation",
-  "שעות": "hours",
-  "סך שעות": "total_hours",
+  יום: "day",
+  מחלה: "sick",
+  חופש: "vacation",
+  שעות: "hours",
+  "סך שעות לתשלום": "total_hours",
   "סך שעות בפועל": "actual_hours",
-  "רגילות": "regular",
-  "תוספות": "extras",
+  רגילות: "regular",
+  תוספות: "extras",
   "ש״נ": "overtime",
-  "שבת": "shabbat",
-  "היעדרות": "absence",
+  שבת: "shabbat",
+  היעדרות: "absence",
   "אש״ל": "meal_allowance",
-  "כלכלה": "meal_per_diem",
-  "גדולה": "large",
-  "קטנה": "small",
+  כלכלה: "meal_per_diem",
+  גדולה: "large",
+  קטנה: "small",
   "זכות שבת": "shabbat_credit",
-  "כניסה": "entry",
-  "יציאה": "exit",
+  כניסה: "entry",
+  יציאה: "exit",
 };
 
 type WorkTableHeaderProps = {

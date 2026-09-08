@@ -7,7 +7,7 @@ import { useAppSnackbar } from "@/hooks/useAppSnackbar";
 import { useAuth } from "@/hooks/useAuth";
 import { shiftService, workDayService } from "@/services";
 import { resolveErrorMessage } from "@/utils";
-import { ShiftEntries, ShiftEntry, WorkTableDayStateContext } from "./workTableDayStateContext";
+import { ShiftEntries, ShiftEntry, WorkTableDayStateContext } from "../context/workTableDayState/workTableDayStateContext";
 
 type UseSyncDayToStorageProps = {
   dateKey: string;

@@ -31,6 +31,7 @@ import {
   WorkTableDayStateProvider,
   WorkTableDayStateHydrator,
   monthToCompactPayBreakdownVM,
+  monthToPayBreakdownVM,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
 import { ShabbatCreditAllocation, WorkDayInfo } from "@/domain";
@@ -66,6 +67,10 @@ export const WorkTable = ({
   const monthBreakdown = monthToCompactPayBreakdownVM(
     globalBreakdown,
     baseRate,
+    shabbatCreditAllocation.usedHours,
+  );
+  const monthFullBreakdown = monthToPayBreakdownVM(
+    globalBreakdown,
     shabbatCreditAllocation.usedHours,
   );
 
@@ -106,7 +111,10 @@ export const WorkTable = ({
                   />
                 </FeatureBoundary>
               ))}
-              <MonthSummaryCard breakdown={monthBreakdown} />
+              <MonthSummaryCard
+                breakdown={monthBreakdown}
+                fullBreakdown={monthFullBreakdown}
+              />
             </Stack>
           ) : (
             <Paper

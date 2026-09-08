@@ -1,5 +1,4 @@
 import type { GlobalState } from "@/redux/states/globalSlice";
-import type { WorkDaysState } from "@/redux/states/workDaysSlice";
 
 /**
  * Factory to create mock GlobalState for testing
@@ -16,18 +15,5 @@ export function createMockGlobalState(
       ...overrides?.config,
     },
     dailyPayMaps: overrides?.dailyPayMaps ?? {},
-  };
-}
-
-/**
- * Factory to create mock WorkDaysState for testing
- */
-export function createMockWorkDaysState(
-  overrides?: Partial<WorkDaysState>
-): WorkDaysState {
-  return {
-    year: overrides?.year ?? 2024,
-    month: overrides?.month ?? 1,
-    workDays: overrides?.workDays ?? [],
   };
 }

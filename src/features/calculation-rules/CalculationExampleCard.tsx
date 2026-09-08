@@ -30,7 +30,8 @@ import { WorkParametersInputs } from "@/features/config";
 import {
   dayToCompactPayBreakdownVM,
   DayDetails,
-  ShiftEditorFields,
+  ShiftCrossDayDutyControls,
+  ShiftTimeInput,
   shiftToPayBreakdownVM,
   useShiftControls,
 } from "@/features/work-table";
@@ -95,6 +96,7 @@ const CalculationExampleShift = ({
   shift,
 }: CalculationExampleShiftProps) => {
   const { t } = useTranslation("pages");
+  const { t: tWT } = useTranslation("work-table");
   const controls = useShiftControls({
     ...domain.services,
     onChange,
@@ -106,21 +108,36 @@ const CalculationExampleShift = ({
       <Box sx={{ p: 1.5 }}>
         <Stack
           direction={{ xs: "column", sm: "row" }}
-          alignItems={{ xs: "stretch", sm: "center" }}
+          alignItems={{ xs: "flex-start", sm: "center" }}
           justifyContent="space-between"
+          flexWrap="wrap"
           spacing={1.5}
         >
-          <Typography fontWeight={700}>
-            {t("calculation_rules_page.example.shift", { number: index + 1 })}
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
+            <Typography fontWeight={700} sx={{ mr: 1 }}>
+              {t("calculation_rules_page.example.shift", { number: index + 1 })}
+            </Typography>
+            <ShiftTimeInput
+              label={tWT("headers.entry")}
+              value={shift.start.date}
+              onChange={(value) => controls.handleChange("start", value)}
+              disabled={false}
+            />
+            <ShiftTimeInput
+              label={tWT("headers.exit")}
+              value={shift.end.date}
+              onChange={(value) => controls.handleChange("end", value)}
+              disabled={false}
+              error={controls.hasError}
+            />
+          </Box>
 
           <Stack direction="row" alignItems="center" flexWrap="wrap" gap={1}>
-            <ShiftEditorFields
+            <ShiftCrossDayDutyControls
               crossDay={controls.crossDay}
               crossDayLabel={t("calculation_rules_page.example.cross_day")}
               disabled={false}
               hasError={controls.hasError}
-              onChange={controls.handleChange}
               onToggleDuty={controls.toggleDuty}
               onToggleNextDay={controls.handleToggleNextDay}
               shift={shift}

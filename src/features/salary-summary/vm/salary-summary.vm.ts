@@ -5,6 +5,7 @@ export type PayRowVM = {
   quantity: number;
   rate: number;
   total: number;
+  tooltip?: string;
 };
 
 export type PayTableVM = {

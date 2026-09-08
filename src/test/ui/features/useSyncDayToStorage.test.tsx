@@ -7,7 +7,7 @@ import { WorkDayStatus } from "@/constants";
 import {
   WorkTableDayStateContext,
   type ShiftEntries,
-} from "@/features/work-table/hooks/workTableDayStateContext";
+} from "@/features/work-table/context/workTableDayState/workTableDayStateContext";
 
 const authMock = vi.hoisted(() => ({ user: null as { id: string } | null }));
 

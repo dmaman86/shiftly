@@ -24,6 +24,7 @@ export const breakdownToDetailGroups = (
   t: Translate,
   showAbsence: boolean,
   showAllowances = true,
+  showShabbatCreditUsed = false,
 ): DetailGroupData[] => [
   {
     key: "overtime",
@@ -40,10 +41,6 @@ export const breakdownToDetailGroups = (
     items: [
       { label: "150%", value: breakdown.special.shabbat150.hours },
       { label: "200%", value: breakdown.special.shabbat200.hours },
-      {
-        label: t("headers.shabbat_credit"),
-        value: breakdown.appliedShabbatCredit.hours,
-      },
     ],
   },
   {
@@ -54,6 +51,20 @@ export const breakdownToDetailGroups = (
       { label: "50%", value: breakdown.extra.hours50.hours },
     ],
   },
+  ...(showShabbatCreditUsed
+    ? [
+        {
+          key: "shabbat_credit_used",
+          title: t("headers.shabbat_credit"),
+          items: [
+            {
+              label: t("day_details.hours_used"),
+              value: breakdown.appliedShabbatCredit.hours,
+            },
+          ],
+        },
+      ]
+    : []),
   ...(showAbsence
     ? [
         {

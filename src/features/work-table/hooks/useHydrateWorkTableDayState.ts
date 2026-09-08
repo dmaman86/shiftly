@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useGlobalState } from "@/hooks/useGlobalState";
 import { shiftService, workDayService } from "@/services";
 import { recordsToWorkTableDayState } from "../mappers/recordsToWorkTableDayState";
-import { WorkTableDayStateContext } from "./workTableDayStateContext";
+import { WorkTableDayStateContext } from "../context/workTableDayState/workTableDayStateContext";
 
 type UseHydrateWorkTableDayStateProps = {
   domain: DomainContextType;

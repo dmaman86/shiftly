@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Box,
   Card,
@@ -21,61 +20,19 @@ import {
   Feedback,
   useShabbatCreditAllocation,
 } from "@/features";
-import { useFetch, useGlobalState, useWorkDays, useAsync } from "@/hooks";
-import { ApiResponse, CalendarEventMap } from "@/domain";
-import { buildEventMap } from "@/adapters";
+import { useGlobalState, useWorkDays } from "@/hooks";
 import { DomainContextType } from "@/app";
-import { hebcalService, analyticsService } from "@/services";
+import { analyticsService } from "@/services";
 import { FeatureBoundary } from "@/layout";
-
-const calendarApi = hebcalService();
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const { t } = useTranslation("work-table");
-  const { dateService } = domain.services;
-  const { year, month, baseRate, reset } = useGlobalState();
+  const { year, month, baseRate } = useGlobalState();
 
-  const { workDays, generate } = useWorkDays();
+  const { workDays, isLoading: loading, error: queryError } = useWorkDays(domain);
   const shabbatCreditAllocation = useShabbatCreditAllocation();
 
-  const [error, setError] = useState<string | undefined>(undefined);
-
-  const { loading, callEndPoint, cancelEndPoint } = useFetch();
-
-  const handleCalendarResult = ({
-    data,
-    error,
-  }: ApiResponse<CalendarEventMap>) => {
-    if (data) {
-      generate(year, month, data);
-      reset();
-      setError(undefined);
-      return;
-    }
-
-    const description = error ?? "hebcal fetch failed";
-
-    analyticsService.track({
-      name: "exception",
-      params: {
-        description,
-        fatal: false,
-        error_type: "hebcal_api_error",
-      },
-    });
-
-    setError(description);
-  };
-
-  useAsync<ApiResponse<CalendarEventMap>>(
-    () => {
-      const { startDate, endDate } = dateService.getDatesRange(year, month);
-      return callEndPoint(calendarApi.getData(startDate, endDate), buildEventMap);
-    },
-    [dateService, year, month, callEndPoint],
-    handleCalendarResult,
-    cancelEndPoint,
-  );
+  const error = queryError?.message;
 
   const hasData = workDays.length > 0;
 

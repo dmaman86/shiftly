@@ -11,7 +11,6 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { configureStore } from "@reduxjs/toolkit";
 import type { RootState } from "@/redux/store";
 import globalReducer from "@/redux/states/globalSlice";
-import workDaysReducer from "@/redux/states/workDaysSlice";
 
 // Create RTL cache for tests
 const cache = createCache({ key: "css", prepend: true });
@@ -32,7 +31,6 @@ const theme = createTheme({
 export function createMockStore(preloadedState?: Partial<RootState>) {
   return configureStore({
     reducer: {
-      workDays: workDaysReducer,
       global: globalReducer,
     },
     preloadedState: preloadedState as RootState,

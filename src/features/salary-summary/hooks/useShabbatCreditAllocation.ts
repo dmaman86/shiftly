@@ -8,16 +8,18 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDomain } from "@/hooks/useDomain";
 import { useFetch } from "@/hooks/useFetch";
 import { useGlobalState } from "@/hooks/useGlobalState";
+import { useWorkDays } from "@/hooks/useWorkDays";
 import { monthlyConfigService } from "@/services";
 
 export const useShabbatCreditAllocation = () => {
   const { user } = useAuth();
   const { year, month } = useGlobalState();
-  const { services } = useDomain();
+  const domain = useDomain();
+  const { services } = domain;
   const { callEndPoint } = useFetch();
   const snackbar = useAppSnackbar();
 
-  const workDays = useSelector((state: RootState) => state.workDays.workDays);
+  const { workDays } = useWorkDays(domain);
   const dailyPayMaps = useSelector(
     (state: RootState) => state.global.dailyPayMaps,
   );

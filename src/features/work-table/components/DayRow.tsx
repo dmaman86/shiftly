@@ -16,7 +16,13 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 import { WorkDayInfo } from "@/domain";
-import { WorkDayStatus, HolidayKey, headersTable } from "@/constants";
+import {
+  WorkDayStatus,
+  WorkDayType,
+  HolidayKey,
+  headersTable,
+  tableColumnWidths,
+} from "@/constants";
 import {
   CompactDayRow,
   countTableColumns,
@@ -64,6 +70,9 @@ export const DayRow = ({
   const shiftCount = Math.max(shifts.length, 1);
   const detailsId = `day-details-${workDay.meta.date}`;
   const columnCount = countTableColumns(headersTable, "compact", baseRate);
+  const eligibleForShabbatCredit =
+    workDay.meta.typeDay === WorkDayType.Regular ||
+    workDay.meta.typeDay === WorkDayType.SpecialPartialStart;
 
   const days = t("days", { returnObjects: true }) as string[];
   const weekdayLabel = days[dateService.getWeekday(workDay.meta.date)];
@@ -72,15 +81,15 @@ export const DayRow = ({
   return (
     <>
       {(shifts.length ? shifts : [null]).map((item, index) => (
-        <TableRow
-          key={item?.shift.id ?? `${workDay.meta.date}-empty`}
-        >
+        <TableRow key={item?.shift.id ?? `${workDay.meta.date}-empty`}>
           {index === 0 && (
             <>
               <TableCell
                 rowSpan={shiftCount}
                 sx={{
-                  width: 80,
+                  width: tableColumnWidths.day,
+                  minWidth: tableColumnWidths.day,
+                  maxWidth: tableColumnWidths.day,
                   borderLeft: "1px solid black",
                   borderRight: "1px solid black",
                   textAlign: "center",
@@ -115,9 +124,9 @@ export const DayRow = ({
                 rowSpan={shiftCount}
                 sx={{
                   textAlign: "center",
-                  width: 40,
-                  minWidth: 40,
-                  maxWidth: 40,
+                  width: tableColumnWidths.sickVacation,
+                  minWidth: tableColumnWidths.sickVacation,
+                  maxWidth: tableColumnWidths.sickVacation,
                   p: 0.25,
                   verticalAlign: "middle",
                 }}
@@ -144,9 +153,9 @@ export const DayRow = ({
                 sx={{
                   borderRight: "1px solid black",
                   textAlign: "center",
-                  width: 40,
-                  minWidth: 40,
-                  maxWidth: 40,
+                  width: tableColumnWidths.sickVacation,
+                  minWidth: tableColumnWidths.sickVacation,
+                  maxWidth: tableColumnWidths.sickVacation,
                   p: 0.25,
                   verticalAlign: "middle",
                 }}
@@ -173,7 +182,7 @@ export const DayRow = ({
                 sx={{
                   borderRight: "1px solid black",
                   textAlign: "center",
-                  width: 48,
+                  width: tableColumnWidths.addShift,
                   px: 0.5,
                   py: 0.5,
                   verticalAlign: "middle",
@@ -206,8 +215,8 @@ export const DayRow = ({
               <TableCell
                 sx={{
                   borderRight: "1px solid black",
-                  width: 96,
-                  maxWidth: 96,
+                  width: tableColumnWidths.entry,
+                  maxWidth: tableColumnWidths.entry,
                   px: 0,
                   verticalAlign: "middle",
                 }}
@@ -215,8 +224,8 @@ export const DayRow = ({
               <TableCell
                 sx={{
                   borderRight: "1px solid black",
-                  width: 96,
-                  maxWidth: 96,
+                  width: tableColumnWidths.exit,
+                  maxWidth: tableColumnWidths.exit,
                   px: 0,
                   verticalAlign: "middle",
                 }}
@@ -224,8 +233,8 @@ export const DayRow = ({
               <TableCell
                 sx={{
                   borderRight: "1px solid black",
-                  width: 112,
-                  maxWidth: 112,
+                  width: tableColumnWidths.actions,
+                  maxWidth: tableColumnWidths.actions,
                   px: 0,
                   verticalAlign: "middle",
                 }}
@@ -284,6 +293,7 @@ export const DayRow = ({
               breakdown={expandedBreakdown}
               id={detailsId}
               showAbsence={!specialFullDay}
+              showShabbatCreditUsed={eligibleForShabbatCredit}
             />
           </Collapse>
         </TableCell>

@@ -20,7 +20,7 @@
     "sick": "מחלה",
     "vacation": "חופש",
     "hours": "שעות",
-    "total_hours": "סך שעות",
+    "total_hours": "סך שעות לתשלום",
     "actual_hours": "סך שעות בפועל",
     "regular": "רגילות",
     "extras": "תוספות",
@@ -84,7 +84,14 @@
     "show": "הצג פרטי יום",
     "hide": "הסתר פרטי יום",
     "region_label": "פירוט שכר יומי",
-    "points": "נקודות"
+    "points": "נקודות",
+    "hours_used": "שעות שנוצלו",
+    "shabbat_credit_generated": "ביום זה נוצרו {{hours}} שעות זכות שבת."
+  },
+  "month_details": {
+    "show": "הצג פרטי חודש",
+    "hide": "הסתר פרטי חודש",
+    "region_label": "פירוט שכר חודשי"
   },
   "shift_row": {
     "tooltip_cross_day_error": "⚠️ יש לסמן חוצה יום - שעת סיום לפני שעת התחלה",
@@ -124,6 +131,8 @@
     "evening_20": "תוספת ערב (20%)",
     "per_diem": "קצובת כלכלה",
     "meal_large": "דמי כלכלה",
-    "meal_small": "תוספת כלכלה למשמרת ג"
+    "meal_small": "תוספת כלכלה למשמרת ג",
+    "meal_large_short": "כלכלה גדולה",
+    "meal_small_short": "כלכלה קטנה"
   }
 }
