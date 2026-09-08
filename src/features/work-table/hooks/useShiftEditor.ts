@@ -24,13 +24,16 @@ export const useShiftEditor = ({
   standardHours,
   onShiftUpdate,
 }: UseShiftEditorProps) => {
-  const [localShift, setLocalShift] = useState(shift);
+  const [draft, setDraft] = useState<Shift | null>(null);
+  const localShift = draft?.id === shift.id ? draft : shift;
 
   const updateShift = useCallback(
     (nextShift: Shift) => {
-      setLocalShift(nextShift);
-
-      if (!domain.services.shiftService.isValidShiftDuration(nextShift)) return;
+      if (!domain.services.shiftService.isValidShiftDuration(nextShift)) {
+        setDraft(nextShift);
+        return;
+      }
+      setDraft(null);
 
       const payMap = domain.payMap.shiftMapBuilder.build({
         shift: nextShift,

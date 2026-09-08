@@ -6,6 +6,7 @@
 ![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 ![Redux](https://img.shields.io/badge/Redux_Toolkit-2.11.0-764ABC?logo=redux&logoColor=white)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?logo=reactquery&logoColor=white)
 ![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-2.112.4-3ECF8E?logo=supabase&logoColor=white)
@@ -91,6 +92,10 @@ Signing in with a **Google account** (via Supabase Auth) additionally persists y
 
 All three tables are protected by Postgres Row Level Security: each user can only read or write their own rows. The schema lives in `supabase/migrations/`.
 
+Authenticated work-table data is loaded with TanStack Query using a cache key scoped to the user, year, and month. Editing remains unavailable until that initial snapshot is ready, and a failed load presents an explicit retry action. Changing accounts resets the editable state before loading the next account's data.
+
+Valid shift edits are saved after a short debounce. Writes for the same user and day are serialized so a late update cannot overtake a subsequent deletion. Invalid time drafts remain local until they become valid.
+
 ---
 
 ## Architecture Overview
@@ -138,9 +143,11 @@ This ensures the domain never depends on presentation concerns.
 Thin orchestration layer between UI, domain, and state.
 Hooks coordinate data flow without embedding business logic.
 
-### State Management (Redux)
+### State Management
 
-- Global and monthly state aggregation
+- **Redux Toolkit** handles global calculation state and monthly aggregation
+- **React Context** owns the current work-table editing session
+- **TanStack Query** coordinates authenticated work-table reads and writes to Supabase
 - Deterministic add / subtract logic
 - No full recomputation on every change
 
@@ -254,6 +261,7 @@ Create specific calculator instances:
 ### State & Routing
 
 - **Redux Toolkit** 2.11.0
+- **TanStack Query** 5 (authenticated server-state synchronization)
 - **React Router** 7
 
 ### UI & Styling
@@ -293,6 +301,19 @@ bun run test:coverage
 
 # Run tests in CI mode (single run)
 bun run test:ci
+```
+
+### Quality Checks and Production Build
+
+```bash
+# Type-check the application and Vite configuration
+bun run typecheck
+
+# Run static analysis
+bun run lint
+
+# Create the production bundle in dist/
+bun run build
 ```
 
 ### Test Coverage

@@ -62,10 +62,7 @@ export const useShabbatCreditAllocation = () => {
     return () => {
       cancelled = true;
     };
-    // snackbar isn't referentially stable (AppSnackbarProvider doesn't memoize
-    // its context value), so it's read via the closure instead of listed here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, year, month, services, callEndPoint]);
+  }, [user, year, month, services, callEndPoint, snackbar]);
 
   const allocation = useMemo(
     () =>
@@ -94,9 +91,15 @@ export const useShabbatCreditAllocation = () => {
     ).then((result) => {
       if (result.error) snackbar.error(result.error);
     });
-    // snackbar isn't referentially stable (see comment above) - read via closure.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, year, month, resolvedKey, allocation.unusedHours, callEndPoint]);
+  }, [
+    user,
+    year,
+    month,
+    resolvedKey,
+    allocation.unusedHours,
+    callEndPoint,
+    snackbar,
+  ]);
 
   return allocation;
 };

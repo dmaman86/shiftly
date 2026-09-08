@@ -1,5 +1,6 @@
 import { useMemo, useEffect, useState } from "react";
 import { Provider } from "react-redux";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CacheProvider } from "@emotion/react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -30,6 +31,7 @@ const rtlCache = createCache({ key: "mui-rtl", stylisPlugins: [rtlPlugin] });
 type AppProvidersProps = { children: React.ReactNode };
 
 export const AppProviders = ({ children }: AppProvidersProps) => {
+  const [queryClient] = useState(() => new QueryClient());
   const [direction, setDirection] = useState<Direction>(getInitialDirection);
 
   const theme = useMemo(() => createTheme({ direction }), [direction]);
@@ -49,7 +51,7 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
                 <DomainProvider>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <CssBaseline />
-                    {children}
+                    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
                   </LocalizationProvider>
                 </DomainProvider>
               </AuthProvider>

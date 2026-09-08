@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Table,
   TableBody,
@@ -46,7 +47,10 @@ export const WorkTable = ({
   workDays,
   shabbatCreditAllocation,
 }: WorkTableProps) => {
-  const { year, month, baseRate } = useGlobalState();
+  const { year, month, baseRate, reset } = useGlobalState();
+  const { user } = useAuth();
+  const userId = user?.id;
+  useEffect(() => reset(), [userId, reset]);
   const globalBreakdown = useGlobalBreakdown(
     domain.payMap.monthPayMapCalculator,
   );
@@ -80,8 +84,8 @@ export const WorkTable = ({
         </Box>
         <Divider sx={{ mb: 2 }} />
 
-        <WorkTableDayStateProvider key={`${year}-${month}`}>
-          <WorkTableDayStateHydrator domain={domain} workDays={workDays} />
+        <WorkTableDayStateProvider ownerKey={JSON.stringify([userId, year, month])}>
+          <WorkTableDayStateHydrator domain={domain} workDays={workDays}>
           {isMobile ? (
             <Stack spacing={1.5}>
               {workDays.map((day) => (
@@ -193,6 +197,7 @@ export const WorkTable = ({
               </TableContainer>
             </Paper>
           )}
+          </WorkTableDayStateHydrator>
         </WorkTableDayStateProvider>
         {shabbatCreditAllocation.totalAvailableHours > 0 && (
           <Alert

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { SnackbarProvider, useSnackbar } from "notistack";
 import { AppSnackbarContextType } from "@/app";
 import { AppSnackbarContext } from "./snackbarContext";
@@ -9,12 +10,15 @@ interface SnackbarProviderProps {
 const SnackbarBridge = ({ children }: { children: React.ReactNode }) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const value: AppSnackbarContextType = {
-    info: (message) => enqueueSnackbar(message, { variant: "info" }),
-    success: (message) => enqueueSnackbar(message, { variant: "success" }),
-    warning: (message) => enqueueSnackbar(message, { variant: "warning" }),
-    error: (message) => enqueueSnackbar(message, { variant: "error" }),
-  };
+  const value = useMemo<AppSnackbarContextType>(
+    () => ({
+      info: (message) => enqueueSnackbar(message, { variant: "info" }),
+      success: (message) => enqueueSnackbar(message, { variant: "success" }),
+      warning: (message) => enqueueSnackbar(message, { variant: "warning" }),
+      error: (message) => enqueueSnackbar(message, { variant: "error" }),
+    }),
+    [enqueueSnackbar],
+  );
 
   return (
     <AppSnackbarContext.Provider value={value}>

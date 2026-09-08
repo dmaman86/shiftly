@@ -1,14 +1,13 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { DomainContextType } from "@/app";
-import { WorkDayStatus } from "@/constants";
-import { Shift, WorkDayInfo } from "@/domain";
-import { useAppSnackbar } from "@/hooks/useAppSnackbar";
+import { WorkDayInfo } from "@/domain";
 import { useAuth } from "@/hooks/useAuth";
-import { useFetch } from "@/hooks/useFetch";
 import { useGlobalState } from "@/hooks/useGlobalState";
 import { shiftService, workDayService } from "@/services";
-import { WorkTableDayState, WorkTableDayStateContext } from "./workTableDayStateContext";
+import { recordsToWorkTableDayState } from "../mappers/recordsToWorkTableDayState";
+import { WorkTableDayStateContext } from "./workTableDayStateContext";
 
 type UseHydrateWorkTableDayStateProps = {
   domain: DomainContextType;
@@ -32,87 +31,60 @@ export const useHydrateWorkTableDayState = ({
     );
   }
 
-  const { dispatch, setHydrated } = context;
-  const { user } = useAuth();
+  const { dispatch, hydrated, setHydrated } = context;
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const userId = user?.id;
   const { year, month, standardHours } = useGlobalState();
-  const { callEndPoint } = useFetch();
-  const snackbar = useAppSnackbar();
-
-  // standardHours is only needed to compute a hydrated shift's payMap, not to
-  // decide whether to re-fetch - it's read via a ref so a config change
-  // (e.g. useMonthlyConfigSync hydrating it moments after mount) can't
-  // re-trigger this effect and clobber local edits made in between with a
-  // stale full-state "hydrate" dispatch.
-  const standardHoursRef = useRef(standardHours);
-  useEffect(() => {
-    standardHoursRef.current = standardHours;
+  const query = useQuery({
+    queryKey: ["workTable", userId, year, month],
+    enabled: !!userId && !isAuthLoading && workDays.length > 0 && !hydrated,
+    // This is an initial snapshot for an editor, not a live replacement of drafts.
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    retry: false,
+    queryFn: async () => {
+      if (!userId) throw new Error("An authenticated user is required");
+      const { startDate, endDate } = domain.services.dateService.getDatesRange(year, month);
+      const [daysResult, shiftsResult] = await Promise.all([
+        workDayService().fetchForMonth(userId, startDate, endDate).call(),
+        shiftService().fetchForMonth(userId, startDate, endDate).call(),
+      ]);
+      if (daysResult.error) throw new Error(daysResult.error);
+      if (shiftsResult.error) throw new Error(shiftsResult.error);
+      return { days: daysResult.data ?? [], shifts: shiftsResult.data ?? [] };
+    },
   });
 
   useEffect(() => {
-    if (!user || workDays.length === 0) return;
-
-    let cancelled = false;
-    const { startDate, endDate } = domain.services.dateService.getDatesRange(year, month);
-
-    void Promise.all([
-      callEndPoint(workDayService().fetchForMonth(user.id, startDate, endDate)),
-      callEndPoint(shiftService().fetchForMonth(user.id, startDate, endDate)),
-    ]).then(([daysResult, shiftsResult]) => {
-      if (cancelled) return;
-
-      if (daysResult.error) {
-        snackbar.error(daysResult.error);
-        return;
-      }
-      if (shiftsResult.error) {
-        snackbar.error(shiftsResult.error);
-        return;
-      }
-
-      const hydratedState: WorkTableDayState = {};
-
-      for (const day of daysResult.data ?? []) {
-        hydratedState[day.date] = { status: day.status, shiftEntries: {} };
-      }
-
-      for (const row of shiftsResult.data ?? []) {
-        const meta = workDays.find((day) => day.meta.date === row.date)?.meta;
-        if (!meta) continue;
-
-        const shift: Shift = {
-          id: row.id,
-          start: { date: new Date(row.start_time) },
-          end: { date: new Date(row.end_time) },
-          isDuty: row.is_duty,
-        };
-
-        const payMap = domain.payMap.shiftMapBuilder.build({
-          shift,
-          meta,
-          standardHours: standardHoursRef.current,
-          isFieldDutyShift: shift.isDuty,
-        });
-
-        const dayState = hydratedState[row.date] ?? {
-          status: WorkDayStatus.normal,
-          shiftEntries: {},
-        };
-
-        hydratedState[row.date] = {
-          ...dayState,
-          shiftEntries: { ...dayState.shiftEntries, [shift.id]: { shift, payMap } },
-        };
-      }
-
-      dispatch({ type: "hydrate", state: hydratedState });
-      setHydrated(true);
+    if (!userId || hydrated || !query.isSuccess || query.isFetching || !query.data) return;
+    const state = recordsToWorkTableDayState({
+      ...query.data,
+      workDays,
+      shiftMapBuilder: domain.payMap.shiftMapBuilder,
+      standardHours,
     });
+    dispatch({ type: "hydrate", state });
+    setHydrated(true);
+  }, [
+    userId,
+    hydrated,
+    query.isSuccess,
+    query.isFetching,
+    query.data,
+    workDays,
+    domain,
+    standardHours,
+    dispatch,
+    setHydrated,
+  ]);
 
-    return () => {
-      cancelled = true;
-    };
-    // snackbar isn't referentially stable (AppSnackbarProvider doesn't memoize
-    // its context value), so it's read via the closure instead of listed here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, year, month, workDays, domain, callEndPoint, dispatch, setHydrated]);
+  return {
+    ready: !isAuthLoading && (!userId || hydrated),
+    error: query.error,
+    retry: query.refetch,
+    isFetching: query.isFetching,
+  };
 };
