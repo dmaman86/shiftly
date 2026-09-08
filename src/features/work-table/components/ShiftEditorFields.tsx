@@ -13,32 +13,29 @@ import { useTranslation } from "react-i18next";
 import type { Shift } from "@/domain";
 import { ShiftTimeInput } from "./ShiftTimeInput";
 
-type ShiftEditorFieldsProps = {
-  additionalActions?: ReactNode;
+type ShiftCrossDayDutyControlsProps = {
   crossDay: boolean;
   crossDayLabel?: string;
   disabled: boolean;
   hasError: boolean;
-  onChange: (field: "start" | "end", value: Date | null) => void;
   onToggleDuty: () => void;
   onToggleNextDay: (checked: boolean) => void;
   shift: Shift;
-  showLabels?: boolean;
 };
 
-export const ShiftEditorFields = ({
-  additionalActions,
+export const ShiftCrossDayDutyControls = ({
   crossDay,
   crossDayLabel,
   disabled,
   hasError,
-  onChange,
   onToggleDuty,
   onToggleNextDay,
   shift,
-  showLabels = true,
-}: ShiftEditorFieldsProps) => {
+}: ShiftCrossDayDutyControlsProps) => {
   const { t } = useTranslation("work-table");
+
+  if (disabled) return null;
+
   const crossDayControl = (
     <Tooltip
       title={
@@ -68,7 +65,8 @@ export const ShiftEditorFields = ({
       />
     </Tooltip>
   );
-  const editorActions = !disabled && (
+
+  return (
     <>
       {crossDayLabel ? (
         <FormControlLabel
@@ -92,6 +90,45 @@ export const ShiftEditorFields = ({
         </span>
       </Tooltip>
     </>
+  );
+};
+
+type ShiftEditorFieldsProps = {
+  additionalActions?: ReactNode;
+  crossDay: boolean;
+  crossDayLabel?: string;
+  disabled: boolean;
+  hasError: boolean;
+  onChange: (field: "start" | "end", value: Date | null) => void;
+  onToggleDuty: () => void;
+  onToggleNextDay: (checked: boolean) => void;
+  shift: Shift;
+  showLabels?: boolean;
+};
+
+export const ShiftEditorFields = ({
+  additionalActions,
+  crossDay,
+  crossDayLabel,
+  disabled,
+  hasError,
+  onChange,
+  onToggleDuty,
+  onToggleNextDay,
+  shift,
+  showLabels = true,
+}: ShiftEditorFieldsProps) => {
+  const { t } = useTranslation("work-table");
+  const editorActions = (
+    <ShiftCrossDayDutyControls
+      crossDay={crossDay}
+      crossDayLabel={crossDayLabel}
+      disabled={disabled}
+      hasError={hasError}
+      onToggleDuty={onToggleDuty}
+      onToggleNextDay={onToggleNextDay}
+      shift={shift}
+    />
   );
 
   return (
