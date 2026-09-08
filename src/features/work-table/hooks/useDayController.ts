@@ -30,7 +30,7 @@ export const useDayController = ({
   const { dateService } = domain.services;
   const { baseRate, standardHours, year, month, updateDayPayMap, removeDay } =
     useGlobalState();
-  const { isSpecialFullDay } = useWorkDays();
+  const { isSpecialFullDay } = useWorkDays(domain);
 
   const {
     status,
