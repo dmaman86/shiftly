@@ -1,6 +1,7 @@
 import { Theme } from "@mui/material";
 import { SystemStyleObject } from "@mui/system";
-import { TableHeader, TableViewMode, WorkDayMap } from "@/domain";
+import { SpecialBreakdown, TableHeader, TableViewMode, WorkDayMap } from "@/domain";
+import { tableColumnWidths } from "@/constants";
 
 /**
  * Filters headers based on the current view mode
@@ -18,7 +19,7 @@ export const filterHeadersByViewMode = (
 export const baseCellSx = (isFooter: boolean): SystemStyleObject<Theme> => ({
   textAlign: "center",
   verticalAlign: "middle",
-  ...(isFooter ? {} : { minWidth: "90px" }),
+  ...(isFooter ? {} : { minWidth: tableColumnWidths.compactStat }),
 });
 
 export const rightBorderIfNotFooter = (
@@ -49,6 +50,9 @@ export const countTableColumns = (
 
   return headerColumns + salaryColumn + detailsColumn;
 };
+
+export const shabbatCreditHoursFromSpecial = (special: SpecialBreakdown): number =>
+  special.shabbat150.hours + special.shabbat200.hours;
 
 export const isSameDayPayMap = (a: WorkDayMap, b: WorkDayMap) => {
   return (

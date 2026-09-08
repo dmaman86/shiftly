@@ -15,7 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { WorkDayInfo } from "@/domain";
-import { WorkDayStatus, HolidayKey } from "@/constants";
+import { WorkDayStatus, WorkDayType, HolidayKey } from "@/constants";
 import { DomainContextType } from "@/app";
 import { formatValue } from "@/utils";
 import { useDayController } from "@/features/work-table";
@@ -55,6 +55,9 @@ export const DayCard = ({ domain, workDay, shabbatCreditHours }: DayCardProps) =
   const weekdayLabel = days[dateService.getWeekday(workDay.meta.date)];
   const dayLabel = dayInfoResolver.formatHebrewWorkDay(workDay, weekdayLabel);
   const detailsId = `day-card-details-${workDay.meta.date}`;
+  const eligibleForShabbatCredit =
+    workDay.meta.typeDay === WorkDayType.Regular ||
+    workDay.meta.typeDay === WorkDayType.SpecialPartialStart;
 
   return (
     <Card variant="outlined" sx={{ borderRadius: 2 }}>
@@ -212,7 +215,11 @@ export const DayCard = ({ domain, workDay, shabbatCreditHours }: DayCardProps) =
           aria-label={t("day_details.region_label")}
           sx={{ borderTop: "1px solid", borderColor: "divider" }}
         >
-          <DayCardDetails breakdown={expandedBreakdown} showAbsence={!specialFullDay} />
+          <DayCardDetails
+            breakdown={expandedBreakdown}
+            showAbsence={!specialFullDay}
+            showShabbatCreditUsed={eligibleForShabbatCredit}
+          />
         </Box>
       </Collapse>
     </Card>

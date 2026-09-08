@@ -1,25 +1,51 @@
-import { Box, Card, Typography } from "@mui/material";
+import { useState } from "react";
+import { Box, Card, Collapse, IconButton, Tooltip, Typography } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTranslation } from "react-i18next";
 
-import { CompactPayBreakdownVM } from "@/domain";
+import { CompactPayBreakdownVM, PayBreakdownViewModel } from "@/domain";
 import { formatValue } from "@/utils";
 import { StatTile } from "./StatTile";
+import { DayCardDetails } from "./DayCardDetails";
 
 type MonthSummaryCardProps = {
   breakdown: CompactPayBreakdownVM;
+  fullBreakdown: PayBreakdownViewModel;
 };
 
-export const MonthSummaryCard = ({ breakdown }: MonthSummaryCardProps) => {
+export const MonthSummaryCard = ({
+  breakdown,
+  fullBreakdown,
+}: MonthSummaryCardProps) => {
   const { t } = useTranslation("work-table");
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const detailsId = "month-summary-details";
 
   return (
     <Card
       variant="outlined"
       sx={{ borderRadius: 2, borderTop: "3px solid", borderTopColor: "text.primary" }}
     >
-      <Typography sx={{ px: 1.5, pt: 1.5, pb: 0.5 }} fontWeight="bold">
-        {t("feature_name_salary_summary")}
-      </Typography>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pr: 0.5 }}>
+        <Typography sx={{ px: 1.5, pt: 1.5, pb: 0.5 }} fontWeight="bold">
+          {t("feature_name_salary_summary")}
+        </Typography>
+        <Tooltip title={detailsOpen ? t("month_details.hide") : t("month_details.show")}>
+          <IconButton
+            size="small"
+            aria-label={detailsOpen ? t("month_details.hide") : t("month_details.show")}
+            aria-expanded={detailsOpen}
+            aria-controls={detailsId}
+            onClick={() => setDetailsOpen((open) => !open)}
+            sx={{
+              transform: detailsOpen ? "rotate(180deg)" : "none",
+              transition: "transform 0.2s",
+            }}
+          >
+            <ExpandMoreIcon />
+          </IconButton>
+        </Tooltip>
+      </Box>
       <Box
         sx={{
           display: "grid",
@@ -45,6 +71,20 @@ export const MonthSummaryCard = ({ breakdown }: MonthSummaryCardProps) => {
           </Box>
         )}
       </Box>
+      <Collapse in={detailsOpen} timeout="auto" unmountOnExit>
+        <Box
+          id={detailsId}
+          role="region"
+          aria-label={t("month_details.region_label")}
+          sx={{ borderTop: "1px solid", borderColor: "divider" }}
+        >
+          <DayCardDetails
+            breakdown={fullBreakdown}
+            showShabbatCreditUsed
+            showGeneratedAlert={false}
+          />
+        </Box>
+      </Collapse>
     </Card>
   );
 };

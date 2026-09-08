@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Paper,
   Table,
@@ -12,12 +13,14 @@ import { useTranslation } from "react-i18next";
 import { PayBreakdownViewModel } from "@/domain";
 import { formatValue } from "@/utils";
 import { breakdownToDetailGroups, DetailGroupData } from "../mappers";
+import { shabbatCreditHoursFromSpecial } from "../helpers";
 
 type DayDetailsProps = {
   breakdown: PayBreakdownViewModel;
   id: string;
   showAbsence?: boolean;
   showAllowances?: boolean;
+  showShabbatCreditUsed?: boolean;
 };
 
 type DetailGroupProps = Omit<DetailGroupData, "key">;
@@ -108,6 +111,7 @@ export const DayDetails = ({
   id,
   showAbsence = true,
   showAllowances = true,
+  showShabbatCreditUsed = false,
 }: DayDetailsProps) => {
   const { t } = useTranslation("work-table");
 
@@ -116,9 +120,13 @@ export const DayDetails = ({
     t,
     showAbsence,
     showAllowances,
+    showShabbatCreditUsed,
   );
   const primaryGroups = groups.slice(0, 2);
   const secondaryGroups = groups.slice(2);
+  const generatedShabbatCreditHours = shabbatCreditHoursFromSpecial(
+    breakdown.special,
+  );
 
   return (
     <Box
@@ -136,6 +144,13 @@ export const DayDetails = ({
         p: 1.5,
       }}
     >
+      {generatedShabbatCreditHours > 0 && (
+        <Alert severity="info" sx={{ gridColumn: "1 / -1" }}>
+          {t("day_details.shabbat_credit_generated", {
+            hours: formatValue(generatedShabbatCreditHours),
+          })}
+        </Alert>
+      )}
       <Box
         sx={{
           display: "grid",

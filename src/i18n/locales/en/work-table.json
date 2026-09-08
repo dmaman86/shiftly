@@ -20,7 +20,7 @@
     "sick": "Sick",
     "vacation": "Vacation",
     "hours": "Hours",
-    "total_hours": "Total Hrs",
+    "total_hours": "Payable Hrs",
     "actual_hours": "Actual Hrs",
     "regular": "Regular",
     "extras": "Extras",
@@ -84,7 +84,14 @@
     "show": "Show day details",
     "hide": "Hide day details",
     "region_label": "Day pay breakdown",
-    "points": "Points"
+    "points": "Points",
+    "hours_used": "Hours used",
+    "shabbat_credit_generated": "This day generated {{hours}} Shabbat Credit hours."
+  },
+  "month_details": {
+    "show": "Show month details",
+    "hide": "Hide month details",
+    "region_label": "Month pay breakdown"
   },
   "shift_row": {
     "tooltip_cross_day_error": "⚠️ Mark as cross-day — end time is before start time",
@@ -124,6 +131,8 @@
     "evening_20": "Evening bonus (20%)",
     "per_diem": "Per diem allowance",
     "meal_large": "Large meal allowance",
-    "meal_small": "Small meal allowance (shift C)"
+    "meal_small": "Small meal allowance (shift C)",
+    "meal_large_short": "Large meal",
+    "meal_small_short": "Small meal"
   }
 }

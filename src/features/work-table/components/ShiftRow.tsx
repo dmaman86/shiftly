@@ -4,6 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
+import { tableColumnWidths } from "@/constants";
 import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { ShiftTimeInput, useShiftEditor } from "@/features/work-table";
@@ -46,8 +47,8 @@ export const ShiftRow = ({
         sx={{
           borderRight: "1px solid black",
           textAlign: "center",
-          width: 96,
-          maxWidth: 96,
+          width: tableColumnWidths.entry,
+          maxWidth: tableColumnWidths.entry,
           p: 0.5,
           overflow: "hidden",
           verticalAlign: "middle",
@@ -65,8 +66,8 @@ export const ShiftRow = ({
         sx={{
           borderRight: "1px solid black",
           textAlign: "center",
-          width: 96,
-          maxWidth: 96,
+          width: tableColumnWidths.exit,
+          maxWidth: tableColumnWidths.exit,
           p: 0.5,
           overflow: "hidden",
           verticalAlign: "middle",
@@ -86,8 +87,8 @@ export const ShiftRow = ({
           borderRight: "1px solid black",
           textAlign: "center",
           whiteSpace: "nowrap",
-          width: 112,
-          maxWidth: 112,
+          width: tableColumnWidths.actions,
+          maxWidth: tableColumnWidths.actions,
           p: 0.25,
           overflow: "visible",
           verticalAlign: "middle",
