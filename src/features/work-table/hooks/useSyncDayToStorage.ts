@@ -1,11 +1,12 @@
 import { useContext, useEffect, useRef } from "react";
+import { useMutation } from "@tanstack/react-query";
 
 import { WorkDayStatus } from "@/constants";
 import type { Shift } from "@/domain";
 import { useAppSnackbar } from "@/hooks/useAppSnackbar";
 import { useAuth } from "@/hooks/useAuth";
-import { useFetch } from "@/hooks/useFetch";
 import { shiftService, workDayService } from "@/services";
+import { resolveErrorMessage } from "@/utils";
 import { ShiftEntries, ShiftEntry, WorkTableDayStateContext } from "./workTableDayStateContext";
 
 type UseSyncDayToStorageProps = {
@@ -18,6 +19,22 @@ type PendingShiftUpsert = {
   dateKey: string;
   shift: Shift;
   userId: string;
+};
+
+type DayMutation =
+  | ({ type: "upsertShift" } & PendingShiftUpsert)
+  | { type: "removeShift"; userId: string; shiftId: string }
+  | { type: "setStatus"; userId: string; dateKey: string; status: WorkDayStatus };
+
+const persistDayChange = async (change: DayMutation) => {
+  const endpoint =
+    change.type === "upsertShift"
+      ? shiftService().upsert(change.userId, change.dateKey, change.shift)
+      : change.type === "removeShift"
+        ? shiftService().remove(change.userId, change.shiftId)
+        : workDayService().setStatus(change.userId, change.dateKey, change.status);
+  const result = await endpoint.call();
+  if (result.error) throw new Error(result.error);
 };
 
 const SHIFT_UPSERT_DEBOUNCE_MS = 600;
@@ -46,8 +63,14 @@ export const useSyncDayToStorage = ({
 
   const { hydrated } = context;
   const { user } = useAuth();
-  const { callEndPoint } = useFetch();
   const snackbar = useAppSnackbar();
+  const { mutate } = useMutation({
+    mutationFn: persistDayChange,
+    // Keep writes ordered so a late upsert cannot undo a subsequent deletion.
+    scope: { id: JSON.stringify(["workDay", user?.id, dateKey]) },
+    retry: false,
+    onError: (error) => snackbar.error(resolveErrorMessage(error)),
+  });
 
   const prevStatusRef = useRef<WorkDayStatus | null>(null);
   const previousValidEntriesRef = useRef<Record<string, ShiftEntry>>({});
@@ -60,15 +83,13 @@ export const useSyncDayToStorage = ({
     () => () => {
       Object.values(upsertTimeoutsRef.current).forEach(clearTimeout);
 
-      // Flush valid edits without using callEndPoint: its loading state is
-      // already unmounted at this point.
-      Object.values(pendingUpsertsRef.current).forEach(
-        ({ userId, dateKey: pendingDateKey, shift }) => {
-          void shiftService().upsert(userId, pendingDateKey, shift).call();
-        },
-      );
+      Object.values(pendingUpsertsRef.current).forEach((pendingUpsert) => {
+        mutate({ type: "upsertShift", ...pendingUpsert });
+      });
+      pendingUpsertsRef.current = {};
+      upsertTimeoutsRef.current = {};
     },
-    [],
+    [mutate],
   );
 
   useEffect(() => {
@@ -81,13 +102,8 @@ export const useSyncDayToStorage = ({
     if (prevStatusRef.current === status) return;
     prevStatusRef.current = status;
 
-    void callEndPoint(workDayService().setStatus(user.id, dateKey, status)).then((result) => {
-      if (result.error) snackbar.error(result.error);
-    });
-    // snackbar isn't referentially stable (AppSnackbarProvider doesn't memoize
-    // its context value), so it's read via the closure instead of listed here.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, hydrated, dateKey, status, callEndPoint]);
+    mutate({ type: "setStatus", userId: user.id, dateKey, status });
+  }, [user, hydrated, dateKey, status, mutate]);
 
   useEffect(() => {
     if (!user || !hydrated) return;
@@ -114,9 +130,7 @@ export const useSyncDayToStorage = ({
       delete upsertTimeoutsRef.current[id];
       delete pendingUpsertsRef.current[id];
 
-      void callEndPoint(shiftService().remove(user.id, id)).then((result) => {
-        if (result.error) snackbar.error(result.error);
-      });
+      mutate({ type: "removeShift", userId: user.id, shiftId: id });
     });
 
     changedEntries.forEach((entry) => {
@@ -134,18 +148,8 @@ export const useSyncDayToStorage = ({
         delete pendingUpsertsRef.current[shiftId];
         delete upsertTimeoutsRef.current[shiftId];
 
-        void callEndPoint(
-          shiftService().upsert(
-            pendingUpsert.userId,
-            pendingUpsert.dateKey,
-            pendingUpsert.shift,
-          ),
-        ).then((result) => {
-          if (result.error) snackbar.error(result.error);
-        });
+        mutate({ type: "upsertShift", ...pendingUpsert });
       }, SHIFT_UPSERT_DEBOUNCE_MS);
     });
-    // snackbar isn't referentially stable (see comment above) - read via closure.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, hydrated, dateKey, shiftEntries, callEndPoint]);
+  }, [user, hydrated, dateKey, shiftEntries, mutate]);
 };

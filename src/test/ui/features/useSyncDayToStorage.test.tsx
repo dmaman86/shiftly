@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { act, renderHook } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { WorkDayStatus } from "@/constants";
@@ -47,15 +48,18 @@ const buildShiftEntry = (id: string, valid: boolean, endHour = 16) => ({
   payMap: valid ? ({ totalHours: 8 } as never) : null,
 });
 
-const hydratedWrapper =
-  (hydrated: boolean) =>
-  ({ children }: { children: ReactNode }) => (
-    <WorkTableDayStateContext.Provider
-      value={{ state: {}, dispatch: vi.fn(), hydrated, setHydrated: vi.fn() }}
-    >
-      {children}
-    </WorkTableDayStateContext.Provider>
+const hydratedWrapper = (hydrated: boolean) => {
+  const client = new QueryClient({ defaultOptions: { mutations: { gcTime: 0 } } });
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={client}>
+      <WorkTableDayStateContext.Provider
+        value={{ state: {}, dispatch: vi.fn(), hydrated, setHydrated: vi.fn() }}
+      >
+        {children}
+      </WorkTableDayStateContext.Provider>
+    </QueryClientProvider>
   );
+};
 
 describe("useSyncDayToStorage", () => {
   beforeEach(() => {
@@ -70,6 +74,69 @@ describe("useSyncDayToStorage", () => {
     shiftServiceMock.remove
       .mockReset()
       .mockReturnValue({ call: () => Promise.resolve({ data: null }) });
+  });
+
+  it.each(["response", "rejection"])("reports a status %s error", async (failure) => {
+    authMock.user = { id: "user-1" };
+    workDayServiceMock.setStatus.mockReturnValue({
+      call: () =>
+        failure === "response"
+          ? Promise.resolve({ error: "Could not save status" })
+          : Promise.reject(new Error("Could not save status")),
+    });
+
+    renderHook(() => useSyncDayToStorage({
+      dateKey: "2026-08-10", status: WorkDayStatus.sick, shiftEntries: {},
+    }), { wrapper: hydratedWrapper(true) });
+
+    await waitFor(() => expect(snackbarMock.error).toHaveBeenCalledWith("Could not save status"));
+    expect(workDayServiceMock.setStatus).toHaveBeenCalledOnce();
+  });
+
+  it("flushes a pending shift on unmount and reports its failure", async () => {
+    authMock.user = { id: "user-1" };
+    const entry = buildShiftEntry("shift-1", true);
+    shiftServiceMock.upsert.mockReturnValue({
+      call: () => Promise.resolve({ error: "Could not save shift" }),
+    });
+    const { unmount } = renderHook(() => useSyncDayToStorage({
+      dateKey: "2026-08-10", status: WorkDayStatus.normal,
+      shiftEntries: { "shift-1": entry },
+    }), { wrapper: hydratedWrapper(true) });
+
+    expect(shiftServiceMock.upsert).not.toHaveBeenCalled();
+    unmount();
+
+    await waitFor(() => expect(snackbarMock.error).toHaveBeenCalledWith("Could not save shift"));
+    expect(shiftServiceMock.upsert).toHaveBeenCalledExactlyOnceWith("user-1", "2026-08-10", entry.shift);
+  });
+
+  it("waits for an in-flight upsert before deleting the shift", async () => {
+    vi.useFakeTimers();
+    try {
+      authMock.user = { id: "user-1" };
+      const pending = Promise.withResolvers<{ data: null }>();
+      shiftServiceMock.upsert.mockReturnValue({ call: () => pending.promise });
+      const { rerender } = renderHook((props) => useSyncDayToStorage(props), {
+        wrapper: hydratedWrapper(true),
+        initialProps: {
+          dateKey: "2026-08-10", status: WorkDayStatus.normal,
+          shiftEntries: { "shift-1": buildShiftEntry("shift-1", true) } as ShiftEntries,
+        },
+      });
+      await act(async () => { await vi.advanceTimersByTimeAsync(600); });
+      expect(shiftServiceMock.upsert).toHaveBeenCalledOnce();
+
+      await act(async () => {
+        rerender({ dateKey: "2026-08-10", status: WorkDayStatus.normal, shiftEntries: {} });
+      });
+      expect(shiftServiceMock.remove).not.toHaveBeenCalled();
+
+      await act(async () => { pending.resolve({ data: null }); });
+      expect(shiftServiceMock.remove).toHaveBeenCalledExactlyOnceWith("user-1", "shift-1");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("does nothing in guest mode", async () => {
