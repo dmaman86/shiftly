@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
+import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import type { DomainContextType } from "@/app";
 import type { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
@@ -38,19 +39,45 @@ const createDomain = (payMap: ShiftPayMap) =>
   }) as unknown as DomainContextType;
 
 describe("useShiftEditor", () => {
+  it("accepts external updates without emitting a write", () => {
+    const domain = createDomain({ totalHours: 8 } as ShiftPayMap);
+    const onShiftUpdate = vi.fn();
+    const { result, rerender } = renderHook(({ shift }) => useShiftEditor({
+      domain, shift, meta, standardHours: 6.67, onShiftUpdate,
+    }), { initialProps: { shift: createShift(16) } });
+    const updated = createShift(18);
+    rerender({ shift: updated });
+    expect(result.current.localShift).toBe(updated);
+    expect(onShiftUpdate).not.toHaveBeenCalled();
+  });
+
+  it("preserves an invalid draft on refresh but not across shift identities", () => {
+    const domain = createDomain({ totalHours: 8 } as ShiftPayMap);
+    const { result, rerender } = renderHook(({ shift }) => useShiftEditor({
+      domain, shift, meta, standardHours: 6.67, onShiftUpdate: vi.fn(),
+    }), { initialProps: { shift: createShift(16) } });
+    const invalidEnd = new Date("2026-08-10T07:00:00");
+    act(() => result.current.handleChange("end", invalidEnd));
+    rerender({ shift: createShift(18) });
+    expect(result.current.localShift.end.date).toEqual(invalidEnd);
+    const other = { ...createShift(19), id: "shift-2" };
+    rerender({ shift: other });
+    expect(result.current.localShift).toBe(other);
+  });
   it("updates calculation immediately for a valid change", () => {
     const payMap = { totalHours: 9 } as ShiftPayMap;
     const domain = createDomain(payMap);
     const onShiftUpdate = vi.fn();
-    const { result } = renderHook(() =>
-      useShiftEditor({
-        domain,
-        shift: createShift(16),
-        meta,
-        standardHours: 6.67,
-        onShiftUpdate,
-      }),
-    );
+    const { result } = renderHook(() => {
+      const [shift, setShift] = useState(() => createShift(16));
+      return useShiftEditor({
+        domain, shift, meta, standardHours: 6.67,
+        onShiftUpdate: (nextShift, nextPayMap) => {
+          setShift(nextShift);
+          onShiftUpdate(nextShift, nextPayMap);
+        },
+      });
+    });
     const nextEnd = new Date("2026-08-10T17:00:00");
 
     act(() => result.current.handleChange("end", nextEnd));

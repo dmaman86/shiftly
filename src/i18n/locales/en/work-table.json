@@ -1,4 +1,9 @@
 {
+  "storage": {
+    "loading": "Loading saved shifts...",
+    "load_error": "Saved shifts could not be loaded. Retry to continue editing.",
+    "retry": "Retry"
+  },
   "page_title": "Daily Salary Calculator",
   "page_subtitle": "Calculate your daily and monthly salary by entering shifts — includes overtime, evening/night bonuses, Shabbat, and allowances. Enter your hourly rate to get started.",
   "nav_hint_monthly": "Want to calculate monthly salary without entering shifts? Go to",

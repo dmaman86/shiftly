@@ -7,9 +7,10 @@ import {
 
 type WorkTableDayStateProviderProps = {
   children: ReactNode;
+  ownerKey?: string;
 };
 
-export const WorkTableDayStateProvider = ({
+const DayStateProvider = ({
   children,
 }: WorkTableDayStateProviderProps) => {
   const [state, dispatch] = useReducer(workTableDayStateReducer, {});
@@ -25,3 +26,10 @@ export const WorkTableDayStateProvider = ({
     </WorkTableDayStateContext.Provider>
   );
 };
+
+export const WorkTableDayStateProvider = ({
+  children,
+  ownerKey = "guest",
+}: WorkTableDayStateProviderProps) => (
+  <DayStateProvider key={ownerKey}>{children}</DayStateProvider>
+);
