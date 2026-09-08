@@ -5,7 +5,7 @@ import {
   emptyDayState,
   ShiftEntries,
   WorkTableDayStateContext,
-} from "./workTableDayStateContext";
+} from "../context/workTableDayState/workTableDayStateContext";
 
 export const useWorkTableDayState = (dateKey: string) => {
   const context = useContext(WorkTableDayStateContext);

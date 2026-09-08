@@ -31,7 +31,7 @@ import type { DomainContextType } from "@/app";
 import { WorkDayStatus, WorkDayType } from "@/constants";
 import type { WorkDayInfo } from "@/domain";
 import { WorkTableDayStateHydrator } from "@/features/work-table/components/WorkTableDayStateHydrator";
-import { WorkTableDayStateProvider } from "@/features/work-table/components/WorkTableDayStateProvider";
+import { WorkTableDayStateProvider } from "@/features/work-table/context/workTableDayState/WorkTableDayStateProvider";
 import { useWorkTableDayState } from "@/features/work-table/hooks/useWorkTableDayState";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

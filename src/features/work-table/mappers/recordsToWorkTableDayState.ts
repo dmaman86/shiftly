@@ -2,7 +2,7 @@ import { WorkDayStatus } from "@/constants";
 import type { Shift, ShiftMapBuilder, WorkDayInfo } from "@/domain";
 import type { ShiftRecord } from "@/services/shift/shift.service";
 import type { WorkDayRecord } from "@/services/workDay/workDay.service";
-import type { WorkTableDayState } from "../hooks/workTableDayStateContext";
+import type { WorkTableDayState } from "../context/workTableDayState/workTableDayStateContext";
 
 type RecordsToWorkTableDayStateParams = {
   days: WorkDayRecord[];
