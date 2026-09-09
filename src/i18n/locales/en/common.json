@@ -37,12 +37,21 @@
     "sign_out": "Sign out",
     "loading": "Loading account...",
     "initialization_error": "Your account session could not be loaded. Please try again.",
-    "sign_out_success": "You are signed out."
+    "sign_out_success": "You are signed out.",
+    "delete_account": "Delete account",
+    "delete_account_title": "Delete account?",
+    "delete_account_description": "This permanently deletes your account, saved shifts, day statuses, and monthly settings. This cannot be undone.",
+    "delete_account_confirmation_label": "Type {{value}} to confirm",
+    "delete_account_confirmation_value": "DELETE",
+    "delete_account_confirm": "Delete my account",
+    "delete_account_success": "Your account was deleted.",
+    "delete_account_local_sign_out_error": "Your account was deleted, but the local session could not be cleared. Refresh the page."
   },
   "actions": {
     "try_again": "Try Again",
     "refresh_page": "Refresh Page",
     "back_to_home": "Back to Home",
+    "cancel": "Cancel",
     "close": "Close"
   },
   "info_dialogs": {

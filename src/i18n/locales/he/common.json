@@ -37,12 +37,21 @@
     "sign_out": "התנתקות",
     "loading": "טוען חשבון...",
     "initialization_error": "לא ניתן לטעון את החשבון. יש לנסות שוב.",
-    "sign_out_success": "התנתקת בהצלחה."
+    "sign_out_success": "התנתקת בהצלחה.",
+    "delete_account": "מחיקת חשבון",
+    "delete_account_title": "למחוק את החשבון?",
+    "delete_account_description": "פעולה זו תמחק לצמיתות את החשבון, המשמרות השמורות, סטטוסי הימים וההגדרות החודשיות שלך. לא ניתן לבטל אותה.",
+    "delete_account_confirmation_label": "יש להקליד {{value}} לאישור",
+    "delete_account_confirmation_value": "מחיקה",
+    "delete_account_confirm": "מחק את החשבון שלי",
+    "delete_account_success": "החשבון שלך נמחק.",
+    "delete_account_local_sign_out_error": "החשבון נמחק, אך לא ניתן היה לנקות את ההתחברות המקומית. יש לרענן את הדף."
   },
   "actions": {
     "try_again": "נסה שוב",
     "refresh_page": "רענן דף",
     "back_to_home": "חזור לדף הבית",
+    "cancel": "ביטול",
     "close": "לסגור"
   },
   "info_dialogs": {

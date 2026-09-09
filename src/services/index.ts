@@ -7,3 +7,4 @@ export { workDayService } from "./workDay/workDay.service";
 export type { WorkDayRecord } from "./workDay/workDay.service";
 export { shiftService } from "./shift/shift.service";
 export type { ShiftRecord } from "./shift/shift.service";
+export { accountService } from "./account/account.service";

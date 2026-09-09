@@ -358,6 +358,14 @@ VITE_SUPABASE_PUBLISHABLE_KEY=
 
 Then run the SQL files under `supabase/migrations/`, in order, in your Supabase project's SQL Editor to create the `monthly_configs`, `work_days`, and `shifts` tables with their Row Level Security policies.
 
+Account deletion requires the `delete-account` Supabase Edge Function because deleting from `auth.users` requires a server-side secret key. Deploy it after linking the project:
+
+```bash
+supabase functions deploy delete-account
+```
+
+The function validates the signed-in user's JWT and deletes that same user from Supabase Auth. The table foreign keys use `on delete cascade`, so the user's `monthly_configs`, `work_days`, and `shifts` rows are removed by the database.
+
 ---
 
 ## Project Structure
@@ -401,6 +409,7 @@ Then run the SQL files under `supabase/migrations/`, in order, in your Supabase 
 │   ├── test/                   # Domain, service, Redux and UI test suites
 │   └── utils/                  # API result handling and shared helpers
 └── supabase/
+    ├── functions/               # Authenticated Edge Functions
     └── migrations/              # Postgres schema and Row Level Security policies
 ```
 
