@@ -71,7 +71,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
     setYearInput(year.toString());
   }, [year]);
 
-  const availableMonths = monthResolver.getAvailableMonthOptions(year);
+  const availableMonths = monthResolver.getAvailableMonths(year);
 
   const currentYear = monthResolver.getCurrentYear();
   const parsedYear = Number(yearInput);
@@ -146,9 +146,9 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                           updateMonth(Number(e.target.value) + 1)
                         }
                       >
-                        {availableMonths.map((m) => (
-                          <MenuItem key={m.value} value={m.value}>
-                            {monthNames[m.value]}
+                        {availableMonths.map((monthIndex) => (
+                          <MenuItem key={monthIndex} value={monthIndex}>
+                            {monthNames[monthIndex]}
                           </MenuItem>
                         ))}
                       </Select>

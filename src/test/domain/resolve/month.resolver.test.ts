@@ -4,21 +4,6 @@ import { DefaultMonthResolver } from "@/domain/resolve/month.resolver";
 describe("DefaultMonthResolver", () => {
   const SYSTEM_START_YEAR = 2015;
 
-  const HEBREW_MONTH_NAMES = [
-    "ינואר",
-    "פברואר",
-    "מרץ",
-    "אפריל",
-    "מאי",
-    "יוני",
-    "יולי",
-    "אוגוסט",
-    "ספטמבר",
-    "אוקטובר",
-    "נובמבר",
-    "דצמבר",
-  ];
-
   describe("constructor and dateProvider", () => {
     it("should use default date provider when none provided", () => {
       const resolver = new DefaultMonthResolver();
@@ -253,81 +238,6 @@ describe("DefaultMonthResolver", () => {
     });
   });
 
-  describe("getAvailableMonthOptions", () => {
-    it("should return month options with Hebrew names for 2020", () => {
-      const resolver = new DefaultMonthResolver(() => new Date("2023-06-15"));
-
-      const result = resolver.getAvailableMonthOptions(2020);
-
-      expect(result).toHaveLength(12);
-      expect(result[0]).toEqual({ value: 0, label: "ינואר" });
-      expect(result[1]).toEqual({ value: 1, label: "פברואר" });
-      expect(result[11]).toEqual({ value: 11, label: "דצמבר" });
-    });
-
-    it("should return empty array for year before system start", () => {
-      const resolver = new DefaultMonthResolver(() => new Date("2023-06-15"));
-
-      const result = resolver.getAvailableMonthOptions(2014);
-
-      expect(result).toEqual([]);
-    });
-
-    it("should return November and December for system start year", () => {
-      const resolver = new DefaultMonthResolver(() => new Date("2023-06-15"));
-
-      const result = resolver.getAvailableMonthOptions(SYSTEM_START_YEAR);
-
-      expect(result).toHaveLength(2);
-      expect(result[0]).toEqual({ value: 10, label: "נובמבר" });
-      expect(result[1]).toEqual({ value: 11, label: "דצמבר" });
-    });
-
-    it("should return months with correct labels for current year", () => {
-      const resolver = new DefaultMonthResolver(
-        () => new Date("2023-03-15T12:00:00.000Z")
-      );
-
-      const result = resolver.getAvailableMonthOptions(2023);
-
-      expect(result).toHaveLength(3);
-      expect(result[0]).toEqual({ value: 0, label: "ינואר" });
-      expect(result[1]).toEqual({ value: 1, label: "פברואר" });
-      expect(result[2]).toEqual({ value: 2, label: "מרץ" });
-    });
-
-    it("should return all months with Hebrew names for past year", () => {
-      const resolver = new DefaultMonthResolver(() => new Date("2023-06-15"));
-
-      const result = resolver.getAvailableMonthOptions(2022);
-
-      expect(result).toHaveLength(12);
-      result.forEach((option, index) => {
-        expect(option.value).toBe(index);
-        expect(option.label).toBe(HEBREW_MONTH_NAMES[index]);
-      });
-    });
-
-    it("should return empty array for future year", () => {
-      const resolver = new DefaultMonthResolver(() => new Date("2023-06-15"));
-
-      const result = resolver.getAvailableMonthOptions(2024);
-
-      expect(result).toEqual([]);
-    });
-
-    it("should map month indices to correct Hebrew names", () => {
-      const resolver = new DefaultMonthResolver(() => new Date("2023-12-31"));
-
-      const result = resolver.getAvailableMonthOptions(2023);
-
-      expect(result).toHaveLength(12);
-      expect(result[0].label).toBe("ינואר"); // January
-      expect(result[5].label).toBe("יוני"); // June
-      expect(result[11].label).toBe("דצמבר"); // December
-    });
-  });
-
   describe("resolveDefaultMonth", () => {
     it("should return November (11) for system start year 2015", () => {
       const resolver = new DefaultMonthResolver(() => new Date("2023-06-15"));
@@ -401,168 +311,6 @@ describe("DefaultMonthResolver", () => {
       const result = resolver.resolveDefaultMonth(2024);
 
       expect(result).toBe(1);
-    });
-  });
-
-  describe("getMonthName", () => {
-    it("should return correct Hebrew name for January (0)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(0);
-
-      expect(result).toBe("ינואר");
-    });
-
-    it("should return correct Hebrew name for February (1)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(1);
-
-      expect(result).toBe("פברואר");
-    });
-
-    it("should return correct Hebrew name for March (2)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(2);
-
-      expect(result).toBe("מרץ");
-    });
-
-    it("should return correct Hebrew name for April (3)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(3);
-
-      expect(result).toBe("אפריל");
-    });
-
-    it("should return correct Hebrew name for May (4)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(4);
-
-      expect(result).toBe("מאי");
-    });
-
-    it("should return correct Hebrew name for June (5)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(5);
-
-      expect(result).toBe("יוני");
-    });
-
-    it("should return correct Hebrew name for July (6)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(6);
-
-      expect(result).toBe("יולי");
-    });
-
-    it("should return correct Hebrew name for August (7)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(7);
-
-      expect(result).toBe("אוגוסט");
-    });
-
-    it("should return correct Hebrew name for September (8)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(8);
-
-      expect(result).toBe("ספטמבר");
-    });
-
-    it("should return correct Hebrew name for October (9)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(9);
-
-      expect(result).toBe("אוקטובר");
-    });
-
-    it("should return correct Hebrew name for November (10)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(10);
-
-      expect(result).toBe("נובמבר");
-    });
-
-    it("should return correct Hebrew name for December (11)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getMonthName(11);
-
-      expect(result).toBe("דצמבר");
-    });
-
-    it("should handle all month indices 0-11", () => {
-      const resolver = new DefaultMonthResolver();
-
-      for (let i = 0; i < 12; i++) {
-        const name = resolver.getMonthName(i);
-        expect(name).toBe(HEBREW_MONTH_NAMES[i]);
-        expect(typeof name).toBe("string");
-        expect(name.length).toBeGreaterThan(0);
-      }
-    });
-  });
-
-  describe("getAllMonthNames", () => {
-    it("should return all 12 Hebrew month names", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getAllMonthNames();
-
-      expect(result).toHaveLength(12);
-      expect(result).toEqual(HEBREW_MONTH_NAMES);
-    });
-
-    it("should return array with correct order", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getAllMonthNames();
-
-      expect(result[0]).toBe("ינואר");
-      expect(result[1]).toBe("פברואר");
-      expect(result[2]).toBe("מרץ");
-      expect(result[11]).toBe("דצמבר");
-    });
-
-    it("should return a new array (not reference)", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result1 = resolver.getAllMonthNames();
-      const result2 = resolver.getAllMonthNames();
-
-      expect(result1).toEqual(result2);
-      expect(result1).not.toBe(result2); // Different references
-    });
-
-    it("should not be affected by modifications", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getAllMonthNames();
-      result[0] = "MODIFIED";
-
-      const newResult = resolver.getAllMonthNames();
-      expect(newResult[0]).toBe("ינואר");
-    });
-
-    it("should contain only Hebrew strings", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const result = resolver.getAllMonthNames();
-
-      result.forEach((name) => {
-        expect(typeof name).toBe("string");
-        expect(name.length).toBeGreaterThan(0);
-      });
     });
   });
 
@@ -666,14 +414,6 @@ describe("DefaultMonthResolver", () => {
       expect(months).toHaveLength(6);
     });
 
-    it("should handle invalid month index gracefully", () => {
-      const resolver = new DefaultMonthResolver();
-
-      // JavaScript array access returns undefined for out-of-bounds
-      const result = resolver.getMonthName(12);
-
-      expect(result).toBeUndefined();
-    });
   });
 
   describe("Integration Scenarios", () => {
@@ -684,12 +424,10 @@ describe("DefaultMonthResolver", () => {
 
       const currentYear = resolver.getCurrentYear();
       const availableMonths = resolver.getAvailableMonths(currentYear);
-      const monthOptions = resolver.getAvailableMonthOptions(currentYear);
       const defaultMonth = resolver.resolveDefaultMonth(currentYear);
 
       expect(currentYear).toBe(2023);
       expect(availableMonths).toEqual([0, 1, 2, 3, 4, 5]);
-      expect(monthOptions).toHaveLength(6);
       expect(defaultMonth).toBe(6); // June + 1
     });
 
@@ -697,12 +435,9 @@ describe("DefaultMonthResolver", () => {
       const resolver = new DefaultMonthResolver(() => new Date("2023-06-15"));
 
       const availableMonths = resolver.getAvailableMonths(2015);
-      const monthOptions = resolver.getAvailableMonthOptions(2015);
       const defaultMonth = resolver.resolveDefaultMonth(2015);
 
       expect(availableMonths).toEqual([10, 11]);
-      expect(monthOptions).toHaveLength(2);
-      expect(monthOptions[0].label).toBe("נובמבר");
       expect(defaultMonth).toBe(11);
     });
 
@@ -710,14 +445,10 @@ describe("DefaultMonthResolver", () => {
       const resolver = new DefaultMonthResolver(() => new Date("2023-06-15"));
 
       const availableMonths = resolver.getAvailableMonths(2020);
-      const monthOptions = resolver.getAvailableMonthOptions(2020);
       const defaultMonth = resolver.resolveDefaultMonth(2020);
-      const allNames = resolver.getAllMonthNames();
 
       expect(availableMonths).toHaveLength(12);
-      expect(monthOptions).toHaveLength(12);
       expect(defaultMonth).toBe(1);
-      expect(allNames).toHaveLength(12);
     });
 
     it("should handle December edge case correctly", () => {
@@ -742,12 +473,10 @@ describe("DefaultMonthResolver", () => {
       const currentYear = resolver.getCurrentYear();
       const availableMonths = resolver.getAvailableMonths(currentYear);
       const defaultMonth = resolver.resolveDefaultMonth(currentYear);
-      const monthName = resolver.getMonthName(0);
 
       expect(currentYear).toBe(2023);
       expect(availableMonths).toEqual([0]);
       expect(defaultMonth).toBe(1);
-      expect(monthName).toBe("ינואר");
     });
   });
 
@@ -763,28 +492,6 @@ describe("DefaultMonthResolver", () => {
       expect(months2).toEqual(months3);
     });
 
-    it("should not be affected by external state changes", () => {
-      const resolver = new DefaultMonthResolver(() => new Date("2023-06-15"));
-
-      const options1 = resolver.getAvailableMonthOptions(2020);
-      options1[0].label = "MODIFIED";
-
-      const options2 = resolver.getAvailableMonthOptions(2020);
-
-      expect(options2[0].label).toBe("ינואר");
-    });
-
-    it("should maintain immutability for month names array", () => {
-      const resolver = new DefaultMonthResolver();
-
-      const names1 = resolver.getAllMonthNames();
-      names1.push("EXTRA");
-
-      const names2 = resolver.getAllMonthNames();
-
-      expect(names2).toHaveLength(12);
-      expect(names2).not.toContain("EXTRA");
-    });
   });
 
   describe("Time-dependent Behavior", () => {

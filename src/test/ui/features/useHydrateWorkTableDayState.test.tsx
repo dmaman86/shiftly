@@ -61,7 +61,6 @@ const domainStub = {
 const workDays: WorkDayInfo[] = [
   {
     meta: { date: "2026-08-10", typeDay: WorkDayType.Regular, crossDayContinuation: false },
-    hebrewDay: "",
   },
 ];
 

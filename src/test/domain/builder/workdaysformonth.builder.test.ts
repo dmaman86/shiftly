@@ -99,7 +99,6 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
       result.forEach((workDay) => {
         expect(workDay).toHaveProperty("meta");
-        expect(workDay).toHaveProperty("hebrewDay");
         expect(workDay.meta).toHaveProperty("date");
         expect(workDay.meta).toHaveProperty("typeDay");
         expect(workDay.meta).toHaveProperty("crossDayContinuation");
@@ -118,39 +117,6 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       expect(result[30].meta.date).toBe("2024-01-31");
     });
 
-    it("should assign correct Hebrew day names", () => {
-      const result = builder.build({
-        year: 2024,
-        month: 1, // January 2024 starts on Monday
-        eventMap: {},
-      });
-
-      // January 1, 2024 is Monday (day 1)
-      expect(result[0].hebrewDay).toBe("ב"); // Monday
-      
-      // January 6, 2024 is Saturday (day 6)
-      expect(result[5].hebrewDay).toBe("ש"); // Saturday
-      
-      // January 7, 2024 is Sunday (day 0)
-      expect(result[6].hebrewDay).toBe("א"); // Sunday
-    });
-
-    it("should have all Hebrew day letters א-ש", () => {
-      const result = builder.build({
-        year: 2024,
-        month: 1,
-        eventMap: {},
-      });
-
-      const hebrewDays = result.map((d) => d.hebrewDay);
-      const uniqueDays = new Set(hebrewDays);
-      
-      // Should have all 7 unique Hebrew days
-      expect(uniqueDays.size).toBe(7);
-      expect(uniqueDays.has("א")).toBe(true); // Sunday
-      expect(uniqueDays.has("ב")).toBe(true); // Monday
-      expect(uniqueDays.has("ש")).toBe(true); // Saturday
-    });
   });
 
   describe("build - WorkDayType assignment", () => {
@@ -557,7 +523,6 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       });
 
       expect(result[0].meta.typeDay).toBe(WorkDayType.SpecialFull);
-      expect(result[0].hebrewDay).toBe("ש");
     });
 
     it("should handle month starting on Friday", () => {
@@ -568,7 +533,6 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       });
 
       expect(result[0].meta.typeDay).toBe(WorkDayType.SpecialPartialStart);
-      expect(result[0].hebrewDay).toBe("ו");
     });
 
     it("should handle sequential crossDayContinuation (Friday-Saturday)", () => {
@@ -650,18 +614,6 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       });
     });
 
-    it("should have all days with non-empty hebrewDay", () => {
-      const result = builder.build({
-        year: 2024,
-        month: 1,
-        eventMap: {},
-      });
-
-      result.forEach((day) => {
-        expect(day.hebrewDay).toBeTruthy();
-        expect(day.hebrewDay.length).toBe(1);
-      });
-    });
   });
 
   describe("build - Different years", () => {

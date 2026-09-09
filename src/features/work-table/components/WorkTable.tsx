@@ -58,6 +58,7 @@ export const WorkTable = ({
   const { isMobile } = useDeviceType();
   const { t } = useTranslation("work-table");
   const monthNames = t("months", { returnObjects: true }) as string[];
+  const currentDate = domain.services.dateService.formatDate(new Date());
 
   // Group workdays by week (ending on Shabbat/Saturday)
   // Note: groupByShabbat is O(n) with n=30, very fast (~0.01ms)
@@ -103,6 +104,7 @@ export const WorkTable = ({
                   <DayCard
                     domain={domain}
                     workDay={day}
+                    isCurrentDay={day.meta.date === currentDate}
                     shabbatCreditHours={
                       shabbatCreditAllocation.appliedHoursByDate[
                         day.meta.date

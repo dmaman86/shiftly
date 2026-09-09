@@ -56,7 +56,6 @@ export interface LabeledSegmentRange {
 
 export interface WorkDayInfo {
   meta: WorkDayMeta;
-  hebrewDay: string;
 }
 
 export enum CalendarEventKind {
@@ -79,7 +78,7 @@ export interface DayInfoResolver {
   isSpecialFullDay(day: WorkDayInfo): boolean;
   isPartialHolidayStart(day: WorkDayInfo): boolean;
   hasCrossDayContinuation(day: WorkDayInfo): boolean;
-  formatHebrewWorkDay(day: WorkDayInfo, weekdayLabel: string): string;
+  formatWorkDayLabel(day: WorkDayInfo, weekdayLabel: string): string;
 }
 
 export enum Mode {
@@ -119,11 +118,8 @@ export type CompactPayBreakdownVM = {
 };
 
 export interface MonthResolver {
-  getAvailableMonthOptions(year: number): { value: number; label: string }[];
   getAvailableMonths(year: number): number[];
   resolveDefaultMonth(year: number): number;
-  getMonthName(monthIndex: number): string;
-  getAllMonthNames(): string[];
   getCurrentYear(): number;
 }
 
