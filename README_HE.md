@@ -323,6 +323,7 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 │   ├── test/                   # בדיקות דומיין, שירותים, Redux וממשק
 │   └── utils/                  # טיפול בתוצאות API וכלי עזר משותפים
 └── supabase/
+    ├── functions/               # Edge Functions מאומתות
     └── migrations/              # סכמת Postgres ומדיניות Row Level Security
 ```
 
@@ -506,6 +507,14 @@ VITE_SUPABASE_PUBLISHABLE_KEY=
 ```
 
 לאחר מכן הריצו את קבצי ה-SQL תחת `supabase/migrations/`, לפי הסדר, ב-SQL Editor של פרויקט ה-Supabase שלכם, כדי ליצור את הטבלאות `monthly_configs`, `work_days` ו-`shifts` עם מדיניות ה-Row Level Security שלהן.
+
+מחיקת חשבון דורשת את Supabase Edge Function בשם `delete-account`, כי מחיקה מ-`auth.users` דורשת מפתח סודי בצד שרת. לאחר קישור הפרויקט, פרסו אותה כך:
+
+```bash
+supabase functions deploy delete-account
+```
+
+הפונקציה מאמתת את ה-JWT של המשתמש המחובר ומוחקת את אותו משתמש מ-Supabase Auth. מאחר שהטבלאות משתמשות ב-`on delete cascade`, הרשומות של המשתמש ב-`monthly_configs`, `work_days` ו-`shifts` נמחקות על ידי בסיס הנתונים.
 
 ---
 
