@@ -33,6 +33,16 @@ export default defineConfig(
     },
   },
   {
+    files: ['supabase/functions/**/*.ts'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: {
+        ...globals.worker,
+        Deno: 'readonly',
+      },
+    },
+  },
+  {
     // These components intentionally synchronize editable state with external data.
     files: [
       'src/features/config/ConfigPanel.tsx',
