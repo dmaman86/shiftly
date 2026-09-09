@@ -151,9 +151,8 @@ Shiftly מבוססת על עקרונות **Clean Architecture**, עם הפרדה
 - לוגיקה add / subtract דטרמיניסטית
 - ללא חישוב מחדש מלא בכל שינוי
 
-Slices מרכזיים:
+Redux slice גלובלי:
 
-- `workDaysSlice`
 - `globalSlice`
 
 ### רכיבי UI
@@ -286,52 +285,45 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 ## מבנה הפרויקט
 
 ```plaintext
-src/
-├── app/              # מעטפת האפליקציה
-│   ├── domain/       # אתחול וחיבור הדומיין
-│   ├── providers/    # ספקי Context
-│   │   └── auth/     # Context ו-Provider לאימות Supabase
-│   └── routes/       # הגדרות ניתוב
-├── domain/           # לוגיקה עסקית (בלתי תלויה בפריימוורקים)
-│   ├── builder/      # בוני מבני דומיין
-│   ├── calculator/   # לוגיקת חישוב שכר
-│   │   ├── regular/
-│   │   ├── special/
-│   │   ├── perdiem/
-│   │   └── mealallowance/
-│   ├── reducer/      # צבירה והפחתה של מצב
-│   ├── resolve/      # החלטות תלויות הקשר
-│   ├── factory/      # פקטוריות רכיבים
-│   ├── pipelines/    # צינורות הרכבה
-│   ├── services/     # שירותי דומיין (תאריך, משמרת)
-│   └── types/        # הגדרות טיפוסים
-├── adapters/         # המרת דומיין ל־UI
-├── features/         # מודולי UI ספציפיים
-│   ├── auth/         # ממשק התחברות Google
-│   ├── calculation-rules/
-│   ├── config/       # פאנל הגדרות + סנכרון שמירת קונפיג חודשי
-│   ├── info-dialog/
-│   ├── salary-summary/
-│   ├── work-table/   # טבלת עבודה + סנכרון שמירת סטטוס יום ומשמרות
-│   └── workday-timeline/
-├── hooks/            # React hooks (שכבת תיאום)
-├── hoc/              # רכיבי Higher-order
-├── layout/           # רכיבי פריסה ו־error boundaries
-├── pages/            # רכיבי עמודים (יומי, חודשי, כללים)
-├── redux/            # ניהול מצב
-│   └── states/       # Redux slices
-├── services/         # שירותים חיצוניים
-│   ├── analytics/    # שירות משוב שכר
-│   ├── hebcal/       # אינטגרציה עם API חגים
-│   ├── supabase/     # קליינט Supabase
-│   ├── monthlyConfig/# שמירת קונפיג חודשי
-│   ├── workDay/      # שמירת סטטוס יום
-│   └── shift/        # שמירת משמרות
-├── constants/        # קבועי אפליקציה
-└── utils/            # עזרי שירות
-
-supabase/
-└── migrations/       # סכמת Postgres (טבלאות, מדיניות RLS)
+.
+├── .github/
+│   ├── assets/                 # צילומי מסך לקובצי README
+│   └── workflows/              # CI, בדיקות pull request ופריסה
+├── src/
+│   ├── adapters/               # מתאמי מידע חיצוני והמרה מהדומיין לתצוגה
+│   ├── app/                    # שורש ההרכבה של האפליקציה
+│   │   ├── domain/             # מופע הדומיין וטיפוסים לשכבת האפליקציה
+│   │   ├── providers/          # ספקי אימות, כיוון, דומיין והתראות
+│   │   └── routes/             # ניתוב האפליקציה וניתוב מותאם שפה
+│   ├── constants/              # קבועי דומיין וממשק משותפים
+│   ├── domain/                 # כללי שכר בלתי תלויים בפריימוורק
+│   │   ├── builder/            # בניית מבני משמרת, יום וחודש
+│   │   ├── calculator/         # חישובים רגילים, מיוחדים, קצבאות וזכויות
+│   │   ├── factory/            # מפעלי מחשבונים
+│   │   ├── pipelines/          # הרכבת תלויות הדומיין
+│   │   ├── reducer/            # צבירה חודשית והפחתה
+│   │   ├── resolve/            # החלטות לוח שנה וציר זמן
+│   │   ├── services/           # שירותי תאריך ומשמרת
+│   │   └── types/              # חוזי דומיין ומבני מידע
+│   ├── features/               # ממשק ותיאום בבעלות כל פיצ'ר
+│   │   ├── auth/               # פקדי התחברות Google
+│   │   ├── calculation-rules/  # כללים ודוגמת חישוב אינטראקטיבית
+│   │   ├── config/             # פרמטרי עבודה ושמירת תצורה חודשית
+│   │   ├── feedback/           # התראות משוב למשתמש
+│   │   ├── info-dialog/        # חלונית מידע על האפליקציה
+│   │   ├── salary-summary/     # רכיבי שכר חודשי, hooks ומודלי תצוגה
+│   │   ├── work-table/         # עריכת ימים ומשמרות רספונסיבית וסנכרון שמירה
+│   │   └── workday-timeline/   # ציר זמן חזותי למשמרות
+│   ├── hooks/                  # React hooks משותפים לאינטגרציה
+│   ├── i18n/                   # משאבי עברית/אנגלית וזיהוי שפה מהכתובת
+│   ├── layout/                 # פריסת האפליקציה וגבולות שגיאה
+│   ├── pages/                  # עמודים יומיים, חודשיים וכללי חישוב
+│   ├── redux/                  # מצב גלובלי, selectors והחנות
+│   ├── services/               # לקוחות Analytics, Hebcal ושמירת Supabase
+│   ├── test/                   # בדיקות דומיין, שירותים, Redux וממשק
+│   └── utils/                  # טיפול בתוצאות API וכלי עזר משותפים
+└── supabase/
+    └── migrations/              # סכמת Postgres ומדיניות Row Level Security
 ```
 
 ---

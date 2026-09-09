@@ -9,8 +9,6 @@ import {
 import { WorkDayType } from "@/constants";
 
 export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
-  private readonly hebrewDays = ["א", "ב", "ג", "ד", "ה", "ו", "ש"];
-
   constructor(
     private readonly holidayResolver: {
       resolve(params: { weekday: number; events: CalendarEvent[] }): WorkDayType;
@@ -33,7 +31,6 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
       const formattedDate = this.dateService.formatDate(date);
       const weekday = date.getDay(); // 0 (Sun) to 6 (Sat)
 
-      const hebrewDay = this.hebrewDays[weekday];
       const events = eventMap[formattedDate] || [];
 
       const typeDay = this.holidayResolver.resolve({ weekday, events });
@@ -50,7 +47,6 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
           crossDayContinuation: false,
           holidayKey,
         },
-        hebrewDay: hebrewDay,
       };
       workDays[day - 1] = row;
 

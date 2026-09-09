@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   Card,
@@ -26,16 +26,32 @@ import { StatTile } from "./StatTile";
 type DayCardProps = {
   domain: DomainContextType;
   workDay: WorkDayInfo;
+  isCurrentDay?: boolean;
   shabbatCreditHours: number;
 };
 
-export const DayCard = ({ domain, workDay, shabbatCreditHours }: DayCardProps) => {
+export const DayCard = ({
+  domain,
+  workDay,
+  isCurrentDay = false,
+  shabbatCreditHours,
+}: DayCardProps) => {
   const { dateService } = domain.services;
   const { dayInfoResolver } = domain.resolvers;
   const { t } = useTranslation("work-table");
   const tHoliday = (key: string) =>
     t(`holidays.${key}` as `holidays.${HolidayKey}`);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isCurrentDay) return;
+
+    cardRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [isCurrentDay]);
 
   const {
     status,
@@ -53,14 +69,19 @@ export const DayCard = ({ domain, workDay, shabbatCreditHours }: DayCardProps) =
 
   const days = t("days", { returnObjects: true }) as string[];
   const weekdayLabel = days[dateService.getWeekday(workDay.meta.date)];
-  const dayLabel = dayInfoResolver.formatHebrewWorkDay(workDay, weekdayLabel);
+  const dayLabel = dayInfoResolver.formatWorkDayLabel(workDay, weekdayLabel);
   const detailsId = `day-card-details-${workDay.meta.date}`;
   const eligibleForShabbatCredit =
     workDay.meta.typeDay === WorkDayType.Regular ||
     workDay.meta.typeDay === WorkDayType.SpecialPartialStart;
 
   return (
-    <Card variant="outlined" sx={{ borderRadius: 2 }}>
+    <Card
+      ref={cardRef}
+      variant="outlined"
+      aria-current={isCurrentDay ? "date" : undefined}
+      sx={{ borderRadius: 2, scrollMarginTop: 16 }}
+    >
       <Box
         sx={{
           display: "flex",

@@ -9,6 +9,7 @@ import {
 } from "@/test/ui/utils";
 import userEvent from "@testing-library/user-event";
 import { ConfigPanel } from "@/features/config/ConfigPanel";
+import i18n from "@/i18n";
 import { pipelineInstance } from "@/test/ui/utils/setup-domain";
 
 describe("ConfigPanel", () => {
@@ -216,6 +217,32 @@ describe("ConfigPanel", () => {
         expect(currentMonth).toBeGreaterThanOrEqual(1);
         expect(currentMonth).toBeLessThanOrEqual(12);
       });
+    });
+
+    it("should render month options in the active language", async () => {
+      await i18n.changeLanguage("en");
+      const user = userEvent.setup();
+      const view = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
+        preloadedState: {
+          global: createMockGlobalState({
+            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 50 },
+          }),
+        },
+      });
+
+      try {
+        await user.click(screen.getByRole("combobox"));
+
+        expect(
+          screen.getByRole("option", { name: "January" }),
+        ).toBeInTheDocument();
+        expect(
+          screen.queryByRole("option", { name: "ינואר" }),
+        ).not.toBeInTheDocument();
+      } finally {
+        view.unmount();
+        await i18n.changeLanguage("he");
+      }
     });
   });
 

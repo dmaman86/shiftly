@@ -36,7 +36,6 @@ export const globalSlice = createSlice({
   reducers: {
     setYear: (state, action: PayloadAction<number>) => {
       state.config.year = action.payload;
-      if (state.config.month > 12) state.config.month = 1;
       resetMonthData(state);
     },
     setMonth: (state, action: PayloadAction<number>) => {

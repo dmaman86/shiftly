@@ -151,9 +151,8 @@ Hooks coordinate data flow without embedding business logic.
 - Deterministic add / subtract logic
 - No full recomputation on every change
 
-Key slices:
+Global Redux slice:
 
-- `workDaysSlice`
 - `globalSlice`
 
 ### UI Components
@@ -364,52 +363,45 @@ Then run the SQL files under `supabase/migrations/`, in order, in your Supabase 
 ## Project Structure
 
 ```plaintext
-src/
-├── app/              # Application shell
-│   ├── domain/       # Domain instance & wiring
-│   ├── providers/    # Context providers
-│   │   └── auth/     # Supabase auth context & provider
-│   └── routes/       # Route configuration
-├── domain/           # Business logic (framework-agnostic)
-│   ├── builder/      # Domain structure builders
-│   ├── calculator/   # Salary calculation logic
-│   │   ├── regular/
-│   │   ├── special/
-│   │   ├── perdiem/
-│   │   └── mealallowance/
-│   ├── reducer/      # State accumulation & rollback
-│   ├── resolve/      # Context-aware decisions
-│   ├── factory/      # Component factories
-│   ├── pipelines/    # Composition pipelines
-│   ├── services/     # Domain services (date, shift)
-│   └── types/        # Type definitions
-├── adapters/         # Domain -> UI view models
-├── features/         # Feature-specific UI modules
-│   ├── auth/         # Google sign-in UI
-│   ├── calculation-rules/
-│   ├── config/       # Config panel + monthly-config persistence sync
-│   ├── info-dialog/
-│   ├── salary-summary/
-│   ├── work-table/   # Work table + day-status/shift persistence sync
-│   └── workday-timeline/
-├── hooks/            # React hooks (orchestration layer)
-├── hoc/              # Higher-order components
-├── layout/           # Layout components & error boundaries
-├── pages/            # Page components (Daily, Monthly, Rules)
-├── redux/            # State management
-│   └── states/       # Redux slices
-├── services/         # External services
-│   ├── analytics/    # Salary feedback service
-│   ├── hebcal/       # Holiday API integration
-│   ├── supabase/     # Supabase client
-│   ├── monthlyConfig/# Monthly config persistence
-│   ├── workDay/      # Day status persistence
-│   └── shift/        # Shift persistence
-├── constants/        # Application constants
-└── utils/            # Helper utilities
-
-supabase/
-└── migrations/       # Postgres schema (tables, RLS policies)
+.
+├── .github/
+│   ├── assets/                 # README screenshots
+│   └── workflows/              # CI, pull-request checks, deployment
+├── src/
+│   ├── adapters/               # External data and domain-to-view adapters
+│   ├── app/                    # Application composition root
+│   │   ├── domain/             # Domain instance and application-facing types
+│   │   ├── providers/          # Auth, direction, domain and snackbar providers
+│   │   └── routes/             # Application and language-aware routing
+│   ├── constants/              # Shared domain and UI constants
+│   ├── domain/                 # Framework-independent payroll rules
+│   │   ├── builder/            # Shift, day and month structure builders
+│   │   ├── calculator/         # Regular, special, allowance and credit calculations
+│   │   ├── factory/            # Calculator factories
+│   │   ├── pipelines/          # Domain dependency composition
+│   │   ├── reducer/            # Monthly accumulation and rollback
+│   │   ├── resolve/            # Calendar and timeline decisions
+│   │   ├── services/           # Date and shift services
+│   │   └── types/              # Domain contracts and data shapes
+│   ├── features/               # Feature-owned UI and orchestration
+│   │   ├── auth/               # Google sign-in controls
+│   │   ├── calculation-rules/  # Rules and interactive calculation example
+│   │   ├── config/             # Work parameters and persisted monthly config
+│   │   ├── feedback/           # User feedback notifications
+│   │   ├── info-dialog/        # Application information dialog
+│   │   ├── salary-summary/     # Monthly salary components, hooks and view models
+│   │   ├── work-table/         # Responsive day/shift editing and persistence sync
+│   │   └── workday-timeline/   # Visual shift timeline
+│   ├── hooks/                  # Shared React integration hooks
+│   ├── i18n/                   # Hebrew/English resources and URL language resolution
+│   ├── layout/                 # Application layout and error boundaries
+│   ├── pages/                  # Daily, monthly and calculation-rules pages
+│   ├── redux/                  # Global state, selectors and store
+│   ├── services/               # Analytics, Hebcal and Supabase persistence clients
+│   ├── test/                   # Domain, service, Redux and UI test suites
+│   └── utils/                  # API result handling and shared helpers
+└── supabase/
+    └── migrations/              # Postgres schema and Row Level Security policies
 ```
 
 ---

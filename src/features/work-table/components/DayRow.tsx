@@ -76,7 +76,7 @@ export const DayRow = ({
 
   const days = t("days", { returnObjects: true }) as string[];
   const weekdayLabel = days[dateService.getWeekday(workDay.meta.date)];
-  const dayLabel = dayInfoResolver.formatHebrewWorkDay(workDay, weekdayLabel);
+  const dayLabel = dayInfoResolver.formatWorkDayLabel(workDay, weekdayLabel);
 
   return (
     <>

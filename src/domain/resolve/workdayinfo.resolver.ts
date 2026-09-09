@@ -17,7 +17,7 @@ export class WorkDayInfoResolver implements DayInfoResolver {
     return day.meta.crossDayContinuation === true;
   }
 
-  formatHebrewWorkDay(day: WorkDayInfo, weekdayLabel: string): string {
+  formatWorkDayLabel(day: WorkDayInfo, weekdayLabel: string): string {
     const dayNumber = this.dateService.getDayOfMonth(day.meta.date);
     return `${weekdayLabel}-${dayNumber}`;
   }

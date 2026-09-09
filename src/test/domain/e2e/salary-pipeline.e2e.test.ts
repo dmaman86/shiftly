@@ -338,7 +338,6 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
       // Verify first day structure
       expect(workDays[0].meta.date).toBe("2025-01-01");
       expect(workDays[0].meta).toHaveProperty("typeDay");
-      expect(workDays[0]).toHaveProperty("hebrewDay");
     });
 
     it("should handle February in leap year (2024)", () => {
@@ -388,8 +387,9 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         eventMap: {},
       });
 
-      // Find all Fridays (ו in Hebrew)
-      const fridays = workDays.filter((day) => day.hebrewDay === "ו");
+      const fridays = workDays.filter(
+        (day) => pipeline.services.dateService.getWeekday(day.meta.date) === 5
+      );
 
       // January 2025 has 4-5 Fridays
       expect(fridays.length).toBeGreaterThanOrEqual(4);
