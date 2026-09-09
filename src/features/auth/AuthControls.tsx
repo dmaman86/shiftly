@@ -1,8 +1,25 @@
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { Alert, Button, CircularProgress, Stack, Typography } from "@mui/material";
+import {
+  Alert,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Stack,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useAppSnackbar, useAuth, useFetch } from "@/hooks";
+import { accountService } from "@/services/account/account.service";
 import { supabase } from "@/services/supabase/supabase.client";
 import { fromSupabaseResult } from "@/utils";
 
@@ -38,6 +55,12 @@ export const AuthControls = ({ display = "guest" }: AuthControlsProps) => {
   const { user, isLoading, initializationError } = useAuth();
   const snackbar = useAppSnackbar();
   const { loading: signingIn, callEndPoint } = useFetch();
+  const { loading: deletingAccount, callEndPoint: callDeleteAccount } = useFetch();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+
+  const deleteConfirmationValue = t("auth.delete_account_confirmation_value");
+  const canDeleteAccount = deleteConfirmation === deleteConfirmationValue;
 
   const handleSignInWithGoogle = async () => {
     const result = await callEndPoint({
@@ -64,6 +87,34 @@ export const AuthControls = ({ display = "guest" }: AuthControlsProps) => {
     snackbar.success(t("auth.sign_out_success"));
   };
 
+  const closeDeleteDialog = () => {
+    if (deletingAccount) return;
+
+    setDeleteDialogOpen(false);
+    setDeleteConfirmation("");
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!canDeleteAccount) return;
+
+    const result = await callDeleteAccount(accountService().deleteCurrentAccount());
+
+    if (result.error) {
+      snackbar.error(result.error);
+      return;
+    }
+
+    const { error } = await supabase.auth.signOut({ scope: "local" });
+
+    if (error) {
+      snackbar.warning(t("auth.delete_account_local_sign_out_error"));
+      return;
+    }
+
+    closeDeleteDialog();
+    snackbar.success(t("auth.delete_account_success"));
+  };
+
   if (isLoading) {
     if (display === "account") return null;
 
@@ -82,15 +133,63 @@ export const AuthControls = ({ display = "guest" }: AuthControlsProps) => {
 
   if (display === "account") {
     return (
-      <Button
-        variant="outlined"
-        color="inherit"
-        size="small"
-        startIcon={<LogoutIcon />}
-        onClick={() => void handleSignOut()}
-      >
-        {t("auth.sign_out")}
-      </Button>
+      <>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Tooltip title={t("auth.sign_out")}>
+            <IconButton
+              aria-label={t("auth.sign_out")}
+              size="small"
+              color="inherit"
+              onClick={() => void handleSignOut()}
+            >
+              <LogoutIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title={t("auth.delete_account")}>
+            <IconButton
+              aria-label={t("auth.delete_account")}
+              size="small"
+              color="error"
+              onClick={() => setDeleteDialogOpen(true)}
+            >
+              <DeleteForeverIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+
+        <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog} maxWidth="xs" fullWidth>
+          <DialogTitle>{t("auth.delete_account_title")}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>{t("auth.delete_account_description")}</DialogContentText>
+            <TextField
+              autoFocus
+              fullWidth
+              margin="normal"
+              label={t("auth.delete_account_confirmation_label", {
+                value: deleteConfirmationValue,
+              })}
+              value={deleteConfirmation}
+              onChange={(event) => setDeleteConfirmation(event.target.value)}
+              disabled={deletingAccount}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeDeleteDialog} disabled={deletingAccount}>
+              {t("actions.cancel")}
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              disabled={!canDeleteAccount || deletingAccount}
+              startIcon={deletingAccount ? <CircularProgress size={16} color="inherit" /> : null}
+              onClick={() => void handleDeleteAccount()}
+            >
+              {t("auth.delete_account_confirm")}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </>
     );
   }
 
