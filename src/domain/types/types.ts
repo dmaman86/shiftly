@@ -51,7 +51,7 @@ export type SegmentKey =
 export interface LabeledSegmentRange {
   point: Point;
   percent: number;
-  key: string;
+  key: SegmentKey;
 }
 
 export interface WorkDayInfo {
