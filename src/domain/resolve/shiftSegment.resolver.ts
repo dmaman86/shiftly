@@ -15,7 +15,6 @@ export class ShiftSegmentResolver implements Resolver<
     min06: 6 * 60,
     min14: 14 * 60,
     min17: 17 * 60,
-    min18: 18 * 60,
     min22: 22 * 60,
   };
 

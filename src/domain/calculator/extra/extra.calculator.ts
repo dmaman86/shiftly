@@ -21,7 +21,7 @@ export class ExtraCalculator
   }
 
   calculate(labeledSegments: LabeledSegmentRange[]): ExtraBreakdown {
-    const sum = (key: string) =>
+    const sum = (key: keyof ExtraBreakdown) =>
       labeledSegments
         .filter((s) => s.key === key)
         .reduce((acc, seg) => acc + (seg.point.end - seg.point.start) / 60, 0);

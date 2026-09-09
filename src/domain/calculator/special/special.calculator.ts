@@ -22,7 +22,7 @@ export class SpecialCalculator
   }
 
   calculate(labeledSegments: LabeledSegmentRange[]): SpecialBreakdown {
-    const sum = (key: string) =>
+    const sum = (key: keyof SpecialBreakdown) =>
       labeledSegments
         .filter((s) => s.key === key)
         .reduce((acc, seg) => acc + (seg.point.end - seg.point.start) / 60, 0);
