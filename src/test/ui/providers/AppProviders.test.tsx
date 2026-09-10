@@ -1,14 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 
-vi.mock("@/redux/store", () => ({
-  store: {
-    getState: () => ({}),
-    subscribe: vi.fn(),
-    dispatch: vi.fn(),
-  },
-}));
-
 vi.mock("@/app/providers/domain/DomainProvider", () => ({
   DomainProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));

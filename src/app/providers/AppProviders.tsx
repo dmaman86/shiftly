@@ -1,12 +1,10 @@
 import { useMemo, useEffect, useState } from "react";
-import { Provider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { CacheProvider } from "@emotion/react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
-import { store } from "@/redux/store";
 import { AuthProvider, DomainProvider, AppSnackbarProvider } from "@/app/providers";
 
 import createCache from "@emotion/cache";
@@ -43,8 +41,7 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
 
   return (
     <DirectionContext.Provider value={{ direction, setDirection }}>
-      <Provider store={store}>
-        <CacheProvider value={direction === "rtl" ? rtlCache : ltrCache}>
+      <CacheProvider value={direction === "rtl" ? rtlCache : ltrCache}>
           <ThemeProvider theme={theme}>
             <AppSnackbarProvider>
               <AuthProvider>
@@ -57,8 +54,7 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
               </AuthProvider>
             </AppSnackbarProvider>
           </ThemeProvider>
-        </CacheProvider>
-      </Provider>
+      </CacheProvider>
     </DirectionContext.Provider>
   );
 };

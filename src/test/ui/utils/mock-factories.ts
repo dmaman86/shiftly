@@ -1,4 +1,4 @@
-import type { GlobalState } from "@/redux/states/globalSlice";
+import type { GlobalState } from "@/store/globalStore";
 
 /**
  * Factory to create mock GlobalState for testing

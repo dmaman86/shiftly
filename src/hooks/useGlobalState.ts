@@ -1,84 +1,23 @@
-import { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/redux/store";
-
-import {
-  setYear,
-  setMonth,
-  setStandardHours,
-  setBaseRate,
-  setDayPayMap,
-  removeDayPayMap,
-  resetGlobal,
-} from "@/redux/states/globalSlice";
-import { WorkDayMap } from "@/domain";
+import { useGlobalStore } from "@/store/globalStore";
 
 export const useGlobalState = () => {
-  const dispatch = useDispatch<AppDispatch>();
-
-  // === SELECTORS ===
-  const year = useSelector((state: RootState) => state.global.config.year);
-  const month = useSelector((state: RootState) => state.global.config.month);
-  const standardHours = useSelector(
-    (state: RootState) => state.global.config.standardHours,
-  );
-  const baseRate = useSelector(
-    (state: RootState) => state.global.config.baseRate,
-  );
-
-  const updateYear = useCallback(
-    (year: number) => {
-      dispatch(setYear(year));
-    },
-    [dispatch],
-  );
-
-  const updateMonth = useCallback(
-    (month: number) => {
-      dispatch(setMonth(month));
-    },
-    [dispatch],
-  );
-
-  const updateStandardHours = useCallback(
-    (hours: number) => {
-      dispatch(setStandardHours(hours));
-    },
-    [dispatch],
-  );
-
-  const updateBaseRate = useCallback(
-    (rate: number) => {
-      dispatch(setBaseRate(rate));
-    },
-    [dispatch],
-  );
-
-  const updateDayPayMap = useCallback(
-    (dateKey: string, dayPayMap: WorkDayMap) => {
-      dispatch(setDayPayMap({ dateKey, dayPayMap }));
-    },
-    [dispatch],
-  );
-
-  const removeDay = useCallback(
-    (dateKey: string) => {
-      dispatch(removeDayPayMap(dateKey));
-    },
-    [dispatch],
-  );
-
-  const reset = useCallback(() => {
-    dispatch(resetGlobal());
-  }, [dispatch]);
+  const year = useGlobalStore((state) => state.config.year);
+  const month = useGlobalStore((state) => state.config.month);
+  const standardHours = useGlobalStore((state) => state.config.standardHours);
+  const baseRate = useGlobalStore((state) => state.config.baseRate);
+  const updateYear = useGlobalStore((state) => state.updateYear);
+  const updateMonth = useGlobalStore((state) => state.updateMonth);
+  const updateStandardHours = useGlobalStore((state) => state.updateStandardHours);
+  const updateBaseRate = useGlobalStore((state) => state.updateBaseRate);
+  const updateDayPayMap = useGlobalStore((state) => state.updateDayPayMap);
+  const removeDay = useGlobalStore((state) => state.removeDay);
+  const reset = useGlobalStore((state) => state.reset);
 
   return {
-    // state
     year,
     month,
     standardHours,
     baseRate,
-    // actions
     updateYear,
     updateMonth,
     updateStandardHours,

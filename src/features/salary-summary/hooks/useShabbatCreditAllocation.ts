@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 
 import { allocateShabbatCredit } from "@/domain";
-import { RootState } from "@/redux/store";
 import { useAppSnackbar } from "@/hooks/useAppSnackbar";
 import { useAuth } from "@/hooks/useAuth";
 import { useDomain } from "@/hooks/useDomain";
 import { useFetch } from "@/hooks/useFetch";
 import { useGlobalState } from "@/hooks/useGlobalState";
+import { useGlobalStore } from "@/store/globalStore";
 import { useWorkDays } from "@/hooks/useWorkDays";
 import { monthlyConfigService } from "@/services";
 
@@ -20,12 +19,8 @@ export const useShabbatCreditAllocation = () => {
   const snackbar = useAppSnackbar();
 
   const { workDays } = useWorkDays(domain);
-  const dailyPayMaps = useSelector(
-    (state: RootState) => state.global.dailyPayMaps,
-  );
-  const standardHours = useSelector(
-    (state: RootState) => state.global.config.standardHours,
-  );
+  const dailyPayMaps = useGlobalStore((state) => state.dailyPayMaps);
+  const standardHours = useGlobalStore((state) => state.config.standardHours);
 
   const [carriedOverHours, setCarriedOverHours] = useState(0);
   // Tracks which (user, year, month) the carry-over fetch has resolved for,

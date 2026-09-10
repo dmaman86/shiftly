@@ -1,6 +1,5 @@
 import { ReactElement } from "react";
 import { render, RenderOptions } from "@testing-library/react";
-import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CacheProvider } from "@emotion/react";
@@ -8,9 +7,11 @@ import createCache from "@emotion/cache";
 import { SnackbarProvider } from "notistack";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { configureStore } from "@reduxjs/toolkit";
-import type { RootState } from "@/redux/store";
-import globalReducer from "@/redux/states/globalSlice";
+import {
+  initialGlobalState,
+  type GlobalState,
+  useGlobalStore,
+} from "@/store/globalStore";
 
 // Create RTL cache for tests
 const cache = createCache({ key: "css", prepend: true });
@@ -24,21 +25,21 @@ const theme = createTheme({
 });
 
 /**
- * Creates a mock Redux store for testing
+ * Initializes the Zustand store for testing
  * @param preloadedState - Initial state for the store
  * @returns Configured store instance
  */
-export function createMockStore(preloadedState?: Partial<RootState>) {
-  return configureStore({
-    reducer: {
-      global: globalReducer,
-    },
-    preloadedState: preloadedState as RootState,
-  });
+export function createMockStore(preloadedState?: { global?: GlobalState }) {
+  const globalState = preloadedState?.global ?? initialGlobalState;
+  useGlobalStore.setState(globalState);
+
+  return {
+    getState: () => ({ global: useGlobalStore.getState() }),
+  };
 }
 
 interface ExtendedRenderOptions extends Omit<RenderOptions, "wrapper"> {
-  preloadedState?: Partial<RootState>;
+  preloadedState?: { global?: GlobalState };
   store?: ReturnType<typeof createMockStore>;
   withRouter?: boolean;
   withTheme?: boolean;
@@ -73,11 +74,7 @@ export function renderWithProviders(
   }: ExtendedRenderOptions = {}
 ) {
   function Wrapper({ children }: { children: React.ReactNode }) {
-    let component = (
-      <Provider store={store}>
-        {children}
-      </Provider>
-    );
+    let component = <>{children}</>;
 
     if (withTheme) {
       component = (

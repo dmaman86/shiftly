@@ -56,7 +56,7 @@ const NavItem = ({
 );
 
 export const ViewSwitcher = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
   const { direction } = useDirection();
   const navigate = useNavigate();
   const location = useLocation();
@@ -99,7 +99,7 @@ export const ViewSwitcher = () => {
           <NavItem to={`/${lang}/daily`}>{t("nav.daily")}</NavItem>
           <NavItem to={`/${lang}/monthly`}>{t("nav.monthly")}</NavItem>
           <NavItem to={accountAndRulesPath}>
-            {t("nav.account_and_rules")}
+            {t("nav.calculation_rules")}
           </NavItem>
         </Box>
 
@@ -153,7 +153,7 @@ export const ViewSwitcher = () => {
             to={accountAndRulesPath}
             onClick={() => setOpen(false)}
           >
-            {t("nav.account_and_rules")}
+            {t("nav.calculation_rules")}
           </NavItem>
         </Box>
       </Collapse>

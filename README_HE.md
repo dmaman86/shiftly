@@ -6,7 +6,7 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dmaman86/shiftly)
 ![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
-![Redux](https://img.shields.io/badge/Redux_Toolkit-2.11.0-764ABC?logo=redux&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-5.0.15-433E38?logo=react&logoColor=white)
 ![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?logo=reactquery&logoColor=white)
 ![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
@@ -95,6 +95,8 @@ Shiftly פועלת במלואה **גם ללא חשבון** — הכל רץ בז�
 
 נתוני טבלת העבודה של משתמש מחובר נטענים באמצעות TanStack Query, עם מפתח מטמון המופרד לפי משתמש, שנה וחודש. העריכה זמינה רק לאחר השלמת הטעינה הראשונית, ובמקרה של כשל מוצגת פעולה מפורשת לניסיון חוזר. מעבר בין חשבונות מאפס את מצב העריכה לפני טעינת נתוני החשבון הבא.
 
+הסיכום החודשי טוען ישירות את המשמרות ואת סטטוסי הימים השמורים כאשר השנה והחודש שנבחרו משתנים, ולכן אינו תלוי במעבר מוקדם לתצוגה היומית.
+
 שינויים תקינים במשמרת נשמרים לאחר השהיה קצרה. פעולות כתיבה עבור אותו משתמש ואותו יום מתבצעות לפי הסדר, כדי שעדכון מאוחר לא יעקוף מחיקה שבוצעה אחריו. טיוטות עם שעות לא תקינות נשארות מקומיות עד לתיקונן.
 
 ---
@@ -117,7 +119,7 @@ Shiftly מבוססת על עקרונות **Clean Architecture**, עם הפרדה
 
 ### דומיין
 
-שכבת הדומיין מכילה לוגיקה עסקית טהורה ואינה תלויה בRedux, React או ספריות חיצוניות.
+שכבת הדומיין מכילה לוגיקה עסקית טהורה ואינה תלויה ב-React, בניהול המצב או בספריות חיצוניות.
 
 - **Builders**
   בניית מבני נתונים מורכבים ללא חוקים עסקיים.
@@ -145,15 +147,15 @@ Shiftly מבוססת על עקרונות **Clean Architecture**, עם הפרדה
 
 ### ניהול מצב
 
-- **Redux Toolkit** מנהל את מצב החישוב הגלובלי ואת הצבירה החודשית
-- **React Context** מחזיק את מצב העריכה הנוכחי של טבלת העבודה
+- **Zustand** מנהל את הגדרות התקופה הגלובליות ואת מפות השכר היומיות
+- **React Context** מחזיק אימות, הזרקת תלויות, גבולות אינטגרציה ואת מצב העריכה הנוכחי של טבלת העבודה
 - **TanStack Query** מתאם קריאות וכתיבות מאומתות של טבלת העבודה מול Supabase
-- לוגיקה add / subtract דטרמיניסטית
-- ללא חישוב מחדש מלא בכל שינוי
+- מפות השכר היומיות מתעדכנות לפי תאריך, והפירוט החודשי נגזר באופן דטרמיניסטי מהמפות הנוכחיות
 
-Redux slice גלובלי:
+מצב Zustand גלובלי:
 
-- `globalSlice`
+- `src/store/globalStore.ts`
+- `src/store/globalBreakdown.ts`
 
 ### רכיבי UI
 
@@ -259,7 +261,7 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 
 ### State וניווט
 
-- **Redux Toolkit** 2.11.0
+- **Zustand** 5.0.15 (מצב גלובלי בצד הלקוח)
 - **TanStack Query** 5 (סנכרון מצב שרת עבור משתמשים מחוברים)
 - **React Router** 7
 
@@ -318,9 +320,9 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 │   ├── i18n/                   # משאבי עברית/אנגלית וזיהוי שפה מהכתובת
 │   ├── layout/                 # פריסת האפליקציה וגבולות שגיאה
 │   ├── pages/                  # עמודים יומיים, חודשיים וכללי חישוב
-│   ├── redux/                  # מצב גלובלי, selectors והחנות
+│   ├── store/                  # מצב גלובלי באמצעות Zustand וחישובי פירוט
 │   ├── services/               # לקוחות Analytics, Hebcal ושמירת Supabase
-│   ├── test/                   # בדיקות דומיין, שירותים, Redux וממשק
+│   ├── test/                   # בדיקות דומיין, store, שירותים וממשק
 │   └── utils/                  # טיפול בתוצאות API וכלי עזר משותפים
 └── supabase/
     ├── functions/               # Edge Functions מאומתות
@@ -347,6 +349,7 @@ Shiftly כוללת שתי תצוגות חישוב עיקריות:
 - מיועדת לניתוח שכר חודשי מצטבר
 - מחייבת בחירת שנה וחודש
 - מבטיחה דיוק תעריפי אש״ל וכלכלה לפי התקופה
+- טוענת את המשמרות ואת סטטוסי הימים השמורים לתקופה שנבחרה באופן עצמאי מהתצוגה היומית
 - מציגה סיכום חודשי קומפקטי וברור
 
 שתי התצוגות משתמשות באותו מנגנון חישוב דומיין.
