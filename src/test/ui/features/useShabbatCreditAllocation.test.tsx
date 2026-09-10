@@ -30,7 +30,7 @@ const monthlyConfigServiceMock = vi.hoisted(() => ({
   setUnusedShabbatCreditHours: vi.fn(),
 }));
 
-const reduxStateMock = vi.hoisted(() => ({
+const globalStoreStateMock = vi.hoisted(() => ({
   global: {
     dailyPayMaps: {} as Record<string, unknown>,
     config: { standardHours: 8 },
@@ -45,9 +45,9 @@ vi.mock("@/hooks/useAppSnackbar", () => ({ useAppSnackbar: () => snackbarMock })
 vi.mock("@/hooks/useDomain", () => ({ useDomain: () => domainMock }));
 vi.mock("@/hooks/useWorkDays", () => ({ useWorkDays: () => workDaysMock }));
 vi.mock("@/services", () => ({ monthlyConfigService: () => monthlyConfigServiceMock }));
-vi.mock("react-redux", () => ({
-  useSelector: (selector: (state: typeof reduxStateMock) => unknown) =>
-    selector(reduxStateMock),
+vi.mock("@/store/globalStore", () => ({
+  useGlobalStore: (selector: (state: typeof globalStoreStateMock.global) => unknown) =>
+    selector(globalStoreStateMock.global),
 }));
 
 import { useShabbatCreditAllocation } from "@/features/salary-summary/hooks/useShabbatCreditAllocation";
@@ -58,7 +58,7 @@ describe("useShabbatCreditAllocation", () => {
     globalStateMock.year = 2026;
     globalStateMock.month = 9;
     workDaysMock.workDays = [];
-    reduxStateMock.global.dailyPayMaps = {};
+    globalStoreStateMock.global.dailyPayMaps = {};
     snackbarMock.error.mockReset();
     monthlyConfigServiceMock.fetch.mockReset();
     monthlyConfigServiceMock.setUnusedShabbatCreditHours
@@ -128,7 +128,7 @@ describe("useShabbatCreditAllocation", () => {
     monthlyConfigServiceMock.fetch.mockReturnValue({
       call: () => Promise.resolve({ data: null }),
     });
-    reduxStateMock.global.dailyPayMaps = {
+    globalStoreStateMock.global.dailyPayMaps = {
       "2026-09-01": {
         totalHours: 0,
         earnedShabbatCredit: { percent: 1, hours: 4 },

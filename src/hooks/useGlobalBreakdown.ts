@@ -1,15 +1,15 @@
 import { useMemo } from "react";
-import { useSelector } from "react-redux";
 import type { MonthPayMapReducer } from "@/domain";
-import { createSelectGlobalBreakdown } from "@/redux/selectors/globalBreakdown.selector";
+import { calculateGlobalBreakdown } from "@/store/globalBreakdown";
+import { useGlobalStore } from "@/store/globalStore";
 
 export const useGlobalBreakdown = (
   monthPayMapCalculator: MonthPayMapReducer,
 ) => {
-  const selectGlobalBreakdown = useMemo(
-    () => createSelectGlobalBreakdown(monthPayMapCalculator),
-    [monthPayMapCalculator],
-  );
+  const dailyPayMaps = useGlobalStore((state) => state.dailyPayMaps);
 
-  return useSelector(selectGlobalBreakdown);
+  return useMemo(
+    () => calculateGlobalBreakdown(dailyPayMaps, monthPayMapCalculator),
+    [dailyPayMaps, monthPayMapCalculator],
+  );
 };
