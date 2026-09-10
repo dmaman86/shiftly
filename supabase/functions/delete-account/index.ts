@@ -81,7 +81,8 @@ Deno.serve(async (request) => {
   );
 
   if (deleteError) {
-    return jsonResponse({ error: deleteError.message }, 500);
+    console.error("Account deletion failed", deleteError);
+    return jsonResponse({ error: "Deletion failed, try again" }, 500);
   }
 
   return jsonResponse({ deleted: true }, 200);
