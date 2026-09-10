@@ -18,7 +18,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useDirection } from "@/hooks";
+import { useAuth, useDirection } from "@/hooks";
 import { analyticsService } from "@/services";
 import { AuthControls } from "@/features/auth";
 
@@ -60,9 +60,11 @@ export const ViewSwitcher = () => {
   const { direction } = useDirection();
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
   /* v8 ignore next */
   const lang = location.pathname.split("/")[1] || "he";
   const [open, setOpen] = useState(false);
+  const accountAndRulesPath = `/${lang}/account-and-rules${user ? "#account-profile" : ""}`;
 
   const toggleLang = () => {
     const nextLang = lang === "he" ? "en" : "he";
@@ -96,8 +98,8 @@ export const ViewSwitcher = () => {
         <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
           <NavItem to={`/${lang}/daily`}>{t("nav.daily")}</NavItem>
           <NavItem to={`/${lang}/monthly`}>{t("nav.monthly")}</NavItem>
-          <NavItem to={`/${lang}/calculation-rules`}>
-            {t("nav.calculation_rules")}
+          <NavItem to={accountAndRulesPath}>
+            {t("nav.account_and_rules")}
           </NavItem>
         </Box>
 
@@ -148,10 +150,10 @@ export const ViewSwitcher = () => {
             {t("nav.monthly")}
           </NavItem>
           <NavItem
-            to={`/${lang}/calculation-rules`}
+            to={accountAndRulesPath}
             onClick={() => setOpen(false)}
           >
-            {t("nav.calculation_rules")}
+            {t("nav.account_and_rules")}
           </NavItem>
         </Box>
       </Collapse>

@@ -29,8 +29,8 @@ vi.mock("@/pages/CalculationRulesPage", () => ({
 }));
 
 const LocationTracker = () => {
-  const { pathname } = useLocation();
-  return <div data-testid="location">{pathname}</div>;
+  const { hash, pathname } = useLocation();
+  return <div data-testid="location">{pathname + hash}</div>;
 };
 
 const renderAtPath = (path: string) =>
@@ -80,8 +80,15 @@ describe("AppRoutes", () => {
       });
     });
 
-    it("renders CalculationRulesPage at /he/calculation-rules", async () => {
+    it("redirects legacy calculation rules route to daily", async () => {
       renderAtPath("/he/calculation-rules");
+      await waitFor(() => {
+        expect(screen.getByTestId("location").textContent).toBe("/he/daily");
+      });
+    });
+
+    it("renders CalculationRulesPage at /he/account-and-rules", async () => {
+      renderAtPath("/he/account-and-rules");
       await waitFor(() => {
         expect(screen.getByText("Calculation Rules Page")).toBeInTheDocument();
       });

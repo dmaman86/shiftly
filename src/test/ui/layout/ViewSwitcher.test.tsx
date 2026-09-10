@@ -75,9 +75,9 @@ describe("ViewSwitcher", () => {
       expect(screen.getAllByText("חישוב חודשי").length).toBeGreaterThan(0);
     });
 
-    it("renders calculation rules nav item", () => {
+    it("renders account and rules nav item", () => {
       renderAtPath("/he/daily");
-      expect(screen.getAllByText("כללי חישוב").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("חשבון וכללי חישוב").length).toBeGreaterThan(0);
     });
 
     it("renders language toggle button", () => {
@@ -95,9 +95,21 @@ describe("ViewSwitcher", () => {
 
       renderAtPath("/he/daily");
 
+      expect(screen.getByRole("link", { name: "חשבון וכללי חישוב" })).toHaveAttribute(
+        "href",
+        "/he/account-and-rules#account-profile",
+      );
       expect(screen.getByRole("button", { name: "התנתקות" })).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "התחברות" })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "הרשמה" })).not.toBeInTheDocument();
+    });
+
+    it("links to account and rules without the profile hash when no user is authenticated", () => {
+      renderAtPath("/he/daily");
+
+      expect(
+        screen.getByRole("link", { name: "חשבון וכללי חישוב" }),
+      ).toHaveAttribute("href", "/he/account-and-rules");
     });
   });
 

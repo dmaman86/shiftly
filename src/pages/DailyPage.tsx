@@ -79,7 +79,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                   </Typography>
                   <MuiLink
                     component={RouterLink}
-                    to="../calculation-rules"
+                    to="../account-and-rules"
                     variant="body2"
                   >
                     {t("nav_link_rules")}
@@ -96,7 +96,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                   </Typography>
                   <MuiLink
                     component={RouterLink}
-                    to="../calculation-rules#interactive-example"
+                    to="../account-and-rules#interactive-example"
                     variant="body2"
                     onClick={() =>
                       analyticsService.track({

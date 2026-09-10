@@ -21,6 +21,7 @@ import {
   WorkDayTimeline,
   TimelineNote,
   AuthControls,
+  AccountProfileCard,
   CalculationExampleCard,
 } from "@/features";
 import { useDomain, useGlobalState } from "@/hooks";
@@ -69,6 +70,8 @@ export const CalculationRulesPage = () => {
             </Box>
           </Box>
           <Divider sx={{ mt: 3 }} />
+
+          <AccountProfileCard defaultExpanded={hash === "#account-profile"} />
 
           <CalculationExampleCard
             defaultExpanded={hash === "#interactive-example"}

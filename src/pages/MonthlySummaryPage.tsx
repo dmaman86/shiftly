@@ -73,7 +73,7 @@ export const MonthlySummaryPage = ({
                   </Typography>
                   <MuiLink
                     component={RouterLink}
-                    to="../calculation-rules"
+                    to="../account-and-rules"
                     variant="body2"
                   >
                     {t("monthly_summary_page.nav_link_rules")}
@@ -90,7 +90,7 @@ export const MonthlySummaryPage = ({
                   </Typography>
                   <MuiLink
                     component={RouterLink}
-                    to="../calculation-rules#interactive-example"
+                    to="../account-and-rules#interactive-example"
                     variant="body2"
                     onClick={() =>
                       analyticsService.track({
