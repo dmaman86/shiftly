@@ -29,8 +29,8 @@ vi.mock("@/pages/CalculationRulesPage", () => ({
 }));
 
 const LocationTracker = () => {
-  const { hash, pathname } = useLocation();
-  return <div data-testid="location">{pathname + hash}</div>;
+  const { hash, pathname, search } = useLocation();
+  return <div data-testid="location">{pathname + search + hash}</div>;
 };
 
 const renderAtPath = (path: string) =>
@@ -50,6 +50,15 @@ describe("AppRoutes", () => {
       });
     });
 
+    it("preserves query parameters and hash when redirecting root", async () => {
+      renderAtPath("/?utm_source=github&utm_medium=readme#demo");
+      await waitFor(() => {
+        expect(screen.getByTestId("location").textContent).toBe(
+          "/he/daily?utm_source=github&utm_medium=readme#demo",
+        );
+      });
+    });
+
     it("redirects unknown page within /he to /he/daily", async () => {
       renderAtPath("/he/unknown-page");
       await waitFor(() => {
@@ -61,6 +70,15 @@ describe("AppRoutes", () => {
       renderAtPath("/en/unknown-page");
       await waitFor(() => {
         expect(screen.getByTestId("location").textContent).toBe("/en/daily");
+      });
+    });
+
+    it("preserves query parameters when redirecting an unknown page", async () => {
+      renderAtPath("/en/unknown-page?utm_source=cv&utm_medium=pdf");
+      await waitFor(() => {
+        expect(screen.getByTestId("location").textContent).toBe(
+          "/en/daily?utm_source=cv&utm_medium=pdf",
+        );
       });
     });
   });

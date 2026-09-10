@@ -1,11 +1,12 @@
 import { useEffect } from "react";
-import { Navigate, Outlet, useParams } from "react-router-dom";
+import { Navigate, Outlet, useLocation, useParams } from "react-router-dom";
 import i18n from "@/i18n";
 import { isSupportedLanguage } from "@/i18n/language";
 import { useDirection } from "@/hooks";
 
 export const LanguageLayout = () => {
   const { lang } = useParams<{ lang: string }>();
+  const location = useLocation();
   const { setDirection } = useDirection();
 
   const isValid = isSupportedLanguage(lang);
@@ -16,7 +17,18 @@ export const LanguageLayout = () => {
     void i18n.changeLanguage(lang);
   }, [lang, isValid, setDirection]);
 
-  if (!isValid) return <Navigate to="/he/daily" replace />;
+  if (!isValid) {
+    return (
+      <Navigate
+        to={{
+          pathname: "/he/daily",
+          search: location.search,
+          hash: location.hash,
+        }}
+        replace
+      />
+    );
+  }
 
   return <Outlet />;
 };

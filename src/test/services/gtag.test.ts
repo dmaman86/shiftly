@@ -47,6 +47,9 @@ describe("gtagService", () => {
       expect(jsCall[1]).toBeInstanceOf(Date);
       expect(configCall[0]).toBe("config");
       expect(configCall[1]).toBe("G-G19J1209M6");
+      expect(configCall[2]).toEqual({
+        page_location: window.location.href,
+      });
     });
 
     it("is idempotent: second call does nothing if script already loaded", () => {

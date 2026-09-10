@@ -17,6 +17,8 @@ export const gtagService = {
     document.head.appendChild(script);
 
     window.gtag("js", new Date());
-    window.gtag("config", GA_ID);
+    window.gtag("config", GA_ID, {
+      page_location: window.location.href,
+    });
   },
 };

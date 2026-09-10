@@ -3,6 +3,7 @@ import {
   Navigate,
   Route,
   Routes,
+  useLocation,
   useParams,
 } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
@@ -26,7 +27,33 @@ const CalculationRulesPage = lazy(() =>
 
 const RedirectToDaily = () => {
   const { lang } = useParams<{ lang: string }>();
-  return <Navigate to={`/${lang}/daily`} replace />;
+  const location = useLocation();
+
+  return (
+    <Navigate
+      to={{
+        pathname: `/${lang}/daily`,
+        search: location.search,
+        hash: location.hash,
+      }}
+      replace
+    />
+  );
+};
+
+const RootRedirect = () => {
+  const location = useLocation();
+
+  return (
+    <Navigate
+      to={{
+        pathname: "/he/daily",
+        search: location.search,
+        hash: location.hash,
+      }}
+      replace
+    />
+  );
 };
 
 const PageLoader = () => (
@@ -58,7 +85,7 @@ export const AppRoutes = () => {
           <Route path="account-and-rules" element={<CalculationRulesPage />} />
           <Route path="*" element={<RedirectToDaily />} />
         </Route>
-        <Route index element={<Navigate to="/he/daily" replace />} />
+        <Route index element={<RootRedirect />} />
       </Routes>
     </Suspense>
   );
