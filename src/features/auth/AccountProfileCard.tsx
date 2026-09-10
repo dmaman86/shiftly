@@ -97,7 +97,11 @@ export const AccountProfileCard = ({
       return;
     }
 
-    closeDeleteDialog();
+    // The handler may have captured an older deletingAccount value. At this
+    // point deletion and sign-out succeeded, so close explicitly instead of
+    // reusing the guarded event handler.
+    setDeleteDialogOpen(false);
+    setDeleteConfirmation("");
     snackbar.success(t("auth.delete_account_success"));
   };
 
