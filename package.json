@@ -1,7 +1,7 @@
 {
   "name": "shiftly",
   "private": true,
-  "version": "0.14.0",
+  "version": "0.14.1",
   "homepage": "https://dmaman86.github.io/shiftly",
   "type": "module",
   "license": "MIT",
