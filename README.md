@@ -5,7 +5,7 @@
 
 ![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
-![Redux](https://img.shields.io/badge/Redux_Toolkit-2.11.0-764ABC?logo=redux&logoColor=white)
+![Zustand](https://img.shields.io/badge/Zustand-5.0.15-433E38?logo=react&logoColor=white)
 ![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?logo=reactquery&logoColor=white)
 ![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
@@ -94,6 +94,8 @@ All three tables are protected by Postgres Row Level Security: each user can onl
 
 Authenticated work-table data is loaded with TanStack Query using a cache key scoped to the user, year, and month. Editing remains unavailable until that initial snapshot is ready, and a failed load presents an explicit retry action. Changing accounts resets the editable state before loading the next account's data.
 
+The monthly summary hydrates persisted shifts and day statuses directly when its selected year and month change, so it does not depend on visiting the daily view first.
+
 Valid shift edits are saved after a short debounce. Writes for the same user and day are serialized so a late update cannot overtake a subsequent deletion. Invalid time drafts remain local until they become valid.
 
 ---
@@ -145,15 +147,15 @@ Hooks coordinate data flow without embedding business logic.
 
 ### State Management
 
-- **Redux Toolkit** handles global calculation state and monthly aggregation
-- **React Context** owns the current work-table editing session
+- **Zustand** handles global period configuration and daily pay maps
+- **React Context** owns authentication, dependency injection, UI integration boundaries, and the current work-table editing session
 - **TanStack Query** coordinates authenticated work-table reads and writes to Supabase
-- Deterministic add / subtract logic
-- No full recomputation on every change
+- Daily pay maps are updated by date key, and the monthly breakdown is derived deterministically from the current maps
 
-Global Redux slice:
+Global Zustand state:
 
-- `globalSlice`
+- `src/store/globalStore.ts`
+- `src/store/globalBreakdown.ts`
 
 ### UI Components
 
@@ -259,7 +261,7 @@ Create specific calculator instances:
 
 ### State & Routing
 
-- **Redux Toolkit** 2.11.0
+- **Zustand** 5.0.15 (global client state)
 - **TanStack Query** 5 (authenticated server-state synchronization)
 - **React Router** 7
 
@@ -404,9 +406,9 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   ├── i18n/                   # Hebrew/English resources and URL language resolution
 │   ├── layout/                 # Application layout and error boundaries
 │   ├── pages/                  # Daily, monthly and calculation-rules pages
-│   ├── redux/                  # Global state, selectors and store
+│   ├── store/                  # Zustand global state and breakdown calculations
 │   ├── services/               # Analytics, Hebcal and Supabase persistence clients
-│   ├── test/                   # Domain, service, Redux and UI test suites
+│   ├── test/                   # Domain, store, service and UI test suites
 │   └── utils/                  # API result handling and shared helpers
 └── supabase/
     ├── functions/               # Authenticated Edge Functions
@@ -456,6 +458,7 @@ Shiftly provides two main calculation views:
 - Focused on aggregated monthly salary analysis
 - Requires selecting **year and month**
 - Ensures accurate per-diem and meal allowance rates based on period
+- Loads persisted shifts and day statuses for the selected period independently of the Daily view
 - Displays a compact monthly salary summary
 
 Both views share the same domain calculation pipeline.
