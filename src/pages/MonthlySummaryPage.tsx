@@ -17,7 +17,8 @@ import {
   MonthlySalarySummary,
   Feedback,
 } from "@/features";
-import { useGlobalState } from "@/hooks";
+import { useHydrateGlobalPayMaps } from "@/features/work-table";
+import { useGlobalState, useWorkDays } from "@/hooks";
 import { FeatureBoundary } from "@/layout";
 import { analyticsService } from "@/services";
 
@@ -29,6 +30,8 @@ export const MonthlySummaryPage = ({
   const { t } = useTranslation("pages");
   const { t: tWT } = useTranslation("work-table");
   const { year, month } = useGlobalState();
+  const { workDays } = useWorkDays(domain);
+  useHydrateGlobalPayMaps({ domain, workDays });
 
   return (
     <Box component="section" sx={{ mt: 2 }}>
