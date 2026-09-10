@@ -91,7 +91,7 @@ describe("AuthControls", () => {
     expect(hookMocks.snackbar.error).toHaveBeenCalledWith("Provider is not enabled");
   });
 
-  it("shows the current user and signs out", async () => {
+  it("renders the account sign-out control", async () => {
     const user = userEvent.setup();
     hookMocks.authState.user = { email: "worker@example.com" };
     authMocks.signOut.mockResolvedValue({ error: null });
@@ -104,47 +104,6 @@ describe("AuthControls", () => {
     expect(hookMocks.snackbar.success).toHaveBeenCalledWith("You are signed out.");
   });
 
-  it("deletes the authenticated account after explicit confirmation", async () => {
-    const user = userEvent.setup();
-    hookMocks.authState.user = { email: "worker@example.com" };
-    functionsMocks.invoke.mockResolvedValue({ data: { deleted: true }, error: null });
-    authMocks.signOut.mockResolvedValue({ error: null });
-
-    render(<AuthControls display="account" />);
-
-    await user.click(screen.getByRole("button", { name: "Delete account" }));
-
-    const confirmButton = screen.getByRole("button", { name: "Delete my account" });
-    expect(confirmButton).toBeDisabled();
-
-    await user.type(screen.getByLabelText("Type DELETE to confirm"), "DELETE");
-    await user.click(confirmButton);
-
-    expect(functionsMocks.invoke).toHaveBeenCalledWith("delete-account", {
-      method: "DELETE",
-    });
-    expect(authMocks.signOut).toHaveBeenCalledWith({ scope: "local" });
-    expect(hookMocks.snackbar.success).toHaveBeenCalledWith("Your account was deleted.");
-  });
-
-  it("does not clear the local session when account deletion fails", async () => {
-    const user = userEvent.setup();
-    hookMocks.authState.user = { email: "worker@example.com" };
-    functionsMocks.invoke.mockResolvedValue({
-      data: null,
-      error: { message: "Authentication is required" },
-    });
-
-    render(<AuthControls display="account" />);
-
-    await user.click(screen.getByRole("button", { name: "Delete account" }));
-    await user.type(screen.getByLabelText("Type DELETE to confirm"), "DELETE");
-    await user.click(screen.getByRole("button", { name: "Delete my account" }));
-
-    expect(authMocks.signOut).not.toHaveBeenCalled();
-    expect(hookMocks.snackbar.error).toHaveBeenCalledWith("Authentication is required");
-  });
-
   it("hides page authentication controls from signed-in users", () => {
     hookMocks.authState.user = { email: "worker@example.com" };
 
@@ -154,5 +113,15 @@ describe("AuthControls", () => {
       screen.queryByRole("button", { name: "Continue with Google" }),
     ).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Sign out" })).not.toBeInTheDocument();
+  });
+
+  it("does not expose account deletion in the compact account control", () => {
+    hookMocks.authState.user = { email: "worker@example.com" };
+
+    render(<AuthControls display="account" />);
+
+    expect(
+      screen.queryByRole("button", { name: "Delete account" }),
+    ).not.toBeInTheDocument();
   });
 });

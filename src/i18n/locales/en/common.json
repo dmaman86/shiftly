@@ -3,7 +3,7 @@
     "app_title": "Shiftly – Shift & Salary Management",
     "daily": "Daily",
     "monthly": "Monthly",
-    "calculation_rules": "Calculation Rules"
+    "account_and_rules": "Account & Rules"
   },
   "footer": {
     "copyright": "© {{year}} Shiftly – Salary & Shift Simulation & Calculator",
@@ -38,6 +38,13 @@
     "loading": "Loading account...",
     "initialization_error": "Your account session could not be loaded. Please try again.",
     "sign_out_success": "You are signed out.",
+    "profile_title": "👤 Profile",
+    "profile_description": "Your signed-in account and saved data controls.",
+    "profile_email": "Email",
+    "profile_provider": "Sign-in provider",
+    "profile_unknown": "Not available",
+    "account_removal_title": "Account removal",
+    "account_removal_description": "Deleting your account permanently removes your saved Shiftly data.",
     "delete_account": "Delete account",
     "delete_account_title": "Delete account?",
     "delete_account_description": "This permanently deletes your account, saved shifts, day statuses, and monthly settings. This cannot be undone.",

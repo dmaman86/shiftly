@@ -3,7 +3,7 @@
     "app_title": "Shiftly – ניהול שעות עבודה ושכר",
     "daily": "חישוב יומי",
     "monthly": "חישוב חודשי",
-    "calculation_rules": "כללי חישוב"
+    "account_and_rules": "חשבון וכללי חישוב"
   },
   "footer": {
     "copyright": "© {{year}} Shiftly – מחשבון סימולציות ובדיקות שכר ומשמרות | Salary & Shift Simulation & Calculator",
@@ -38,6 +38,13 @@
     "loading": "טוען חשבון...",
     "initialization_error": "לא ניתן לטעון את החשבון. יש לנסות שוב.",
     "sign_out_success": "התנתקת בהצלחה.",
+    "profile_title": "👤 פרופיל",
+    "profile_description": "החשבון המחובר שלך ובקרות הנתונים השמורים.",
+    "profile_email": "אימייל",
+    "profile_provider": "ספק התחברות",
+    "profile_unknown": "לא זמין",
+    "account_removal_title": "מחיקת חשבון",
+    "account_removal_description": "מחיקת החשבון מסירה לצמיתות את נתוני Shiftly השמורים שלך.",
     "delete_account": "מחיקת חשבון",
     "delete_account_title": "למחוק את החשבון?",
     "delete_account_description": "פעולה זו תמחק לצמיתות את החשבון, המשמרות השמורות, סטטוסי הימים וההגדרות החודשיות שלך. לא ניתן לבטל אותה.",

@@ -1,5 +1,10 @@
 import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useParams,
+} from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
 
 import { useDomain, usePageTracking } from "@/hooks";
@@ -50,7 +55,7 @@ export const AppRoutes = () => {
             path="monthly"
             element={<MonthlySummaryPage domain={domain} />}
           />
-          <Route path="calculation-rules" element={<CalculationRulesPage />} />
+          <Route path="account-and-rules" element={<CalculationRulesPage />} />
           <Route path="*" element={<RedirectToDaily />} />
         </Route>
         <Route index element={<Navigate to="/he/daily" replace />} />
