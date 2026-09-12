@@ -124,16 +124,16 @@ The domain layer contains **pure business logic** and is framework-agnostic.
   Construct domain structures without embedding business rules.
 
 - **Calculators**
-  Pure functions implementing salary rules.
+  Pure, dependency-free functions implementing salary rules, time-based segment percentages, and dated-rate lookups.
 
 - **Reducers**
   Handle accumulation and rollback of calculated values, enabling incremental recalculation.
 
 - **Resolvers**
-  Decision logic based on time, date, and contextual rules.
+  Multi-method decision services (day-type classification, available months) whose shape doesn't reduce to a single input/output calculation.
 
-- **Factories & Composition**
-  Centralized wiring of domain components.
+- **Composition**
+  Centralized wiring of domain components via `pipelines/`.
 
 ### Adapters
 
@@ -181,8 +181,11 @@ Pure calculation logic organized by concern:
 
 - **Regular hours**: by shift / by day
 - **Extra & special segments**: time-based bonuses
-- **Per-diem**: shift / day / month levels
-- **Meal allowance**: eligibility & rate calculation
+- **Shift segments**: percentage-rate breakdown by time-of-day and Shabbat status
+- **Per-diem**: shift / day / month levels, with timeline-based rate lookup
+- **Meal allowance**: eligibility & rate calculation, with timeline-based rate lookup
+- **Fixed segments**: sick, vacation and earned Shabbat credit
+- **Holiday day-type classification**: Hebcal-based
 
 #### Shabbat Credit Terminology
 
@@ -215,14 +218,10 @@ Accumulate and subtract breakdowns:
 
 ### Resolvers
 
-Context-aware decision logic:
+Multi-method decision services whose shape doesn't reduce to a single input/output calculation:
 
-- Holiday resolver (Hebcal-based)
-- Shift segment resolver
-- Timeline-based per-diem rate resolver
-- Timeline-based meal allowance rate resolver
-- Month resolver
-- Workday info resolver
+- Month resolver — available months and default month for a given year
+- Workday info resolver — day-type and cross-day-continuation queries
 
 ### Services
 
@@ -236,18 +235,12 @@ Domain-level utilities:
 Composition pipelines for wiring domain components:
 
 - `buildCoreServices`: Date & shift services
-- `buildResolvers`: All resolver instances
+- `buildResolvers`: Month and workday-info resolver instances
+- `buildRateCalculators`: Holiday, per-diem rate, and meal-allowance rate calculators
 - `buildCalculators`: Calculator instances
 - `buildShiftLayer`: Shift-level logic
 - `buildDayLayer`: Day-level aggregation
 - `buildMonthLayer`: Month-level aggregation
-
-### Factories
-
-Create specific calculator instances:
-
-- `FixedSegmentFactory`
-- `RegularFactory`
 
 ---
 
@@ -386,11 +379,10 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   ├── constants/              # Shared domain and UI constants
 │   ├── domain/                 # Framework-independent payroll rules
 │   │   ├── builder/            # Shift, day and month structure builders
-│   │   ├── calculator/         # Regular, special, allowance and credit calculations
-│   │   ├── factory/            # Calculator factories
+│   │   ├── calculator/         # Regular, special, segment, rate and credit calculations
 │   │   ├── pipelines/          # Domain dependency composition
 │   │   ├── reducer/            # Monthly accumulation and rollback
-│   │   ├── resolve/            # Calendar and timeline decisions
+│   │   ├── resolve/            # Multi-method decision services (day-type, month)
 │   │   ├── services/           # Date and shift services
 │   │   └── types/              # Domain contracts and data shapes
 │   ├── features/               # Feature-owned UI and orchestration
