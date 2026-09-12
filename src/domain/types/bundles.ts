@@ -1,4 +1,4 @@
-import { FixedSegmentFactory } from "../factory";
+import { FixedSegmentCalculator } from "../calculator";
 import { MealAllowanceMonthReducer } from "../reducer";
 import { Calculator, Reducer } from "./core-behaviors";
 import {
@@ -7,11 +7,11 @@ import {
   SpecialBreakdown,
 } from "./data-shapes";
 import {
-  MealAllowanceLogicResolver,
-  MealAllowanceRateResolver,
+  MealAllowanceLogicCalculator,
+  MealAllowanceRateCalculator,
   PerDiemDayCalculator,
   PerDiemMonthReducer,
-  PerDiemRateResolver,
+  PerDiemRateCalculator,
   RegularCalculator,
 } from "./services";
 import { LabeledSegmentRange } from "./types";
@@ -31,19 +31,19 @@ export type WorkDayReducerBundle = {
 };
 
 export type FixedSegmentBundle = {
-  sick: FixedSegmentFactory;
-  vacation: FixedSegmentFactory;
-  earnedShabbatCredit: FixedSegmentFactory;
+  sick: FixedSegmentCalculator;
+  vacation: FixedSegmentCalculator;
+  earnedShabbatCredit: FixedSegmentCalculator;
 };
 
 export type PerDiemBundle = {
   calculator: PerDiemDayCalculator;
-  rateResolver: PerDiemRateResolver;
+  rateResolver: PerDiemRateCalculator;
 };
 
 export type MealAllowanceBundle = {
-  resolver: MealAllowanceLogicResolver;
-  rateResolver: MealAllowanceRateResolver;
+  resolver: MealAllowanceLogicCalculator;
+  rateResolver: MealAllowanceRateCalculator;
 };
 
 export type MealAllowanceMonthBundle = {

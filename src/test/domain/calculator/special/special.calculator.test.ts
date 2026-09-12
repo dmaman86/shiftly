@@ -153,7 +153,7 @@ describe("SpecialCalculator", () => {
 
     it("should ignore time segments with keys other than shabbat150 or shabbat200", () => {
       // Mix of Shabbat segments (150%, 200%) and regular segments (ignored)
-      // This simulates what ShiftSegmentResolver would return for a shift on a SpecialPartialStart day
+      // This simulates what ShiftSegmentCalculator would return for a shift on a SpecialPartialStart day
       // For example, a shift from 08:00-23:00 on Friday (specialStart at 18:00/1080 minutes):
       // 08:00-14:00 (480-840): hours100
       // 14:00-18:00 (840-1080): hours20  
@@ -275,8 +275,8 @@ describe("SpecialCalculator", () => {
       expect(result.shabbat200.hours).toBeCloseTo(5); // 5 segments * 60 minutes = 5 hours
     });
 
-    it("should handle Shabbat time segments according to ShiftSegmentResolver rules", () => {
-      // Real Shabbat scenario based on ShiftSegmentResolver:
+    it("should handle Shabbat time segments according to ShiftSegmentCalculator rules", () => {
+      // Real Shabbat scenario based on ShiftSegmentCalculator:
       // SpecialFull day (Saturday):
       // - 00:00-06:00 (0-360): shabbat200 (200%)
       // - 06:00-22:00 (360-1320): shabbat150 (150%)  
@@ -601,7 +601,7 @@ describe("SpecialCalculator", () => {
       expect(result).toEqual(breakdown);
     });
 
-    it("should handle full Shabbat day calculation with segments from ShiftSegmentResolver", () => {
+    it("should handle full Shabbat day calculation with segments from ShiftSegmentCalculator", () => {
       // Friday evening entry (SpecialPartialStart)
       // According to resolver: specialStart (17:00 or 18:00) to 22:00 is shabbat150
       // For this example, using 18:00 start (1080 minutes)
@@ -670,7 +670,7 @@ describe("SpecialCalculator", () => {
     });
 
     it("should handle monthly accumulation of Shabbat hours from weekly segments", () => {
-      // Each Shabbat (SpecialFull day) according to ShiftSegmentResolver:
+      // Each Shabbat (SpecialFull day) according to ShiftSegmentCalculator:
       // 00:00-06:00 (6h) at 200%, 06:00-22:00 (16h) at 150%, 22:00-24:00 (2h) at 200%
       // Total per Shabbat: 16h at 150%, 8h at 200%
       

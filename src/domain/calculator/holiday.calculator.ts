@@ -2,11 +2,11 @@ import { Weekend, WorkDayType } from "@/constants";
 import {
   CalendarEventKind,
   type CalendarEvent,
-  type HolidayResolver,
+  type HolidayCalculator,
 } from "@/domain";
 
-export class HolidayResolverService implements HolidayResolver {
-  resolve(params: { weekday: number; events: CalendarEvent[] }): WorkDayType {
+export class DefaultHolidayCalculator implements HolidayCalculator {
+  calculate(params: { weekday: number; events: CalendarEvent[] }): WorkDayType {
     const { weekday, events } = params;
 
     if (

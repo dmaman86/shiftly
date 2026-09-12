@@ -2,15 +2,15 @@
 import {
   DateService,
   ShiftService,
-  HolidayResolverService,
+  DefaultHolidayCalculator,
   WorkDayInfoResolver,
   DefaultMonthResolver,
-  TimelinePerDiemRateResolver,
-  TimelineMealAllowanceRateResolver,
+  TimelinePerDiemRateCalculator,
+  TimelineMealAllowanceRateCalculator,
   RegularCalculator,
   ExtraCalculator,
   SpecialCalculator,
-  FixedSegmentFactory,
+  FixedSegmentCalculator,
   LargeMealAllowanceCalculator,
   SmallMealAllowanceCalculator,
   DefaultPerDiemDayCalculator,
@@ -33,11 +33,14 @@ export interface DomainConfig {
 }
 
 export interface Resolvers {
-  holidayResolver: HolidayResolverService;
   workDayInfoResolver: WorkDayInfoResolver;
   monthResolver: DefaultMonthResolver;
-  perDiemRateResolver: TimelinePerDiemRateResolver;
-  mealAllowanceRateResolver: TimelineMealAllowanceRateResolver;
+}
+
+export interface RateCalculators {
+  holiday: DefaultHolidayCalculator;
+  perDiemRate: TimelinePerDiemRateCalculator;
+  mealAllowanceRate: TimelineMealAllowanceRateCalculator;
 }
 
 export interface Calculators {
@@ -49,9 +52,9 @@ export interface Calculators {
   extra: ExtraCalculator;
   special: SpecialCalculator;
   fixedSegments: {
-    sick: FixedSegmentFactory;
-    vacation: FixedSegmentFactory;
-    earnedShabbatCredit: FixedSegmentFactory;
+    sick: FixedSegmentCalculator;
+    vacation: FixedSegmentCalculator;
+    earnedShabbatCredit: FixedSegmentCalculator;
   };
   mealAllowance: {
     large: LargeMealAllowanceCalculator;
@@ -77,6 +80,7 @@ export interface BuildDayLayerParams {
   dateService: DateService;
   calculators: Calculators;
   resolvers: Resolvers;
+  rateCalculators: RateCalculators;
 }
 
 export interface DayLayer {
@@ -100,5 +104,6 @@ export interface PayMapPipeline {
     workDaysForMonthBuilder: DefaultWorkDaysForMonthBuilder;
   };
   resolvers: Resolvers;
+  rateCalculators: RateCalculators;
   services: CoreServices;
 }

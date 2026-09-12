@@ -1,9 +1,9 @@
 import { WorkDayType } from "@/constants";
 import type { LabeledSegmentRange, Point, WorkDayMeta } from "@/domain/types/types";
-import type { Resolver } from "@/domain/types/core-behaviors";
+import type { Calculator } from "@/domain/types/core-behaviors";
 import type { DateService } from "@/domain/services/date.service";
 
-export class ShiftSegmentResolver implements Resolver<
+export class ShiftSegmentCalculator implements Calculator<
   {
     point: Point;
     meta: WorkDayMeta;
@@ -29,7 +29,7 @@ export class ShiftSegmentResolver implements Resolver<
 
   constructor(private readonly dateService: DateService) {}
 
-  resolve(params: { point: Point; meta: WorkDayMeta }): LabeledSegmentRange[] {
+  calculate(params: { point: Point; meta: WorkDayMeta }): LabeledSegmentRange[] {
     const { point, meta } = params;
 
     const source = (() => {

@@ -3,13 +3,13 @@ import { DefaultDayPayMapBuilder } from "@/domain/builder/daypaymap.builder";
 import { RegularByDayCalculator } from "@/domain/calculator/regular/regularByDay.calculator";
 import { ExtraCalculator } from "@/domain/calculator/extra/extra.calculator";
 import { SpecialCalculator } from "@/domain/calculator/special/special.calculator";
-import { FixedSegmentFactory } from "@/domain/factory/fixed-segment.factory";
+import { FixedSegmentCalculator } from "@/domain/calculator/fixed-segment.calculator";
 import { DefaultPerDiemDayCalculator } from "@/domain/calculator/perdiem/perdiem-day.calculator";
-import { TimelinePerDiemRateResolver } from "@/domain/resolve/timeline-per-diem-rate.resolver";
-import { MealAllowanceResolver } from "@/domain/resolve/meal-allowance.resolver";
+import { TimelinePerDiemRateCalculator } from "@/domain/calculator/perdiem/timeline-per-diem-rate.calculator";
+import { DefaultMealAllowanceCalculator } from "@/domain/calculator/mealallowance/meal-allowance.calculator";
 import { LargeMealAllowanceCalculator } from "@/domain/calculator/mealallowance/large-mealallowance.calculator";
 import { SmallMealAllowanceCalculator } from "@/domain/calculator/mealallowance/small-mealallowance.calculator";
-import { TimelineMealAllowanceRateResolver } from "@/domain/resolve/timeline-meal-allowance-rate.resolver";
+import { TimelineMealAllowanceRateCalculator } from "@/domain/calculator/mealallowance/timeline-meal-allowance-rate.calculator";
 import { WorkDayStatus, WorkDayType } from "@/constants/fields.constant";
 import type { ShiftPayMap, WorkDayMeta, PayCalculationBundle, FixedSegmentBundle, PerDiemBundle, MealAllowanceBundle } from "@/domain";
 
@@ -41,25 +41,25 @@ describe("DefaultDayPayMapBuilder", () => {
 
     // Setup fixed segments
     fixedSegments = {
-      sick: new FixedSegmentFactory(),
-      vacation: new FixedSegmentFactory(),
-      earnedShabbatCredit: new FixedSegmentFactory(),
+      sick: new FixedSegmentCalculator(),
+      vacation: new FixedSegmentCalculator(),
+      earnedShabbatCredit: new FixedSegmentCalculator(),
     };
 
     // Setup per diem
     perDiemBundle = {
       calculator: new DefaultPerDiemDayCalculator(),
-      rateResolver: new TimelinePerDiemRateResolver(),
+      rateResolver: new TimelinePerDiemRateCalculator(),
     };
 
     // Setup meal allowance
     const largeCalculator = new LargeMealAllowanceCalculator();
     const smallCalculator = new SmallMealAllowanceCalculator();
-    const mealResolver = new MealAllowanceResolver(largeCalculator, smallCalculator);
-    
+    const mealResolver = new DefaultMealAllowanceCalculator(largeCalculator, smallCalculator);
+
     mealAllowanceBundle = {
       resolver: mealResolver,
-      rateResolver: new TimelineMealAllowanceRateResolver(),
+      rateResolver: new TimelineMealAllowanceRateCalculator(),
     };
 
     // Create builder
@@ -671,7 +671,7 @@ describe("DefaultDayPayMapBuilder", () => {
     });
 
     it("should call perDiem rateResolver", () => {
-      const resolveSpy = vi.spyOn(perDiemBundle.rateResolver, "resolve");
+      const resolveSpy = vi.spyOn(perDiemBundle.rateResolver, "calculate");
       
       const shifts = [createShiftPayMap(8, 8)];
 
@@ -688,7 +688,7 @@ describe("DefaultDayPayMapBuilder", () => {
     });
 
     it("should call meal allowance resolver", () => {
-      const resolveSpy = vi.spyOn(mealAllowanceBundle.resolver, "resolve");
+      const resolveSpy = vi.spyOn(mealAllowanceBundle.resolver, "calculate");
       
       const shifts = [createShiftPayMap(8, 8)];
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { DefaultWorkDaysForMonthBuilder } from "@/domain/builder/workdaysformonth.builder";
-import { HolidayResolverService } from "@/domain/resolve/holiday.resolver";
+import { DefaultHolidayCalculator } from "@/domain/calculator/holiday.calculator";
 import { WorkDayInfoResolver } from "@/domain/resolve/workdayinfo.resolver";
 import { DateService } from "@/domain/services/date.service";
 import { WorkDayType } from "@/constants/fields.constant";
@@ -19,13 +19,13 @@ const partialHolidayStart = (holidayKey?: HolidayKey): CalendarEvent => ({
 
 describe("DefaultWorkDaysForMonthBuilder", () => {
   let builder: DefaultWorkDaysForMonthBuilder;
-  let holidayResolver: HolidayResolverService;
+  let holidayResolver: DefaultHolidayCalculator;
   let workDayInfoResolver: WorkDayInfoResolver;
   let dateService: DateService;
 
   beforeEach(() => {
     dateService = new DateService("Asia/Jerusalem");
-    holidayResolver = new HolidayResolverService();
+    holidayResolver = new DefaultHolidayCalculator();
     workDayInfoResolver = new WorkDayInfoResolver(dateService);
     
     builder = new DefaultWorkDaysForMonthBuilder(
@@ -299,8 +299,8 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
   });
 
   describe("build - Integration with dependencies", () => {
-    it("should call holidayResolver.resolve for each day", () => {
-      const resolveSpy = vi.spyOn(holidayResolver, "resolve");
+    it("should call holidayResolver.calculate for each day", () => {
+      const resolveSpy = vi.spyOn(holidayResolver, "calculate");
 
       builder.build({
         year: 2024,

@@ -1,5 +1,5 @@
 import { DefaultShiftMapBuilder, ShiftSegmentBuilder } from "../builder";
-import { ShiftSegmentResolver } from "../resolve";
+import { ShiftSegmentCalculator } from "../calculator";
 import { PayCalculationBundle } from "../types/bundles";
 import { BuildShiftLayerParams, ShiftLayer } from "../types/domain.types";
 
@@ -8,7 +8,7 @@ export const buildShiftLayer = ({
   shiftService,
   calculators,
 }: BuildShiftLayerParams): ShiftLayer => {
-  const segmentResolver = new ShiftSegmentResolver(dateService);
+  const segmentResolver = new ShiftSegmentCalculator(dateService);
   const shiftSegmentBuilder = new ShiftSegmentBuilder(
     segmentResolver,
     shiftService,

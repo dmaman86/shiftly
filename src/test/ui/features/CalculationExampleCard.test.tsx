@@ -16,11 +16,11 @@ const domain = {
     workDaysMonthBuilder: pipelineInstance.payMap.workDaysForMonthBuilder,
   },
   resolvers: {
-    holidayResolver: pipelineInstance.resolvers.holidayResolver,
-    perDiemResolver: pipelineInstance.resolvers.perDiemRateResolver,
+    holidayResolver: pipelineInstance.rateCalculators.holiday,
+    perDiemResolver: pipelineInstance.rateCalculators.perDiemRate,
     dayInfoResolver: pipelineInstance.resolvers.workDayInfoResolver,
     monthResolver: pipelineInstance.resolvers.monthResolver,
-    mealAllowanceRateResolver: pipelineInstance.resolvers.mealAllowanceRateResolver,
+    mealAllowanceRateResolver: pipelineInstance.rateCalculators.mealAllowanceRate,
   },
   services: {
     dateService: pipelineInstance.services.dateService,

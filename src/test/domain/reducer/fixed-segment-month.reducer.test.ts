@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { FixedSegmentMonthReducer } from "@/domain/reducer/fixed-segment-month.reducer";
-import { FixedSegmentFactory } from "@/domain/factory/fixed-segment.factory";
+import { FixedSegmentCalculator } from "@/domain/calculator/fixed-segment.calculator";
 import type { FixedSegmentBundle, MonthPayMap, WorkDayMap, Segment } from "@/domain";
 
 describe("FixedSegmentMonthReducer", () => {
@@ -10,23 +10,23 @@ describe("FixedSegmentMonthReducer", () => {
   beforeEach(() => {
     mockBundle = {
       sick: {
-        create: vi.fn((hours: number): Segment => ({
+        calculate: vi.fn((hours: number): Segment => ({
           percent: 1,
           hours,
         })),
-      } as unknown as FixedSegmentFactory,
+      } as unknown as FixedSegmentCalculator,
       vacation: {
-        create: vi.fn((hours: number): Segment => ({
+        calculate: vi.fn((hours: number): Segment => ({
           percent: 1,
           hours,
         })),
-      } as unknown as FixedSegmentFactory,
+      } as unknown as FixedSegmentCalculator,
       earnedShabbatCredit: {
-        create: vi.fn((hours: number): Segment => ({
+        calculate: vi.fn((hours: number): Segment => ({
           percent: 1.5,
           hours,
         })),
-      } as unknown as FixedSegmentFactory,
+      } as unknown as FixedSegmentCalculator,
     };
     reducer = new FixedSegmentMonthReducer(mockBundle);
   });
@@ -45,9 +45,9 @@ describe("FixedSegmentMonthReducer", () => {
     it("should call all factories with zero", () => {
       reducer.createEmpty();
 
-      expect(mockBundle.sick.create).toHaveBeenCalledWith(0);
-      expect(mockBundle.vacation.create).toHaveBeenCalledWith(0);
-      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(0);
+      expect(mockBundle.sick.calculate).toHaveBeenCalledWith(0);
+      expect(mockBundle.vacation.calculate).toHaveBeenCalledWith(0);
+      expect(mockBundle.earnedShabbatCredit.calculate).toHaveBeenCalledWith(0);
     });
 
     it("should return a new object each time", () => {
@@ -93,7 +93,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
-      expect(mockBundle.sick.create).toHaveBeenCalledWith(16);
+      expect(mockBundle.sick.calculate).toHaveBeenCalledWith(16);
       expect(result.hours100Sick.hours).toBe(16);
     });
 
@@ -111,7 +111,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
-      expect(mockBundle.vacation.create).toHaveBeenCalledWith(24);
+      expect(mockBundle.vacation.calculate).toHaveBeenCalledWith(24);
       expect(result.hours100Vacation.hours).toBe(24);
     });
 
@@ -129,7 +129,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       const result = reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
-      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(15);
+      expect(mockBundle.earnedShabbatCredit.calculate).toHaveBeenCalledWith(15);
       expect(result.earnedShabbatCredit.hours).toBe(15);
     });
 
@@ -204,7 +204,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
-      expect(mockBundle.sick.create).toHaveBeenCalledWith(12);
+      expect(mockBundle.sick.calculate).toHaveBeenCalledWith(12);
     });
 
     it("should call factories with accumulated values", () => {
@@ -221,9 +221,9 @@ describe("FixedSegmentMonthReducer", () => {
 
       reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
-      expect(mockBundle.sick.create).toHaveBeenCalledWith(15);
-      expect(mockBundle.vacation.create).toHaveBeenCalledWith(30);
-      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(45);
+      expect(mockBundle.sick.calculate).toHaveBeenCalledWith(15);
+      expect(mockBundle.vacation.calculate).toHaveBeenCalledWith(30);
+      expect(mockBundle.earnedShabbatCredit.calculate).toHaveBeenCalledWith(45);
     });
   });
 
@@ -242,7 +242,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
-      expect(mockBundle.sick.create).toHaveBeenCalledWith(8);
+      expect(mockBundle.sick.calculate).toHaveBeenCalledWith(8);
       expect(result.hours100Sick.hours).toBe(8);
     });
 
@@ -260,7 +260,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
-      expect(mockBundle.vacation.create).toHaveBeenCalledWith(16);
+      expect(mockBundle.vacation.calculate).toHaveBeenCalledWith(16);
       expect(result.hours100Vacation.hours).toBe(16);
     });
 
@@ -278,7 +278,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
-      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(10);
+      expect(mockBundle.earnedShabbatCredit.calculate).toHaveBeenCalledWith(10);
       expect(result.earnedShabbatCredit.hours).toBe(10);
     });
 
@@ -315,11 +315,11 @@ describe("FixedSegmentMonthReducer", () => {
 
       const result = reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
-      expect(mockBundle.sick.create).toHaveBeenCalledWith(0);
+      expect(mockBundle.sick.calculate).toHaveBeenCalledWith(0);
       expect(result.hours100Sick.hours).toBe(0);
-      expect(mockBundle.vacation.create).toHaveBeenCalledWith(0);
+      expect(mockBundle.vacation.calculate).toHaveBeenCalledWith(0);
       expect(result.hours100Vacation.hours).toBe(0);
-      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(0);
+      expect(mockBundle.earnedShabbatCredit.calculate).toHaveBeenCalledWith(0);
       expect(result.earnedShabbatCredit.hours).toBe(0);
     });
 
@@ -375,7 +375,7 @@ describe("FixedSegmentMonthReducer", () => {
 
       reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
-      expect(mockBundle.sick.create).toHaveBeenCalledWith(4);
+      expect(mockBundle.sick.calculate).toHaveBeenCalledWith(4);
     });
 
     it("should use Math.max to prevent negative values", () => {
@@ -392,9 +392,9 @@ describe("FixedSegmentMonthReducer", () => {
 
       reducer.subtract(base as MonthPayMap, sub as WorkDayMap);
 
-      expect(mockBundle.sick.create).toHaveBeenCalledWith(0);
-      expect(mockBundle.vacation.create).toHaveBeenCalledWith(0);
-      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalledWith(0);
+      expect(mockBundle.sick.calculate).toHaveBeenCalledWith(0);
+      expect(mockBundle.vacation.calculate).toHaveBeenCalledWith(0);
+      expect(mockBundle.earnedShabbatCredit.calculate).toHaveBeenCalledWith(0);
     });
   });
 
@@ -531,13 +531,13 @@ describe("FixedSegmentMonthReducer", () => {
 
       reducer.accumulate(base as MonthPayMap, add as WorkDayMap);
 
-      expect(mockBundle.sick.create).toHaveBeenCalled();
-      expect(mockBundle.vacation.create).toHaveBeenCalled();
-      expect(mockBundle.earnedShabbatCredit.create).toHaveBeenCalled();
+      expect(mockBundle.sick.calculate).toHaveBeenCalled();
+      expect(mockBundle.vacation.calculate).toHaveBeenCalled();
+      expect(mockBundle.earnedShabbatCredit.calculate).toHaveBeenCalled();
     });
 
     it("should respect factory return values", () => {
-      mockBundle.sick.create = vi.fn(() => ({ percent: 1, hours: 100 }));
+      mockBundle.sick.calculate = vi.fn(() => ({ percent: 1, hours: 100 }));
 
       const result = reducer.createEmpty();
 
@@ -547,23 +547,23 @@ describe("FixedSegmentMonthReducer", () => {
     it("should work with different factory implementations", () => {
       const customBundle: FixedSegmentBundle = {
         sick: {
-          create: (hours: number): Segment => ({
+          calculate: (hours: number): Segment => ({
             percent: 2, // Custom percentage
             hours,
           }),
-        } as unknown as FixedSegmentFactory,
+        } as unknown as FixedSegmentCalculator,
         vacation: {
-          create: (hours: number): Segment => ({
+          calculate: (hours: number): Segment => ({
             percent: 1,
             hours,
           }),
-        } as unknown as FixedSegmentFactory,
+        } as unknown as FixedSegmentCalculator,
         earnedShabbatCredit: {
-          create: (hours: number): Segment => ({
+          calculate: (hours: number): Segment => ({
             percent: 1.5,
             hours,
           }),
-        } as unknown as FixedSegmentFactory,
+        } as unknown as FixedSegmentCalculator,
       };
 
       const customReducer = new FixedSegmentMonthReducer(customBundle);
@@ -620,7 +620,7 @@ describe("FixedSegmentMonthReducer", () => {
       }
 
       // Should be called with approximately 1.0
-      const lastSickCall = (mockBundle.sick.create as ReturnType<typeof vi.fn>).mock.calls.slice(-1)[0][0];
+      const lastSickCall = (mockBundle.sick.calculate as ReturnType<typeof vi.fn>).mock.calls.slice(-1)[0][0];
       expect(lastSickCall).toBeCloseTo(1.0, 1);
     });
   });

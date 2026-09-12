@@ -1,6 +1,6 @@
-import { Resolver } from "@/domain";
+import { Calculator } from "@/domain";
 
-export class TimelinePerDiemRateResolver implements Resolver<
+export class TimelinePerDiemRateCalculator implements Calculator<
   { year: number; month: number },
   number
 > {
@@ -9,7 +9,7 @@ export class TimelinePerDiemRateResolver implements Resolver<
     { year: 2024, month: 9, rateA: 36.3 },
   ];
 
-  resolve(params: { year: number; month: number }): number {
+  calculate(params: { year: number; month: number }): number {
     const { year, month } = params;
     const applicable = this.timeline
       .filter(

@@ -4,10 +4,10 @@ import {
   MealAllowanceRates,
   LargeMealAllowanceCalculator,
   SmallMealAllowanceCalculator,
-  Resolver,
+  Calculator,
 } from "@/domain";
 
-export class MealAllowanceResolver implements Resolver<
+export class DefaultMealAllowanceCalculator implements Calculator<
   {
     day: MealAllowanceDayInfo;
     rates: MealAllowanceRates;
@@ -26,7 +26,7 @@ export class MealAllowanceResolver implements Resolver<
     };
   }
 
-  resolve(params: {
+  calculate(params: {
     day: MealAllowanceDayInfo;
     rates: MealAllowanceRates;
   }): MealAllowance {

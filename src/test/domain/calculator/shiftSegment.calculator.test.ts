@@ -1,17 +1,17 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { ShiftSegmentResolver } from "@/domain/resolve/shiftSegment.resolver";
+import { ShiftSegmentCalculator } from "@/domain/calculator/shiftSegment.calculator";
 import type { Point, WorkDayMeta } from "@/domain/types/types";
 import { WorkDayType } from "@/constants/fields.constant";
 import { DateService } from "@/domain/services/date.service";
 
-describe("ShiftSegmentResolver", () => {
-  let resolver: ShiftSegmentResolver;
+describe("ShiftSegmentCalculator", () => {
+  let calculator: ShiftSegmentCalculator;
 
   beforeEach(() => {
-    resolver = new ShiftSegmentResolver(new DateService("Asia/Jerusalem"));
+    calculator = new ShiftSegmentCalculator(new DateService("Asia/Jerusalem"));
   });
 
-  describe("resolve - Regular Day", () => {
+  describe("calculate - Regular Day", () => {
     const meta: WorkDayMeta = {
       date: "2024-01-01",
       typeDay: WorkDayType.Regular,
@@ -21,7 +21,7 @@ describe("ShiftSegmentResolver", () => {
     it("should return empty array for shifts outside time ranges", () => {
       const point: Point = { start: 3000, end: 3100 }; // Way beyond valid range
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toEqual([]);
     });
@@ -29,7 +29,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve night shift 00:00-06:00 as hours50", () => {
       const point: Point = { start: 0, end: 360 }; // 00:00-06:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -42,7 +42,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve morning shift 06:00-14:00 as hours100", () => {
       const point: Point = { start: 360, end: 840 }; // 06:00-14:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -55,7 +55,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve evening shift 14:00-22:00 as hours20", () => {
       const point: Point = { start: 840, end: 1320 }; // 14:00-22:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -68,7 +68,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve night shift 22:00-06:00 next day as hours50", () => {
       const point: Point = { start: 1320, end: 1800 }; // 22:00-30:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -81,7 +81,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve full 24-hour shift with all segments", () => {
       const point: Point = { start: 0, end: 1440 }; // Full day
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(4);
       
@@ -94,7 +94,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve shift crossing midnight (20:00-04:00)", () => {
       const point: Point = { start: 1200, end: 1680 }; // 20:00-28:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result.length).toBeGreaterThan(0);
       expect(result[0].key).toBe("hours20");
@@ -104,7 +104,7 @@ describe("ShiftSegmentResolver", () => {
     it("should handle shift starting at 06:00 boundary", () => {
       const point: Point = { start: 360, end: 480 }; // 06:00-08:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0].key).toBe("hours100");
@@ -113,7 +113,7 @@ describe("ShiftSegmentResolver", () => {
     it("should handle shift ending at 22:00 boundary", () => {
       const point: Point = { start: 1200, end: 1320 }; // 20:00-22:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0].key).toBe("hours20");
@@ -122,7 +122,7 @@ describe("ShiftSegmentResolver", () => {
     it("should handle very short shift (30 minutes)", () => {
       const point: Point = { start: 400, end: 430 }; // 06:40-07:10
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0].key).toBe("hours100");
@@ -131,14 +131,14 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve shift during evening period (16:00-20:00)", () => {
       const point: Point = { start: 960, end: 1200 }; // 16:00-20:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0].key).toBe("hours20");
     });
   });
 
-  describe("resolve - SpecialPartialStart Day (Friday evening)", () => {
+  describe("calculate - SpecialPartialStart Day (Friday evening)", () => {
     it("should resolve Friday evening shift with Shabbat segments", () => {
       const meta: WorkDayMeta = {
         date: "2024-01-05T00:00:00.000Z",
@@ -148,7 +148,7 @@ describe("ShiftSegmentResolver", () => {
 
       const point: Point = { start: 1080, end: 1320 }; // 18:00-22:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result.length).toBeGreaterThan(0);
       
@@ -166,7 +166,7 @@ describe("ShiftSegmentResolver", () => {
 
       const point: Point = { start: 720, end: 960 }; // 12:00-16:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result.length).toBeGreaterThan(0);
     });
@@ -180,7 +180,7 @@ describe("ShiftSegmentResolver", () => {
 
       const point: Point = { start: 1320, end: 1800 }; // 22:00-30:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -199,7 +199,7 @@ describe("ShiftSegmentResolver", () => {
 
       const point: Point = { start: 0, end: 1440 };
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result.length).toBeGreaterThan(3);
       
@@ -211,7 +211,7 @@ describe("ShiftSegmentResolver", () => {
     });
   });
 
-  describe("resolve - SpecialFull Day (Saturday)", () => {
+  describe("calculate - SpecialFull Day (Saturday)", () => {
     const meta: WorkDayMeta = {
       date: "2024-01-06",
       typeDay: WorkDayType.SpecialFull,
@@ -221,7 +221,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve early morning shift as shabbat200", () => {
       const point: Point = { start: 0, end: 360 }; // 00:00-06:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -234,7 +234,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve day shift as shabbat150", () => {
       const point: Point = { start: 360, end: 1320 }; // 06:00-22:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -247,7 +247,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve night shift as shabbat200", () => {
       const point: Point = { start: 1320, end: 1800 }; // 22:00-30:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0]).toEqual({
@@ -260,7 +260,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve full 24-hour Shabbat shift", () => {
       const point: Point = { start: 0, end: 1440 };
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(3);
       
@@ -272,7 +272,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve shift crossing from night to day", () => {
       const point: Point = { start: 240, end: 600 }; // 04:00-10:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(2);
       
@@ -283,7 +283,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve shift crossing from day to night", () => {
       const point: Point = { start: 1200, end: 1560 }; // 20:00-26:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(2);
       
@@ -294,7 +294,7 @@ describe("ShiftSegmentResolver", () => {
     it("should resolve short shift at boundary", () => {
       const point: Point = { start: 330, end: 390 }; // 05:30-06:30
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(2);
       
@@ -305,7 +305,7 @@ describe("ShiftSegmentResolver", () => {
     it("should handle shift exactly at day boundaries", () => {
       const point: Point = { start: 360, end: 1320 }; // 06:00-22:00
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0].key).toBe("shabbat150");
@@ -322,7 +322,7 @@ describe("ShiftSegmentResolver", () => {
     it("should return empty array for invalid point (start > end)", () => {
       const point: Point = { start: 1000, end: 500 };
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toEqual([]);
     });
@@ -330,7 +330,7 @@ describe("ShiftSegmentResolver", () => {
     it("should return empty array for zero-duration shift", () => {
       const point: Point = { start: 600, end: 600 };
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toEqual([]);
     });
@@ -338,7 +338,7 @@ describe("ShiftSegmentResolver", () => {
     it("should handle shift with 1 minute duration", () => {
       const point: Point = { start: 600, end: 601 };
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
       expect(result[0].point).toEqual({ start: 600, end: 601 });
@@ -347,7 +347,7 @@ describe("ShiftSegmentResolver", () => {
     it("should handle negative start time gracefully", () => {
       const point: Point = { start: -100, end: 100 };
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
@@ -364,7 +364,7 @@ describe("ShiftSegmentResolver", () => {
     it("should handle exact minute at 06:00 boundary", () => {
       const point: Point = { start: 359, end: 361 };
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result.length).toBeGreaterThanOrEqual(1);
     });
@@ -372,7 +372,7 @@ describe("ShiftSegmentResolver", () => {
     it("should handle boundaries at 14:00 correctly", () => {
       const point: Point = { start: 839, end: 841 }; // 13:59-14:01
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result.length).toBeGreaterThanOrEqual(1);
     });
@@ -380,7 +380,7 @@ describe("ShiftSegmentResolver", () => {
     it("should handle transitions at 22:00", () => {
       const point: Point = { start: 1319, end: 1321 }; // 21:59-22:01
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result.length).toBeGreaterThanOrEqual(1);
     });
@@ -402,8 +402,8 @@ describe("ShiftSegmentResolver", () => {
 
       const point: Point = { start: 600, end: 900 };
 
-      const result1 = resolver.resolve({ point, meta: meta1 });
-      const result2 = resolver.resolve({ point, meta: meta2 });
+      const result1 = calculator.calculate({ point, meta: meta1 });
+      const result2 = calculator.calculate({ point, meta: meta2 });
 
       expect(result1).toEqual(result2);
     });
@@ -417,8 +417,8 @@ describe("ShiftSegmentResolver", () => {
         crossDayContinuation: false,
       };
 
-      const shift1 = resolver.resolve({ point: { start: 480, end: 960 }, meta });
-      const shift2 = resolver.resolve({ point: { start: 960, end: 1440 }, meta });
+      const shift1 = calculator.calculate({ point: { start: 480, end: 960 }, meta });
+      const shift2 = calculator.calculate({ point: { start: 960, end: 1440 }, meta });
 
       expect(shift1.length).toBeGreaterThan(0);
       expect(shift2.length).toBeGreaterThan(0);
@@ -443,12 +443,12 @@ describe("ShiftSegmentResolver", () => {
         crossDayContinuation: true,
       };
 
-      const fridayShift = resolver.resolve({
+      const fridayShift = calculator.calculate({
         point: { start: 1080, end: 1440 },
         meta: metaFriday,
       });
 
-      const saturdayShift = resolver.resolve({
+      const saturdayShift = calculator.calculate({
         point: { start: 0, end: 600 },
         meta: metaSaturday,
       });
@@ -472,7 +472,7 @@ describe("ShiftSegmentResolver", () => {
 
       const point: Point = { start: 480, end: 1680 }; // 08:00 to 28:00 (04:00 next day)
 
-      const result = resolver.resolve({ point, meta });
+      const result = calculator.calculate({ point, meta });
 
       expect(result.length).toBeGreaterThan(0);
 
@@ -498,8 +498,8 @@ describe("ShiftSegmentResolver", () => {
         crossDayContinuation: false,
       };
 
-      const result1 = resolver.resolve({ point: { start: 1000, end: 1100 }, meta: meta1 });
-      const result2 = resolver.resolve({ point: { start: 1000, end: 1100 }, meta: meta2 });
+      const result1 = calculator.calculate({ point: { start: 1000, end: 1100 }, meta: meta1 });
+      const result2 = calculator.calculate({ point: { start: 1000, end: 1100 }, meta: meta2 });
 
       expect(result1).toBeDefined();
       expect(result2).toBeDefined();

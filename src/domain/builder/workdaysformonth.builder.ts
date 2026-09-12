@@ -11,7 +11,7 @@ import { WorkDayType } from "@/constants";
 export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
   constructor(
     private readonly holidayResolver: {
-      resolve(params: { weekday: number; events: CalendarEvent[] }): WorkDayType;
+      calculate(params: { weekday: number; events: CalendarEvent[] }): WorkDayType;
     },
     private readonly workDayInfoResolver: WorkDayInfoResolver,
     private readonly dateService: DateService,
@@ -33,7 +33,7 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
 
       const events = eventMap[formattedDate] || [];
 
-      const typeDay = this.holidayResolver.resolve({ weekday, events });
+      const typeDay = this.holidayResolver.calculate({ weekday, events });
 
       const holidayKey =
         typeDay !== WorkDayType.Regular
@@ -60,7 +60,7 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
     const nextDateKey = this.dateService.formatDate(nextMonthDate);
     const nextDayEvents = eventMap[nextDateKey] || [];
 
-    const nextDayType = this.holidayResolver.resolve({
+    const nextDayType = this.holidayResolver.calculate({
       weekday: nextMonthDate.getDay(),
       events: nextDayEvents,
     });
