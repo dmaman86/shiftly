@@ -24,7 +24,7 @@ import { groupByShabbat } from "@/utils";
 import { headersTable } from "@/constants";
 import {
   CompactDayRow,
-  DayCard,
+  MobileWorkTable,
   DayRow,
   MonthSummaryCard,
   WorkTableHeader,
@@ -94,25 +94,20 @@ export const WorkTable = ({
           <WorkTableDayStateHydrator domain={domain} workDays={workDays}>
           {isMobile ? (
             <Stack spacing={1.5}>
-              {workDays.map((day) => (
-                <FeatureBoundary
-                  key={day.meta.date}
-                  featureName={t("feature_name_work_table")}
-                  errorContext="DayCard"
-                  resetKeys={[day.meta.date]}
-                >
-                  <DayCard
-                    domain={domain}
-                    workDay={day}
-                    isCurrentDay={day.meta.date === currentDate}
-                    shabbatCreditHours={
-                      shabbatCreditAllocation.appliedHoursByDate[
-                        day.meta.date
-                      ] ?? 0
-                    }
-                  />
-                </FeatureBoundary>
-              ))}
+              <FeatureBoundary
+                featureName={t("feature_name_work_table")}
+                errorContext="MobileWorkTable"
+                resetKeys={[year, month]}
+              >
+                <MobileWorkTable
+                  domain={domain}
+                  workDays={workDays}
+                  currentDate={currentDate}
+                  shabbatCreditHoursByDate={
+                    shabbatCreditAllocation.appliedHoursByDate
+                  }
+                />
+              </FeatureBoundary>
               <MonthSummaryCard
                 breakdown={monthBreakdown}
                 fullBreakdown={monthFullBreakdown}
