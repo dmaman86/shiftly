@@ -19,6 +19,7 @@ import {
   MonthlySalarySummary,
   Feedback,
   useShabbatCreditAllocation,
+  useHydrateGlobalPayMaps,
 } from "@/features";
 import { useGlobalState, useWorkDays } from "@/hooks";
 import { DomainContextType } from "@/app";
@@ -31,6 +32,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
 
   const { workDays, isLoading: loading, error: queryError } = useWorkDays(domain);
   const shabbatCreditAllocation = useShabbatCreditAllocation();
+  useHydrateGlobalPayMaps({ domain, workDays });
 
   const error = queryError?.message;
 

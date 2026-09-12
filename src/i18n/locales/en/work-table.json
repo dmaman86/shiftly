@@ -78,6 +78,7 @@
     "shabbat_credit_summary": "Shabbat credit — earned: {{earned}}, used: {{used}}, unused: {{unused}}.",
     "shabbat_credit_unused_note": "Unused Shabbat credit hours are not included in this month's total hours or salary — they carry over to next month.",
     "add_shift_label": "Add shift",
+    "mobile_calendar_label": "Select a work day",
     "total_gross_label": "Total gross"
   },
   "day_details": {

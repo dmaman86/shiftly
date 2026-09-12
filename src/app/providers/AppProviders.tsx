@@ -4,6 +4,10 @@ import { CacheProvider } from "@emotion/react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { enUS as dateFnsEnUS } from "date-fns/locale/en-US";
+import { he } from "date-fns/locale/he";
+import { enUS as pickerEnUS, heIL } from "@mui/x-date-pickers/locales";
+import { useTranslation } from "react-i18next";
 
 import { AuthProvider, DomainProvider, AppSnackbarProvider } from "@/app/providers";
 
@@ -31,6 +35,8 @@ type AppProvidersProps = { children: React.ReactNode };
 export const AppProviders = ({ children }: AppProvidersProps) => {
   const [queryClient] = useState(() => new QueryClient());
   const [direction, setDirection] = useState<Direction>(getInitialDirection);
+  const { i18n } = useTranslation();
+  const language = i18n.resolvedLanguage === "en" ? "en" : "he";
 
   const theme = useMemo(() => createTheme({ direction }), [direction]);
 
@@ -46,7 +52,17 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
             <AppSnackbarProvider>
               <AuthProvider>
                 <DomainProvider>
-                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <LocalizationProvider
+                    dateAdapter={AdapterDateFns}
+                    adapterLocale={language === "he" ? he : dateFnsEnUS}
+                    localeText={
+                      language === "he"
+                        ? heIL.components.MuiLocalizationProvider.defaultProps
+                            .localeText
+                        : pickerEnUS.components.MuiLocalizationProvider
+                            .defaultProps.localeText
+                    }
+                  >
                     <CssBaseline />
                     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
                   </LocalizationProvider>

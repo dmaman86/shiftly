@@ -1,6 +1,7 @@
 export { DayDetails } from "./DayDetails";
 export { DayRow } from "./DayRow";
 export { WorkTable } from "./WorkTable";
+export { MobileWorkTable } from "./MobileWorkTable";
 export { WorkTableHeader } from "./WorkTableHeader";
 export { ShiftRow } from "./ShiftRow";
 export { ShiftTimeInput } from "./ShiftTimeInput";
