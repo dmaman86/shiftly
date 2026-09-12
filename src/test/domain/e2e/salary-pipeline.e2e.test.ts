@@ -72,11 +72,14 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
 
       // Verify resolvers
       expect(pipeline.resolvers).toBeDefined();
-      expect(pipeline.resolvers.holidayResolver).toBeDefined();
       expect(pipeline.resolvers.workDayInfoResolver).toBeDefined();
       expect(pipeline.resolvers.monthResolver).toBeDefined();
-      expect(pipeline.resolvers.perDiemRateResolver).toBeDefined();
-      expect(pipeline.resolvers.mealAllowanceRateResolver).toBeDefined();
+
+      // Verify rate calculators
+      expect(pipeline.rateCalculators).toBeDefined();
+      expect(pipeline.rateCalculators.holiday).toBeDefined();
+      expect(pipeline.rateCalculators.perDiemRate).toBeDefined();
+      expect(pipeline.rateCalculators.mealAllowanceRate).toBeDefined();
 
       // Verify services
       expect(pipeline.services).toBeDefined();

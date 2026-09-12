@@ -2,13 +2,13 @@ import {
   DateService,
   DayInfoResolver,
   DayPayMapBuilder,
-  HolidayResolver,
+  HolidayCalculator,
   MonthPayMapReducer,
   MonthResolver,
-  PerDiemRateResolver,
+  PerDiemRateCalculator,
   ShiftMapBuilder,
   ShiftService,
-  TimelineMealAllowanceRateResolver,
+  TimelineMealAllowanceRateCalculator,
   WorkDaysForMonthBuilder,
 } from "@/domain";
 
@@ -20,11 +20,11 @@ export type DomainContextType = {
     workDaysMonthBuilder: WorkDaysForMonthBuilder;
   };
   resolvers: {
-    holidayResolver: HolidayResolver;
-    perDiemResolver: PerDiemRateResolver;
+    holidayResolver: HolidayCalculator;
+    perDiemResolver: PerDiemRateCalculator;
     dayInfoResolver: DayInfoResolver;
     monthResolver: MonthResolver;
-    mealAllowanceRateResolver: TimelineMealAllowanceRateResolver;
+    mealAllowanceRateResolver: TimelineMealAllowanceRateCalculator;
   };
   services: {
     dateService: DateService;

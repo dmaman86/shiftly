@@ -1,7 +1,7 @@
 import { WorkDayType } from "@/constants";
 import { LabeledSegmentRange, Point, WorkDayMeta } from "@/domain/types/types";
 import { Builder } from "../types/core-behaviors";
-import { ShiftSegmentResolver } from "../resolve";
+import { ShiftSegmentCalculator } from "../calculator";
 import { Shift } from "../types/data-shapes";
 import { ShiftService } from "../services";
 
@@ -16,7 +16,7 @@ export class ShiftSegmentBuilder implements Builder<
   };
 
   constructor(
-    private readonly segmentResolver: ShiftSegmentResolver,
+    private readonly segmentResolver: ShiftSegmentCalculator,
     private readonly shiftService: ShiftService,
   ) {}
 
@@ -27,7 +27,7 @@ export class ShiftSegmentBuilder implements Builder<
 
     const [firstPart, secondPart] = this.splitShift(shift);
 
-    const part1 = this.segmentResolver.resolve({
+    const part1 = this.segmentResolver.calculate({
       point: firstPart,
       meta,
     });
@@ -44,7 +44,7 @@ export class ShiftSegmentBuilder implements Builder<
     };
 
     const part2 = this.shiftToNextDay(
-      this.segmentResolver.resolve({
+      this.segmentResolver.calculate({
         point: secondPart,
         meta: metaNextDay,
       }),

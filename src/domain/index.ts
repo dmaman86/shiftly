@@ -11,8 +11,6 @@ export * from "./builder";
 
 export * from "./calculator";
 
-export * from "./factory";
-
 export * from "./reducer";
 
 export * from "./resolve";

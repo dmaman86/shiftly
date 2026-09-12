@@ -2,24 +2,27 @@ import {
   DefaultPerDiemDayCalculator,
   DefaultPerDiemMonthCalculator,
   ExtraCalculator,
+  FixedSegmentCalculator,
   LargeMealAllowanceCalculator,
+  RegularByDayCalculator,
+  RegularByShiftCalculator,
   SmallMealAllowanceCalculator,
   SpecialCalculator,
 } from "../calculator";
-import { FixedSegmentFactory, RegularFactory } from "../factory";
+import { RegularByMonthAccumulator } from "../reducer";
 import { Calculators } from "../types/domain.types";
 
 export const buildCalculators = (): Calculators => {
-  const regularByShift = RegularFactory.byShift();
-  const regularByDay = RegularFactory.byDay();
-  const regularAccumulator = RegularFactory.monthReducer();
+  const regularByShift = new RegularByShiftCalculator();
+  const regularByDay = new RegularByDayCalculator();
+  const regularAccumulator = new RegularByMonthAccumulator();
 
   const extraCalculator = new ExtraCalculator();
   const specialCalculator = new SpecialCalculator();
 
-  const sickCalculator = new FixedSegmentFactory();
-  const vacationCalculator = new FixedSegmentFactory();
-  const earnedShabbatCreditCalculator = new FixedSegmentFactory();
+  const sickCalculator = new FixedSegmentCalculator();
+  const vacationCalculator = new FixedSegmentCalculator();
+  const earnedShabbatCreditCalculator = new FixedSegmentCalculator();
 
   const largeMealAllowanceCalculator = new LargeMealAllowanceCalculator();
   const smallMealAllowanceCalculator = new SmallMealAllowanceCalculator();

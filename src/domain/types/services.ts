@@ -1,5 +1,5 @@
 import { WorkDayStatus, WorkDayType } from "@/constants";
-import { Builder, Calculator, Reducer, Resolver } from "./core-behaviors";
+import { Builder, Calculator, Reducer } from "./core-behaviors";
 import {
   DailyPerDiemInfo,
   MealAllowance,
@@ -67,7 +67,7 @@ export type WorkDaysForMonthBuilder = Builder<
   WorkDayInfo[]
 >;
 
-export type HolidayResolver = Resolver<
+export type HolidayCalculator = Calculator<
   {
     weekday: number;
     events: CalendarEvent[];
@@ -75,7 +75,7 @@ export type HolidayResolver = Resolver<
   WorkDayType
 >;
 
-export type PerDiemRateResolver = Resolver<
+export type PerDiemRateCalculator = Calculator<
   {
     year: number;
     month: number;
@@ -83,7 +83,7 @@ export type PerDiemRateResolver = Resolver<
   number
 >;
 
-export type MealAllowanceRateResolver = Resolver<
+export type MealAllowanceRateCalculator = Calculator<
   {
     year: number;
     month: number;
@@ -91,7 +91,7 @@ export type MealAllowanceRateResolver = Resolver<
   MealAllowanceRates
 >;
 
-export interface MealAllowanceLogicResolver extends Resolver<
+export interface MealAllowanceLogicCalculator extends Calculator<
   {
     day: MealAllowanceDayInfo;
     rates: MealAllowanceRates;

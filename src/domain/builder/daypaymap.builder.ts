@@ -54,9 +54,9 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
         special: init.special,
         totalHours: params.standardHours,
       },
-      hours100Sick: sick.create(hoursSick),
-      hours100Vacation: vacation.create(hoursVacation),
-      earnedShabbatCredit: earnedShabbatCredit.create(0),
+      hours100Sick: sick.calculate(hoursSick),
+      hours100Vacation: vacation.calculate(hoursVacation),
+      earnedShabbatCredit: earnedShabbatCredit.calculate(0),
       perDiem: calculator.calculate({ shifts: [], rate: 0 }),
       totalHours: params.standardHours,
       mealAllowance: init.mealAllowance,
@@ -84,7 +84,7 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
     year: number,
     month: number,
   ) {
-    const rate = this.perDiem.rateResolver.resolve({ year, month });
+    const rate = this.perDiem.rateResolver.calculate({ year, month });
     return this.perDiem.calculator.calculate({
       shifts,
       rate,
@@ -140,17 +140,17 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
       isFieldDutyDay: perDiem.isFieldDutyDay,
     });
 
-    const mealAllowance = this.mealAllowance.resolver.resolve({
+    const mealAllowance = this.mealAllowance.resolver.calculate({
       day: dayInfo,
-      rates: this.mealAllowance.rateResolver.resolve({ year, month }),
+      rates: this.mealAllowance.rateResolver.calculate({ year, month }),
     });
 
     return {
       workMap: { regular, extra, special, totalHours },
-      hours100Sick: this.fixedSegments.sick.create(0),
-      hours100Vacation: this.fixedSegments.vacation.create(0),
+      hours100Sick: this.fixedSegments.sick.calculate(0),
+      hours100Vacation: this.fixedSegments.vacation.calculate(0),
       earnedShabbatCredit:
-        this.fixedSegments.earnedShabbatCredit.create(totalExtraShabbat),
+        this.fixedSegments.earnedShabbatCredit.calculate(totalExtraShabbat),
       perDiem,
       totalHours,
       mealAllowance,

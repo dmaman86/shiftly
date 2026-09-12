@@ -6,7 +6,7 @@ import { DateService } from "@/domain/services/date.service";
 import { ExtraCalculator } from "@/domain/calculator/extra/extra.calculator";
 import { SpecialCalculator } from "@/domain/calculator/special/special.calculator";
 import { RegularByShiftCalculator } from "@/domain/calculator/regular/regularByShift.calculator";
-import { ShiftSegmentResolver } from "@/domain/resolve/shiftSegment.resolver";
+import { ShiftSegmentCalculator } from "@/domain/calculator/shiftSegment.calculator";
 import { WorkDayType } from "@/constants/fields.constant";
 import type { Shift, WorkDayMeta, PayCalculationBundle } from "@/domain";
 
@@ -44,7 +44,7 @@ describe("DefaultShiftMapBuilder", () => {
     };
 
     // Setup segment builder
-    const segmentResolver = new ShiftSegmentResolver(dateService);
+    const segmentResolver = new ShiftSegmentCalculator(dateService);
     segmentBuilder = new ShiftSegmentBuilder(segmentResolver, shiftService);
 
     // Create builder

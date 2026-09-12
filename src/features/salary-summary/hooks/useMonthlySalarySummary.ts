@@ -35,8 +35,8 @@ export const useMonthlySalarySummary = ({
   );
 
   const sections = useMemo(() => {
-    const rateDiem = domain.resolvers.perDiemResolver.resolve({ year, month });
-    const allowanceRate = domain.resolvers.mealAllowanceRateResolver.resolve({
+    const rateDiem = domain.resolvers.perDiemResolver.calculate({ year, month });
+    const allowanceRate = domain.resolvers.mealAllowanceRateResolver.calculate({
       year,
       month,
     });

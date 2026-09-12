@@ -1,6 +1,6 @@
-import { MealAllowanceRates, Resolver } from "@/domain";
+import { MealAllowanceRates, Calculator } from "@/domain";
 
-export class TimelineMealAllowanceRateResolver implements Resolver<
+export class TimelineMealAllowanceRateCalculator implements Calculator<
   {
     year: number;
     month: number;
@@ -16,7 +16,7 @@ export class TimelineMealAllowanceRateResolver implements Resolver<
     { year: 2024, month: 9, rates: { small: 14.5, large: 21.1 } },
   ];
 
-  resolve(params: { year: number; month: number }): MealAllowanceRates {
+  calculate(params: { year: number; month: number }): MealAllowanceRates {
     const { year, month } = params;
     const applicable = this.timeline
       .filter(

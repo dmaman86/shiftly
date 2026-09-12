@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { ShiftSegmentBuilder } from "@/domain/builder/shiftSegment.builder";
-import { ShiftSegmentResolver } from "@/domain/resolve/shiftSegment.resolver";
+import { ShiftSegmentCalculator } from "@/domain/calculator/shiftSegment.calculator";
 import { ShiftService } from "@/domain/services/shift.service";
 import { DateService } from "@/domain/services/date.service";
 import { WorkDayType } from "@/constants/fields.constant";
@@ -9,14 +9,14 @@ import type { WorkDayMeta } from "@/domain/types/types";
 
 describe("ShiftSegmentBuilder", () => {
   let builder: ShiftSegmentBuilder;
-  let segmentResolver: ShiftSegmentResolver;
+  let segmentResolver: ShiftSegmentCalculator;
   let shiftService: ShiftService;
   let dateService: DateService;
 
   beforeEach(() => {
     dateService = new DateService("Asia/Jerusalem");
     shiftService = new ShiftService(dateService);
-    segmentResolver = new ShiftSegmentResolver(dateService);
+    segmentResolver = new ShiftSegmentCalculator(dateService);
     builder = new ShiftSegmentBuilder(segmentResolver, shiftService);
   });
 
@@ -446,9 +446,9 @@ describe("ShiftSegmentBuilder", () => {
     });
   });
 
-  describe("build - Integration with ShiftSegmentResolver", () => {
+  describe("build - Integration with ShiftSegmentCalculator", () => {
     it("should call resolver for single-day shift once", () => {
-      const resolveSpy = vi.spyOn(segmentResolver, "resolve");
+      const resolveSpy = vi.spyOn(segmentResolver, "calculate");
       
       const shift = createShift(8, 0, 16, 0);
       const meta = createMeta();
@@ -459,7 +459,7 @@ describe("ShiftSegmentBuilder", () => {
     });
 
     it("should call resolver for cross-day shift twice when crossing dayLimit", () => {
-      const resolveSpy = vi.spyOn(segmentResolver, "resolve");
+      const resolveSpy = vi.spyOn(segmentResolver, "calculate");
       
       // Create a shift that crosses the 30:06 (1446 minutes) limit
       const shift = createShift(20, 0, 8, 0, false); // 20:00 to 08:00 next day
@@ -472,7 +472,7 @@ describe("ShiftSegmentBuilder", () => {
     });
 
     it("should pass correct metadata to resolver for second day when crossing dayLimit", () => {
-      const resolveSpy = vi.spyOn(segmentResolver, "resolve");
+      const resolveSpy = vi.spyOn(segmentResolver, "calculate");
       
       // Create a shift that crosses the 30:06 (1446 minutes) limit
       const shift = createShift(20, 0, 8, 0, false, "2024-01-15");
