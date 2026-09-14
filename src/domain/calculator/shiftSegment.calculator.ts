@@ -1,5 +1,9 @@
 import { WorkDayType } from "@/constants";
-import type { LabeledSegmentRange, Point, WorkDayMeta } from "@/domain/types/types";
+import type {
+  LabeledSegmentRange,
+  Point,
+  WorkDayMeta,
+} from "@/domain/types/types";
 import type { Calculator } from "@/domain/types/core-behaviors";
 import type { DateService } from "@/domain/services/date.service";
 
@@ -12,6 +16,7 @@ export class ShiftSegmentCalculator implements Calculator<
 > {
   private readonly fieldMinutes = {
     fullDay: 1440,
+    minExtraShift: 4 * 60,
     min06: 6 * 60,
     min14: 14 * 60,
     min17: 17 * 60,
@@ -29,7 +34,10 @@ export class ShiftSegmentCalculator implements Calculator<
 
   constructor(private readonly dateService: DateService) {}
 
-  calculate(params: { point: Point; meta: WorkDayMeta }): LabeledSegmentRange[] {
+  calculate(params: {
+    point: Point;
+    meta: WorkDayMeta;
+  }): LabeledSegmentRange[] {
     const { point, meta } = params;
 
     const source = (() => {
@@ -43,7 +51,23 @@ export class ShiftSegmentCalculator implements Calculator<
       }
     })();
 
-    return this.findSegments(point, source);
+    const segments = this.findSegments(point, source);
+    const qualifiesForExtraRates =
+      point.end - point.start >= this.fieldMinutes.minExtraShift;
+
+    if (qualifiesForExtraRates) return segments;
+
+    return segments.map((segment) => {
+      if (segment.key !== "hours20" && segment.key !== "hours50") {
+        return segment;
+      }
+
+      return {
+        ...segment,
+        percent: this.fieldShiftPercent.hours100,
+        key: "hours100",
+      };
+    });
   }
 
   private getRegularMap(): LabeledSegmentRange[] {

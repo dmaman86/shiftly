@@ -110,13 +110,13 @@ describe("ShiftSegmentCalculator", () => {
       expect(result[0].key).toBe("hours100");
     });
 
-    it("should handle shift ending at 22:00 boundary", () => {
+    it("should handle a short shift ending at 22:00 boundary", () => {
       const point: Point = { start: 1200, end: 1320 }; // 20:00-22:00
 
       const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
-      expect(result[0].key).toBe("hours20");
+      expect(result[0].key).toBe("hours100");
     });
 
     it("should handle very short shift (30 minutes)", () => {
@@ -134,6 +134,28 @@ describe("ShiftSegmentCalculator", () => {
       const result = calculator.calculate({ point, meta });
 
       expect(result).toHaveLength(1);
+      expect(result[0].key).toBe("hours20");
+    });
+
+    it("should not apply extra rates to a short evening shift", () => {
+      const point: Point = { start: 961, end: 1058 }; // 16:01-17:38
+
+      const result = calculator.calculate({ point, meta });
+
+      expect(result).toEqual([
+        {
+          point,
+          percent: 1,
+          key: "hours100",
+        },
+      ]);
+    });
+
+    it("should apply extra rates when the shift is exactly four hours", () => {
+      const point: Point = { start: 960, end: 1200 }; // 16:00-20:00
+
+      const result = calculator.calculate({ point, meta });
+
       expect(result[0].key).toBe("hours20");
     });
   });
