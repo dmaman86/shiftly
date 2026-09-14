@@ -1,10 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {
   Box,
-  Card,
   Checkbox,
   Chip,
-  Collapse,
   IconButton,
   Stack,
   Tooltip,
@@ -12,16 +10,15 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import AddIcon from "@mui/icons-material/Add";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import { WorkDayInfo } from "@/domain";
 import { WorkDayStatus, WorkDayType, HolidayKey } from "@/constants";
 import { DomainContextType } from "@/app";
 import { formatValue } from "@/utils";
+import { CollapsibleCard, StatTile } from "@/components";
 import { useDayController } from "@/features/work-table";
 import { ShiftCard } from "./ShiftCard";
 import { DayCardDetails } from "./DayCardDetails";
-import { StatTile } from "./StatTile";
 
 type DayCardProps = {
   domain: DomainContextType;
@@ -41,7 +38,6 @@ export const DayCard = ({
   const { t } = useTranslation("work-table");
   const tHoliday = (key: string) =>
     t(`holidays.${key}` as `holidays.${HolidayKey}`);
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -76,33 +72,16 @@ export const DayCard = ({
     workDay.meta.typeDay === WorkDayType.SpecialPartialStart;
 
   return (
-    <Card
+    <CollapsibleCard
       ref={cardRef}
-      variant="outlined"
       aria-current={isCurrentDay ? "date" : undefined}
-      sx={{ borderRadius: 2, scrollMarginTop: 16 }}
-    >
-      <Box
-        role="button"
-        tabIndex={0}
-        aria-expanded={detailsOpen}
-        aria-controls={detailsId}
-        onClick={() => setDetailsOpen((open) => !open)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            setDetailsOpen((open) => !open);
-          }
-        }}
-        sx={{
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          p: 1.5,
-          pb: 1,
-          cursor: "pointer",
-        }}
-      >
+      detailsId={detailsId}
+      regionLabel={t("day_details.region_label")}
+      expandedLabel={t("day_details.hide")}
+      collapsedLabel={t("day_details.show")}
+      headerSx={{ alignItems: "flex-start", p: 1.5, pb: 1 }}
+      sx={{ scrollMarginTop: 16 }}
+      header={
         <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
           <Typography fontWeight="bold">{dayLabel}</Typography>
           {workDay.meta.holidayKey && (
@@ -113,26 +92,17 @@ export const DayCard = ({
             />
           )}
         </Stack>
-        <Tooltip title={detailsOpen ? t("day_details.hide") : t("day_details.show")}>
-          <IconButton
-            size="small"
-            aria-label={detailsOpen ? t("day_details.hide") : t("day_details.show")}
-            aria-expanded={detailsOpen}
-            aria-controls={detailsId}
-            onClick={(event) => {
-              event.stopPropagation();
-              setDetailsOpen((open) => !open);
-            }}
-            sx={{
-              transform: detailsOpen ? "rotate(180deg)" : "none",
-              transition: "transform 0.2s",
-            }}
-          >
-            <ExpandMoreIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
-
+      }
+      collapsibleContent={
+        <Box sx={{ borderTop: "1px solid", borderColor: "divider" }}>
+          <DayCardDetails
+            breakdown={expandedBreakdown}
+            showAbsence={!specialFullDay}
+            showShabbatCreditUsed={eligibleForShabbatCredit}
+          />
+        </Box>
+      }
+    >
       {!specialFullDay && (
         <Box
           sx={{
@@ -244,20 +214,6 @@ export const DayCard = ({
         )}
       </Box>
 
-      <Collapse in={detailsOpen} timeout="auto" unmountOnExit>
-        <Box
-          id={detailsId}
-          role="region"
-          aria-label={t("day_details.region_label")}
-          sx={{ borderTop: "1px solid", borderColor: "divider" }}
-        >
-          <DayCardDetails
-            breakdown={expandedBreakdown}
-            showAbsence={!specialFullDay}
-            showShabbatCreditUsed={eligibleForShabbatCredit}
-          />
-        </Box>
-      </Collapse>
-    </Card>
+    </CollapsibleCard>
   );
 };

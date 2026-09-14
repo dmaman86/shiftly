@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Card,
   CardHeader,
   CardContent,
   Table,
@@ -18,6 +17,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DoneIcon from "@mui/icons-material/Done";
 import { useTranslation } from "react-i18next";
 import { formatValue } from "@/utils";
+import { CardSurface } from "@/components";
 import { useGlobalState } from "@/hooks";
 import { analyticsService } from "@/services";
 import {
@@ -56,8 +56,7 @@ export const SalaryCardSection = ({
   };
 
   return (
-    <Card
-      variant="outlined"
+    <CardSurface
       sx={{ mb: 3, borderRadius: 2, overflow: "hidden" }}
     >
       <CardHeader
@@ -137,6 +136,6 @@ export const SalaryCardSection = ({
           </TableBody>
         </Table>
       </CardContent>
-    </Card>
+    </CardSurface>
   );
 };

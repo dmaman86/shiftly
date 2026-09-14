@@ -1,11 +1,9 @@
-import { useState } from "react";
-import { Box, Card, Collapse, IconButton, Tooltip, Typography } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { CompactPayBreakdownVM, PayBreakdownViewModel } from "@/domain";
 import { formatValue } from "@/utils";
-import { StatTile } from "./StatTile";
+import { CollapsibleCard, StatTile } from "@/components";
 import { DayCardDetails } from "./DayCardDetails";
 
 type MonthSummaryCardProps = {
@@ -18,56 +16,31 @@ export const MonthSummaryCard = ({
   fullBreakdown,
 }: MonthSummaryCardProps) => {
   const { t } = useTranslation("work-table");
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const detailsId = "month-summary-details";
 
   return (
-    <Card
-      variant="outlined"
+    <CollapsibleCard
+      detailsId={detailsId}
+      regionLabel={t("month_details.region_label")}
+      expandedLabel={t("month_details.hide")}
+      collapsedLabel={t("month_details.show")}
+      headerSx={{ pr: 0.5 }}
       sx={{ borderRadius: 2, borderTop: "3px solid", borderTopColor: "text.primary" }}
-    >
-      <Box
-        role="button"
-        tabIndex={0}
-        aria-expanded={detailsOpen}
-        aria-controls={detailsId}
-        onClick={() => setDetailsOpen((open) => !open)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            setDetailsOpen((open) => !open);
-          }
-        }}
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          pr: 0.5,
-          cursor: "pointer",
-        }}
-      >
+      header={
         <Typography sx={{ px: 1.5, pt: 1.5, pb: 0.5 }} fontWeight="bold">
           {t("feature_name_salary_summary")}
         </Typography>
-        <Tooltip title={detailsOpen ? t("month_details.hide") : t("month_details.show")}>
-          <IconButton
-            size="small"
-            aria-label={detailsOpen ? t("month_details.hide") : t("month_details.show")}
-            aria-expanded={detailsOpen}
-            aria-controls={detailsId}
-            onClick={(event) => {
-              event.stopPropagation();
-              setDetailsOpen((open) => !open);
-            }}
-            sx={{
-              transform: detailsOpen ? "rotate(180deg)" : "none",
-              transition: "transform 0.2s",
-            }}
-          >
-            <ExpandMoreIcon />
-          </IconButton>
-        </Tooltip>
-      </Box>
+      }
+      collapsibleContent={
+        <Box sx={{ borderTop: "1px solid", borderColor: "divider" }}>
+          <DayCardDetails
+            breakdown={fullBreakdown}
+            showShabbatCreditUsed
+            showGeneratedAlert={false}
+          />
+        </Box>
+      }
+    >
       <Box
         sx={{
           display: "grid",
@@ -93,20 +66,6 @@ export const MonthSummaryCard = ({
           </Box>
         )}
       </Box>
-      <Collapse in={detailsOpen} timeout="auto" unmountOnExit>
-        <Box
-          id={detailsId}
-          role="region"
-          aria-label={t("month_details.region_label")}
-          sx={{ borderTop: "1px solid", borderColor: "divider" }}
-        >
-          <DayCardDetails
-            breakdown={fullBreakdown}
-            showShabbatCreditUsed
-            showGeneratedAlert={false}
-          />
-        </Box>
-      </Collapse>
-    </Card>
+    </CollapsibleCard>
   );
 };
