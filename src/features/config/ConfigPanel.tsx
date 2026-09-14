@@ -1,10 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Card,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   Typography,
   Box,
   Divider,
@@ -15,15 +10,13 @@ import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PaymentsIcon from "@mui/icons-material/Payments";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
-import { ConfigInput } from "./ConfigInput";
 import { WorkParametersInputs } from "./WorkParametersInputs";
 import { SYSTEM_START_YEAR } from "@/constants";
 import { useTranslation } from "react-i18next";
-
-const DEBOUNCE_DELAY = 500;
 
 type ConfigPanelProps = {
   domain: DomainContextType;
@@ -34,57 +27,19 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
   const { t } = useTranslation();
   const { t: tWT } = useTranslation("work-table");
   const monthNames = tWT("months", { returnObjects: true }) as string[];
-  const {
-    year,
-    month,
-    updateYear,
-    updateMonth,
-  } = useGlobalState();
+  const { year, month, updateYear, updateMonth } = useGlobalState();
 
   const { monthResolver } = domain.resolvers;
 
-  const [yearInput, setYearInput] = useState(year.toString());
-
-  const yearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleYearChange = useCallback(
-    (value: string) => {
-      setYearInput(value);
-      if (yearTimerRef.current !== null) clearTimeout(yearTimerRef.current);
-      yearTimerRef.current = setTimeout(() => {
-        const parsed = Number(value);
-        if (
-          !isNaN(parsed) &&
-          parsed >= SYSTEM_START_YEAR &&
-          parsed <= monthResolver.getCurrentYear() &&
-          parsed !== year
-        ) {
-          updateYear(parsed);
-          updateMonth(monthResolver.resolveDefaultMonth(parsed));
-        }
-      }, DEBOUNCE_DELAY);
-    },
-    [year, monthResolver, updateYear, updateMonth],
-  );
-
-  useEffect(() => {
-    setYearInput(year.toString());
-  }, [year]);
-
-  const availableMonths = monthResolver.getAvailableMonths(year);
-
   const currentYear = monthResolver.getCurrentYear();
-  const parsedYear = Number(yearInput);
-  const yearBelowMinimum =
-    !Number.isNaN(parsedYear) && parsedYear < SYSTEM_START_YEAR;
-  const yearAboveMaximum =
-    !Number.isNaN(parsedYear) && parsedYear > currentYear;
-  const yearError = yearBelowMinimum || yearAboveMaximum;
-  const yearHelperText = yearBelowMinimum
-    ? t("config.year_min_error", { year: SYSTEM_START_YEAR })
-    : yearAboveMaximum
-      ? t("config.year_max_error", { year: currentYear })
-      : "";
+  const firstAvailableMonth =
+    monthResolver.getAvailableMonths(SYSTEM_START_YEAR)[0];
+  const availableCurrentYearMonths =
+    monthResolver.getAvailableMonths(currentYear);
+  const lastAvailableMonth =
+    availableCurrentYearMonths[availableCurrentYearMonths.length - 1];
+  const minDate = new Date(SYSTEM_START_YEAR, firstAvailableMonth, 1);
+  const maxDate = new Date(currentYear, (lastAvailableMonth ?? 11) + 1, 0);
 
   return (
     <Card sx={{ mb: 3 }}>
@@ -122,37 +77,33 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
 
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                   <Box sx={{ flex: 1 }}>
-                    <ConfigInput
-                      name="year"
-                      value={yearInput}
-                      label={t("config.year_label")}
-                      error={yearError}
-                      helperText={yearHelperText}
-                      onChange={handleYearChange}
-                    />
-                  </Box>
+                    <DatePicker
+                      label={t("config.date_section")}
+                      value={new Date(year, month - 1, 1)}
+                      minDate={minDate}
+                      maxDate={maxDate}
+                      views={["year", "month"]}
+                      openTo="month"
+                      onChange={(value) => {
+                        if (!value || Number.isNaN(value.getTime())) return;
 
-                  <Box sx={{ flex: 1 }}>
-                    <FormControl
-                      size="small"
-                      disabled={availableMonths.length === 0}
-                      fullWidth
-                    >
-                      <InputLabel>{t("config.month_label")}</InputLabel>
-                      <Select
-                        label={t("config.month_label")}
-                        value={(month - 1).toString()}
-                        onChange={(e) =>
-                          updateMonth(Number(e.target.value) + 1)
+                        const nextYear = value.getFullYear();
+                        const nextMonth = value.getMonth() + 1;
+                        if (
+                          !monthResolver
+                            .getAvailableMonths(nextYear)
+                            .includes(nextMonth - 1)
+                        ) {
+                          return;
                         }
-                      >
-                        {availableMonths.map((monthIndex) => (
-                          <MenuItem key={monthIndex} value={monthIndex}>
-                            {monthNames[monthIndex]}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+
+                        if (nextYear !== year) updateYear(nextYear);
+                        if (nextMonth !== month) updateMonth(nextMonth);
+                      }}
+                      slotProps={{
+                        textField: { size: "small", fullWidth: true },
+                      }}
+                    />
                   </Box>
                 </Stack>
 

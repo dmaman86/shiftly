@@ -8,7 +8,7 @@ export const minutesToTimeStr = (minutes: number): string => {
 };
 
 export const formatValue = (value: number | null | undefined): string => {
-  if (value === null || value === undefined || value === 0) return "";
+  if (value === null || value === undefined || Math.abs(value) < 0.005) return "";
   return value.toFixed(2);
 };
 

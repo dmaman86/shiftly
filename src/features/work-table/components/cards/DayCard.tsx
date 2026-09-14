@@ -83,12 +83,24 @@ export const DayCard = ({
       sx={{ borderRadius: 2, scrollMarginTop: 16 }}
     >
       <Box
+        role="button"
+        tabIndex={0}
+        aria-expanded={detailsOpen}
+        aria-controls={detailsId}
+        onClick={() => setDetailsOpen((open) => !open)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setDetailsOpen((open) => !open);
+          }
+        }}
         sx={{
           display: "flex",
           alignItems: "flex-start",
           justifyContent: "space-between",
           p: 1.5,
           pb: 1,
+          cursor: "pointer",
         }}
       >
         <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
@@ -107,7 +119,10 @@ export const DayCard = ({
             aria-label={detailsOpen ? t("day_details.hide") : t("day_details.show")}
             aria-expanded={detailsOpen}
             aria-controls={detailsId}
-            onClick={() => setDetailsOpen((open) => !open)}
+            onClick={(event) => {
+              event.stopPropagation();
+              setDetailsOpen((open) => !open);
+            }}
             sx={{
               transform: detailsOpen ? "rotate(180deg)" : "none",
               transition: "transform 0.2s",

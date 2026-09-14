@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateActualHours } from "@/utils";
+import { calculateActualHours, formatValue } from "@/utils";
+
+describe("formatValue", () => {
+  it("does not render floating-point noise as negative zero", () => {
+    expect(formatValue(-0.0000001)).toBe("");
+    expect(formatValue(0)).toBe("");
+  });
+});
 
 describe("calculateActualHours", () => {
   it("excludes sick and vacation hours from total hours", () => {

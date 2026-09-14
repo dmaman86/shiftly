@@ -26,7 +26,26 @@ export const MonthSummaryCard = ({
       variant="outlined"
       sx={{ borderRadius: 2, borderTop: "3px solid", borderTopColor: "text.primary" }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pr: 0.5 }}>
+      <Box
+        role="button"
+        tabIndex={0}
+        aria-expanded={detailsOpen}
+        aria-controls={detailsId}
+        onClick={() => setDetailsOpen((open) => !open)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setDetailsOpen((open) => !open);
+          }
+        }}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          pr: 0.5,
+          cursor: "pointer",
+        }}
+      >
         <Typography sx={{ px: 1.5, pt: 1.5, pb: 0.5 }} fontWeight="bold">
           {t("feature_name_salary_summary")}
         </Typography>
@@ -36,7 +55,10 @@ export const MonthSummaryCard = ({
             aria-label={detailsOpen ? t("month_details.hide") : t("month_details.show")}
             aria-expanded={detailsOpen}
             aria-controls={detailsId}
-            onClick={() => setDetailsOpen((open) => !open)}
+            onClick={(event) => {
+              event.stopPropagation();
+              setDetailsOpen((open) => !open);
+            }}
             sx={{
               transform: detailsOpen ? "rotate(180deg)" : "none",
               transition: "transform 0.2s",
