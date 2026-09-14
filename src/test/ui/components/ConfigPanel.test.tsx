@@ -48,7 +48,7 @@ describe("ConfigPanel", () => {
         },
       });
 
-      expect(screen.getByText("תאריך")).toBeInTheDocument();
+      expect(screen.getByTestId("CalendarTodayIcon")).toBeInTheDocument();
     });
 
     it("should render work parameters section", () => {
@@ -61,7 +61,7 @@ describe("ConfigPanel", () => {
       expect(screen.getByText("פרמטרי עבודה")).toBeInTheDocument();
     });
 
-    it("should render all four input fields", () => {
+    it("should render the date picker and numeric input fields", () => {
       renderWithProviders(<ConfigPanel domain={mockDomain} />, {
         preloadedState: {
           global: createMockGlobalState({
@@ -70,8 +70,8 @@ describe("ConfigPanel", () => {
         },
       });
 
-      expect(screen.getByLabelText("שנה")).toBeInTheDocument();
-      expect(screen.getByRole("combobox")).toBeInTheDocument(); // Month select
+      expect(screen.getByRole("group", { name: "תאריך" })).toBeInTheDocument();
+      expect(screen.getAllByRole("spinbutton")).toHaveLength(2);
       expect(screen.getByLabelText("שעות תקן")).toBeInTheDocument();
       expect(screen.getByLabelText("שכר שעתי")).toBeInTheDocument();
     });
@@ -87,8 +87,8 @@ describe("ConfigPanel", () => {
         },
       });
 
-      const yearInput = screen.getByLabelText("שנה") as HTMLInputElement;
-      expect(yearInput.value).toBe("2025");
+      const yearSection = screen.getByRole("spinbutton", { name: "Year" });
+      expect(yearSection).toHaveTextContent("2025");
     });
 
     it("should display standard hours from Redux state", () => {
@@ -126,7 +126,7 @@ describe("ConfigPanel", () => {
         },
       });
 
-      expect(screen.getByLabelText("תאריך")).toBeInTheDocument();
+      expect(screen.getByRole("group", { name: "תאריך" })).toBeInTheDocument();
     });
 
     it("should update Redux state when standard hours changes", async () => {
@@ -182,7 +182,7 @@ describe("ConfigPanel", () => {
         },
       });
 
-      expect(screen.getByLabelText("תאריך")).toBeInTheDocument();
+      expect(screen.getByRole("group", { name: "תאריך" })).toBeInTheDocument();
     });
   });
 
@@ -276,7 +276,7 @@ describe("ConfigPanel", () => {
         },
       });
 
-      expect(screen.getByLabelText("תאריך")).toBeInTheDocument();
+      expect(screen.getByRole("group", { name: "תאריך" })).toBeInTheDocument();
       expect(screen.getByLabelText("שעות תקן")).toBeInTheDocument();
       expect(screen.getByLabelText("שכר שעתי")).toBeInTheDocument();
     });
