@@ -36,7 +36,7 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     const special = specialCalculator.calculate(labeledSegments);
 
     const specialHours = special.shabbat150.hours + special.shabbat200.hours;
-    const regularHours = totalHours - specialHours;
+    const regularHours = Math.max(totalHours - specialHours, 0);
 
     const regular = regularCalculator.calculate({
       totalHours: regularHours,

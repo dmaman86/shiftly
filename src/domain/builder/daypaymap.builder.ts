@@ -127,7 +127,7 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
     const totalExtraShabbat =
       special.shabbat150.hours + special.shabbat200.hours;
     const regular = this.payCalculators.regular.calculate({
-      totalHours: totalHours - totalExtraShabbat,
+      totalHours: Math.max(totalHours - totalExtraShabbat, 0),
       standardHours,
       meta,
     });

@@ -1,15 +1,12 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import {
-  act,
   createMockGlobalState,
-  fireEvent,
   renderWithProviders,
   screen,
   waitFor,
 } from "@/test/ui/utils";
 import userEvent from "@testing-library/user-event";
 import { ConfigPanel } from "@/features/config/ConfigPanel";
-import i18n from "@/i18n";
 import { pipelineInstance } from "@/test/ui/utils/setup-domain";
 
 describe("ConfigPanel", () => {
@@ -120,27 +117,16 @@ describe("ConfigPanel", () => {
       expect(baseRateInput.value).toBe("75");
     });
 
-    it("should update Redux state when year changes", async () => {
-      const user = userEvent.setup();
-      const { store } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
+    it("should render a combined month and year date picker", () => {
+      renderWithProviders(<ConfigPanel domain={mockDomain} />, {
         preloadedState: {
           global: createMockGlobalState({
-            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 50 },
+            config: { year: 2025, month: 1, standardHours: 6.67, baseRate: 50 },
           }),
         },
       });
 
-      const yearInput = screen.getByLabelText("שנה");
-      await user.clear(yearInput);
-      await user.type(yearInput, "2025");
-
-      // Wait for debounce (500ms)
-      await waitFor(
-        () => {
-          expect(store.getState().global.config.year).toBe(2025);
-        },
-        { timeout: 1000 }
-      );
+      expect(screen.getByLabelText("תאריך")).toBeInTheDocument();
     });
 
     it("should update Redux state when standard hours changes", async () => {
@@ -189,127 +175,18 @@ describe("ConfigPanel", () => {
       );
     });
 
-    it("should update month via select dropdown", async () => {
-      const user = userEvent.setup();
-      const { store } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
+    it("should expose the date picker with an accessible label", () => {
+      renderWithProviders(<ConfigPanel domain={mockDomain} />, {
         preloadedState: {
-          global: createMockGlobalState({
-            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 50 },
-          }),
+          global: createMockGlobalState(),
         },
       });
 
-      // Find the select by its button role (MUI Select renders as a button)
-      const monthSelect = screen.getByRole("combobox");
-      await user.click(monthSelect);
-
-      // Wait for options to appear and click one
-      await waitFor(async () => {
-        const options = screen.getAllByRole("option");
-        if (options.length > 1) {
-          await user.click(options[1]);
-        }
-      });
-
-      // Month should update immediately (no debounce)
-      await waitFor(() => {
-        const currentMonth = store.getState().global.config.month;
-        expect(currentMonth).toBeGreaterThanOrEqual(1);
-        expect(currentMonth).toBeLessThanOrEqual(12);
-      });
-    });
-
-    it("should render month options in the active language", async () => {
-      await i18n.changeLanguage("en");
-      const user = userEvent.setup();
-      const view = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
-        preloadedState: {
-          global: createMockGlobalState({
-            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 50 },
-          }),
-        },
-      });
-
-      try {
-        await user.click(screen.getByRole("combobox"));
-
-        expect(
-          screen.getByRole("option", { name: "January" }),
-        ).toBeInTheDocument();
-        expect(
-          screen.queryByRole("option", { name: "ינואר" }),
-        ).not.toBeInTheDocument();
-      } finally {
-        view.unmount();
-        await i18n.changeLanguage("he");
-      }
+      expect(screen.getByLabelText("תאריך")).toBeInTheDocument();
     });
   });
 
   describe("Validation and Error Handling", () => {
-    it("should show error for year below system minimum", async () => {
-      const user = userEvent.setup();
-      renderWithProviders(<ConfigPanel domain={mockDomain} />, {
-        preloadedState: {
-          global: createMockGlobalState({
-            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 50 },
-          }),
-        },
-      });
-
-      //Type a year below 2023 (SYSTEM_START_YEAR = 2023)
-      const yearInput = screen.getByLabelText("שנה");
-      await user.clear(yearInput);
-      await user.type(yearInput, "2022");
-
-      // ConfigInput component should show error for year < 2023
-      // Just verify the error state is applied (aria-invalid would be set)
-      await waitFor(() => {
-        const input = screen.getByLabelText("שנה");
-        // Year error is shown through helperText, just verify input exists
-        expect(input).toBeInTheDocument();
-      }, { timeout: 200 });
-    });
-
-    it("should show an error for a year after the current year", () => {
-      vi.useFakeTimers();
-
-      try {
-        const currentYear = mockDomain.resolvers.monthResolver.getCurrentYear();
-        const { store } = renderWithProviders(
-          <ConfigPanel domain={mockDomain} />,
-          {
-            preloadedState: {
-              global: createMockGlobalState({
-                config: {
-                  year: 2024,
-                  month: 1,
-                  standardHours: 6.67,
-                  baseRate: 50,
-                },
-              }),
-            },
-          },
-        );
-
-        const yearInput = screen.getByLabelText("שנה");
-        fireEvent.change(yearInput, {
-          target: { value: String(currentYear + 1) },
-        });
-
-        expect(
-          screen.getByText(`השנה המקסימלית הנתמכת היא ${currentYear}`),
-        ).toBeInTheDocument();
-        expect(yearInput).toHaveAttribute("aria-invalid", "true");
-
-        act(() => vi.advanceTimersByTime(500));
-
-        expect(store.getState().global.config.year).toBe(2024);
-      } finally {
-        vi.useRealTimers();
-      }
-    });
-
     it("should show helper text for zero base rate in daily mode", () => {
       renderWithProviders(<ConfigPanel domain={mockDomain} mode="daily" />, {
         preloadedState: {
@@ -399,8 +276,7 @@ describe("ConfigPanel", () => {
         },
       });
 
-      expect(screen.getByLabelText("שנה")).toBeInTheDocument();
-      expect(screen.getByRole("combobox")).toBeInTheDocument(); // Month select renders as combobox
+      expect(screen.getByLabelText("תאריך")).toBeInTheDocument();
       expect(screen.getByLabelText("שעות תקן")).toBeInTheDocument();
       expect(screen.getByLabelText("שכר שעתי")).toBeInTheDocument();
     });

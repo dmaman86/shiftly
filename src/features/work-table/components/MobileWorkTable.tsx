@@ -21,15 +21,27 @@ type MobileWorkTableProps = {
 
 type CalendarDayProps = PickersDayProps & {
   workDayDates: Set<string>;
+  shabbatCreditHoursByDate: Readonly<Record<string, number>>;
 };
 
-const CalendarDay = ({ workDayDates, day, ...other }: CalendarDayProps) => {
+const CalendarDay = ({
+  workDayDates,
+  shabbatCreditHoursByDate,
+  day,
+  ...other
+}: CalendarDayProps) => {
   const dateKey = format(day, "yyyy-MM-dd");
   const { status, shiftEntries } = useWorkTableDayState(dateKey);
   const hasEdits =
     status !== WorkDayStatus.normal || Object.keys(shiftEntries).length > 0;
   const hasWorkDay = workDayDates.has(dateKey);
-  const showIndicator = hasWorkDay && (hasEdits || other.today);
+  const hasShabbatCredit = (shabbatCreditHoursByDate[dateKey] ?? 0) > 0;
+  const showWorkIndicator = hasWorkDay && (hasEdits || Boolean(other.today));
+  const showCreditIndicator = hasWorkDay && hasShabbatCredit;
+  const showIndicator = showWorkIndicator || showCreditIndicator;
+  const indicatorPosition = (hasMultipleIndicators: boolean, offset: string) =>
+    hasMultipleIndicators ? `calc(50% ${offset} 4px)` : "50%";
+  const hasMultipleIndicators = showWorkIndicator && showCreditIndicator;
 
   return (
     <PickersDay
@@ -39,17 +51,32 @@ const CalendarDay = ({ workDayDates, day, ...other }: CalendarDayProps) => {
         showIndicator
           ? {
               position: "relative",
-              "&::after": {
-                content: '""',
-                position: "absolute",
-                bottom: 3,
-                left: "50%",
-                width: 4,
-                height: 4,
-                borderRadius: "50%",
-                backgroundColor: "primary.main",
-                transform: "translateX(-50%)",
-              },
+              ...(showWorkIndicator && {
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  bottom: 3,
+                  left: indicatorPosition(hasMultipleIndicators, "-") ,
+                  width: 4,
+                  height: 4,
+                  borderRadius: "50%",
+                  backgroundColor: "primary.main",
+                  transform: "translateX(-50%)",
+                },
+              }),
+              ...(showCreditIndicator && {
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  bottom: 3,
+                  left: indicatorPosition(hasMultipleIndicators, "+"),
+                  width: 4,
+                  height: 4,
+                  borderRadius: "50%",
+                  backgroundColor: "success.main",
+                  transform: "translateX(-50%)",
+                },
+              }),
             }
           : undefined
       }
@@ -138,7 +165,11 @@ export const MobileWorkTable = ({
           maxDate={maxDate}
           slots={{
             day: (props) => (
-              <CalendarDay {...props} workDayDates={workDayDates} />
+              <CalendarDay
+                {...props}
+                workDayDates={workDayDates}
+                shabbatCreditHoursByDate={shabbatCreditHoursByDate}
+              />
             ),
           }}
           slotProps={{

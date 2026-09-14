@@ -7,7 +7,7 @@ export const mapSegmentToPayRow = (
   baseRate: number,
 ): PayRowVM => {
   const rate = baseRate * segment.percent;
-  const quantity = Number(segment.hours.toFixed(2));
+  const quantity = segment.hours;
 
   return {
     label,

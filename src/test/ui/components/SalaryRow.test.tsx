@@ -83,12 +83,24 @@ describe("SalaryRow", () => {
   });
 
   describe("Edit Mode", () => {
+    it("should sync the input when the calculated quantity changes", () => {
+      const { rerender } = renderWithTheme(
+        <SalaryRow {...defaultProps} row={{ ...defaultRow, quantity: 0 }} editMode={false} />,
+      );
+
+      rerender(
+        <SalaryRow {...defaultProps} row={{ ...defaultRow, quantity: 2.75 }} editMode={true} />,
+      );
+
+      expect(screen.getByRole("textbox")).toHaveValue("2.75");
+    });
+
     it("should display quantity as input when editMode is true", () => {
       renderWithTheme(<SalaryRow {...defaultProps} editMode={true} />);
 
       const input = screen.getByRole("textbox");
       expect(input).toBeInTheDocument();
-      expect(input).toHaveValue("160");
+      expect(input).toHaveValue("160.00");
     });
 
     it("should allow editing quantity value", async () => {
