@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DomainContextType } from "@/app";
 import { WorkDayStatus, WorkDayType } from "@/constants";
-import type { WorkDayInfo } from "@/domain";
+import type { PayBreakdownViewModel, WorkDayInfo } from "@/domain";
 import { DayCard } from "@/features/work-table/components/cards/DayCard";
-import { renderWithTheme } from "@/test/ui/utils";
+import { renderWithTheme, screen } from "@/test/ui/utils";
 
 const useDayControllerMock = vi.hoisted(() => vi.fn());
 
@@ -50,6 +50,33 @@ const workDay: WorkDayInfo = {
   },
 };
 
+const breakdown: PayBreakdownViewModel = {
+  totalHours: 0,
+  actualHours: 0,
+  regular: {
+    hours100: { hours: 0, percent: 1 },
+    hours125: { hours: 0, percent: 1.25 },
+    hours150: { hours: 0, percent: 1.5 },
+  },
+  extra: {
+    hours20: { hours: 0, percent: 0.2 },
+    hours50: { hours: 0, percent: 0.5 },
+  },
+  special: {
+    shabbat150: { hours: 0, percent: 1.5 },
+    shabbat200: { hours: 0, percent: 2 },
+  },
+  hours100Sick: { hours: 0, percent: 1 },
+  hours100Vacation: { hours: 0, percent: 1 },
+  appliedShabbatCredit: { hours: 0, percent: 1 },
+  perDiemPoints: 0,
+  perDiemAmount: 0,
+  largePoints: 0,
+  largeAmount: 0,
+  smallPoints: 0,
+  smallAmount: 0,
+};
+
 describe("DayCard", () => {
   const scrollIntoViewMock = vi.fn();
 
@@ -68,7 +95,7 @@ describe("DayCard", () => {
       removeShift: vi.fn(),
       handleStatusChanged: vi.fn(),
       handleAddShift: vi.fn(),
-      expandedBreakdown: {},
+      expandedBreakdown: breakdown,
       compactBreakdown: {
         actualHours: 0,
         totalHours: 0,
@@ -108,5 +135,20 @@ describe("DayCard", () => {
 
     expect(container.querySelector('[aria-current="date"]')).not.toBeInTheDocument();
     expect(scrollIntoViewMock).not.toHaveBeenCalled();
+  });
+
+  it("starts collapsed regardless of the selected day", () => {
+    renderWithTheme(
+      <DayCard
+        domain={domainStub}
+        workDay={workDay}
+        shabbatCreditHours={0}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "day_details.show" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
   });
 });

@@ -377,6 +377,7 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   │   ├── providers/          # Auth, direction, domain and snackbar providers
 │   │   └── routes/             # Application and language-aware routing
 │   ├── constants/              # Shared domain and UI constants
+│   ├── components/             # Shared presentational UI components
 │   ├── domain/                 # Framework-independent payroll rules
 │   │   ├── builder/            # Shift, day and month structure builders
 │   │   ├── calculator/         # Regular, special, segment, rate and credit calculations
@@ -444,6 +445,7 @@ Shiftly provides two main calculation views:
 - Allows adding, editing, and validating shifts
 - Displays per-day breakdown
 - Monthly totals are updated incrementally
+- On mobile, selecting a day shows its card collapsed by default. Sick/vacation controls, shift editing, and the compact summary remain visible; the detailed breakdown expands on demand.
 
 ### Monthly View
 
@@ -478,6 +480,7 @@ This separation keeps configuration logic explicit and context-aware.
 - **Sick/Vacation days**: disables work segments.
 - **Shabbat/holiday**: only allows work, not absence.
 - **Cross-day shifts**: user must confirm with a checkbox.
+- **Mobile day cards**: OT, Shabbat, extras, Shabbat credit, and other breakdown details are hidden until the card is expanded.
 
 ### Day Configuration Examples
 

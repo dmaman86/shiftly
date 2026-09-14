@@ -3,11 +3,11 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Card,
   CardContent,
   Divider,
   Typography,
 } from "@mui/material";
+import { CardSurface } from "@/components";
 
 type RuleCardProps = {
   title: string;
@@ -62,7 +62,7 @@ export const RuleCard = ({
   }
 
   return (
-    <Card id={id} sx={cardSx}>
+    <CardSurface id={id} sx={cardSx}>
       <CardContent>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
           {title}
@@ -72,6 +72,6 @@ export const RuleCard = ({
 
         {children}
       </CardContent>
-    </Card>
+    </CardSurface>
   );
 };
