@@ -79,7 +79,9 @@
     "shabbat_credit_unused_note": "שעות זכות שבת שלא נוצלו אינן נכללות בסך השעות או בחישוב השכר של החודש הנוכחי — הן יועברו לחודש הבא.",
     "add_shift_label": "הוסף משמרת",
     "mobile_calendar_label": "בחר יום עבודה",
-    "total_gross_label": "סה״כ ברוטו"
+    "total_gross_label": "סה״כ ברוטו",
+    "export_pdf": "ייצא כ-PDF",
+    "export_pdf_error": "לא ניתן לייצא את טבלת העבודה כקובץ PDF"
   },
   "day_details": {
     "show": "הצג פרטי יום",

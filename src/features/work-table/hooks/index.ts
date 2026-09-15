@@ -5,6 +5,7 @@ export { useShiftControls } from "./useShiftControls";
 export { useSyncDayToGlobalState } from "./useSyncDayToGlobalState";
 export { useSyncDayToStorage } from "./useSyncDayToStorage";
 export { useHydrateGlobalPayMaps } from "./useHydrateGlobalPayMaps";
+export { usePersistedWorkTableRecords } from "./usePersistedWorkTableRecords";
 export {
   useWorkTableDayState,
 } from "./useWorkTableDayState";
