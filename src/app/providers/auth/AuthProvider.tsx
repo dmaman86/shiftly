@@ -17,29 +17,33 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     let isMounted = true;
-    let receivedAuthEvent = false;
+    const latestAuthEvent = { value: undefined as Session | null | undefined };
+    const isInitialized = { value: false };
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!isMounted) return;
 
-      receivedAuthEvent = true;
+      latestAuthEvent.value = nextSession;
       setSession(nextSession);
-      setInitializationError(null);
-      setIsLoading(false);
+      if (isInitialized.value) {
+        setInitializationError(null);
+        setIsLoading(false);
+      }
     });
 
     void supabase.auth.getSession().then(({ data, error }) => {
-      if (!isMounted || receivedAuthEvent) return;
+      if (!isMounted) return;
 
       if (error) {
         setInitializationError(error.message);
-        setSession(null);
+        if (latestAuthEvent.value === undefined) setSession(null);
       } else {
-        setSession(data.session);
+        setSession(latestAuthEvent.value ?? data.session);
       }
 
+      isInitialized.value = true;
       setIsLoading(false);
     });
 

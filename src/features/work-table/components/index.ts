@@ -11,3 +11,4 @@ export { CompactDayRow } from "./rows/CompactDayRow";
 export { DayCard } from "./cards/DayCard";
 export { MonthSummaryCard } from "./cards/MonthSummaryCard";
 export { WorkTableDayStateHydrator } from "./WorkTableDayStateHydrator";
+export { WorkTablePrintView } from "./WorkTablePrintView";

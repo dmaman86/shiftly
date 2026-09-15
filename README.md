@@ -445,6 +445,7 @@ Shiftly provides two main calculation views:
 - Allows adding, editing, and validating shifts
 - Displays per-day breakdown
 - Monthly totals are updated incrementally
+- Downloads the work table directly as a landscape, right-to-left PDF
 - On mobile, selecting a day shows its card collapsed by default. Sick/vacation controls, shift editing, and the compact summary remain visible; the detailed breakdown expands on demand.
 
 ### Monthly View
