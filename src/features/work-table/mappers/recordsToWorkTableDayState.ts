@@ -25,7 +25,13 @@ export const recordsToWorkTableDayState = ({
     state[day.date] = { status: day.status, shiftEntries: {} };
   }
 
-  for (const row of shifts) {
+  // Insertion order into shiftEntries becomes display order, so days with
+  // multiple shifts need them sorted ascending by start time before insertion.
+  const sortedShifts = [...shifts].sort(
+    (a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+  );
+
+  for (const row of sortedShifts) {
     const meta = workDays.find((day) => day.meta.date === row.date)?.meta;
     if (!meta) continue;
 
