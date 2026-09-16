@@ -184,6 +184,7 @@ export const MobileWorkTable = ({
       </Box>
 
       <DayCard
+        key={selectedWorkDay.meta.date}
         domain={domain}
         workDay={selectedWorkDay}
         isCurrentDay={activeSelectedDate === currentDate}
