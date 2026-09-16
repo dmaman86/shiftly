@@ -6,6 +6,7 @@ import { WorkDayStatus } from "@/constants";
 import { DomainContextType } from "@/app";
 import { dayToPayBreakdownVM } from "@/adapters";
 import { analyticsService } from "@/services/analytics";
+import { useAdjacentDayShifts } from "./useAdjacentDayShifts";
 import { useDay } from "./useDay";
 import { useSyncDayToGlobalState } from "./useSyncDayToGlobalState";
 import { useSyncDayToStorage } from "./useSyncDayToStorage";
@@ -42,6 +43,8 @@ export const useDayController = ({
     updateShift,
     removeShift,
   } = useDay({ domain, meta: workDay.meta, standardHours, year, month });
+
+  const adjacentShifts = useAdjacentDayShifts({ domain, dateKey: workDay.meta.date });
 
   useSyncDayToGlobalState({
     dateKey: workDay.meta.date,
@@ -90,6 +93,7 @@ export const useDayController = ({
     isEditable,
     specialFullDay,
     shifts,
+    adjacentShifts,
     updateShift,
     removeShift,
     handleStatusChanged,

@@ -9,6 +9,7 @@ type UseShiftEditorProps = {
   shift: Shift;
   meta: WorkDayMeta;
   standardHours: number;
+  otherShifts: Shift[];
   onShiftUpdate: (shift: Shift, payMap: ShiftPayMap) => void;
 };
 
@@ -16,20 +17,34 @@ type UseShiftEditorProps = {
  * Editing behavior shared by every presentation of a shift (desktop row,
  * mobile card): draft state, validation, and immediate calculation updates.
  * Invalid drafts remain local and never replace the last valid shift.
+ *
+ * `otherShifts` is the day's other shifts (the caller excludes the one being
+ * edited). A draft that overlaps any of them is treated like an invalid
+ * duration - kept local and never committed - so a day can't end up with two
+ * shifts covering the same time, duplicates included.
  */
 export const useShiftEditor = ({
   domain,
   shift,
   meta,
   standardHours,
+  otherShifts,
   onShiftUpdate,
 }: UseShiftEditorProps) => {
   const [draft, setDraft] = useState<Shift | null>(null);
   const localShift = draft?.id === shift.id ? draft : shift;
 
+  const hasOverlap = otherShifts.some((other) =>
+    domain.services.shiftService.overlaps(localShift, other),
+  );
+
   const updateShift = useCallback(
     (nextShift: Shift) => {
-      if (!domain.services.shiftService.isValidShiftDuration(nextShift)) {
+      const isValidDuration = domain.services.shiftService.isValidShiftDuration(nextShift);
+      const overlapsSibling = otherShifts.some((other) =>
+        domain.services.shiftService.overlaps(nextShift, other),
+      );
+      if (!isValidDuration || overlapsSibling) {
         setDraft(nextShift);
         return;
       }
@@ -43,7 +58,7 @@ export const useShiftEditor = ({
       });
       onShiftUpdate(nextShift, payMap);
     },
-    [domain, meta, standardHours, onShiftUpdate],
+    [domain, meta, standardHours, otherShifts, onShiftUpdate],
   );
 
   const controls = useShiftControls({
@@ -54,6 +69,7 @@ export const useShiftEditor = ({
 
   return {
     localShift,
+    hasOverlap,
     ...controls,
   };
 };

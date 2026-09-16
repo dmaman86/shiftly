@@ -49,4 +49,8 @@ export class ShiftService {
     );
     return daysDiff > 0;
   }
+
+  overlaps(a: Shift, b: Shift): boolean {
+    return a.start.date < b.end.date && b.start.date < a.end.date;
+  }
 }

@@ -99,6 +99,7 @@
   "shift_row": {
     "tooltip_cross_day_error": "⚠️ יש לסמן חוצה יום - שעת סיום לפני שעת התחלה",
     "tooltip_cross_day": "חוצה יום",
+    "tooltip_overlap": "⚠️ חופף למשמרת אחרת באותו יום",
     "tooltip_duty": "משמרת בתפקיד",
     "tooltip_delete": "מחק"
   },

@@ -54,6 +54,7 @@ export const DayCard = ({
     isEditable,
     specialFullDay,
     shifts,
+    adjacentShifts,
     updateShift,
     removeShift,
     handleStatusChanged,
@@ -176,6 +177,12 @@ export const DayCard = ({
                 meta={workDay.meta}
                 standardHours={standardHours}
                 isEditable={isEditable}
+                otherShifts={[
+                  ...shifts
+                    .filter((other) => other.shift.id !== entry.shift.id)
+                    .map((other) => other.shift),
+                  ...adjacentShifts,
+                ]}
                 onShiftUpdate={updateShift}
                 onRemove={removeShift}
               />

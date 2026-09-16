@@ -99,6 +99,7 @@ type ShiftEditorFieldsProps = {
   crossDayLabel?: string;
   disabled: boolean;
   hasError: boolean;
+  hasOverlap?: boolean;
   onChange: (field: "start" | "end", value: Date | null) => void;
   onToggleDuty: () => void;
   onToggleNextDay: (checked: boolean) => void;
@@ -112,6 +113,7 @@ export const ShiftEditorFields = ({
   crossDayLabel,
   disabled,
   hasError,
+  hasOverlap = false,
   onChange,
   onToggleDuty,
   onToggleNextDay,
@@ -147,13 +149,17 @@ export const ShiftEditorFields = ({
         onChange={(value) => onChange("start", value)}
         disabled={disabled}
       />
-      <ShiftTimeInput
-        label={showLabels ? t("headers.exit") : ""}
-        value={shift.end.date}
-        onChange={(value) => onChange("end", value)}
-        disabled={disabled}
-        error={hasError}
-      />
+      <Tooltip title={hasOverlap ? t("shift_row.tooltip_overlap") : ""}>
+        <span>
+          <ShiftTimeInput
+            label={showLabels ? t("headers.exit") : ""}
+            value={shift.end.date}
+            onChange={(value) => onChange("end", value)}
+            disabled={disabled}
+            error={hasError || hasOverlap}
+          />
+        </span>
+      </Tooltip>
 
       {additionalActions && !disabled ? (
         <Box

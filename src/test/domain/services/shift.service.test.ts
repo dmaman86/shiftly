@@ -712,6 +712,52 @@ describe("ShiftService", () => {
     });
   });
 
+  describe("overlaps", () => {
+    it("returns true for two identical shifts (duplicate)", () => {
+      const a = createShift(new Date(2025, 0, 15, 6, 30, 0), new Date(2025, 0, 15, 15, 0, 0));
+      const b = createShift(new Date(2025, 0, 15, 6, 30, 0), new Date(2025, 0, 15, 15, 0, 0));
+
+      expect(service.overlaps(a, b)).toBe(true);
+    });
+
+    it("returns true when one shift starts in the middle of another", () => {
+      const a = createShift(new Date(2025, 0, 15, 6, 30, 0), new Date(2025, 0, 15, 15, 0, 0));
+      const b = createShift(new Date(2025, 0, 15, 11, 0, 0), new Date(2025, 0, 15, 16, 0, 0));
+
+      expect(service.overlaps(a, b)).toBe(true);
+      expect(service.overlaps(b, a)).toBe(true);
+    });
+
+    it("returns true when one shift fully contains another", () => {
+      const outer = createShift(new Date(2025, 0, 15, 6, 0, 0), new Date(2025, 0, 15, 20, 0, 0));
+      const inner = createShift(new Date(2025, 0, 15, 10, 0, 0), new Date(2025, 0, 15, 12, 0, 0));
+
+      expect(service.overlaps(outer, inner)).toBe(true);
+    });
+
+    it("returns false for back-to-back shifts sharing a boundary", () => {
+      const a = createShift(new Date(2025, 0, 15, 6, 30, 0), new Date(2025, 0, 15, 15, 0, 0));
+      const b = createShift(new Date(2025, 0, 15, 15, 0, 0), new Date(2025, 0, 15, 23, 0, 0));
+
+      expect(service.overlaps(a, b)).toBe(false);
+      expect(service.overlaps(b, a)).toBe(false);
+    });
+
+    it("returns false for shifts on unrelated time ranges", () => {
+      const a = createShift(new Date(2025, 0, 15, 6, 30, 0), new Date(2025, 0, 15, 15, 0, 0));
+      const b = createShift(new Date(2025, 0, 15, 18, 0, 0), new Date(2025, 0, 15, 22, 0, 0));
+
+      expect(service.overlaps(a, b)).toBe(false);
+    });
+
+    it("compares by absolute timestamp, so a cross-day shift overlaps the next day's morning shift", () => {
+      const night = createShift(new Date(2025, 0, 15, 22, 0, 0), new Date(2025, 0, 16, 6, 0, 0));
+      const morning = createShift(new Date(2025, 0, 16, 5, 0, 0), new Date(2025, 0, 16, 13, 0, 0));
+
+      expect(service.overlaps(night, morning)).toBe(true);
+    });
+  });
+
   describe("Dependency on DateService", () => {
     it("should use DateService for getMinutesFromMidnight", () => {
       const mockDateService = {

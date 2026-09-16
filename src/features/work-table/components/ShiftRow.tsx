@@ -16,6 +16,7 @@ type ShiftRowProps = {
   meta: WorkDayMeta;
   standardHours: number;
   isEditable: boolean;
+  otherShifts: Shift[];
 
   onShiftUpdate: (shift: Shift, payMap: ShiftPayMap) => void;
   onRemove: (id: string) => void;
@@ -27,6 +28,7 @@ export const ShiftRow = ({
   meta,
   standardHours,
   isEditable,
+  otherShifts,
   onShiftUpdate,
   onRemove,
 }: ShiftRowProps) => {
@@ -36,10 +38,11 @@ export const ShiftRow = ({
     localShift,
     crossDay,
     hasError,
+    hasOverlap,
     handleChange,
     handleToggleNextDay,
     toggleDuty,
-  } = useShiftEditor({ domain, shift, meta, standardHours, onShiftUpdate });
+  } = useShiftEditor({ domain, shift, meta, standardHours, otherShifts, onShiftUpdate });
 
   return (
     <>
@@ -73,13 +76,17 @@ export const ShiftRow = ({
           verticalAlign: "middle",
         }}
       >
-        <ShiftTimeInput
-          label=""
-          value={localShift.end.date}
-          onChange={(newVal) => handleChange("end", newVal)}
-          disabled={!isEditable}
-          error={hasError}
-        />
+        <Tooltip title={hasOverlap ? t("shift_row.tooltip_overlap") : ""}>
+          <span>
+            <ShiftTimeInput
+              label=""
+              value={localShift.end.date}
+              onChange={(newVal) => handleChange("end", newVal)}
+              disabled={!isEditable}
+              error={hasError || hasOverlap}
+            />
+          </span>
+        </Tooltip>
       </TableCell>
 
       <TableCell
