@@ -57,6 +57,7 @@ export const DayRow = ({
     isEditable,
     specialFullDay,
     shifts,
+    adjacentShifts,
     updateShift,
     removeShift,
     handleStatusChanged,
@@ -207,6 +208,12 @@ export const DayRow = ({
               meta={workDay.meta}
               standardHours={standardHours}
               isEditable={isEditable}
+              otherShifts={[
+                ...shifts
+                  .filter((entry) => entry.shift.id !== item.shift.id)
+                  .map((entry) => entry.shift),
+                ...adjacentShifts,
+              ]}
               onShiftUpdate={updateShift}
               onRemove={removeShift}
             />

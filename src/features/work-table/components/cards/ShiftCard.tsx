@@ -15,6 +15,7 @@ type ShiftCardProps = {
   meta: WorkDayMeta;
   standardHours: number;
   isEditable: boolean;
+  otherShifts: Shift[];
   onShiftUpdate: (shift: Shift, payMap: ShiftPayMap) => void;
   onRemove: (id: string) => void;
 };
@@ -25,6 +26,7 @@ export const ShiftCard = ({
   meta,
   standardHours,
   isEditable,
+  otherShifts,
   onShiftUpdate,
   onRemove,
 }: ShiftCardProps) => {
@@ -34,10 +36,11 @@ export const ShiftCard = ({
     localShift,
     crossDay,
     hasError,
+    hasOverlap,
     handleChange,
     handleToggleNextDay,
     toggleDuty,
-  } = useShiftEditor({ domain, shift, meta, standardHours, onShiftUpdate });
+  } = useShiftEditor({ domain, shift, meta, standardHours, otherShifts, onShiftUpdate });
 
   return (
     <Box
@@ -74,6 +77,7 @@ export const ShiftCard = ({
         crossDay={crossDay}
         disabled={!isEditable}
         hasError={hasError}
+        hasOverlap={hasOverlap}
         onChange={handleChange}
         onToggleDuty={toggleDuty}
         onToggleNextDay={handleToggleNextDay}

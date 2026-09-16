@@ -99,6 +99,7 @@
   "shift_row": {
     "tooltip_cross_day_error": "⚠️ Mark as cross-day — end time is before start time",
     "tooltip_cross_day": "Cross day",
+    "tooltip_overlap": "⚠️ Overlaps with another shift this day",
     "tooltip_duty": "Duty shift",
     "tooltip_delete": "Delete"
   },
