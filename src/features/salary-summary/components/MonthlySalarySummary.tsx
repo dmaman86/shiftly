@@ -9,9 +9,12 @@ import {
   SummaryHeader,
   SalaryCardSection,
   useMonthlySalarySummary,
-  useShabbatCreditAllocation,
 } from "@/features/salary-summary";
-import { useGlobalBreakdown, useGlobalState } from "@/hooks";
+import {
+  useGlobalBreakdown,
+  useGlobalState,
+} from "@/hooks";
+import { useShabbatCreditAllocation } from "@/features/monthly-pay";
 
 export const MonthlySalarySummary = ({ domain }: {
   domain: DomainContextType;
@@ -56,7 +59,7 @@ export const MonthlySalarySummary = ({ domain }: {
   }, [month, year]);
 
   return (
-    <Card ref={sectionRef} sx={{ mb: 3 }}>
+    <Card ref={sectionRef} sx={{ mb: 3 }} data-testid="monthly-salary-summary">
       <CardContent>
         <SummaryHeader
           title={t("salary_summary.title")}
@@ -89,7 +92,11 @@ export const MonthlySalarySummary = ({ domain }: {
                   {t("salary_summary.total_label")}
                 </Typography>
               </Box>
-              <Typography variant="h6" fontWeight="bold">
+              <Typography
+                variant="h6"
+                fontWeight="bold"
+                data-testid="monthly-salary-total"
+              >
                 ₪{formatValue(monthlyTotal)}
               </Typography>
             </Box>

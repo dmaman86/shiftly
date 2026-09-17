@@ -274,6 +274,7 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 
 - **Vitest** 4
 - **Testing Library** (React, Jest-DOM, User Event)
+- **Playwright** 1.63 (בדיקות מקצה לקצה בדפדפן Chromium)
 
 ---
 
@@ -284,6 +285,8 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 ├── .github/
 │   ├── assets/                 # צילומי מסך לקובצי README
 │   └── workflows/              # CI, בדיקות pull request ופריסה
+├── e2e/                         # בדיקות Playwright מקצה לקצה ו-fixtures
+├── playwright.config.ts         # הגדרות Playwright
 ├── src/
 │   ├── adapters/               # מתאמי מידע חיצוני והמרה מהדומיין לתצוגה
 │   ├── app/                    # שורש ההרכבה של האפליקציה
@@ -304,10 +307,23 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 │   │   ├── auth/               # פקדי התחברות Google
 │   │   ├── calculation-rules/  # כללים ודוגמת חישוב אינטראקטיבית
 │   │   ├── config/             # פרמטרי עבודה ושמירת תצורה חודשית
+│   │   │   └── hooks/          # סנכרון תצורה חודשית
 │   │   ├── feedback/           # התראות משוב למשתמש
 │   │   ├── info-dialog/        # חלונית מידע על האפליקציה
-│   │   ├── salary-summary/     # רכיבי שכר חודשי, hooks ומודלי תצוגה
-│   │   ├── work-table/         # עריכת ימים ומשמרות רספונסיבית וסנכרון שמירה
+│   │   ├── monthly-pay/        # שכר חודשי נגזר והקצאת זכות שבת
+│   │   │   └── hooks/          # חישוב הקצאה ושמירת יתרת זכות שבת
+│   │   ├── salary-summary/     # רכיבי שכר חודשי ומודלי תצוגה
+│   │   │   ├── components/     # תצוגת סיכום השכר
+│   │   │   ├── helpers/        # בניית סעיפי השכר
+│   │   │   ├── hooks/          # hooks לתיאום סיכום השכר
+│   │   │   ├── mappers/        # מיפוי שורות שכר והטבות
+│   │   │   └── vm/             # מודלי תצוגה של סיכום השכר
+│   │   ├── work-table/         # עריכה וחישוב רספונסיביים לפי חודש, יום ומשמרת
+│   │   │   ├── components/     # רכיבים המחולקים לחודש, יום ומשמרת
+│   │   │   ├── context/        # context למצב העריך של יום העבודה
+│   │   │   ├── helpers/        # שינויי מצב וייצוא PDF
+│   │   │   ├── hooks/          # hooks המחולקים לחודש, יום ומשמרת
+│   │   │   └── mappers/        # מיפויים המחולקים לחודש, יום ומשמרת
 │   │   └── workday-timeline/   # ציר זמן חזותי למשמרות
 │   ├── hooks/                  # React hooks משותפים לאינטגרציה
 │   ├── i18n/                   # משאבי עברית/אנגלית וזיהוי שפה מהכתובת
@@ -452,6 +468,42 @@ bun run test:coverage
 # הרצת בדיקות במצב CI (הרצה חד־פעמית)
 bun run test:ci
 ```
+
+### בדיקות End-to-End
+
+Playwright מכסה את זרימת העבודה של טבלת העבודה היומית במצב אורח באמצעות fixture של אוגוסט 2026. הבדיקה בוחרת את החודש, מזינה ימי חופשה, יוצרת משמרות רגילות ומשמרות החוצות חצות, ומשווה את התוצאות היומיות והחודשיות לקובץ התוצאות הצפוי.
+
+יש להתקין את דפדפן Chromium פעם אחת לאחר התקנת התלויות:
+
+```bash
+bunx playwright install chromium
+```
+
+הרצת בדיקות הקצה לקצה:
+
+```bash
+# הרצת בדיקות E2E
+bun run test:e2e
+
+# פתיחת ממשק Playwright
+bun run test:e2e:ui
+
+# הרצה עם דפדפן גלוי
+bun run test:e2e:headed
+```
+
+קובצי הקלט והתוצאות הצפויות נמצאים תחת:
+
+```text
+e2e/
+├── fixtures/
+│   ├── august-2026.json
+│   └── august-2026.results.json
+└── work-table-august-2026.spec.ts
+```
+
+שרת ה־E2E מפעיל את Vite על `127.0.0.1` ומשתמש בנתיב הבסיס `/shiftly`. שירות Hebcal מדומה בבדיקה כדי לשמור על תרחיש דטרמיניסטי.
+ה־workflows הראשיים של GitHub ושל pull request מתקינים Chromium ומריצים את חבילת בדיקות ה־E2E באופן אוטומטי.
 
 ### בדיקות איכות ובניית גרסת Production
 

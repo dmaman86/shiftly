@@ -274,6 +274,7 @@ Composition pipelines for wiring domain components:
 
 - **Vitest** 4
 - **Testing Library** (React, Jest-DOM, User Event)
+- **Playwright** 1.63 (Chromium end-to-end tests)
 
 ---
 
@@ -296,6 +297,42 @@ bun run test:coverage
 # Run tests in CI mode (single run)
 bun run test:ci
 ```
+
+### End-to-End Tests
+
+Playwright covers the guest daily-work-table flow using the August 2026 fixture. The test selects the month, enters vacation days, creates regular and cross-day shifts, and compares the daily and monthly results with the expected-results fixture.
+
+Install the Playwright browser once after installing dependencies:
+
+```bash
+bunx playwright install chromium
+```
+
+Run the end-to-end test suite:
+
+```bash
+# Run E2E tests
+bun run test:e2e
+
+# Open Playwright UI mode
+bun run test:e2e:ui
+
+# Run with a visible browser
+bun run test:e2e:headed
+```
+
+The E2E inputs and expected outputs are stored in:
+
+```text
+e2e/
+├── fixtures/
+│   ├── august-2026.json
+│   └── august-2026.results.json
+└── work-table-august-2026.spec.ts
+```
+
+The Playwright web server starts Vite on `127.0.0.1` and uses the `/shiftly` base path. Hebcal is mocked by the test so the scenario remains deterministic.
+The main and pull-request GitHub Actions workflows install Chromium and run the E2E suite automatically.
 
 ### Quality Checks and Production Build
 
@@ -370,6 +407,8 @@ The function validates the signed-in user's JWT and deletes that same user from 
 ├── .github/
 │   ├── assets/                 # README screenshots
 │   └── workflows/              # CI, pull-request checks, deployment
+├── e2e/                         # Playwright end-to-end tests and fixtures
+├── playwright.config.ts         # Playwright configuration
 ├── src/
 │   ├── adapters/               # External data and domain-to-view adapters
 │   ├── app/                    # Application composition root
@@ -390,10 +429,23 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   │   ├── auth/               # Google sign-in controls
 │   │   ├── calculation-rules/  # Rules and interactive calculation example
 │   │   ├── config/             # Work parameters and persisted monthly config
+│   │   │   └── hooks/          # Monthly configuration synchronization
 │   │   ├── feedback/           # User feedback notifications
 │   │   ├── info-dialog/        # Application information dialog
-│   │   ├── salary-summary/     # Monthly salary components, hooks and view models
-│   │   ├── work-table/         # Responsive day/shift editing and persistence sync
+│   │   ├── monthly-pay/        # Derived monthly pay and Shabbat credit allocation
+│   │   │   └── hooks/          # Allocation calculation and carry-over persistence
+│   │   ├── salary-summary/     # Monthly salary components and view models
+│   │   │   ├── components/     # Salary summary presentation
+│   │   │   ├── helpers/        # Salary section construction
+│   │   │   ├── hooks/          # Salary summary orchestration hooks
+│   │   │   ├── mappers/        # Pay-row and allowance mapping
+│   │   │   └── vm/             # Salary summary view models
+│   │   ├── work-table/         # Responsive month/day/shift editing and calculation views
+│   │   │   ├── components/     # Components grouped by month, day and shift
+│   │   │   ├── context/        # Editable work-table day state context
+│   │   │   ├── helpers/        # State changes and PDF export helpers
+│   │   │   ├── hooks/          # Hooks grouped by month, day and shift
+│   │   │   └── mappers/        # Mappers grouped by month, day and shift
 │   │   └── workday-timeline/   # Visual shift timeline
 │   ├── hooks/                  # Shared React integration hooks
 │   ├── i18n/                   # Hebrew/English resources and URL language resolution

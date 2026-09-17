@@ -50,7 +50,7 @@ vi.mock("@/store/globalStore", () => ({
     selector(globalStoreStateMock.global),
 }));
 
-import { useShabbatCreditAllocation } from "@/features/salary-summary/hooks/useShabbatCreditAllocation";
+import { useShabbatCreditAllocation } from "@/features/monthly-pay/hooks/useShabbatCreditAllocation";
 
 describe("useShabbatCreditAllocation", () => {
   beforeEach(() => {

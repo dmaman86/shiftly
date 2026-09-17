@@ -1,7 +1,7 @@
-import { createContext, Dispatch, SetStateAction } from "react";
+import { createContext, Dispatch, SetStateAction, useCallback, useContext } from "react";
 
 import { WorkDayStatus } from "@/constants";
-import { Shift, ShiftPayMap } from "@/domain";
+import type { DateService, Shift, ShiftPayMap } from "@/domain";
 
 export type ShiftEntry = {
   shift: Shift;
@@ -45,6 +45,10 @@ export type WorkTableDayStateContextValue = {
   setHydrated: Dispatch<SetStateAction<boolean>>;
 };
 
+type WorkTableDayStateContextApi = WorkTableDayStateContextValue & {
+  getAdjacentDayShifts: (dateKey: string, dateService: DateService) => Shift[];
+};
+
 export const emptyDayState: DayEditingState = {
   status: WorkDayStatus.normal,
   shiftEntries: {},
@@ -52,6 +56,36 @@ export const emptyDayState: DayEditingState = {
 
 export const WorkTableDayStateContext =
   createContext<WorkTableDayStateContextValue | null>(null);
+
+export const useWorkTableDayStateContext = (): WorkTableDayStateContextApi => {
+  const context = useContext(WorkTableDayStateContext);
+
+  if (!context) {
+    throw new Error(
+      "useWorkTableDayStateContext must be used within WorkTableDayStateProvider",
+    );
+  }
+
+  const getAdjacentDayShifts = useCallback(
+    (dateKey: string, dateService: DateService): Shift[] => {
+      const dayDate = dateService.createDateWithTime(dateKey);
+      const previousDateKey = dateService.formatDate(
+        dateService.addDaysToDate(dayDate, -1),
+      );
+      const nextDateKey = dateService.formatDate(
+        dateService.addDaysToDate(dayDate, 1),
+      );
+
+      return [
+        ...Object.values(context.state[previousDateKey]?.shiftEntries ?? {}),
+        ...Object.values(context.state[nextDateKey]?.shiftEntries ?? {}),
+      ].map((entry) => entry.shift);
+    },
+    [context.state],
+  );
+
+  return { ...context, getAdjacentDayShifts };
+};
 
 export const workTableDayStateReducer = (
   state: WorkTableDayState,

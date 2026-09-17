@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import i18n from "@/i18n";
 import { PayBreakdownViewModel } from "@/domain";
-import { DayDetails } from "@/features/work-table/components/DayDetails";
+import { DayDetails } from "@/features/work-table/components/day/DayDetails";
 import { renderWithTheme, screen } from "@/test/ui/utils";
 
 const breakdown: PayBreakdownViewModel = {

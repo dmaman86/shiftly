@@ -36,6 +36,12 @@ jobs:
       - name: Run tests with coverage
         run: bun run test:coverage
 
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps chromium
+
+      - name: Run end-to-end tests
+        run: bun run test:e2e
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
