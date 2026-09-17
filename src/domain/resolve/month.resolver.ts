@@ -1,4 +1,4 @@
-import { MonthResolver } from "@/domain";
+import { MonthResolver } from "../types/types";
 
 export class DefaultMonthResolver implements MonthResolver {
   // System effective date

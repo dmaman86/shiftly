@@ -1,4 +1,4 @@
-import { Calculator } from "@/domain";
+import { Calculator } from "../../types/core-behaviors";
 
 export class TimelinePerDiemRateCalculator implements Calculator<
   { year: number; month: number },

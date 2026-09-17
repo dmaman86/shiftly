@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { buildPayTable } from "../helpers";
-import { PayRowVM, PayTableVM, SalarySectionConfig } from "../vm";
+import { PayRowVM, SalarySectionConfig } from "../vm";
 
 type UsePayTableVMParams = {
   section: SalarySectionConfig;
@@ -22,50 +22,47 @@ export const usePayTableVM = ({ section }: UsePayTableVMParams) => {
     }
   }, [section]);
 
-  // State is derived from initialRows
-  const [state, setState] = useState<PayTableVM>(() =>
-    buildPayTable(initialRows),
-  );
+  const [quantityOverrides, setQuantityOverrides] = useState<
+    Record<string, number>
+  >({});
 
-  const syncRow = (incomingRow: PayRowVM, currentRow?: PayRowVM): PayRowVM => {
-    if (!currentRow) return incomingRow;
+  const table = useMemo(() => {
+    const rows = initialRows.map((row, index) => {
+      const key = `${section.id}:${index}`;
+      const quantity = quantityOverrides[key] ?? row.quantity;
 
-    const rateChanged = incomingRow.rate !== currentRow.rate;
-    const quantityChanged = incomingRow.quantity !== currentRow.quantity;
-
-    if (rateChanged) {
-      return {
-        ...incomingRow,
-        quantity: currentRow.quantity,
-        total: currentRow.quantity * incomingRow.rate,
-      };
-    }
-
-    if (quantityChanged) return incomingRow;
-
-    return { ...currentRow, label: incomingRow.label };
-  };
-
-  useEffect(() => {
-    setState((prev) => {
-      return buildPayTable(
-        initialRows.map((row, index) => syncRow(row, prev.rows[index])),
-      );
+      return quantity === row.quantity
+        ? row
+        : { ...row, quantity, total: quantity * row.rate };
     });
-  }, [initialRows]);
+
+    return buildPayTable(rows);
+  }, [initialRows, quantityOverrides, section.id]);
 
   // Update single row (for user quantity changes)
-  const updateRow = (index: number, updatedRow: PayRowVM) => {
-    setState((prev) => {
-      return buildPayTable(
-        prev.rows.map((row, i) => (i === index ? updatedRow : row)),
-      );
-    });
-  };
+  const updateRow = useCallback(
+    (index: number, updatedRow: PayRowVM) => {
+      const key = `${section.id}:${index}`;
+
+      setQuantityOverrides((previous) => {
+        if (initialRows[index]?.quantity === updatedRow.quantity) {
+          if (!(key in previous)) return previous;
+
+          const next = { ...previous };
+          delete next[key];
+          return next;
+        }
+
+        if (previous[key] === updatedRow.quantity) return previous;
+        return { ...previous, [key]: updatedRow.quantity };
+      });
+    },
+    [initialRows, section.id],
+  );
 
   return {
-    rows: state.rows,
-    total: state.total,
+    rows: table.rows,
+    total: table.total,
     updateRow,
   };
 };

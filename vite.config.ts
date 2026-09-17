@@ -30,7 +30,6 @@ export default defineConfig({
         manualChunks: (id) => {
           if (id.includes("node_modules")) {
             if (["react", "react-dom", "react-router-dom"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-react";
-            if (["@reduxjs/toolkit", "react-redux"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-redux";
             if (["@mui/icons-material"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-mui-icons";
             if (["@mui/material", "@emotion/react", "@emotion/styled", "@emotion/cache"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-mui-core";
             if (["@mui/x-date-pickers", "@date-io/date-fns", "date-fns"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-mui-pickers";
@@ -49,11 +48,19 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",
     css: true,
-    exclude: ["node_modules", ".claude/**", "e2e/**", "playwright.config.ts"],
+    exclude: [
+      "node_modules",
+      ".claude/**",
+      "coverage/**",
+      "e2e/**",
+      "playwright-report/**",
+      "playwright.config.ts",
+      "test-results/**",
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "json-summary", "html"],
-      exclude: ["node_modules/", "src/test/", "**/*.config.ts", "**/*. d.ts"],
+      exclude: ["node_modules/", "src/test/", "**/*.config.ts", "**/*.d.ts"],
     },
   },
 });

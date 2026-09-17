@@ -1,12 +1,9 @@
-import {
-  Shift,
-  ShiftMapBuilder,
-  ShiftPayMap,
-  WorkDayMeta,
-  PayCalculationBundle,
-  ShiftSegmentBuilder,
-  ShiftService,
-} from "@/domain";
+import { ShiftSegmentBuilder } from "./shiftSegment.builder";
+import { ShiftService } from "../services/shift.service";
+import { PayCalculationBundle } from "../types/bundles";
+import { ShiftMapBuilder } from "../types/services";
+import { Shift, ShiftPayMap } from "../types/data-shapes";
+import { WorkDayMeta } from "../types/types";
 
 export class DefaultShiftMapBuilder implements ShiftMapBuilder {
   constructor(

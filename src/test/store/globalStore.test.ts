@@ -5,7 +5,7 @@ import { initialGlobalState, useGlobalStore } from "@/store/globalStore";
 const createDayPayMap = (totalHours: number) =>
   ({ totalHours }) as WorkDayMap;
 
-describe("globalSlice", () => {
+describe("globalStore", () => {
   beforeEach(() => useGlobalStore.setState(initialGlobalState));
 
   it("stores and replaces a daily pay map without a derived summary", () => {

@@ -1,4 +1,5 @@
-import { MealAllowance, Reducer } from "@/domain";
+import { Reducer } from "../types/core-behaviors";
+import { MealAllowance } from "../types/data-shapes";
 
 export class MealAllowanceMonthReducer implements Reducer<MealAllowance> {
   createEmpty(): MealAllowance {

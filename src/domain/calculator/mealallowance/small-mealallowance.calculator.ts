@@ -1,8 +1,8 @@
 import type {
   MealAllowanceCalcParams,
   MealAllowanceEntry,
-} from "@/domain/types/data-shapes";
-import type { Calculator } from "@/domain/types/core-behaviors";
+} from "../../types/data-shapes";
+import type { Calculator } from "../../types/core-behaviors";
 
 export class SmallMealAllowanceCalculator implements Calculator<
   MealAllowanceCalcParams,

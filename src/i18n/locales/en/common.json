@@ -17,7 +17,7 @@
     "year_label": "Year",
     "month_label": "Month",
     "standard_hours_label": "Standard Hours",
-    "standard_hours_helper": "Default: 6.67",
+    "standard_hours_helper": "Default: {{standardHours}}",
     "base_rate_label": "Hourly Rate",
     "year_min_error": "Minimum supported year is {{year}}",
     "year_max_error": "Maximum supported year is {{year}}",

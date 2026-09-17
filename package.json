@@ -14,7 +14,7 @@
     "dev": "vite",
     "typecheck": "tsc --project tsconfig.app.json --noEmit && tsc --project tsconfig.node.json --noEmit",
     "build": "vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",

@@ -1,11 +1,11 @@
+import { WorkDayInfoResolver } from "../resolve/workdayinfo.resolver";
+import { DateService } from "../services/date.service";
 import {
-  WorkDaysForMonthBuilder,
-  WorkDayInfo,
-  WorkDayInfoResolver,
-  DateService,
   CalendarEvent,
   CalendarEventMap,
-} from "@/domain";
+  WorkDayInfo,
+} from "../types/types";
+import { WorkDaysForMonthBuilder } from "../types/services";
 import { WorkDayType } from "@/constants";
 
 export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {

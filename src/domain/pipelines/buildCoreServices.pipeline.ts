@@ -1,4 +1,4 @@
-import { DateService, ShiftService } from "@/domain/services";
+import { DateService, ShiftService } from "../services";
 import { CoreServices, DomainConfig } from "../types/domain.types";
 
 export const buildCoreServices = (config: DomainConfig): CoreServices => {

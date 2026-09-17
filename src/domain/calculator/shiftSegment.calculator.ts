@@ -3,9 +3,9 @@ import type {
   LabeledSegmentRange,
   Point,
   WorkDayMeta,
-} from "@/domain/types/types";
-import type { Calculator } from "@/domain/types/core-behaviors";
-import type { DateService } from "@/domain/services/date.service";
+} from "../types/types";
+import type { Calculator } from "../types/core-behaviors";
+import type { DateService } from "../services/date.service";
 
 export class ShiftSegmentCalculator implements Calculator<
   {

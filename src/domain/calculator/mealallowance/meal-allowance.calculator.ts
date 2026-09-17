@@ -1,11 +1,9 @@
-import {
-  MealAllowance,
-  MealAllowanceDayInfo,
-  MealAllowanceRates,
-  LargeMealAllowanceCalculator,
-  SmallMealAllowanceCalculator,
-  Calculator,
-} from "@/domain";
+import { LargeMealAllowanceCalculator } from "./large-mealallowance.calculator";
+import { SmallMealAllowanceCalculator } from "./small-mealallowance.calculator";
+import { Calculator } from "../../types/core-behaviors";
+import { MealAllowance } from "../../types/data-shapes";
+import { MealAllowanceDayInfo } from "../../types/bundles";
+import { MealAllowanceRates } from "../../types/types";
 
 export class DefaultMealAllowanceCalculator implements Calculator<
   {

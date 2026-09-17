@@ -1,4 +1,3 @@
-export { useAsync } from "./useAsync";
 export { useWorkDays } from "./useWorkDays";
 export { useDirection } from "./useDirection";
 export { useFetch } from "./useFetch";

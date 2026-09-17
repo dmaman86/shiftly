@@ -1,11 +1,8 @@
-import {
-  MonthPayMap,
-  WorkDayMap,
-  MealAllowanceMonthReducer,
-  FixedSegmentMonthReducer,
-  PerDiemMonthReducer,
-  Reducer,
-} from "@/domain";
+import { FixedSegmentMonthReducer } from "./fixed-segment-month.reducer";
+import { MealAllowanceMonthReducer } from "./meal-allowance-month.reducer";
+import { MonthPayMap, WorkDayMap } from "../types/data-shapes";
+import { PerDiemMonthReducer } from "../types/services";
+import { Reducer } from "../types/core-behaviors";
 import { WorkDayMonthReducer } from "./workday-month.reducer";
 
 export class MonthPayMapReducer implements Reducer<MonthPayMap, WorkDayMap> {
