@@ -1,9 +1,6 @@
-import {
-  Reducer,
-  WorkDayMap,
-  WorkDayReducerBundle,
-  WorkPayPart,
-} from "@/domain";
+import { WorkDayReducerBundle } from "../types/bundles";
+import { WorkDayMap, WorkPayPart } from "../types/data-shapes";
+import { Reducer } from "../types/core-behaviors";
 
 export class WorkDayMonthReducer implements Reducer<WorkPayPart, WorkDayMap> {
   constructor(private readonly workDay: WorkDayReducerBundle) {}

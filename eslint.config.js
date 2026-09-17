@@ -6,7 +6,9 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig(
-  { ignores: ['dist'] },
+  {
+    ignores: ['dist', 'coverage', 'playwright-report', 'test-results'],
+  },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ['**/*.{ts,tsx}'],
@@ -14,18 +16,13 @@ export default defineConfig(
       ecmaVersion: 2020,
       globals: globals.browser,
     },
-    settings: {
-      'react-hooks': {
-        additionalEffectHooks: '(useAsync)',
-      },
-    },
     plugins: {
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      'react-hooks/exhaustive-deps': 'warn',
+      'react-hooks/exhaustive-deps': 'error',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
@@ -40,16 +37,6 @@ export default defineConfig(
         ...globals.worker,
         Deno: 'readonly',
       },
-    },
-  },
-  {
-    // These components intentionally synchronize editable state with external data.
-    files: [
-      'src/features/config/ConfigPanel.tsx',
-      'src/features/salary-summary/hooks/usePayTableVM.ts',
-    ],
-    rules: {
-      'react-hooks/set-state-in-effect': 'off',
     },
   },
 )

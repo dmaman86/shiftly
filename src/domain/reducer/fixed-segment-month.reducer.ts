@@ -1,4 +1,5 @@
-import { FixedSegmentBundle, MonthPayMap, WorkDayMap } from "@/domain";
+import { FixedSegmentBundle } from "../types/bundles";
+import { MonthPayMap, WorkDayMap } from "../types/data-shapes";
 
 export class FixedSegmentMonthReducer {
   constructor(private readonly fixed: FixedSegmentBundle) {}

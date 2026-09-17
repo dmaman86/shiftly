@@ -1,5 +1,5 @@
-import type { PerDiemDayCalculator } from "@/domain/types/services";
-import type { PerDiemShiftInfo } from "@/domain/types/types";
+import type { PerDiemDayCalculator } from "../../types/services";
+import type { PerDiemShiftInfo } from "../../types/types";
 
 export class DefaultPerDiemDayCalculator implements PerDiemDayCalculator {
   private getTier(totalHours: number): {

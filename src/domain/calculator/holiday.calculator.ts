@@ -2,8 +2,8 @@ import { Weekend, WorkDayType } from "@/constants";
 import {
   CalendarEventKind,
   type CalendarEvent,
-  type HolidayCalculator,
-} from "@/domain";
+} from "../types/types";
+import type { HolidayCalculator } from "../types/services";
 
 export class DefaultHolidayCalculator implements HolidayCalculator {
   calculate(params: { weekday: number; events: CalendarEvent[] }): WorkDayType {

@@ -1,4 +1,5 @@
-import { MealAllowanceRates, Calculator } from "@/domain";
+import { Calculator } from "../../types/core-behaviors";
+import { MealAllowanceRates } from "../../types/types";
 
 export class TimelineMealAllowanceRateCalculator implements Calculator<
   {

@@ -1,5 +1,5 @@
-import type { Segment } from "@/domain/types/data-shapes";
-import type { Calculator } from "@/domain/types/core-behaviors";
+import type { Segment } from "../types/data-shapes";
+import type { Calculator } from "../types/core-behaviors";
 
 export class FixedSegmentCalculator implements Calculator<number, Segment> {
   private readonly fieldShiftPercent: Record<string, number> = {

@@ -1,17 +1,18 @@
 import { WorkDayStatus } from "@/constants";
 import {
-  DayPayMapBuilder,
-  WorkDayMap,
-  PerDiemShiftInfo,
-  ShiftPayMap,
-  WorkDayMeta,
-  PayCalculationBundle,
   FixedSegmentBundle,
-  PerDiemBundle,
   MealAllowanceBundle,
+  PayCalculationBundle,
+  PerDiemBundle,
+} from "../types/bundles";
+import { DayPayMapBuilder } from "../types/services";
+import {
   ExtraBreakdown,
+  ShiftPayMap,
   SpecialBreakdown,
-} from "@/domain";
+  WorkDayMap,
+} from "../types/data-shapes";
+import { PerDiemShiftInfo, WorkDayMeta } from "../types/types";
 
 export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
   constructor(

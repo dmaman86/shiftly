@@ -1,12 +1,7 @@
 import { WorkDayStatus } from "@/constants";
-import type {
-  DayPayMapBuilder,
-  Shift,
-  ShiftMapBuilder,
-  ShiftPayMap,
-  WorkDayMap,
-  WorkDayMeta,
-} from "@/domain";
+import type { DayPayMapBuilder, ShiftMapBuilder } from "../types/services";
+import type { Shift, ShiftPayMap, WorkDayMap } from "../types/data-shapes";
+import type { WorkDayMeta } from "../types/types";
 
 type CalculateDayFromShiftsParams = {
   dayPayMapBuilder: DayPayMapBuilder;

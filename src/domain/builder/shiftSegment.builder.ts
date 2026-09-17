@@ -1,5 +1,5 @@
 import { WorkDayType } from "@/constants";
-import { LabeledSegmentRange, Point, WorkDayMeta } from "@/domain/types/types";
+import { LabeledSegmentRange, Point, WorkDayMeta } from "../types/types";
 import { Builder } from "../types/core-behaviors";
 import { ShiftSegmentCalculator } from "../calculator";
 import { Shift } from "../types/data-shapes";

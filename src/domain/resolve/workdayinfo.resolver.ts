@@ -1,6 +1,6 @@
 import { WorkDayType } from "@/constants";
-import { DayInfoResolver, WorkDayInfo } from "@/domain";
-import { DateService } from "@/domain/services/date.service";
+import { DayInfoResolver, WorkDayInfo } from "../types/types";
+import { DateService } from "../services/date.service";
 
 export class WorkDayInfoResolver implements DayInfoResolver {
   constructor(private readonly dateService: DateService) {}
