@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      "env -u NO_COLOR -u FORCE_COLOR bun node_modules/vite/bin/vite.js --host 127.0.0.1 --port 4173 --strictPort",
+      "env -u NO_COLOR -u FORCE_COLOR bun run --bun dev -- --host 127.0.0.1 --port 4173 --strictPort",
     url: "http://127.0.0.1:4173/shiftly/en/daily",
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,

@@ -21,6 +21,17 @@ describe("gtagService", () => {
       spy.mockRestore();
     });
 
+    it.each(["127.0.0.1", "::1"])(
+      "does nothing on loopback hostname %s",
+      (hostname) => {
+        vi.stubGlobal("location", { hostname });
+        const spy = vi.spyOn(document.head, "appendChild");
+        gtagService.load();
+        expect(spy).not.toHaveBeenCalled();
+        spy.mockRestore();
+      },
+    );
+
     it("initializes dataLayer and gtag on non-localhost", () => {
       vi.stubGlobal("location", { hostname: "dmaman86.github.io" });
       gtagService.load();

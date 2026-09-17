@@ -102,6 +102,11 @@ const fillTimeField = async (field: ReturnType<Page["getByTestId"]>, time: strin
 };
 
 test("creates the August 2026 work table from the fixture", async ({ page }) => {
+  await page.route(
+    /https:\/\/(www\.googletagmanager\.com|www\.google-analytics\.com|analytics\.google\.com|stats\.g\.doubleclick\.net)\//,
+    (route) => route.abort(),
+  );
+
   await page.route("https://www.hebcal.com/hebcal/**", (route) =>
     route.fulfill({
       status: 200,
