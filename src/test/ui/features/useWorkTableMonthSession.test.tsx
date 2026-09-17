@@ -22,10 +22,14 @@ const shiftServiceMock = vi.hoisted(() => ({ fetchForMonth: vi.fn() }));
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => authMock }));
 vi.mock("@/hooks/useGlobalState", () => ({ useGlobalState: () => globalStateMock }));
 vi.mock("@/hooks/useAppSnackbar", () => ({ useAppSnackbar: () => snackbarMock }));
-vi.mock("@/services", () => ({
-  workDayService: () => workDayServiceMock,
-  shiftService: () => shiftServiceMock,
-}));
+vi.mock("@/services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/services")>();
+  return {
+    ...actual,
+    workDayService: () => workDayServiceMock,
+    shiftService: () => shiftServiceMock,
+  };
+});
 
 import type { DomainContextType } from "@/app";
 import { WorkDayStatus, WorkDayType } from "@/constants";

@@ -49,7 +49,7 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",
     css: true,
-    exclude: ["node_modules", ".claude/**"],
+    exclude: ["node_modules", ".claude/**", "e2e/**", "playwright.config.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "json-summary", "html"],
