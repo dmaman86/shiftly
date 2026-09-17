@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { DomainContextType } from "@/app";
 import { WorkDayStatus, WorkDayType } from "@/constants";
 import type { PayBreakdownViewModel, WorkDayInfo } from "@/domain";
-import { DayCard } from "@/features/work-table/components/cards/DayCard";
+import { DayCard } from "@/features/work-table/components/day/DayCard";
 import { renderWithTheme, screen } from "@/test/ui/utils";
 
 const useDayControllerMock = vi.hoisted(() => vi.fn());

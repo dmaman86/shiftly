@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { renderWithTheme, screen } from "@/test/ui/utils";
-import { ShiftTimeReadonly } from "@/features/work-table/components/ShiftTimeReadonly";
+import { ShiftTimeReadonly } from "@/features/work-table/components/shift/ShiftTimeReadonly";
 
 describe("ShiftTimeReadonly", () => {
   describe("Basic Rendering", () => {

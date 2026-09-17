@@ -17,8 +17,11 @@ import {
   MonthlySalarySummary,
   Feedback,
 } from "@/features";
-import { useHydrateGlobalPayMaps } from "@/features/work-table";
-import { useGlobalState, useWorkDays } from "@/hooks";
+import {
+  WorkTableDayStateHydrator,
+  WorkTableDayStateProvider,
+} from "@/features/work-table";
+import { useAuth, useGlobalState, useWorkDays } from "@/hooks";
 import { FeatureBoundary } from "@/layout";
 import { analyticsService } from "@/services";
 
@@ -31,7 +34,7 @@ export const MonthlySummaryPage = ({
   const { t: tWT } = useTranslation("work-table");
   const { year, month } = useGlobalState();
   const { workDays } = useWorkDays(domain);
-  useHydrateGlobalPayMaps({ domain, workDays });
+  const { user } = useAuth();
 
   return (
     <Box component="section" sx={{ mt: 2 }}>
@@ -118,13 +121,19 @@ export const MonthlySummaryPage = ({
             <Stack spacing={3}>
               <ConfigPanel domain={domain} mode={"monthly"} />
 
-              <FeatureBoundary
-                featureName={tWT("feature_name_salary_summary")}
-                errorContext="MonthlySalarySummary"
-                resetKeys={[year, month]}
+              <WorkTableDayStateProvider
+                ownerKey={JSON.stringify([user?.id, year, month])}
               >
-                <MonthlySalarySummary domain={domain} />
-              </FeatureBoundary>
+                <WorkTableDayStateHydrator domain={domain} workDays={workDays}>
+                  <FeatureBoundary
+                    featureName={tWT("feature_name_salary_summary")}
+                    errorContext="MonthlySalarySummary"
+                    resetKeys={[year, month]}
+                  >
+                    <MonthlySalarySummary domain={domain} />
+                  </FeatureBoundary>
+                </WorkTableDayStateHydrator>
+              </WorkTableDayStateProvider>
               <Feedback />
             </Stack>
           </CardContent>

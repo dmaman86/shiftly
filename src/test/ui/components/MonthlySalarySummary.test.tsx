@@ -20,6 +20,10 @@ vi.mock("@/hooks", () => ({
   useGlobalBreakdown: () => ({}),
 }));
 
+vi.mock("@/features/monthly-pay", () => ({
+  useShabbatCreditAllocation: () => ({ usedHours: 0 }),
+}));
+
 vi.mock("@/features/salary-summary", () => ({
   SummaryHeader: () => <div>SummaryHeader</div>,
   SalaryCardSection: () => <div>SalaryCardSection</div>,
@@ -30,7 +34,6 @@ vi.mock("@/features/salary-summary", () => ({
     handleTotalChange: vi.fn(),
     monthlyTotal: 5000,
   }),
-  useShabbatCreditAllocation: () => ({ usedHours: 0 }),
 }));
 
 vi.mock("@/utils", () => ({

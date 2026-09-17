@@ -3,7 +3,7 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import type { DomainContextType } from "@/app";
 import type { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
-import { useShiftEditor } from "@/features/work-table/hooks/useShiftEditor";
+import { useShiftEditor } from "@/features/work-table/hooks/shift/useShiftEditor";
 
 const createShift = (endHour: number): Shift => ({
   id: "shift-1",

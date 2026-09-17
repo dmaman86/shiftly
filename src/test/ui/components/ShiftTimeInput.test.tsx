@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { renderWithTheme, screen } from "@/test/ui/utils";
 import userEvent from "@testing-library/user-event";
-import { ShiftTimeInput } from "@/features/work-table/components/ShiftTimeInput";
+import { ShiftTimeInput } from "@/features/work-table/components/shift/ShiftTimeInput";
 
 describe("ShiftTimeInput", () => {
   const defaultProps = {

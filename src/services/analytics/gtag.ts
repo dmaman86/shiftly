@@ -1,8 +1,9 @@
 const GA_ID = "G-G19J1209M6";
+const LOCAL_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1"]);
 
 export const gtagService = {
   load() {
-    if (location.hostname === "localhost") return;
+    if (LOCAL_HOSTNAMES.has(location.hostname)) return;
     if (document.querySelector(`script[src*="${GA_ID}"]`)) return;
 
     window.dataLayer = window.dataLayer || [];

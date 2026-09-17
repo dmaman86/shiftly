@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import type { DomainContextType } from "@/app";
 import { WorkDayType } from "@/constants";
 import type { WorkDayInfo } from "@/domain";
-import { MobileWorkTable } from "@/features/work-table/components/MobileWorkTable";
+import { MobileWorkTable } from "@/features/work-table/components/month/MobileWorkTable";
 import { fireEvent, renderWithTheme, screen } from "@/test/ui/utils";
 
 vi.mock("react-i18next", () => ({
@@ -42,8 +42,8 @@ vi.mock("@mui/x-date-pickers/StaticDatePicker", () => ({
 // Regression guard for the data-loss bug: MobileWorkTable used to render a
 // single DayCard instance and swap its `workDay` prop as the user picked a
 // different date, without a `key`. React then reused the same DayCard
-// instance (and its internal useSyncDayToStorage refs) across unrelated
-// days, so the previous day's just-saved shifts looked "removed" to the new
+// instance across unrelated days, so the previous day's just-saved shifts
+// looked "removed" to the new
 // day and got deleted from Supabase. An effect with an empty dependency
 // array only runs once per real mount (its closure keeps the date the
 // instance was first created with), so it only records a second entry when
@@ -51,7 +51,7 @@ vi.mock("@mui/x-date-pickers/StaticDatePicker", () => ({
 // `key` to change.
 const mountedDates: string[] = [];
 
-vi.mock("@/features/work-table/components/cards/DayCard", () => ({
+vi.mock("@/features/work-table/components/day/DayCard", () => ({
   DayCard: ({ workDay }: { workDay: WorkDayInfo }) => {
     useEffect(() => {
       mountedDates.push(workDay.meta.date);

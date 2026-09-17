@@ -28,6 +28,8 @@ supabase/functions/.env
 # Mac
 .DS_Store
 coverage/
+playwright-report/
+test-results/
 .claude/
 
 # Internal documentation (not for repo)

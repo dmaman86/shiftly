@@ -27,7 +27,10 @@ const serviceMock = vi.hoisted(() => ({
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => authMock }));
 vi.mock("@/hooks/useGlobalState", () => ({ useGlobalState: () => globalStateMock }));
 vi.mock("@/hooks/useAppSnackbar", () => ({ useAppSnackbar: () => snackbarMock }));
-vi.mock("@/services", () => ({ monthlyConfigService: () => serviceMock }));
+vi.mock("@/services", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/services")>();
+  return { ...actual, monthlyConfigService: () => serviceMock };
+});
 
 import { useMonthlyConfigSync } from "@/features/config/hooks/useMonthlyConfigSync";
 

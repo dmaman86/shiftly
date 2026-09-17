@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { WorkDayType } from "@/constants";
 import type { ShiftMapBuilder, WorkDayInfo } from "@/domain";
 import type { ShiftRecord } from "@/services/shift/shift.service";
-import { recordsToWorkTableDayState } from "@/features/work-table/mappers/recordsToWorkTableDayState";
+import { recordsToWorkTableDayState } from "@/features/work-table/mappers/month/recordsToWorkTableDayState";
 
 const shiftMapBuilder = {
   build: () => ({ totalHours: 8 }),

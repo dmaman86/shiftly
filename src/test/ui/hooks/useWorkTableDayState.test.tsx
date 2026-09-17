@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { WorkDayStatus } from "@/constants";
 import {
   useWorkTableDayState,
-} from "@/features/work-table/hooks/useWorkTableDayState";
+} from "@/features/work-table/hooks/day/useWorkTableDayState";
 import { WorkTableDayStateProvider } from "@/features/work-table/context/workTableDayState/WorkTableDayStateProvider";
 import { renderPure, screen, userEvent } from "@/test/ui/utils";
 
