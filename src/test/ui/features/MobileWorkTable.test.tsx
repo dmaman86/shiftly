@@ -22,6 +22,19 @@ vi.mock("@/hooks", () => ({
     updateYear: vi.fn(),
     updateMonth: vi.fn(),
   }),
+  useAuth: () => ({
+    user: null,
+    isLoading: false,
+    initializationError: null,
+  }),
+  useAppSnackbar: () => ({
+    error: vi.fn(),
+    success: vi.fn(),
+  }),
+  useFetch: () => ({
+    loading: false,
+    callEndPoint: vi.fn(),
+  }),
 }));
 
 // Real StaticDatePicker requires driving MUI's own calendar grid, which is
