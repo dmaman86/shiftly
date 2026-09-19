@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Typography, Box, Stack, Card, CardContent } from "@mui/material";
 
@@ -8,33 +8,52 @@ import { formatValue } from "@/utils";
 import {
   SummaryHeader,
   SalaryCardSection,
+  SalaryQuantityOverrides,
   useMonthlySalarySummary,
 } from "@/features/salary-summary";
-import {
-  useGlobalBreakdown,
-  useGlobalState,
-} from "@/hooks";
-import { useShabbatCreditAllocation } from "@/features/monthly-pay";
+import { useGlobalState } from "@/hooks";
+import type { PayBreakdownViewModel } from "@/domain";
 
-export const MonthlySalarySummary = ({ domain }: {
+export const MonthlySalarySummary = ({
+  domain,
+  monthFullBreakdown,
+}: {
   domain: DomainContextType;
+  monthFullBreakdown: PayBreakdownViewModel;
 }) => {
   const { t } = useTranslation("work-table");
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const { baseRate, year, month } = useGlobalState();
-  const globalBreakdown = useGlobalBreakdown(
-    domain.payMap.monthPayMapCalculator,
-  );
-  const shabbatCreditAllocation = useShabbatCreditAllocation();
+  const scope = `${year}-${month}`;
+  const [overrideState, setOverrideState] = useState<{
+    scope: string;
+    values: SalaryQuantityOverrides;
+  }>({ scope, values: {} });
+  const quantityOverrides =
+    overrideState.scope === scope ? overrideState.values : {};
+
+  const handleQuantityOverrideChange = (key: string, value?: number) => {
+    setOverrideState((previous) => {
+      const values = previous.scope === scope ? { ...previous.values } : {};
+
+      if (value === undefined) {
+        delete values[key];
+      } else {
+        values[key] = value;
+      }
+
+      return { scope, values };
+    });
+  };
 
   const { sections, getMonthLabel, monthlyTotal } = useMonthlySalarySummary({
     domain,
-    globalBreakdown,
+    monthFullBreakdown,
     year,
     month,
     baseRate,
-    shabbatCreditHours: shabbatCreditAllocation.usedHours,
+    quantityOverrides,
   });
 
   useEffect(() => {
@@ -77,6 +96,8 @@ export const MonthlySalarySummary = ({ domain }: {
               <SalaryCardSection
                 key={`${section.id}-${year}-${month}`}
                 section={section}
+                quantityOverrides={quantityOverrides}
+                onQuantityOverrideChange={handleQuantityOverrideChange}
               />
             ))}
 

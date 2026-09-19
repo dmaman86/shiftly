@@ -46,6 +46,7 @@ import { MonthlySalarySummary } from "@/features/salary-summary/components/Month
 const mockDomain = {
   payMap: { monthPayMapCalculator: {} },
 } as never;
+const mockMonthFullBreakdown = {} as never;
 
 describe("MonthlySalarySummary", () => {
   let observerCallback: (entries: { isIntersecting: boolean }[]) => void;
@@ -64,7 +65,12 @@ describe("MonthlySalarySummary", () => {
   });
 
   it("tracks salary_summary_viewed when card becomes visible", async () => {
-    render(<MonthlySalarySummary domain={mockDomain} />);
+    render(
+      <MonthlySalarySummary
+        domain={mockDomain}
+        monthFullBreakdown={mockMonthFullBreakdown}
+      />,
+    );
 
     observerCallback([{ isIntersecting: true }]);
 
@@ -77,7 +83,12 @@ describe("MonthlySalarySummary", () => {
   });
 
   it("does not track when card is not intersecting", async () => {
-    render(<MonthlySalarySummary domain={mockDomain} />);
+    render(
+      <MonthlySalarySummary
+        domain={mockDomain}
+        monthFullBreakdown={mockMonthFullBreakdown}
+      />,
+    );
 
     observerCallback([{ isIntersecting: false }]);
 
@@ -87,7 +98,12 @@ describe("MonthlySalarySummary", () => {
   });
 
   it("disconnects observer after tracking", async () => {
-    render(<MonthlySalarySummary domain={mockDomain} />);
+    render(
+      <MonthlySalarySummary
+        domain={mockDomain}
+        monthFullBreakdown={mockMonthFullBreakdown}
+      />,
+    );
 
     observerCallback([{ isIntersecting: true }]);
 

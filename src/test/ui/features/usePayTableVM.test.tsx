@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
+import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { usePayTableVM } from "@/features/salary-summary/hooks/usePayTableVM";
@@ -23,10 +24,30 @@ const createSection = (
 describe("usePayTableVM", () => {
   it("preserves user quantity overrides when external row data changes", () => {
     const initialRows: PayRowVM[] = [
-      { label: "Regular", quantity: 2, rate: 10, total: 20 },
+      { id: "regular", label: "Regular", quantity: 2, rate: 10, total: 20 },
     ];
     const { result, rerender } = renderHook(
-      ({ section }) => usePayTableVM({ section }),
+      ({ section }) => {
+        const [quantityOverrides, setQuantityOverrides] = useState<
+          Record<string, number>
+        >({});
+
+        return usePayTableVM({
+          section,
+          quantityOverrides,
+          onQuantityOverrideChange: (key, value) => {
+            setQuantityOverrides((previous) => {
+              if (value === undefined) {
+                const next = { ...previous };
+                delete next[key];
+                return next;
+              }
+
+              return { ...previous, [key]: value };
+            });
+          },
+        });
+      },
       { initialProps: { section: createSection(initialRows) } },
     );
 
@@ -46,7 +67,7 @@ describe("usePayTableVM", () => {
 
     rerender({
       section: createSection([
-        { label: "Regular", quantity: 3, rate: 20, total: 60 },
+        { id: "regular", label: "Regular", quantity: 3, rate: 20, total: 60 },
       ]),
     });
 

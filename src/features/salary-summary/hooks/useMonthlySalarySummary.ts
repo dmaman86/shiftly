@@ -1,30 +1,30 @@
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DomainContextType } from "@/app";
-import { MonthPayMap } from "@/domain";
-
-import { monthToPayBreakdownVM } from "@/adapters";
+import { PayBreakdownViewModel } from "@/domain";
 import {
   buildSectionsSalary,
+  applyQuantityOverrides,
   calculateTotal,
+  SalaryQuantityOverrides,
 } from "@/features/salary-summary";
 
 type MonthlySalarySummaryParams = {
   domain: DomainContextType;
-  globalBreakdown: MonthPayMap;
+  monthFullBreakdown: PayBreakdownViewModel;
   year: number;
   month: number;
   baseRate: number;
-  shabbatCreditHours: number;
+  quantityOverrides: SalaryQuantityOverrides;
 };
 
 export const useMonthlySalarySummary = ({
   domain,
-  globalBreakdown,
+  monthFullBreakdown,
   year,
   month,
   baseRate,
-  shabbatCreditHours,
+  quantityOverrides,
 }: MonthlySalarySummaryParams) => {
   const { t } = useTranslation("work-table");
   const monthNames = t("months", { returnObjects: true }) as string[];
@@ -40,34 +40,43 @@ export const useMonthlySalarySummary = ({
       year,
       month,
     });
-    const payVM = monthToPayBreakdownVM(
-      globalBreakdown,
-      shabbatCreditHours,
-    );
-    return buildSectionsSalary({ payVM, baseRate, allowanceRate, rateDiem, t });
+    return buildSectionsSalary({
+      payVM: monthFullBreakdown,
+      baseRate,
+      allowanceRate,
+      rateDiem,
+      t,
+    });
   }, [
     domain,
-    globalBreakdown,
+    monthFullBreakdown,
     year,
     month,
     baseRate,
-    shabbatCreditHours,
     t,
   ]);
 
-  const monthlyTotal = useMemo(() => {
-    return sections.reduce((sum, section) => {
-      const rows =
-        section.type === "allowance"
-          ? section.buildRows(
-              section.payVM,
-              section.allowanceRate,
-              section.rateDiem,
-            )
-          : section.buildRows(section.payVM, section.baseRate);
-      return sum + calculateTotal(rows);
-    }, 0);
-  }, [sections]);
+  const monthlyTotal = useMemo(
+    () =>
+      sections.reduce((sum, section) => {
+        const rows =
+          section.type === "allowance"
+            ? section.buildRows(
+                section.payVM,
+                section.allowanceRate,
+                section.rateDiem,
+              )
+            : section.buildRows(section.payVM, section.baseRate);
+        const rowsWithOverrides = applyQuantityOverrides(
+          rows,
+          section.id,
+          quantityOverrides,
+        );
+
+        return sum + calculateTotal(rowsWithOverrides);
+      }, 0),
+    [quantityOverrides, sections],
+  );
 
   return { sections, getMonthLabel, monthlyTotal };
 };

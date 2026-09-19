@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import type { DomainContextType } from "@/app";
-import type { WorkDayInfo } from "@/domain";
+import type { WorkDayInfo, WorkDayMap } from "@/domain";
 import { useAppSnackbar, useAuth, useGlobalState } from "@/hooks";
 import { shiftService, workDayService } from "@/services";
 import type { ShiftRecord } from "@/services/shift/shift.service";
@@ -28,6 +28,8 @@ type PersistedWorkTableRecords = {
   shifts: ShiftRecord[];
 };
 
+const EMPTY_DAILY_PAY_MAPS: Record<string, WorkDayMap> = {};
+
 const persistDayChange = async (change: DayMutation) => {
   const endpoint =
     change.type === "upsertShift"
@@ -52,6 +54,21 @@ export const useWorkTableMonthSession = ({
   const replaceDailyPayMaps = useGlobalStore((store) => store.replaceDailyPayMaps);
   const userId = user?.id;
   const previousStateRef = useRef<typeof state | null>(null);
+
+  const dailyPayMaps = useMemo(() => {
+    if (workDays.length === 0 && Object.keys(state).length === 0) {
+      return EMPTY_DAILY_PAY_MAPS;
+    }
+
+    return workTableStateToDailyPayMaps({
+      domain,
+      state,
+      workDays,
+      standardHours,
+      year,
+      month,
+    });
+  }, [domain, month, standardHours, state, workDays, year]);
 
   const query = useQuery({
     queryKey: ["workTable", userId, year, month],
@@ -105,30 +122,16 @@ export const useWorkTableMonthSession = ({
       return;
     }
 
-    replaceDailyPayMaps(
-      workTableStateToDailyPayMaps({
-        domain,
-        state,
-        workDays,
-        standardHours,
-        year,
-        month,
-      }),
-    );
+    replaceDailyPayMaps(dailyPayMaps);
   }, [
-    domain,
+    dailyPayMaps,
     hydrated,
     isAuthLoading,
-    month,
     query.data,
     query.isFetching,
     query.isSuccess,
     replaceDailyPayMaps,
-    standardHours,
-    state,
     userId,
-    workDays,
-    year,
   ]);
 
   const { mutate } = useMutation({
