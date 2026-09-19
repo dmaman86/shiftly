@@ -9,6 +9,7 @@ type NumberConfigInputProps = {
   label: string;
   helperText?: string;
   allowEmpty?: boolean;
+  emptyValue?: number;
   isValid?: (parsed: number) => boolean;
   onChange: (value: number) => void;
 };
@@ -28,6 +29,7 @@ export const NumberConfigInput = ({
   label,
   helperText,
   allowEmpty = true,
+  emptyValue,
   isValid = defaultIsValid,
   onChange,
 }: NumberConfigInputProps) => {
@@ -48,11 +50,17 @@ export const NumberConfigInput = ({
   const debouncedDraft = useDebounce({ value: draft });
 
   useEffect(() => {
-    if (debouncedDraft === undefined || debouncedDraft === "") return;
+    if (debouncedDraft === undefined) return;
+    if (debouncedDraft === "") {
+      if (emptyValue !== undefined && emptyValue !== value) {
+        onChange(emptyValue);
+      }
+      return;
+    }
     const parsed = Number(debouncedDraft);
     if (!Number.isFinite(parsed) || !isValid(parsed)) return;
     if (parsed !== value) onChange(parsed);
-  }, [debouncedDraft, value, onChange, isValid]);
+  }, [debouncedDraft, emptyValue, value, onChange, isValid]);
 
   const displayValue = draft ?? value.toString();
   const parsed = Number(displayValue);

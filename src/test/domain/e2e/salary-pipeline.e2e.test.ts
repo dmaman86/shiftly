@@ -20,7 +20,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
 
   beforeEach(() => {
     // Build the complete pipeline with all dependencies
-    pipeline = buildPayMapPipeline({ timeZone: "Asia/Jerusalem" });
+    pipeline = buildPayMapPipeline();
   });
 
   // Helper to create a shift
@@ -88,8 +88,8 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
     });
 
     it("should create new pipeline instances each time", () => {
-      const pipeline1 = buildPayMapPipeline({ timeZone: "Asia/Jerusalem" });
-      const pipeline2 = buildPayMapPipeline({ timeZone: "Asia/Jerusalem" });
+      const pipeline1 = buildPayMapPipeline();
+      const pipeline2 = buildPayMapPipeline();
 
       // Different instances
       expect(pipeline1).not.toBe(pipeline2);

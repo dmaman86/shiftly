@@ -4,17 +4,19 @@ import {
   isAfter,
   addDays,
   format,
+  isValid,
+  parseISO,
 } from "date-fns";
 
-export class DateService {
-  private readonly timeZoneOffsetFormatter: Intl.DateTimeFormat;
+const DATE_ONLY_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+const MINUTES_PER_HOUR = 60;
+const WINTER_START_HOUR = 17;
+const SUMMER_START_HOUR = 18;
+const SUMMER_START_MONTH = 4;
+const SUMMER_END_MONTH = 9;
 
-  constructor(private readonly timeZone: string) {
-    this.timeZoneOffsetFormatter = new Intl.DateTimeFormat("en-US", {
-      timeZone,
-      timeZoneName: "longOffset",
-    });
-  }
+export class DateService {
+  constructor() {}
 
   getMinutesFromMidnight(date: Date): number {
     return date.getHours() * 60 + date.getMinutes();
@@ -87,40 +89,23 @@ export class DateService {
   }
 
   getSpecialStartMinutes(date: string): number {
-    const offsetMinutes = this.getTimeZoneOffsetMinutes(date);
+    const match = date.match(DATE_ONLY_PATTERN);
 
-    if (offsetMinutes !== 120 && offsetMinutes !== 180) {
-      throw new RangeError(
-        `Unsupported UTC offset ${offsetMinutes} minutes for time zone "${this.timeZone}"`,
-      );
-    }
-
-    const specialStart = offsetMinutes === 180 ? 18 : 17;
-    return specialStart * 60;
-  }
-
-  private getTimeZoneOffsetMinutes(date: string): number {
-    const instant = new Date(
-      /^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T12:00:00.000Z` : date,
-    );
-
-    if (Number.isNaN(instant.getTime())) {
+    if (!match) {
       throw new RangeError(`Invalid date: "${date}"`);
     }
 
-    const offset = this.timeZoneOffsetFormatter
-      .formatToParts(instant)
-      .find((part) => part.type === "timeZoneName")?.value;
-    const match = offset?.match(/^GMT([+-])(\d{2}):(\d{2})$/);
-
-    if (!match) {
-      throw new RangeError(
-        `Could not resolve UTC offset for time zone "${this.timeZone}"`,
-      );
+    const calendarDate = parseISO(date);
+    if (!isValid(calendarDate)) {
+      throw new RangeError(`Invalid date: "${date}"`);
     }
 
-    const [, sign, hours, minutes] = match;
-    const absoluteMinutes = Number(hours) * 60 + Number(minutes);
-    return sign === "+" ? absoluteMinutes : -absoluteMinutes;
+    const month = calendarDate.getMonth() + 1;
+    const specialStartHour =
+      month >= SUMMER_START_MONTH && month <= SUMMER_END_MONTH
+        ? SUMMER_START_HOUR
+        : WINTER_START_HOUR;
+
+    return specialStartHour * MINUTES_PER_HOUR;
   }
 }

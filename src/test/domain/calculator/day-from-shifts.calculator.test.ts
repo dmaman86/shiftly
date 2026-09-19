@@ -1,7 +1,7 @@
 import { WorkDayStatus, WorkDayType } from "@/constants";
 import { buildPayMapPipeline, calculateDayFromShifts, Shift } from "@/domain";
 
-const pipeline = buildPayMapPipeline({ timeZone: "Asia/Jerusalem" });
+const pipeline = buildPayMapPipeline();
 
 const createShift = (startHour: number, endHour: number, isDuty = false): Shift => ({
   id: crypto.randomUUID(),

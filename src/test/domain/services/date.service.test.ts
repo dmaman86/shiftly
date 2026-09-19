@@ -5,7 +5,7 @@ describe("DateService", () => {
   let service: DateService;
 
   beforeEach(() => {
-    service = new DateService("Asia/Jerusalem");
+    service = new DateService();
   });
 
   describe("getMinutesFromMidnight", () => {
@@ -518,27 +518,44 @@ describe("DateService", () => {
   });
 
   describe("getSpecialStartMinutes", () => {
-    it("should return 17:00 during Israel standard time", () => {
+    it("should return 17:00 from October through March", () => {
       expect(service.getSpecialStartMinutes("2025-01-15")).toBe(17 * 60);
+      expect(service.getSpecialStartMinutes("2025-03-31")).toBe(17 * 60);
+      expect(service.getSpecialStartMinutes("2025-10-01")).toBe(17 * 60);
     });
 
-    it("should return 18:00 during Israel daylight saving time", () => {
+    it("should return 18:00 from April through September", () => {
+      expect(service.getSpecialStartMinutes("2025-04-01")).toBe(18 * 60);
       expect(service.getSpecialStartMinutes("2025-06-15")).toBe(18 * 60);
+      expect(service.getSpecialStartMinutes("2025-09-30")).toBe(18 * 60);
     });
 
-    it("should handle date-only and ISO inputs consistently", () => {
-      const dateOnlyResult = service.getSpecialStartMinutes("2025-06-15");
-      const isoResult = service.getSpecialStartMinutes(
-        "2025-06-15T00:00:00.000Z",
-      );
-
-      expect(dateOnlyResult).toBe(isoResult);
+    it("should reject ISO timestamps because only date-only input is supported", () => {
+      expect(() =>
+        service.getSpecialStartMinutes("2025-06-15T00:00:00.000Z"),
+      ).toThrow('Invalid date: "2025-06-15T00:00:00.000Z"');
     });
 
     it("should reject invalid dates", () => {
       expect(() => service.getSpecialStartMinutes("invalid-date")).toThrow(
         'Invalid date: "invalid-date"',
       );
+    });
+
+    it.each([
+      "2025-00-15",
+      "2025-13-01",
+      "2025-04-00",
+      "2025-04-31",
+      "2025-02-29",
+    ])("should reject invalid calendar date %s", (date) => {
+      expect(() => service.getSpecialStartMinutes(date)).toThrow(
+        `Invalid date: "${date}"`,
+      );
+    });
+
+    it("should accept February 29 in a leap year", () => {
+      expect(service.getSpecialStartMinutes("2024-02-29")).toBe(17 * 60);
     });
   });
 

@@ -357,5 +357,48 @@ describe("ConfigPanel", () => {
       expect(standardHoursInput.value).toBe("0");
       expect(baseRateInput.value).toBe("0");
     });
+
+    it("should reset base rate to zero when an existing value is cleared", async () => {
+      const user = userEvent.setup();
+      const { store } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
+        preloadedState: {
+          global: createMockGlobalState({
+            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 75 },
+          }),
+        },
+      });
+
+      const baseRateInput = screen.getByLabelText("שכר שעתי");
+      await user.clear(baseRateInput);
+
+      await waitFor(
+        () => {
+          expect(store.getState().global.config.baseRate).toBe(0);
+        },
+        { timeout: 1000 },
+      );
+    });
+
+    it("should accept zero as a base rate", async () => {
+      const user = userEvent.setup();
+      const { store } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
+        preloadedState: {
+          global: createMockGlobalState({
+            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 75 },
+          }),
+        },
+      });
+
+      const baseRateInput = screen.getByLabelText("שכר שעתי");
+      await user.clear(baseRateInput);
+      await user.type(baseRateInput, "0");
+
+      await waitFor(
+        () => {
+          expect(store.getState().global.config.baseRate).toBe(0);
+        },
+        { timeout: 1000 },
+      );
+    });
   });
 });

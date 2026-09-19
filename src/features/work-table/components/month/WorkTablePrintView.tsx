@@ -21,7 +21,7 @@ import {
   WorkDayInfo,
 } from "@/domain";
 import { useGlobalState } from "@/hooks";
-import { formatValue } from "@/utils";
+import { formatValue, groupByShabbat } from "@/utils";
 import { dayToCompactPayBreakdownVM } from "../../mappers/day/dayToCompactPayBreakdownVM";
 import { useWorkTableDayState } from "../../hooks/day/useWorkTableDayState";
 
@@ -32,6 +32,7 @@ type WorkTablePrintViewProps = {
   shabbatCreditHoursByDate: Readonly<Record<string, number>>;
   monthBreakdown: PayBreakdownViewModel;
   dailySalary?: number;
+  pdfMetadataHeader?: string;
 };
 
 type PrintDayRowProps = {
@@ -42,6 +43,7 @@ type PrintDayRowProps = {
   baseRate: number;
   standardHours: number;
   shabbatCreditHours: number;
+  isLastInWeek: boolean;
 };
 
 const PrintDayRow = ({
@@ -52,6 +54,7 @@ const PrintDayRow = ({
   baseRate,
   standardHours,
   shabbatCreditHours,
+  isLastInWeek,
 }: PrintDayRowProps) => {
   const { t } = useTranslation("work-table");
   const { status, shiftEntries } = useWorkTableDayState(workDay.meta.date);
@@ -108,7 +111,14 @@ const PrintDayRow = ({
   const specialFullDay = workDay.meta.typeDay === WorkDayType.SpecialFull;
 
   return (
-    <TableRow>
+    <TableRow
+      data-week-end={isLastInWeek ? "true" : undefined}
+      sx={{
+        "& > td": {
+          borderBottom: isLastInWeek ? "3px solid #1d3e91" : undefined,
+        },
+      }}
+    >
       <TableCell>{dayLabel}</TableCell>
       <TableCell>{status === WorkDayStatus.sick ? "✓" : ""}</TableCell>
       <TableCell>{status === WorkDayStatus.vacation ? "✓" : ""}</TableCell>
@@ -140,11 +150,20 @@ const PrintDayRow = ({
 
 export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewProps>(
   function WorkTablePrintView(
-    { domain, workDays, monthName, shabbatCreditHoursByDate, monthBreakdown, dailySalary },
+    {
+      domain,
+      workDays,
+      monthName,
+      shabbatCreditHoursByDate,
+      monthBreakdown,
+      dailySalary,
+      pdfMetadataHeader,
+    },
     ref,
   ) {
   const { t } = useTranslation("work-table");
   const { month, year, baseRate, standardHours } = useGlobalState();
+  const groupedWorkDays = useMemo(() => groupByShabbat(workDays), [workDays]);
 
   return (
     <>
@@ -185,6 +204,14 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
         <Typography component="h1" sx={{ mb: 1, fontSize: 14, fontWeight: 700 }}>
           {t("table.month_hours_title", { monthName, year })}
         </Typography>
+        {pdfMetadataHeader && (
+          <Typography
+            component="div"
+            sx={{ mb: 1, color: "#4a4a4a", fontSize: 8, fontWeight: 500 }}
+          >
+            {pdfMetadataHeader}
+          </Typography>
+        )}
         <TableContainer>
           <Table
             size="small"
@@ -214,7 +241,9 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
                 <TableCell colSpan={2}>{t("headers.shabbat")}</TableCell>
                 <TableCell colSpan={2}>{t("headers.absence")}</TableCell>
                 <TableCell rowSpan={2}>{t("headers.shabbat_credit")}</TableCell>
-                <TableCell colSpan={3}>{t("headers.meal_allowance")}</TableCell>
+                <TableCell rowSpan={2}>{t("headers.meal_allowance")}</TableCell>
+                <TableCell rowSpan={2}>{t("headers.meal_large")}</TableCell>
+                <TableCell rowSpan={2}>{t("headers.meal_small")}</TableCell>
                 <TableCell rowSpan={2}>{t("daily_salary_header")}</TableCell>
               </TableRow>
               <TableRow>
@@ -233,25 +262,25 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
                 <TableCell>200%</TableCell>
                 <TableCell>{t("headers.sick")}</TableCell>
                 <TableCell>{t("headers.vacation")}</TableCell>
-                <TableCell>{t("headers.meal_per_diem")}</TableCell>
-                <TableCell>{t("headers.large")}</TableCell>
-                <TableCell>{t("headers.small")}</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {workDays.map((workDay) => (
-                <PrintDayRow
-                  key={workDay.meta.date}
-                  domain={domain}
-                  workDay={workDay}
-                  month={month}
-                  year={year}
-                  baseRate={baseRate}
-                  standardHours={standardHours}
-                  shabbatCreditHours={shabbatCreditHoursByDate[workDay.meta.date] ?? 0}
-                />
-              ))}
-            </TableBody>
+            {groupedWorkDays.map((group) => (
+              <TableBody key={group[0].meta.date}>
+                {group.map((workDay, dayIndex) => (
+                  <PrintDayRow
+                    key={workDay.meta.date}
+                    domain={domain}
+                    workDay={workDay}
+                    month={month}
+                    year={year}
+                    baseRate={baseRate}
+                    standardHours={standardHours}
+                    shabbatCreditHours={shabbatCreditHoursByDate[workDay.meta.date] ?? 0}
+                    isLastInWeek={dayIndex === group.length - 1}
+                  />
+                ))}
+              </TableBody>
+            ))}
             <TableFooter>
               <TableRow sx={{ fontWeight: 700 }}>
                 <TableCell colSpan={5}>{t("table.total_gross_label")}</TableCell>

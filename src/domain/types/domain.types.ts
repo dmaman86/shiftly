@@ -26,10 +26,6 @@ export interface CoreServices {
   shiftService: ShiftService;
 }
 
-export interface DomainConfig {
-  timeZone: string;
-}
-
 export interface Resolvers {
   workDayInfoResolver: WorkDayInfoResolver;
   monthResolver: DefaultMonthResolver;

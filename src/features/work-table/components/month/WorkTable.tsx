@@ -59,7 +59,7 @@ export const WorkTable = ({
   monthBreakdown,
   monthFullBreakdown,
 }: WorkTableProps) => {
-  const { year, month, baseRate, reset } = useGlobalState();
+  const { year, month, baseRate, standardHours, reset } = useGlobalState();
   const { user } = useAuth();
   const userId = user?.id;
   const printViewRef = useRef<HTMLDivElement>(null);
@@ -68,8 +68,10 @@ export const WorkTable = ({
   useEffect(() => reset(), [userId, reset]);
   const { isMobile } = useDeviceType();
   const { t } = useTranslation("work-table");
+  const { t: tCommon } = useTranslation("common");
   const monthNames = t("months", { returnObjects: true }) as string[];
   const currentDate = domain.services.dateService.formatDate(new Date());
+  const copyrightYear = new Date().getFullYear();
 
   // Group workdays by week (ending on Shabbat/Saturday)
   // groupByShabbat is O(n), with n bounded by the number of days in the month.
@@ -102,6 +104,19 @@ export const WorkTable = ({
                 await exportWorkTablePdf({
                   element: printViewRef.current,
                   fileName: `work-table-${year}-${String(month).padStart(2, "0")}.pdf`,
+                  metadata: {
+                    header: [
+                      user?.email
+                        ? `${t("table.pdf_email")}: ${user.email}`
+                        : null,
+                      `${t("table.pdf_base_rate")}: ${baseRate}`,
+                      `${t("table.pdf_standard_hours")}: ${standardHours}`,
+                    ]
+                      .filter(Boolean)
+                      .join("  |  "),
+                    footer: tCommon("footer.copyright", { year: copyrightYear }),
+                    direction: "rtl",
+                  },
                 });
               } catch (error) {
                 console.error("Failed to export work table PDF", error);
@@ -236,6 +251,15 @@ export const WorkTable = ({
               domain={domain}
               workDays={workDays}
               monthName={monthNames[month - 1]}
+              pdfMetadataHeader={[
+                user?.email
+                  ? `${t("table.pdf_email")}: ${user.email}`
+                  : null,
+                `${t("table.pdf_base_rate")}: ${baseRate}`,
+                `${t("table.pdf_standard_hours")}: ${standardHours}`,
+              ]
+                .filter(Boolean)
+                .join("  |  ")}
               monthBreakdown={monthFullBreakdown}
               dailySalary={monthBreakdown.dailySalary}
               shabbatCreditHoursByDate={
