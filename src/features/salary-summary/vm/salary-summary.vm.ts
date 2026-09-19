@@ -1,6 +1,8 @@
 import { MealAllowanceRates, PayBreakdownViewModel } from "@/domain";
 
 export type PayRowVM = {
+  /** Stable domain identifier used by salary-summary edits and React keys. */
+  id: string;
   label: string;
   quantity: number;
   rate: number;
@@ -12,6 +14,8 @@ export type PayTableVM = {
   rows: PayRowVM[];
   total: number;
 };
+
+export type SalaryQuantityOverrides = Record<string, number>;
 
 export type MonthlySalarySummaryVM = {
   baseRows: PayRowVM[];

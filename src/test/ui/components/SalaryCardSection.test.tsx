@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { renderWithProviders, screen, waitFor } from "@/test/ui/utils";
 import userEvent from "@testing-library/user-event";
 import { SalaryCardSection } from "@/features/salary-summary/components/SalaryCardSection";
@@ -42,8 +42,8 @@ describe("SalaryCardSection", () => {
     },
     baseRate: 50,
     buildRows: () => [
-      { label: "100%", quantity: 160, rate: 50, total: 8000 },
-      { label: "125%", quantity: 20, rate: 62.5, total: 1250 },
+      { id: "regular100", label: "100%", quantity: 160, rate: 50, total: 8000 },
+      { id: "regular125", label: "125%", quantity: 20, rate: 62.5, total: 1250 },
     ],
   };
 
@@ -145,36 +145,6 @@ describe("SalaryCardSection", () => {
       expect(firstInput).toHaveValue("200");
     });
 
-    it("should update total when quantity changes", async () => {
-      const user = userEvent.setup();
-      const handleTotalChange = vi.fn();
-
-      renderWithProviders(
-        <SalaryCardSection section={mockSection} onTotalChange={handleTotalChange} />
-      );
-
-      // Clear previous calls
-      handleTotalChange.mockClear();
-
-      const editButton = screen.getByRole("button");
-      await user.click(editButton);
-
-      // Get first input (for 100% row, rate=50)
-      const inputs = screen.getAllByRole("textbox");
-      const firstInput = inputs[0];
-
-      await user.clear(firstInput);
-      await user.type(firstInput, "200");
-
-      // Wait for debounce and recalculation
-      await waitFor(
-        () => {
-          // New total: 200*50 + 20*62.5 = 10000 + 1250 = 11250
-          expect(handleTotalChange).toHaveBeenCalledWith("base", 11250);
-        },
-        { timeout: 1000 }
-      );
-    });
   });
 
   describe("Table Structure", () => {
@@ -269,7 +239,9 @@ describe("SalaryCardSection", () => {
     it("should handle single row", () => {
       const singleRowSection: SalarySectionConfig = {
         ...mockSection,
-        buildRows: () => [{ label: "100%", quantity: 160, rate: 50, total: 8000 }],
+        buildRows: () => [
+          { id: "regular100", label: "100%", quantity: 160, rate: 50, total: 8000 },
+        ],
       };
 
       renderWithProviders(<SalaryCardSection section={singleRowSection} />);

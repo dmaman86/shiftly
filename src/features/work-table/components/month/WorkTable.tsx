@@ -25,7 +25,6 @@ import {
   useAppSnackbar,
   useAuth,
   useDeviceType,
-  useGlobalBreakdown,
   useGlobalState,
 } from "@/hooks";
 import { groupByShabbat } from "@/utils";
@@ -38,25 +37,27 @@ import {
   WorkTableHeader,
   WorkTableDayStateProvider,
   WorkTableDayStateHydrator,
-  monthToCompactPayBreakdownVM,
-  monthToPayBreakdownVM,
   WorkTablePrintView,
   exportWorkTablePdf,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
-import { ShabbatCreditAllocation, WorkDayInfo } from "@/domain";
+import { CompactPayBreakdownVM, PayBreakdownViewModel, ShabbatCreditAllocation, WorkDayInfo } from "@/domain";
 import { FeatureBoundary } from "@/layout";
 
 type WorkTableProps = {
   domain: DomainContextType;
   workDays: WorkDayInfo[];
   shabbatCreditAllocation: ShabbatCreditAllocation;
+  monthBreakdown: CompactPayBreakdownVM;
+  monthFullBreakdown: PayBreakdownViewModel;
 };
 
 export const WorkTable = ({
   domain,
   workDays,
   shabbatCreditAllocation,
+  monthBreakdown,
+  monthFullBreakdown,
 }: WorkTableProps) => {
   const { year, month, baseRate, reset } = useGlobalState();
   const { user } = useAuth();
@@ -65,9 +66,6 @@ export const WorkTable = ({
   const [isExporting, setIsExporting] = useState(false);
   const snackbar = useAppSnackbar();
   useEffect(() => reset(), [userId, reset]);
-  const globalBreakdown = useGlobalBreakdown(
-    domain.payMap.monthPayMapCalculator,
-  );
   const { isMobile } = useDeviceType();
   const { t } = useTranslation("work-table");
   const monthNames = t("months", { returnObjects: true }) as string[];
@@ -77,16 +75,6 @@ export const WorkTable = ({
   // groupByShabbat is O(n), with n bounded by the number of days in the month.
   // Memoization avoids rebuilding the groups when unrelated state changes trigger a render.
   const groupByWeeks = useMemo(() => groupByShabbat(workDays), [workDays]);
-
-  const monthBreakdown = monthToCompactPayBreakdownVM(
-    globalBreakdown,
-    baseRate,
-    shabbatCreditAllocation.usedHours,
-  );
-  const monthFullBreakdown = monthToPayBreakdownVM(
-    globalBreakdown,
-    shabbatCreditAllocation.usedHours,
-  );
 
   return (
     <Card sx={{ mb: 3 }}>

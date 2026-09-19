@@ -1,12 +1,25 @@
-import { useCallback, useMemo, useState } from "react";
-import { buildPayTable } from "../helpers";
-import { PayRowVM, SalarySectionConfig } from "../vm";
+import { useCallback, useMemo } from "react";
+import { applyQuantityOverrides, buildPayTable } from "../helpers";
+import type {
+  PayRowVM,
+  SalaryQuantityOverrides,
+  SalarySectionConfig,
+} from "../vm";
 
 type UsePayTableVMParams = {
   section: SalarySectionConfig;
+  quantityOverrides: SalaryQuantityOverrides;
+  onQuantityOverrideChange: (key: string, value?: number) => void;
 };
 
-export const usePayTableVM = ({ section }: UsePayTableVMParams) => {
+const getOverrideKey = (sectionId: string, row: PayRowVM) =>
+  `${sectionId}:${row.id}`;
+
+export const usePayTableVM = ({
+  section,
+  quantityOverrides,
+  onQuantityOverrideChange,
+}: UsePayTableVMParams) => {
   // Build rows from domain (recalculates when inputs change)
   const initialRows: PayRowVM[] = useMemo(() => {
     switch (section.type) {
@@ -22,19 +35,12 @@ export const usePayTableVM = ({ section }: UsePayTableVMParams) => {
     }
   }, [section]);
 
-  const [quantityOverrides, setQuantityOverrides] = useState<
-    Record<string, number>
-  >({});
-
   const table = useMemo(() => {
-    const rows = initialRows.map((row, index) => {
-      const key = `${section.id}:${index}`;
-      const quantity = quantityOverrides[key] ?? row.quantity;
-
-      return quantity === row.quantity
-        ? row
-        : { ...row, quantity, total: quantity * row.rate };
-    });
+    const rows = applyQuantityOverrides(
+      initialRows,
+      section.id,
+      quantityOverrides,
+    );
 
     return buildPayTable(rows);
   }, [initialRows, quantityOverrides, section.id]);
@@ -42,22 +48,15 @@ export const usePayTableVM = ({ section }: UsePayTableVMParams) => {
   // Update single row (for user quantity changes)
   const updateRow = useCallback(
     (index: number, updatedRow: PayRowVM) => {
-      const key = `${section.id}:${index}`;
+      const key = getOverrideKey(section.id, initialRows[index]);
+      const nextValue =
+        initialRows[index]?.quantity === updatedRow.quantity
+          ? undefined
+          : updatedRow.quantity;
 
-      setQuantityOverrides((previous) => {
-        if (initialRows[index]?.quantity === updatedRow.quantity) {
-          if (!(key in previous)) return previous;
-
-          const next = { ...previous };
-          delete next[key];
-          return next;
-        }
-
-        if (previous[key] === updatedRow.quantity) return previous;
-        return { ...previous, [key]: updatedRow.quantity };
-      });
+      onQuantityOverrideChange(key, nextValue);
     },
-    [initialRows, section.id],
+    [initialRows, onQuantityOverrideChange, section.id],
   );
 
   return {

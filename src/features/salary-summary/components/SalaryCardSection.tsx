@@ -22,37 +22,41 @@ import { useGlobalState } from "@/hooks";
 import { analyticsService } from "@/services";
 import {
   SalaryRow,
+  SalaryQuantityOverrides,
   SalarySectionConfig,
   usePayTableVM,
 } from "@/features/salary-summary";
 
 type SalaryCardSectionProps = {
   section: SalarySectionConfig;
-  onTotalChange?: (id: string, total: number) => void;
+  quantityOverrides?: SalaryQuantityOverrides;
+  onQuantityOverrideChange?: (key: string, value?: number) => void;
 };
+
+const EMPTY_QUANTITY_OVERRIDES: SalaryQuantityOverrides = {};
+const IGNORE_QUANTITY_OVERRIDE = () => {};
 
 export const SalaryCardSection = ({
   section,
-  onTotalChange,
+  quantityOverrides,
+  onQuantityOverrideChange,
 }: SalaryCardSectionProps) => {
   const { t } = useTranslation("work-table");
   const { month, year } = useGlobalState();
   const [editMode, setEditMode] = useState(false);
 
-  const table = usePayTableVM({ section });
+  const table = usePayTableVM({
+    section,
+    quantityOverrides: quantityOverrides ?? EMPTY_QUANTITY_OVERRIDES,
+    onQuantityOverrideChange:
+      onQuantityOverrideChange ?? IGNORE_QUANTITY_OVERRIDE,
+  });
 
   const handleQuantityChange = (index: number, newQuantity: number) => {
     const row = table.rows[index];
     const updatedRow = { ...row, quantity: newQuantity, total: newQuantity * row.rate };
     table.updateRow(index, updatedRow);
 
-    if (onTotalChange) {
-      const newTotal = table.rows.reduce(
-        (sum, r, i) => sum + (i === index ? updatedRow.total : r.total),
-        0,
-      );
-      onTotalChange(section.id, newTotal);
-    }
   };
 
   return (
@@ -115,7 +119,7 @@ export const SalaryCardSection = ({
           <TableBody>
             {table.rows.map((row, index) => (
               <SalaryRow
-                key={`${row.label}-${month}-${year}`}
+                key={`${row.id ?? row.label}-${month}-${year}`}
                 row={row}
                 editMode={editMode}
                 onQuantityChange={(val) => handleQuantityChange(index, val)}

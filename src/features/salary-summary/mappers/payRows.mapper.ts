@@ -13,11 +13,14 @@ export const buildBasePayRows = (
   baseRate: number,
   t: TranslateFn,
 ): PayRowVM[] => {
-  const baseMap: Record<string, Segment> = {
-    [t("pay_labels.regular_100")]: payVM.regular.hours100,
-    [t("pay_labels.shabbat_bonus_100")]: payVM.appliedShabbatCredit,
-    [t("pay_labels.sick")]: payVM.hours100Sick,
-    [t("pay_labels.vacation")]: payVM.hours100Vacation,
+  const baseMap: Record<string, { label: string; segment: Segment }> = {
+    regular100: { label: t("pay_labels.regular_100"), segment: payVM.regular.hours100 },
+    shabbatCredit100: {
+      label: t("pay_labels.shabbat_bonus_100"),
+      segment: payVM.appliedShabbatCredit,
+    },
+    sick100: { label: t("pay_labels.sick"), segment: payVM.hours100Sick },
+    vacation100: { label: t("pay_labels.vacation"), segment: payVM.hours100Vacation },
   };
 
   return mapSegmentsToPayRows(baseRate, baseMap);
@@ -28,13 +31,19 @@ export const buildExtraPayRows = (
   baseRate: number,
   t: TranslateFn,
 ): PayRowVM[] => {
-  const extraMap: Record<string, Segment> = {
-    [t("pay_labels.night_50")]: payVM.extra.hours50,
-    [t("pay_labels.shabbat_150")]: payVM.regular.hours150,
-    [t("pay_labels.extra_125")]: payVM.regular.hours125,
-    [t("pay_labels.shabbat_rate_150")]: payVM.special.shabbat150,
-    [t("pay_labels.shabbat_rate_200")]: payVM.special.shabbat200,
-    [t("pay_labels.evening_20")]: payVM.extra.hours20,
+  const extraMap: Record<string, { label: string; segment: Segment }> = {
+    night50: { label: t("pay_labels.night_50"), segment: payVM.extra.hours50 },
+    shabbat150: { label: t("pay_labels.shabbat_150"), segment: payVM.regular.hours150 },
+    extra125: { label: t("pay_labels.extra_125"), segment: payVM.regular.hours125 },
+    shabbatRate150: {
+      label: t("pay_labels.shabbat_rate_150"),
+      segment: payVM.special.shabbat150,
+    },
+    shabbatRate200: {
+      label: t("pay_labels.shabbat_rate_200"),
+      segment: payVM.special.shabbat200,
+    },
+    evening20: { label: t("pay_labels.evening_20"), segment: payVM.extra.hours20 },
   };
 
   return mapSegmentsToPayRows(baseRate, extraMap);

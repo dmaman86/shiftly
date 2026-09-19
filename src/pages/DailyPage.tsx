@@ -18,6 +18,7 @@ import {
   ConfigPanel,
   MonthlySalarySummary,
   Feedback,
+  useMonthlyBreakdowns,
   useShabbatCreditAllocation,
 } from "@/features";
 import { useGlobalState, useWorkDays } from "@/hooks";
@@ -31,6 +32,11 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
 
   const { workDays, isLoading: loading, error: queryError } = useWorkDays(domain);
   const shabbatCreditAllocation = useShabbatCreditAllocation();
+  const { monthBreakdown, monthFullBreakdown } = useMonthlyBreakdowns({
+    monthPayMapCalculator: domain.payMap.monthPayMapCalculator,
+    baseRate,
+    shabbatCreditHours: shabbatCreditAllocation.usedHours,
+  });
   const error = queryError?.message;
 
   const hasData = workDays.length > 0;
@@ -138,6 +144,8 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                     domain={domain}
                     workDays={workDays}
                     shabbatCreditAllocation={shabbatCreditAllocation}
+                    monthBreakdown={monthBreakdown}
+                    monthFullBreakdown={monthFullBreakdown}
                   />
                 </FeatureBoundary>
               )}
@@ -149,7 +157,10 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                     errorContext="MonthlySalarySummary"
                     resetKeys={[year, month]}
                   >
-                    <MonthlySalarySummary domain={domain} />
+                    <MonthlySalarySummary
+                      domain={domain}
+                      monthFullBreakdown={monthFullBreakdown}
+                    />
                   </FeatureBoundary>
                   <Feedback />
                 </>

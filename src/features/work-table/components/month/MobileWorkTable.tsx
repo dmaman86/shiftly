@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { WorkDayInfo } from "@/domain";
 import { SYSTEM_START_YEAR, WorkDayStatus } from "@/constants";
 import { DomainContextType } from "@/app";
+import { AuthControls } from "@/features/auth";
 import { useGlobalState } from "@/hooks";
 import { useWorkTableDayState } from "../../hooks/day/useWorkTableDayState";
 import { DayCard } from "../day/DayCard";
@@ -182,6 +183,8 @@ export const MobileWorkTable = ({
           }}
         />
       </Box>
+
+      <AuthControls />
 
       <DayCard
         key={selectedWorkDay.meta.date}

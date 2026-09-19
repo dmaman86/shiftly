@@ -16,6 +16,8 @@ import {
   ConfigPanel,
   MonthlySalarySummary,
   Feedback,
+  useMonthlyBreakdowns,
+  useShabbatCreditAllocation,
 } from "@/features";
 import {
   WorkTableDayStateHydrator,
@@ -32,9 +34,15 @@ export const MonthlySummaryPage = ({
 }) => {
   const { t } = useTranslation("pages");
   const { t: tWT } = useTranslation("work-table");
-  const { year, month } = useGlobalState();
+  const { year, month, baseRate } = useGlobalState();
   const { workDays } = useWorkDays(domain);
   const { user } = useAuth();
+  const shabbatCreditAllocation = useShabbatCreditAllocation();
+  const { monthFullBreakdown } = useMonthlyBreakdowns({
+    monthPayMapCalculator: domain.payMap.monthPayMapCalculator,
+    baseRate,
+    shabbatCreditHours: shabbatCreditAllocation.usedHours,
+  });
 
   return (
     <Box component="section" sx={{ mt: 2 }}>
@@ -60,11 +68,7 @@ export const MonthlySummaryPage = ({
                   <Typography variant="body2" color="text.secondary">
                     {t("monthly_summary_page.nav_hint_daily")}
                   </Typography>
-                  <MuiLink
-                    component={RouterLink}
-                    to="../daily"
-                    variant="body2"
-                  >
+                  <MuiLink component={RouterLink} to="../daily" variant="body2">
                     {t("monthly_summary_page.nav_link_daily")}
                   </MuiLink>
                 </Stack>
@@ -130,7 +134,10 @@ export const MonthlySummaryPage = ({
                     errorContext="MonthlySalarySummary"
                     resetKeys={[year, month]}
                   >
-                    <MonthlySalarySummary domain={domain} />
+                    <MonthlySalarySummary
+                      domain={domain}
+                      monthFullBreakdown={monthFullBreakdown}
+                    />
                   </FeatureBoundary>
                 </WorkTableDayStateHydrator>
               </WorkTableDayStateProvider>

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type UseEditableQuantityParams = {
   value: number;
@@ -19,11 +19,17 @@ export const useEditableQuantity = ({
   const [inputValue, setInputValue] = useState(formatEditableValue(value));
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [previousValue, setPreviousValue] = useState(value);
-  if (value !== previousValue) {
-    setPreviousValue(value);
+  useEffect(() => {
+    // Keep the input synchronized when the controlled row value changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setInputValue(formatEditableValue(value));
-  }
+  }, [value]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   const onInputChange = useCallback(
     (raw: string) => {

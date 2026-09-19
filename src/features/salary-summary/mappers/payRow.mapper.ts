@@ -2,6 +2,7 @@ import { Segment } from "@/domain";
 import { PayRowVM } from "@/features/salary-summary";
 
 export const mapSegmentToPayRow = (
+  id: string,
   label: string,
   segment: Segment,
   baseRate: number,
@@ -10,6 +11,7 @@ export const mapSegmentToPayRow = (
   const quantity = segment.hours;
 
   return {
+    id,
     label,
     quantity,
     rate,
@@ -19,8 +21,8 @@ export const mapSegmentToPayRow = (
 
 export const mapSegmentsToPayRows = (
   baseRate: number,
-  map: Record<string, Segment>,
+  map: Record<string, { label: string; segment: Segment }>,
 ): PayRowVM[] =>
-  Object.entries(map).map(([label, segment]) =>
-    mapSegmentToPayRow(label, segment, baseRate),
+  Object.entries(map).map(([id, { label, segment }]) =>
+    mapSegmentToPayRow(id, label, segment, baseRate),
   );

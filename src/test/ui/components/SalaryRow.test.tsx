@@ -6,6 +6,7 @@ import { PayRowVM } from "@/features/salary-summary/vm";
 
 describe("SalaryRow", () => {
   const defaultRow: PayRowVM = {
+    id: "regular100",
     label: "Regular Hours 100%",
     quantity: 160,
     rate: 50,
@@ -214,6 +215,7 @@ describe("SalaryRow", () => {
   describe("Different Row Types", () => {
     it("should render overtime row correctly", () => {
       const row: PayRowVM = {
+        id: "extra125",
         label: "Overtime 125%",
         quantity: 20,
         rate: 62.5,
@@ -230,6 +232,7 @@ describe("SalaryRow", () => {
 
     it("should render night shift row correctly", () => {
       const row: PayRowVM = {
+        id: "night150",
         label: "Night Shift 150%",
         quantity: 8,
         rate: 75,
@@ -244,6 +247,7 @@ describe("SalaryRow", () => {
 
     it("should render Hebrew labels correctly", () => {
       const row: PayRowVM = {
+        id: "regular100-hebrew",
         label: "שעות רגילות 100%",
         quantity: 160,
         rate: 50,
@@ -376,6 +380,7 @@ describe("SalaryRow", () => {
 
     it("should render with all values at maximum", () => {
       const row: PayRowVM = {
+        id: "maximum",
         label: "Maximum Values",
         quantity: 999999.99,
         rate: 999999.99,
