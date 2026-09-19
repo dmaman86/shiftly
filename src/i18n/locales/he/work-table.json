@@ -29,6 +29,8 @@
     "absence": "היעדרות",
     "meal_allowance": "אש״ל",
     "meal_per_diem": "כלכלה",
+    "meal_large": "כלכלה גדולה",
+    "meal_small": "כלכלה קטנה",
     "large": "גדולה",
     "small": "קטנה",
     "shabbat_credit": "זכות שבת",
@@ -81,7 +83,10 @@
     "mobile_calendar_label": "בחר יום עבודה",
     "total_gross_label": "סה״כ ברוטו",
     "export_pdf": "ייצא כ-PDF",
-    "export_pdf_error": "לא ניתן לייצא את טבלת העבודה כקובץ PDF"
+    "export_pdf_error": "לא ניתן לייצא את טבלת העבודה כקובץ PDF",
+    "pdf_email": "דוא״ל",
+    "pdf_base_rate": "שכר שעתי",
+    "pdf_standard_hours": "שעות תקן"
   },
   "day_details": {
     "show": "הצג פרטי יום",

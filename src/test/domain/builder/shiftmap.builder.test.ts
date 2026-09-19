@@ -22,7 +22,7 @@ describe("DefaultShiftMapBuilder", () => {
 
   beforeEach(() => {
     // Setup services
-    dateService = new DateService("Asia/Jerusalem");
+    dateService = new DateService();
     shiftService = new ShiftService(dateService);
     
     // Setup calculators

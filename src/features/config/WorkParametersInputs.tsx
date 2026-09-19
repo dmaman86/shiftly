@@ -10,7 +10,7 @@ type WorkParametersInputsProps = {
   showHelperText?: boolean;
 };
 
-const isPositive = (value: number) => value > 0;
+const isNonNegative = (value: number) => value >= 0;
 
 export const WorkParametersInputs = ({
   idPrefix = "",
@@ -55,7 +55,8 @@ export const WorkParametersInputs = ({
           label={t("config.base_rate_label")}
           helperText={showHelperText ? baseRateHelper : undefined}
           allowEmpty={false}
-          isValid={isPositive}
+          emptyValue={0}
+          isValid={isNonNegative}
           onChange={updateBaseRate}
         />
       </Box>

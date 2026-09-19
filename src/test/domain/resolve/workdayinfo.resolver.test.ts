@@ -9,7 +9,7 @@ describe("WorkDayInfoResolver", () => {
   type WorkDayTestCase = WorkDayInfo & { weekdayLabel: string };
 
   beforeEach(() => {
-    resolver = new WorkDayInfoResolver(new DateService("Asia/Jerusalem"));
+    resolver = new WorkDayInfoResolver(new DateService());
   });
 
   const createWorkDayInfo = (

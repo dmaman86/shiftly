@@ -1,9 +1,7 @@
 import { buildPayMapPipeline } from "@/domain";
 import { DomainContextType } from "./domain.types";
 
-const pipelineInstance = buildPayMapPipeline({
-  timeZone: "Asia/Jerusalem",
-});
+const pipelineInstance = buildPayMapPipeline();
 
 export const domain: DomainContextType = {
   payMap: {

@@ -8,7 +8,7 @@ describe("ShiftService", () => {
   let dateService: DateService;
 
   beforeEach(() => {
-    dateService = new DateService("Asia/Jerusalem");
+    dateService = new DateService();
     service = new ShiftService(dateService);
   });
 

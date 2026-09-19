@@ -2,9 +2,7 @@ import { vi } from "vitest";
 import { buildPayMapPipeline } from "@/domain";
 
 // Initialize domain pipeline once for all tests
-const pipelineInstance = buildPayMapPipeline({
-  timeZone: "Asia/Jerusalem",
-});
+const pipelineInstance = buildPayMapPipeline();
 
 vi.mock("@/app", () => ({
   domain: {

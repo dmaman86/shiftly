@@ -46,7 +46,9 @@ The result is a predictable source of confusion: employees receive a payslip the
 The core principle behind Shiftly is that **calculation logic remains stable over time**.
 
 Salary rules do not change per implementation, but per **period context**.
-Dates, daylight saving time, hourly rates, per-diem rules, and allowances are treated as inputs rather than hardcoded logic.
+Calendar dates, hourly rates, per-diem rules, and allowances are treated as inputs rather than hardcoded UI behavior.
+
+For partial special days, the start of the special-rate period follows the current business rule: **18:00 from April through September and 17:00 from October through March**. Dates are accepted only in `YYYY-MM-DD` format and are validated as real calendar dates.
 
 This makes it possible to **recalculate past months accurately** using the same calculation pipeline, simply by changing the contextual parameters - without modifying domain code.
 
@@ -66,9 +68,11 @@ This makes it possible to **recalculate past months accurately** using the same 
 - Cross-day shifts
 - Per-diem calculation with historical rate timeline
 - Meal allowance calculation (small / large)
+- Optional hourly-rate calculation: when `baseRate > 0`, the daily pay column and salary summary are shown; clearing it or setting it to `0` hides them
 - Monthly aggregated breakdown
 - Incremental recalculation (add / update / remove shifts)
 - Fully reactive UI
+- Landscape, right-to-left PDF export with weekly separators, independent meal-allowance columns, per-page metadata, and the application copyright footer
 - Optional Google sign-in with cross-device data persistence
 
 ---
@@ -354,6 +358,7 @@ Tests cover:
 - Calculation logic (builders, calculators, reducers)
 - Time-based resolution (holidays, rates, segments)
 - Edge cases (cross-day shifts, partial days, sick/vacation)
+- UI configuration and work-table behavior, including salary visibility when `baseRate` changes
 - End-to-end calculation scenarios
 
 The domain layer is fully testable and framework-independent, making it easy to validate business rules in isolation.
@@ -500,6 +505,14 @@ Shiftly provides two main calculation views:
 - Downloads the work table directly as a landscape, right-to-left PDF
 - On mobile, selecting a day shows its card collapsed by default. Sick/vacation controls, shift editing, and the compact summary remain visible; the detailed breakdown expands on demand.
 
+#### PDF Export
+
+- The title uses the selected month and year: `Month hours {monthName} {year}`.
+- The first page shows the authenticated user's email when available, `baseRate`, and `standardHours` below the title.
+- Additional pages repeat the metadata header and every page includes the Shiftly copyright footer.
+- Week boundaries are emphasized visually, and meal allowances are exported as three independent columns: `Per Diem`, `Large Per Diem`, and `Small Per Diem`.
+- The PDF is generated with embedded Unicode text, so titles, metadata, headers, values, and footers remain selectable and searchable, including Hebrew content.
+
 ### Monthly View
 
 - Focused on aggregated monthly salary analysis
@@ -517,7 +530,8 @@ The `ConfigPanel` adapts its behavior based on the active view:
 
 - In **Daily mode**:
   - Allows defining standard hours and hourly rate
-  - Monthly values are derived incrementally
+  - When `baseRate > 0`, shows daily pay and the monthly salary summary
+  - Clearing the hourly rate or setting it to `0` hides salary-dependent output
 
 - In **Monthly mode**:
   - Year and month selection becomes mandatory
@@ -528,8 +542,8 @@ This separation keeps configuration logic explicit and context-aware.
 
 ### Workday Overview
 
-- If `baseRate` is **not set**: only displays worked hours per day.
-- If `baseRate` is **set**: shows per-day salary and monthly total.
+- If `baseRate` is `0`: only displays worked hours per day.
+- If `baseRate > 0`: shows the daily-pay column, per-day salary, and monthly salary summary.
 - **Sick/Vacation days**: disables work segments.
 - **Shabbat/holiday**: only allows work, not absence.
 - **Cross-day shifts**: user must confirm with a checkbox.

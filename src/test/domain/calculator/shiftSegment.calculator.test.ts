@@ -8,7 +8,7 @@ describe("ShiftSegmentCalculator", () => {
   let calculator: ShiftSegmentCalculator;
 
   beforeEach(() => {
-    calculator = new ShiftSegmentCalculator(new DateService("Asia/Jerusalem"));
+    calculator = new ShiftSegmentCalculator(new DateService());
   });
 
   describe("calculate - Regular Day", () => {
@@ -163,7 +163,7 @@ describe("ShiftSegmentCalculator", () => {
   describe("calculate - SpecialPartialStart Day (Friday evening)", () => {
     it("should resolve Friday evening shift with Shabbat segments", () => {
       const meta: WorkDayMeta = {
-        date: "2024-01-05T00:00:00.000Z",
+        date: "2024-01-05",
         typeDay: WorkDayType.SpecialPartialStart,
         crossDayContinuation: false,
       };
@@ -181,7 +181,7 @@ describe("ShiftSegmentCalculator", () => {
 
     it("should resolve shift before Shabbat entry", () => {
       const meta: WorkDayMeta = {
-        date: "2024-01-05T00:00:00.000Z",
+        date: "2024-01-05",
         typeDay: WorkDayType.SpecialPartialStart,
         crossDayContinuation: false,
       };
@@ -195,7 +195,7 @@ describe("ShiftSegmentCalculator", () => {
 
     it("should resolve night shift after Shabbat entry as shabbat200", () => {
       const meta: WorkDayMeta = {
-        date: "2024-01-05T00:00:00.000Z",
+        date: "2024-01-05",
         typeDay: WorkDayType.SpecialPartialStart,
         crossDayContinuation: false,
       };
@@ -214,7 +214,7 @@ describe("ShiftSegmentCalculator", () => {
 
     it("should handle full day on SpecialPartialStart", () => {
       const meta: WorkDayMeta = {
-        date: "2024-01-05T00:00:00.000Z",
+        date: "2024-01-05",
         typeDay: WorkDayType.SpecialPartialStart,
         crossDayContinuation: false,
       };
@@ -454,7 +454,7 @@ describe("ShiftSegmentCalculator", () => {
 
     it("should handle Friday-to-Saturday Shabbat transition", () => {
       const metaFriday: WorkDayMeta = {
-        date: "2024-01-05T00:00:00.000Z",
+        date: "2024-01-05",
         typeDay: WorkDayType.SpecialPartialStart,
         crossDayContinuation: false,
       };
@@ -506,16 +506,16 @@ describe("ShiftSegmentCalculator", () => {
     });
   });
 
-  describe("timezone handling", () => {
+  describe("month-based special start handling", () => {
     it("should calculate special start time based on date", () => {
       const meta1: WorkDayMeta = {
-        date: "2024-01-01T00:00:00.000Z",
+        date: "2024-01-01",
         typeDay: WorkDayType.SpecialPartialStart,
         crossDayContinuation: false,
       };
 
       const meta2: WorkDayMeta = {
-        date: "2024-07-01T00:00:00.000Z",
+        date: "2024-07-01",
         typeDay: WorkDayType.SpecialPartialStart,
         crossDayContinuation: false,
       };

@@ -7,10 +7,10 @@ import {
   buildResolvers,
   buildShiftLayer,
 } from "./pipelines";
-import { DomainConfig, PayMapPipeline } from "./types/domain.types";
+import { PayMapPipeline } from "./types/domain.types";
 
-export const buildPayMapPipeline = (config: DomainConfig): PayMapPipeline => {
-  const services = buildCoreServices(config);
+export const buildPayMapPipeline = (): PayMapPipeline => {
+  const services = buildCoreServices();
 
   const resolvers = buildResolvers(services.dateService);
   const rateCalculators = buildRateCalculators();
