@@ -120,10 +120,15 @@ const PrintDayRow = ({
       }}
     >
       <TableCell>{dayLabel}</TableCell>
-      <TableCell>{status === WorkDayStatus.sick ? "✓" : ""}</TableCell>
-      <TableCell>{status === WorkDayStatus.vacation ? "✓" : ""}</TableCell>
       <TableCell sx={{ whiteSpace: "pre-line" }}>{formatShiftTimes("start")}</TableCell>
       <TableCell sx={{ whiteSpace: "pre-line" }}>{formatShiftTimes("end")}</TableCell>
+      <TableCell>
+        {status === WorkDayStatus.sick
+          ? t("headers.sick")
+          : status === WorkDayStatus.vacation
+            ? t("headers.vacation")
+            : ""}
+      </TableCell>
       <TableCell>{formatValue(calculation.compact.actualHours)}</TableCell>
       <TableCell>{formatValue(calculation.compact.totalHours)}</TableCell>
       <TableCell>{formatValue(calculation.breakdown.regular.hours100.hours)}</TableCell>
@@ -233,8 +238,8 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
             <TableHead>
               <TableRow>
                 <TableCell rowSpan={2}>{t("headers.day")}</TableCell>
-                <TableCell colSpan={2}>{t("headers.absence")}</TableCell>
                 <TableCell colSpan={2}>{t("headers.hours")}</TableCell>
+                <TableCell rowSpan={2}>{t("headers.description")}</TableCell>
                 <TableCell colSpan={2}>{t("headers.total_hours")}</TableCell>
                 <TableCell colSpan={3}>{t("headers.regular")}</TableCell>
                 <TableCell colSpan={2}>{t("headers.extras")}</TableCell>
@@ -247,8 +252,6 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
                 <TableCell rowSpan={2}>{t("daily_salary_header")}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>{t("headers.sick")}</TableCell>
-                <TableCell>{t("headers.vacation")}</TableCell>
                 <TableCell>{t("headers.entry")}</TableCell>
                 <TableCell>{t("headers.exit")}</TableCell>
                 <TableCell>{t("headers.actual_hours")}</TableCell>
@@ -283,7 +286,7 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
             ))}
             <TableFooter>
               <TableRow sx={{ fontWeight: 700 }}>
-                <TableCell colSpan={5}>{t("table.total_gross_label")}</TableCell>
+                <TableCell colSpan={4}>{t("table.total_gross_label")}</TableCell>
                 <TableCell>{formatValue(monthBreakdown.actualHours)}</TableCell>
                 <TableCell>{formatValue(monthBreakdown.totalHours)}</TableCell>
                 <TableCell>{formatValue(monthBreakdown.regular.hours100.hours)}</TableCell>

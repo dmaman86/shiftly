@@ -71,9 +71,9 @@ describe("ConfigPanel", () => {
       });
 
       expect(screen.getByRole("group", { name: "תאריך" })).toBeInTheDocument();
-      expect(screen.getAllByRole("spinbutton")).toHaveLength(2);
-      expect(screen.getByLabelText("שעות תקן")).toBeInTheDocument();
-      expect(screen.getByLabelText("שכר שעתי")).toBeInTheDocument();
+      expect(screen.getAllByRole("spinbutton")).toHaveLength(4);
+      expect(screen.getByLabelText("שעות תקן")).toHaveAttribute("type", "number");
+      expect(screen.getByLabelText("שכר שעתי")).toHaveAttribute("type", "number");
     });
   });
 
@@ -115,6 +115,9 @@ describe("ConfigPanel", () => {
 
       const baseRateInput = screen.getByLabelText("שכר שעתי") as HTMLInputElement;
       expect(baseRateInput.value).toBe("75");
+      expect(baseRateInput).toHaveAttribute("dir", "ltr");
+      expect(baseRateInput).toHaveAttribute("inputmode", "decimal");
+      expect(baseRateInput).toHaveAttribute("step", "any");
     });
 
     it("should render a combined month and year date picker", () => {

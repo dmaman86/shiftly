@@ -17,6 +17,7 @@
   "daily_salary_header": "Daily Salary",
   "headers": {
     "day": "Day",
+    "description": "Description",
     "sick": "Sick",
     "vacation": "Vacation",
     "hours": "Hours",

@@ -158,6 +158,20 @@ describe("ShiftSegmentCalculator", () => {
 
       expect(result[0].key).toBe("hours20");
     });
+
+    it("should keep hours50 on a short shift", () => {
+      const point: Point = { start: 1320, end: 1380 }; // 22:00-23:00
+
+      const result = calculator.calculate({ point, meta });
+
+      expect(result).toEqual([
+        {
+          point,
+          percent: 0.5,
+          key: "hours50",
+        },
+      ]);
+    });
   });
 
   describe("calculate - SpecialPartialStart Day (Friday evening)", () => {
@@ -191,6 +205,41 @@ describe("ShiftSegmentCalculator", () => {
       const result = calculator.calculate({ point, meta });
 
       expect(result.length).toBeGreaterThan(0);
+    });
+
+    it("should not apply hours20 when the pre-special period is exactly three hours", () => {
+      const meta: WorkDayMeta = {
+        date: "2024-01-05",
+        typeDay: WorkDayType.SpecialPartialStart,
+        crossDayContinuation: false,
+      };
+      const specialStart = new DateService().getSpecialStartMinutes(meta.date);
+      const point: Point = {
+        start: specialStart - 3 * 60,
+        end: specialStart,
+      };
+
+      const result = calculator.calculate({ point, meta });
+
+      expect(result.some((segment) => segment.key === "hours20")).toBe(false);
+      expect(result.some((segment) => segment.key === "hours100")).toBe(true);
+    });
+
+    it("should apply hours20 when the pre-special period is longer than three hours", () => {
+      const meta: WorkDayMeta = {
+        date: "2024-01-05",
+        typeDay: WorkDayType.SpecialPartialStart,
+        crossDayContinuation: false,
+      };
+      const specialStart = new DateService().getSpecialStartMinutes(meta.date);
+      const point: Point = {
+        start: specialStart - 3 * 60 - 1,
+        end: specialStart,
+      };
+
+      const result = calculator.calculate({ point, meta });
+
+      expect(result.some((segment) => segment.key === "hours20")).toBe(true);
     });
 
     it("should resolve night shift after Shabbat entry as shabbat200", () => {

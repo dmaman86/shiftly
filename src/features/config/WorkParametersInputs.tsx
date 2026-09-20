@@ -18,12 +18,8 @@ export const WorkParametersInputs = ({
   showHelperText = true,
 }: WorkParametersInputsProps) => {
   const { t } = useTranslation();
-  const {
-    baseRate,
-    standardHours,
-    updateBaseRate,
-    updateStandardHours,
-  } = useGlobalState();
+  const { baseRate, standardHours, updateBaseRate, updateStandardHours } =
+    useGlobalState();
 
   const baseRateHelper =
     baseRate === 0

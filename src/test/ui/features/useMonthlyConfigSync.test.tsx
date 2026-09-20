@@ -155,4 +155,32 @@ describe("useMonthlyConfigSync", () => {
       await vi.advanceTimersByTimeAsync(0);
     });
   });
+
+  it("does not write the previous debounced value after hydration", async () => {
+    authMock.user = { id: "user-1" };
+    globalStateMock.baseRate = 48.47;
+    serviceMock.fetch.mockReturnValue({
+      call: () =>
+        Promise.resolve({
+          data: { year: 2026, month: 8, standard_hours: 6.67, base_rate: 47.48 },
+        }),
+    });
+
+    const { rerender } = renderHook(() => useMonthlyConfigSync());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    globalStateMock.baseRate = 47.48;
+    rerender();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(500);
+    });
+
+    expect(serviceMock.upsert).not.toHaveBeenCalledWith(
+      "user-1",
+      expect.objectContaining({ base_rate: 48.47 }),
+    );
+  });
 });

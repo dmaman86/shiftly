@@ -17,6 +17,7 @@
   "daily_salary_header": "שכר יומי",
   "headers": {
     "day": "יום",
+    "description": "תיאור",
     "sick": "מחלה",
     "vacation": "חופש",
     "hours": "שעות",
