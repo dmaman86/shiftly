@@ -1,101 +1,41 @@
 {
-  "year": 2026,
-  "month": 8,
-  "baseRate": 47.48,
-  "standardHours": 6.67,
+  "year": 2021,
+  "month": 10,
+  "baseRate": 0,
+  "standardHours": 7,
   "timeZone": "Asia/Jerusalem",
   "carryOverHours": 0,
   "shabbatCreditAllocation": {
     "carriedOverHours": 0,
-    "earnedHours": 25.199999999999996,
-    "totalAvailableHours": 25.199999999999996,
-    "usedHours": 25.199999999999996,
+    "earnedHours": 22.15,
+    "totalAvailableHours": 22.15,
+    "usedHours": 22.15,
     "unusedHours": 0,
     "appliedHoursByDate": {
-      "2026-08-02": 6.67,
-      "2026-08-05": 6.67,
-      "2026-08-07": 6.67,
-      "2026-08-14": 5.189999999999994
+      "2021-10-05": 7,
+      "2021-10-14": 7,
+      "2021-10-18": 7,
+      "2021-10-22": 1.1499999999999986
     }
   },
   "daily": {
-    "2026-08-01": {
+    "2021-10-01": {
       "status": "normal",
       "breakdown": {
-        "totalHours": 8.316666666666666,
-        "actualHours": 8.316666666666666,
+        "totalHours": 8.283333333333333,
+        "actualHours": 8.283333333333333,
         "regular": {
           "hours100": {
             "percent": 1,
-            "hours": 0
+            "hours": 7
           },
           "hours125": {
             "percent": 1.25,
-            "hours": 0
+            "hours": 1.2833333333333332
           },
           "hours150": {
             "percent": 1.5,
             "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 0
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 8.316666666666666
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 592.313
-    },
-    "2026-08-03": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 9.466666666666667,
-        "actualHours": 9.466666666666667,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 2
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0.7966666666666669
           }
         },
         "extra": {
@@ -137,25 +77,865 @@
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 492.1302
+      "salary": 0
     },
-    "2026-08-04": {
+    "2021-10-02": {
       "status": "normal",
       "breakdown": {
-        "totalHours": 17.166666666666664,
-        "actualHours": 17.166666666666664,
+        "totalHours": 8.1,
+        "actualHours": 8.1,
         "regular": {
           "hours100": {
             "percent": 1,
-            "hours": 6.67
+            "hours": 0
           },
           "hours125": {
             "percent": 1.25,
-            "hours": 2
+            "hours": 0
           },
           "hours150": {
             "percent": 1.5,
-            "hours": 8.496666666666664
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 0
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 8.1
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 2,
+        "perDiemAmount": 67.8,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 67.8
+    },
+    "2021-10-03": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 8.083333333333334,
+        "actualHours": 8.083333333333334,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 7
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 1.083333333333334
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 6.983333333333333
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 1.1
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-04": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 8.1,
+        "actualHours": 8.1,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 7
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 1.0999999999999996
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 0
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-06": {
+      "status": "sick",
+      "breakdown": {
+        "totalHours": 7,
+        "actualHours": 0,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 0
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 0
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 0
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 7
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-07": {
+      "status": "sick",
+      "breakdown": {
+        "totalHours": 7,
+        "actualHours": 0,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 0
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 0
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 0
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 7
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-08": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 8.083333333333334,
+        "actualHours": 8.083333333333334,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 2.0500000000000007
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 0
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 0
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 5
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 1.0333333333333334
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 2,
+        "perDiemAmount": 67.8,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 67.8
+    },
+    "2021-10-10": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 8.366666666666667,
+        "actualHours": 8.366666666666667,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 7
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 1.3666666666666671
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 7.116666666666666
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 1.25
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-11": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 8.333333333333334,
+        "actualHours": 8.333333333333334,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 7
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 1.333333333333334
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 7.25
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 1.0833333333333333
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-12": {
+      "status": "vacation",
+      "breakdown": {
+        "totalHours": 7,
+        "actualHours": 0,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 0
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 0
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 0
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 7
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-13": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 8.116666666666667,
+        "actualHours": 8.116666666666667,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 7
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 1.1166666666666671
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 0
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-15": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 8.216666666666667,
+        "actualHours": 8.216666666666667,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 7
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 1.2166666666666668
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 0
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-17": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 8.3,
+        "actualHours": 8.3,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 7
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 1.3000000000000007
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 7.183333333333334
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 1.1166666666666667
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-19": {
+      "status": "sick",
+      "breakdown": {
+        "totalHours": 7,
+        "actualHours": 0,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 0
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 0
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 0
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 7
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-20": {
+      "status": "sick",
+      "breakdown": {
+        "totalHours": 7,
+        "actualHours": 0,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 0
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 0
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 0
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 7
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-21": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 8.566666666666666,
+        "actualHours": 8.566666666666666,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 7
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 1.5666666666666664
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 0
           }
         },
         "extra": {
@@ -190,32 +970,32 @@
           "percent": 1,
           "hours": 0
         },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 1,
-        "largeAmount": 21.1,
-        "smallPoints": 0,
-        "smallAmount": 0
+        "perDiemPoints": 2,
+        "perDiemAmount": 67.8,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 1,
+        "smallAmount": 13.5
       },
-      "salary": 1238.8828666666666
+      "salary": 81.3
     },
-    "2026-08-06": {
+    "2021-10-23": {
       "status": "normal",
       "breakdown": {
-        "totalHours": 14.666666666666666,
-        "actualHours": 14.666666666666666,
+        "totalHours": 8.016666666666667,
+        "actualHours": 8.016666666666667,
         "regular": {
           "hours100": {
             "percent": 1,
-            "hours": 6.67
+            "hours": 0
           },
           "hours125": {
             "percent": 1.25,
-            "hours": 2
+            "hours": 0
           },
           "hours150": {
             "percent": 1.5,
-            "hours": 5.996666666666666
+            "hours": 0
           }
         },
         "extra": {
@@ -225,13 +1005,13 @@
           },
           "hours50": {
             "percent": 0.5,
-            "hours": 6
+            "hours": 0
           }
         },
         "special": {
           "shabbat150": {
             "percent": 1.5,
-            "hours": 0
+            "hours": 8.016666666666667
           },
           "shabbat200": {
             "percent": 2,
@@ -250,499 +1030,19 @@
           "percent": 1,
           "hours": 0
         },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 1,
-        "largeAmount": 21.1,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 1026.0141999999998
-    },
-    "2026-08-09": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 8.65,
-        "actualHours": 8.65,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 1.9800000000000004
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 7.7
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0.95
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
+        "perDiemPoints": 2,
+        "perDiemAmount": 67.8,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 529.8767999999999
+      "salary": 67.8
     },
-    "2026-08-10": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 8.666666666666666,
-        "actualHours": 8.666666666666666,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 1.9966666666666661
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 0
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 435.19376666666653
-    },
-    "2026-08-11": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 8.566666666666666,
-        "actualHours": 8.566666666666666,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 1.8966666666666665
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 0
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 429.25876666666665
-    },
-    "2026-08-12": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 8.5,
-        "actualHours": 8.5,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 1.83
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 7.516666666666667
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0.9833333333333333
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 520.0246999999999
-    },
-    "2026-08-13": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 8.366666666666667,
-        "actualHours": 8.366666666666667,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 1.6966666666666672
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 7.45
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0.9166666666666666
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 509.89563333333336
-    },
-    "2026-08-15": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 8.333333333333334,
-        "actualHours": 8.333333333333334,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 0
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 0
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 0
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 8.333333333333334
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 593.5
-    },
-    "2026-08-16": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 16.9,
-        "actualHours": 16.9,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 2
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 8.229999999999999
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 0
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 7.4
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 1,
-        "largeAmount": 21.1,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 1218.3081999999997
-    },
-    "2026-08-18": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 8.516666666666667,
-        "actualHours": 8.516666666666667,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 1.8466666666666676
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 7.583333333333333
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0.9333333333333333
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 520.4599333333333
-    },
-    "2026-08-19": {
+    "2021-10-24": {
       "status": "vacation",
       "breakdown": {
-        "totalHours": 6.67,
+        "totalHours": 7,
         "actualHours": 0,
         "regular": {
           "hours100": {
@@ -784,7 +1084,7 @@
         },
         "hours100Vacation": {
           "percent": 1,
-          "hours": 6.67
+          "hours": 7
         },
         "appliedShabbatCredit": {
           "percent": 1,
@@ -797,429 +1097,9 @@
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 316.6916
+      "salary": 0
     },
-    "2026-08-20": {
-      "status": "vacation",
-      "breakdown": {
-        "totalHours": 6.67,
-        "actualHours": 0,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 0
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 0
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 0
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 6.67
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 316.6916
-    },
-    "2026-08-21": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 7.6,
-        "actualHours": 7.6,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 0.9299999999999997
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 0
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 371.8871
-    },
-    "2026-08-23": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 8.616666666666667,
-        "actualHours": 8.616666666666667,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 1.9466666666666672
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 0
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 432.2262666666666
-    },
-    "2026-08-24": {
-      "status": "vacation",
-      "breakdown": {
-        "totalHours": 6.67,
-        "actualHours": 0,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 0
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 0
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 0
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 6.67
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 316.6916
-    },
-    "2026-08-25": {
-      "status": "vacation",
-      "breakdown": {
-        "totalHours": 6.67,
-        "actualHours": 0,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 0
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 0
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 0
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 6.67
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 316.6916
-    },
-    "2026-08-26": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 8.466666666666667,
-        "actualHours": 8.466666666666667,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 1.7966666666666669
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 7.4
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 1.0666666666666667
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 518.9168333333333
-    },
-    "2026-08-27": {
-      "status": "normal",
-      "breakdown": {
-        "totalHours": 8.5,
-        "actualHours": 8.5,
-        "regular": {
-          "hours100": {
-            "percent": 1,
-            "hours": 6.67
-          },
-          "hours125": {
-            "percent": 1.25,
-            "hours": 1.83
-          },
-          "hours150": {
-            "percent": 1.5,
-            "hours": 0
-          }
-        },
-        "extra": {
-          "hours20": {
-            "percent": 0.2,
-            "hours": 7.516666666666667
-          },
-          "hours50": {
-            "percent": 0.5,
-            "hours": 0.9833333333333333
-          }
-        },
-        "special": {
-          "shabbat150": {
-            "percent": 1.5,
-            "hours": 0
-          },
-          "shabbat200": {
-            "percent": 2,
-            "hours": 0
-          }
-        },
-        "hours100Sick": {
-          "percent": 1,
-          "hours": 0
-        },
-        "hours100Vacation": {
-          "percent": 1,
-          "hours": 0
-        },
-        "appliedShabbatCredit": {
-          "percent": 1,
-          "hours": 0
-        },
-        "perDiemPoints": 0,
-        "perDiemAmount": 0,
-        "largePoints": 0,
-        "largeAmount": 0,
-        "smallPoints": 0,
-        "smallAmount": 0
-      },
-      "salary": 520.0246999999999
-    },
-    "2026-08-28": {
+    "2021-10-25": {
       "status": "normal",
       "breakdown": {
         "totalHours": 8.55,
@@ -1227,11 +1107,131 @@
         "regular": {
           "hours100": {
             "percent": 1,
-            "hours": 1.7763568394002505e-15
+            "hours": 7
           },
           "hours125": {
             "percent": 1.25,
+            "hours": 1.5500000000000007
+          },
+          "hours150": {
+            "percent": 1.5,
             "hours": 0
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 7.166666666666667
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 1.3833333333333333
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 0,
+        "largeAmount": 0,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 0
+    },
+    "2021-10-27": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 10.066666666666666,
+        "actualHours": 10.066666666666666,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 7
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 2
+          },
+          "hours150": {
+            "percent": 1.5,
+            "hours": 1.0666666666666664
+          }
+        },
+        "extra": {
+          "hours20": {
+            "percent": 0.2,
+            "hours": 4
+          },
+          "hours50": {
+            "percent": 0.5,
+            "hours": 0
+          }
+        },
+        "special": {
+          "shabbat150": {
+            "percent": 1.5,
+            "hours": 0
+          },
+          "shabbat200": {
+            "percent": 2,
+            "hours": 0
+          }
+        },
+        "hours100Sick": {
+          "percent": 1,
+          "hours": 0
+        },
+        "hours100Vacation": {
+          "percent": 1,
+          "hours": 0
+        },
+        "appliedShabbatCredit": {
+          "percent": 1,
+          "hours": 0
+        },
+        "perDiemPoints": 0,
+        "perDiemAmount": 0,
+        "largePoints": 1,
+        "largeAmount": 19.7,
+        "smallPoints": 0,
+        "smallAmount": 0
+      },
+      "salary": 19.7
+    },
+    "2021-10-28": {
+      "status": "normal",
+      "breakdown": {
+        "totalHours": 8.3,
+        "actualHours": 8.3,
+        "regular": {
+          "hours100": {
+            "percent": 1,
+            "hours": 7
+          },
+          "hours125": {
+            "percent": 1.25,
+            "hours": 1.3000000000000007
           },
           "hours150": {
             "percent": 1.5,
@@ -1245,17 +1245,17 @@
           },
           "hours50": {
             "percent": 0.5,
-            "hours": 0
+            "hours": 7.216666666666667
           }
         },
         "special": {
           "shabbat150": {
             "percent": 1.5,
-            "hours": 0.95
+            "hours": 0
           },
           "shabbat200": {
             "percent": 2,
-            "hours": 7.6
+            "hours": 0
           }
         },
         "hours100Sick": {
@@ -1275,37 +1275,37 @@
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 1,
-        "smallAmount": 14.5
+        "smallAmount": 13.5
       },
-      "salary": 803.855
+      "salary": 13.5
     },
-    "2026-08-30": {
+    "2021-10-31": {
       "status": "normal",
       "breakdown": {
-        "totalHours": 17.616666666666667,
-        "actualHours": 17.616666666666667,
+        "totalHours": 8.366666666666667,
+        "actualHours": 8.366666666666667,
         "regular": {
           "hours100": {
             "percent": 1,
-            "hours": 6.67
+            "hours": 7
           },
           "hours125": {
             "percent": 1.25,
-            "hours": 2
+            "hours": 1.3666666666666671
           },
           "hours150": {
             "percent": 1.5,
-            "hours": 8.946666666666667
+            "hours": 0
           }
         },
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 0
+            "hours": 8
           },
           "hours50": {
             "percent": 0.5,
-            "hours": 7.666666666666667
+            "hours": 0.11666666666666667
           }
         },
         "special": {
@@ -1332,71 +1332,71 @@
         },
         "perDiemPoints": 0,
         "perDiemAmount": 0,
-        "largePoints": 1,
-        "largeAmount": 21.1,
+        "largePoints": 0,
+        "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 1275.6798666666666
+      "salary": 0
     }
   },
   "monthly": {
     "breakdown": {
-      "totalHours": 237.3466666666666,
-      "actualHours": 185.4666666666666,
+      "totalHours": 198.00000000000003,
+      "actualHours": 133.85000000000002,
       "regular": {
         "hours100": {
           "percent": 1,
-          "hours": 100.05000000000001
+          "hours": 93.05
         },
         "hours125": {
           "percent": 1.25,
-          "hours": 27.75
+          "hours": 17.583333333333336
         },
         "hours150": {
           "percent": 1.5,
-          "hours": 32.46666666666666
+          "hours": 1.0666666666666664
         }
       },
       "extra": {
         "hours20": {
           "percent": 0.2,
-          "hours": 45.166666666666664
+          "hours": 47.7
         },
         "hours50": {
           "percent": 0.5,
-          "hours": 34.36666666666667
+          "hours": 20.733333333333334
         }
       },
       "special": {
         "shabbat150": {
           "percent": 1.5,
-          "hours": 17.599999999999998
+          "hours": 21.116666666666667
         },
         "shabbat200": {
           "percent": 2,
-          "hours": 7.6
+          "hours": 1.0333333333333334
         }
       },
       "hours100Sick": {
         "percent": 1,
-        "hours": 0
+        "hours": 28
       },
       "hours100Vacation": {
         "percent": 1,
-        "hours": 26.68
+        "hours": 14
       },
       "appliedShabbatCredit": {
         "percent": 1,
-        "hours": 25.199999999999996
+        "hours": 22.15
       },
-      "perDiemPoints": 0,
-      "perDiemAmount": 0,
-      "largePoints": 4,
-      "largeAmount": 84.4,
-      "smallPoints": 1,
-      "smallAmount": 14.5
+      "perDiemPoints": 8,
+      "perDiemAmount": 271.2,
+      "largePoints": 1,
+      "largeAmount": 19.7,
+      "smallPoints": 2,
+      "smallAmount": 27
     },
-    "salary": 14491.71023333333
+    "salary": 317.9
   }
 }

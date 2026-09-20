@@ -32,8 +32,26 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     const extra = extraCalculator.calculate(labeledSegments);
     const special = specialCalculator.calculate(labeledSegments);
 
-    const specialHours = special.shabbat150.hours + special.shabbat200.hours;
-    const regularHours = Math.max(totalHours - specialHours, 0);
+    const regularSegments = labeledSegments
+      .filter((segment) =>
+        segment.key !== "shabbat150" && segment.key !== "shabbat200",
+      )
+      .sort((a, b) => a.point.start - b.point.start);
+
+    // Segment definitions can touch or overlap at a rate boundary. Use their
+    // union so regular hours represent elapsed time rather than label count.
+    const regularHours = regularSegments.reduce(
+      (state, segment) => {
+        const start = Math.max(segment.point.start, state.coveredUntil);
+        const end = Math.max(segment.point.end, state.coveredUntil);
+
+        return {
+          coveredUntil: end,
+          hours: state.hours + Math.max(end - start, 0) / 60,
+        };
+      },
+      { coveredUntil: Number.NEGATIVE_INFINITY, hours: 0 },
+    ).hours;
 
     const regular = regularCalculator.calculate({
       totalHours: regularHours,

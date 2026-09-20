@@ -10,6 +10,9 @@ interface ConfigInputProps {
   helperText?: string;
   error?: boolean;
   icon?: React.ReactNode;
+  inputDirection?: "ltr" | "rtl";
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  step?: number | "any";
   onChange: (newValue: string) => void;
   onBlur?: () => void;
 }
@@ -24,6 +27,9 @@ export const ConfigInput = ({
   helperText,
   error = false,
   icon,
+  inputDirection,
+  inputMode,
+  step,
   onChange,
   onBlur,
 }: ConfigInputProps) => {
@@ -47,6 +53,11 @@ export const ConfigInput = ({
           startAdornment: icon ? (
             <InputAdornment position="start">{icon}</InputAdornment>
           ) : null,
+        },
+        htmlInput: {
+          ...(inputDirection ? { dir: inputDirection } : {}),
+          ...(inputMode ? { inputMode } : {}),
+          ...(step !== undefined ? { step } : {}),
         },
       }}
     />

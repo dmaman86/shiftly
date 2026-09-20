@@ -17,6 +17,7 @@ export class ShiftSegmentCalculator implements Calculator<
   private readonly fieldMinutes = {
     fullDay: 1440,
     minExtraShift: 4 * 60,
+    minSpecialPartialHours20: 3 * 60,
     min06: 6 * 60,
     min14: 14 * 60,
     min17: 17 * 60,
@@ -52,13 +53,10 @@ export class ShiftSegmentCalculator implements Calculator<
     })();
 
     const segments = this.findSegments(point, source);
-    const qualifiesForExtraRates =
-      point.end - point.start >= this.fieldMinutes.minExtraShift;
-
-    if (qualifiesForExtraRates) return segments;
+    const qualifiesForHours20 = this.qualifiesForHours20(point, meta);
 
     return segments.map((segment) => {
-      if (segment.key !== "hours20" && segment.key !== "hours50") {
+      if (segment.key !== "hours20" || qualifiesForHours20) {
         return segment;
       }
 
@@ -68,6 +66,17 @@ export class ShiftSegmentCalculator implements Calculator<
         key: "hours100",
       };
     });
+  }
+
+  private qualifiesForHours20(point: Point, meta: WorkDayMeta): boolean {
+    if (meta.typeDay === WorkDayType.SpecialPartialStart) {
+      const specialStart = this.dateService.getSpecialStartMinutes(meta.date);
+      const hoursBeforeSpecialStart = Math.min(point.end, specialStart) - point.start;
+
+      return hoursBeforeSpecialStart > this.fieldMinutes.minSpecialPartialHours20;
+    }
+
+    return point.end - point.start >= this.fieldMinutes.minExtraShift;
   }
 
   private getRegularMap(): LabeledSegmentRange[] {

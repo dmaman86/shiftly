@@ -580,6 +580,38 @@ describe("DefaultShiftMapBuilder", () => {
       expect(callArgs.meta).toBe(meta);
     });
 
+    it("should calculate regular hours from non-special labeled segments", () => {
+      vi.spyOn(segmentBuilder, "build").mockReturnValue([
+        {
+          key: "hours100",
+          percent: 1,
+          point: { start: 0, end: 120 },
+        },
+        {
+          key: "shabbat150",
+          percent: 1.5,
+          point: { start: 120, end: 480 },
+        },
+      ]);
+      const calcSpy = vi.spyOn(regularCalculator, "calculate");
+
+      const shift = createShift(8, 0, 16, 0);
+      const meta = createMeta();
+
+      builder.build({
+        shift,
+        meta,
+        standardHours: 8.75,
+        isFieldDutyShift: false,
+      });
+
+      expect(calcSpy).toHaveBeenCalledWith({
+        totalHours: 2,
+        standardHours: 8.75,
+        meta,
+      });
+    });
+
     it("should map field duty info directly from total shift duration", () => {
       const shift = createShift(8, 0, 16, 0);
       const meta = createMeta();
