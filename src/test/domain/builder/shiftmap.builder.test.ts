@@ -7,15 +7,15 @@ import { ExtraCalculator } from "@/domain/calculator/extra/extra.calculator";
 import { SpecialCalculator } from "@/domain/calculator/special/special.calculator";
 import { RegularByShiftCalculator } from "@/domain/calculator/regular/regularByShift.calculator";
 import { ShiftSegmentCalculator } from "@/domain/calculator/shiftSegment.calculator";
-import { WorkDayType } from "@/constants/fields.constant";
-import type { Shift, WorkDayMeta, PayCalculationBundle } from "@/domain";
+import { WorkDayType } from "@/domain/constants";
+import type { Shift, WorkDayMeta, ShiftPayCalculationBundle } from "@/domain";
 
 describe("DefaultShiftMapBuilder", () => {
   let builder: DefaultShiftMapBuilder;
   let segmentBuilder: ShiftSegmentBuilder;
   let shiftService: ShiftService;
   let dateService: DateService;
-  let calculators: PayCalculationBundle;
+  let calculators: ShiftPayCalculationBundle;
   let regularCalculator: RegularByShiftCalculator;
   let extraCalculator: ExtraCalculator;
   let specialCalculator: SpecialCalculator;
@@ -403,6 +403,23 @@ describe("DefaultShiftMapBuilder", () => {
         result.special.shabbat150.hours > 0 || result.special.shabbat200.hours > 0;
       expect(hasShabbatHours).toBe(true);
     });
+
+    it("should preserve progression after a SpecialFull night segment", () => {
+      const shift = createShift(22, 30, 7, 0, false, "2024-01-06");
+      const meta = createMeta("2024-01-06", WorkDayType.SpecialFull);
+
+      const result = builder.build({
+        shift,
+        meta,
+        standardHours: 6.67,
+        isFieldDutyShift: false,
+      });
+
+      expect(result.special.shabbat200.hours).toBe(7.5);
+      expect(result.regular.hours100.hours).toBe(0);
+      expect(result.regular.hours125.hours).toBe(0);
+      expect(result.regular.hours150.hours).toBe(1);
+    });
   });
 
   describe("build - Edge cases", () => {
@@ -562,7 +579,7 @@ describe("DefaultShiftMapBuilder", () => {
     });
 
     it("should call regularCalculator.calculate with adjusted hours", () => {
-      const calcSpy = vi.spyOn(regularCalculator, "calculate");
+      const calcSpy = vi.spyOn(regularCalculator, "calculateFromSegments");
       
       const shift = createShift(8, 0, 16, 0);
       const meta = createMeta();
@@ -593,7 +610,7 @@ describe("DefaultShiftMapBuilder", () => {
           point: { start: 120, end: 480 },
         },
       ]);
-      const calcSpy = vi.spyOn(regularCalculator, "calculate");
+      const calcSpy = vi.spyOn(regularCalculator, "calculateFromSegments");
 
       const shift = createShift(8, 0, 16, 0);
       const meta = createMeta();
@@ -606,7 +623,18 @@ describe("DefaultShiftMapBuilder", () => {
       });
 
       expect(calcSpy).toHaveBeenCalledWith({
-        totalHours: 2,
+        segments: [
+          {
+            key: "hours100",
+            percent: 1,
+            point: { start: 0, end: 120 },
+          },
+          {
+            key: "shabbat150",
+            percent: 1.5,
+            point: { start: 120, end: 480 },
+          },
+        ],
         standardHours: 8.75,
         meta,
       });

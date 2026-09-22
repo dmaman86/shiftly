@@ -32,8 +32,8 @@ vi.mock("@/services", async (importOriginal) => {
 });
 
 import type { DomainContextType } from "@/app";
-import { WorkDayStatus, WorkDayType } from "@/constants";
-import type { WorkDayInfo } from "@/domain";
+import { WorkDayStatus, WorkDayType } from "@/domain/constants";
+import type { WorkDayInfo } from "@/app/types";
 import { WorkTableDayStateHydrator } from "@/features/work-table/components/month/WorkTableDayStateHydrator";
 import { WorkTableDayStateProvider } from "@/features/work-table/context/workTableDayState/WorkTableDayStateProvider";
 import { useWorkTableDayState } from "@/features/work-table/hooks/day/useWorkTableDayState";
@@ -62,6 +62,10 @@ const domainStub = {
     shiftMapBuilder: {
       build: vi.fn().mockReturnValue({ totalHours: 8 }),
     },
+    calculateDayFromShifts: vi.fn().mockReturnValue({
+      dayPayMap: { totalHours: 0 },
+      shiftPayMaps: [],
+    }),
   },
 } as unknown as DomainContextType;
 

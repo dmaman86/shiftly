@@ -1,9 +1,9 @@
-import { WorkDayStatus } from "@/constants";
+import { WorkDayStatus } from "@/domain/constants";
 import type { DayPayMapBuilder, ShiftMapBuilder } from "../types/services";
 import type { Shift, ShiftPayMap, WorkDayMap } from "../types/data-shapes";
 import type { WorkDayMeta } from "../types/types";
 
-type CalculateDayFromShiftsParams = {
+export type CalculateDayFromShiftsParams = {
   dayPayMapBuilder: DayPayMapBuilder;
   meta: WorkDayMeta;
   month: number;
@@ -14,10 +14,15 @@ type CalculateDayFromShiftsParams = {
   year: number;
 };
 
-type DayFromShiftsCalculation = {
+export type DayFromShiftsCalculation = {
   dayPayMap: WorkDayMap;
   shiftPayMaps: ShiftPayMap[];
 };
+
+export type ComposedDayCalculationParams = Omit<
+  CalculateDayFromShiftsParams,
+  "dayPayMapBuilder" | "shiftMapBuilder"
+>;
 
 export const calculateDayFromShifts = ({
   dayPayMapBuilder,

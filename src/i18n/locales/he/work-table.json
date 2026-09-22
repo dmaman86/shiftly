@@ -18,6 +18,7 @@
   "headers": {
     "day": "יום",
     "description": "תיאור",
+    "duty": "תפקיד",
     "sick": "מחלה",
     "vacation": "חופש",
     "hours": "שעות",

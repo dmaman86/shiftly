@@ -1,13 +1,5 @@
 import { MealAllowanceDayInfo } from "./bundles";
-import { TableViewMode, WorkDayMeta } from "./types";
-
-export type TableHeader = {
-  label: string;
-  viewMode: TableViewMode;
-  children?: string[];
-  rowSpan?: number;
-  widths?: number[];
-};
+import { WorkDayMeta } from "./types";
 
 // --- Primitives ---
 export interface Segment {

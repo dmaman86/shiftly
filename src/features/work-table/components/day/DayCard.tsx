@@ -11,8 +11,8 @@ import {
 import { useTranslation } from "react-i18next";
 import AddIcon from "@mui/icons-material/Add";
 
-import { WorkDayInfo } from "@/domain";
-import { WorkDayStatus, WorkDayType, HolidayKey } from "@/constants";
+import type { WorkDayInfo } from "@/app/types";
+import { WorkDayStatus, WorkDayType, HolidayKey } from "@/domain/constants";
 import { DomainContextType } from "@/app";
 import { formatValue } from "@/utils";
 import { CollapsibleCard, StatTile } from "@/components";

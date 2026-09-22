@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import type { DomainContextType } from "@/app";
-import type { WorkDayInfo, WorkDayMap } from "@/domain";
+import type { WorkDayMap } from "@/domain";
+import type { WorkDayInfo } from "@/app/types";
 import { useAppSnackbar, useAuth, useGlobalState } from "@/hooks";
 import { shiftService, workDayService } from "@/services";
 import type { ShiftRecord } from "@/services/shift/shift.service";

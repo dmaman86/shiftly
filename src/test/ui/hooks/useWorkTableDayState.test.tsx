@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { describe, expect, it } from "vitest";
 
-import { WorkDayStatus } from "@/constants";
+import { WorkDayStatus } from "@/domain/constants";
 import {
   useWorkTableDayState,
 } from "@/features/work-table/hooks/day/useWorkTableDayState";

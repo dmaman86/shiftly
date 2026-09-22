@@ -1,7 +1,10 @@
 import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { CompactPayBreakdownVM, PayBreakdownViewModel } from "@/domain";
+import type {
+  CompactPayBreakdownVM,
+  PayBreakdownViewModel,
+} from "@/app/types";
 import { formatValue } from "@/utils";
 import { CollapsibleCard, StatTile } from "@/components";
 import { DayCardDetails } from "../day/DayCardDetails";

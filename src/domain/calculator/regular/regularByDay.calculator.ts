@@ -1,4 +1,4 @@
-import { WorkDayType } from "@/constants";
+import { WorkDayType } from "@/domain/constants";
 import { BaseRegularCalculator } from "./baseRegular.calculator";
 import type { Calculator } from "../../types/core-behaviors";
 import type { RegularBreakdown, RegularInput } from "../../types/data-shapes";

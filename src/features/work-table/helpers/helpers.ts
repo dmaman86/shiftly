@@ -1,7 +1,8 @@
 import { Theme } from "@mui/material";
 import { SystemStyleObject } from "@mui/system";
-import { SpecialBreakdown, TableHeader, TableViewMode, WorkDayMap } from "@/domain";
-import { tableColumnWidths } from "@/constants";
+import { SpecialBreakdown, WorkDayMap } from "@/domain";
+import { TableHeader, TableViewMode } from "@/app/types/table.types";
+import { tableColumnWidths } from "@/app/constants";
 
 /**
  * Filters headers based on the current view mode

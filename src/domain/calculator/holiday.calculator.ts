@@ -1,4 +1,4 @@
-import { Weekend, WorkDayType } from "@/constants";
+import { Weekend, WorkDayType } from "@/domain/constants";
 import {
   CalendarEventKind,
   type CalendarEvent,

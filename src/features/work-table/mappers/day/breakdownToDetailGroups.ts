@@ -1,6 +1,6 @@
 import { TFunction } from "i18next";
 
-import { PayBreakdownViewModel } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
 
 export type DetailItem = { label: string; value: number };
 export type DetailSection = { label: string; items: DetailItem[] };

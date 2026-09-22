@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { ShiftSegmentCalculator } from "@/domain/calculator/shiftSegment.calculator";
 import type { Point, WorkDayMeta } from "@/domain/types/types";
-import { WorkDayType } from "@/constants/fields.constant";
+import { WorkDayType } from "@/domain/constants";
 import { DateService } from "@/domain/services/date.service";
 
 describe("ShiftSegmentCalculator", () => {
@@ -97,7 +97,7 @@ describe("ShiftSegmentCalculator", () => {
       const result = calculator.calculate({ point, meta });
 
       expect(result.length).toBeGreaterThan(0);
-      expect(result[0].key).toBe("hours20");
+      expect(result[0].key).toBe("hours100");
       expect(result[result.length - 1].key).toBe("hours50");
     });
 
@@ -142,13 +142,23 @@ describe("ShiftSegmentCalculator", () => {
 
       const result = calculator.calculate({ point, meta });
 
-      expect(result).toEqual([
-        {
-          point,
-          percent: 1,
-          key: "hours100",
-        },
-      ]);
+      expect(result.some((segment) => segment.key === "hours20")).toBe(false);
+    });
+
+    it("should apply hours20 when exactly three evening hours are worked", () => {
+      const point: Point = { start: 360, end: 1020 }; // 06:00-17:00
+
+      const result = calculator.calculate({ point, meta });
+
+      expect(result.some((segment) => segment.key === "hours20")).toBe(true);
+    });
+
+    it("should not apply hours20 to a short afternoon portion", () => {
+      const point: Point = { start: 382, end: 905 }; // 06:22-15:05
+
+      const result = calculator.calculate({ point, meta });
+
+      expect(result.some((segment) => segment.key === "hours20")).toBe(false);
     });
 
     it("should apply extra rates when the shift is exactly four hours", () => {
@@ -207,7 +217,7 @@ describe("ShiftSegmentCalculator", () => {
       expect(result.length).toBeGreaterThan(0);
     });
 
-    it("should not apply hours20 when the pre-special period is exactly three hours", () => {
+    it("should apply hours20 when the pre-special period is exactly three hours", () => {
       const meta: WorkDayMeta = {
         date: "2024-01-05",
         typeDay: WorkDayType.SpecialPartialStart,
@@ -221,8 +231,7 @@ describe("ShiftSegmentCalculator", () => {
 
       const result = calculator.calculate({ point, meta });
 
-      expect(result.some((segment) => segment.key === "hours20")).toBe(false);
-      expect(result.some((segment) => segment.key === "hours100")).toBe(true);
+      expect(result.some((segment) => segment.key === "hours20")).toBe(true);
     });
 
     it("should apply hours20 when the pre-special period is longer than three hours", () => {

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { buildPayMapPipeline } from "@/domain/composition";
 import type { PayMapPipeline } from "@/domain/types/domain.types";
 import type { Shift, WorkDayMeta, ShiftPayMap } from "@/domain";
-import { WorkDayType } from "@/constants/fields.constant";
+import { WorkDayType } from "@/domain/constants";
 
 /**
  * END-TO-END TESTS FOR SALARY CALCULATION PIPELINE

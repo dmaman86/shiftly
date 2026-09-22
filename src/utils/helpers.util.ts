@@ -1,4 +1,5 @@
-import { PayBreakdownViewModel, TableHeader, WorkDayInfo } from "@/domain";
+import type { PayBreakdownViewModel, WorkDayInfo } from "@/app/types";
+import { TableHeader } from "@/app/types/table.types";
 
 export const minutesToTimeStr = (minutes: number): string => {
   const clean = minutes % (24 * 60);

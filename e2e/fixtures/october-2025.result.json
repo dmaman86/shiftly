@@ -469,7 +469,7 @@
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 2.9833333333333334
+            "hours": 3
           },
           "hours50": {
             "percent": 0.5,
@@ -505,7 +505,7 @@
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 1013.6644000000001
+      "salary": 1013.82
     },
     "2025-10-11": {
       "status": "normal",
@@ -565,7 +565,7 @@
         "smallPoints": 1,
         "smallAmount": 14.5
       },
-      "salary": 797.5649999999999
+      "salary": 797.57
     },
     "2025-10-14": {
       "status": "normal",
@@ -769,7 +769,7 @@
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 2.9833333333333334
+            "hours": 3.0
           },
           "hours50": {
             "percent": 0.5,
@@ -805,7 +805,7 @@
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 1012.0904
+      "salary": 1012.25
     },
     "2025-10-19": {
       "status": "normal",
@@ -1050,7 +1050,7 @@
     "2025-10-29": {
       "status": "normal",
       "breakdown": {
-        "totalHours": 1.85,
+        "totalHours": 6.67,
         "actualHours": 1.85,
         "regular": {
           "hours100": {
@@ -1105,7 +1105,7 @@
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 87.357
+      "salary": 314.96
     },
     "2025-10-31": {
       "status": "normal",
@@ -1225,6 +1225,6 @@
       "smallPoints": 4,
       "smallAmount": 58
     },
-    "salary": 18731.423100000004
+    "salary": 18731.74
   }
 }

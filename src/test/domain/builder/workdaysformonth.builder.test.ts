@@ -3,9 +3,9 @@ import { DefaultWorkDaysForMonthBuilder } from "@/domain/builder/workdaysformont
 import { DefaultHolidayCalculator } from "@/domain/calculator/holiday.calculator";
 import { WorkDayInfoResolver } from "@/domain/resolve/workdayinfo.resolver";
 import { DateService } from "@/domain/services/date.service";
-import { WorkDayType } from "@/constants/fields.constant";
+import { WorkDayType } from "@/domain/constants";
 import { CalendarEventKind, type CalendarEvent } from "@/domain";
-import type { HolidayKey } from "@/constants";
+import type { HolidayKey } from "@/domain/constants";
 
 const paidHoliday = (holidayKey?: HolidayKey): CalendarEvent => ({
   kind: CalendarEventKind.PaidHoliday,

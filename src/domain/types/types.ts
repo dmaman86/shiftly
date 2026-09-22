@@ -1,12 +1,9 @@
-import { WorkDayType, HolidayKey } from "@/constants";
-
-export type TableViewMode = "compact" | "both";
+import { WorkDayType, HolidayKey } from "../constants";
 
 import {
   DailyPerDiemInfo,
   ExtraBreakdown,
   RegularBreakdown,
-  Segment,
   Shift,
   SpecialBreakdown,
 } from "./data-shapes";
@@ -54,7 +51,7 @@ export interface LabeledSegmentRange {
   key: SegmentKey;
 }
 
-export interface WorkDayInfo {
+export interface DomainWorkDay {
   meta: WorkDayMeta;
 }
 
@@ -75,10 +72,10 @@ export type ApiResponse<T> =
   | { data?: never; error: string };
 
 export interface DayInfoResolver {
-  isSpecialFullDay(day: WorkDayInfo): boolean;
-  isPartialHolidayStart(day: WorkDayInfo): boolean;
-  hasCrossDayContinuation(day: WorkDayInfo): boolean;
-  formatWorkDayLabel(day: WorkDayInfo, weekdayLabel: string): string;
+  isSpecialFullDay(day: DomainWorkDay): boolean;
+  isPartialHolidayStart(day: DomainWorkDay): boolean;
+  hasCrossDayContinuation(day: DomainWorkDay): boolean;
+  formatWorkDayLabel(day: DomainWorkDay, weekdayLabel: string): string;
 }
 
 export enum Mode {
@@ -86,36 +83,6 @@ export enum Mode {
   BY_DAY,
   BY_MONTH,
 }
-
-export type PayBreakdownViewModel = {
-  totalHours: number;
-  actualHours: number;
-
-  regular: RegularBreakdown;
-  extra: ExtraBreakdown;
-  special: SpecialBreakdown;
-
-  hours100Sick: Segment;
-  hours100Vacation: Segment;
-  appliedShabbatCredit: Segment;
-
-  perDiemPoints: number;
-  perDiemAmount: number;
-
-  largePoints: number;
-  largeAmount: number;
-
-  smallPoints: number;
-  smallAmount: number;
-};
-
-export type CompactPayBreakdownVM = {
-  totalHours: number;
-  actualHours: number;
-  regularHours: number;
-  extraHours: number;
-  dailySalary?: number;
-};
 
 export interface MonthResolver {
   getAvailableMonths(year: number): number[];

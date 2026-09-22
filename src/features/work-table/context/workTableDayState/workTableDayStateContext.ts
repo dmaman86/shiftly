@@ -1,6 +1,6 @@
 import { createContext, Dispatch, SetStateAction, useCallback, useContext } from "react";
 
-import { WorkDayStatus } from "@/constants";
+import { WorkDayStatus } from "@/domain/constants";
 import type { DateService, Shift, ShiftPayMap } from "@/domain";
 
 export type ShiftEntry = {

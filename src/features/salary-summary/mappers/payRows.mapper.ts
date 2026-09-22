@@ -1,5 +1,6 @@
 import type { useTranslation } from "react-i18next";
-import { MealAllowanceRates, PayBreakdownViewModel, Segment } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
+import { MealAllowanceRates, Segment } from "@/domain";
 import {
   mapSegmentsToPayRows,
   mapAllowanceRows,

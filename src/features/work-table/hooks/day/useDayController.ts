@@ -1,8 +1,9 @@
 import { useCallback } from "react";
 
 import { useGlobalState, useWorkDays } from "@/hooks";
-import { TimeFieldType, WorkDayInfo } from "@/domain";
-import { WorkDayStatus } from "@/constants";
+import { TimeFieldType } from "@/domain";
+import type { WorkDayInfo } from "@/app/types";
+import { WorkDayStatus } from "@/domain/constants";
 import { DomainContextType } from "@/app";
 import { dayToPayBreakdownVM } from "@/adapters";
 import { analyticsService } from "@/services/analytics";

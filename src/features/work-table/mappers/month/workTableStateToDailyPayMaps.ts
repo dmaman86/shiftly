@@ -1,9 +1,8 @@
 import type { DomainContextType } from "@/app";
 import {
-  calculateDayFromShifts,
-  type WorkDayInfo,
   type WorkDayMap,
 } from "@/domain";
+import type { WorkDayInfo } from "@/app/types";
 import type { WorkTableDayState } from "../../context/workTableDayState/workTableDayStateContext";
 
 type WorkTableStateToDailyPayMapsParams = {
@@ -32,12 +31,10 @@ export const workTableStateToDailyPayMaps = ({
     const shifts = Object.values(dayState.shiftEntries)
       .filter((entry) => entry.payMap !== null)
       .map((entry) => entry.shift);
-    const dayPayMap = calculateDayFromShifts({
-      dayPayMapBuilder: domain.payMap.dayPayMapBuilder,
+    const dayPayMap = domain.payMap.calculateDayFromShifts({
       meta,
       month,
       shifts,
-      shiftMapBuilder: domain.payMap.shiftMapBuilder,
       standardHours,
       status: dayState.status,
       year,

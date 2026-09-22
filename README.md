@@ -137,7 +137,13 @@ The domain layer contains **pure business logic** and is framework-agnostic.
   Multi-method decision services (day-type classification, available months) whose shape doesn't reduce to a single input/output calculation.
 
 - **Composition**
-  Centralized wiring of domain components via `pipelines/`.
+  Centralized wiring of domain components via `pipelines/`. The public domain API is assembled by `src/domain/composition.ts` and exposed to the application through `src/app/domain/domain.instance.ts`.
+
+### Application and UI Types
+
+`src/app/` is the application composition root. It creates the composed domain instance and makes domain operations available to React without importing orchestration functions directly. For example, application code calls `domain.payMap.calculateDayFromShifts(...)`.
+
+Domain contracts remain under `src/domain/types`. UI-facing models such as `PayBreakdownViewModel`, `CompactPayBreakdownVM`, and `WorkDayInfo` live under `src/app/types`, because they describe presentation and application state rather than domain rules. Adapters and feature mappers convert domain results into those application models.
 
 ### Adapters
 
@@ -165,6 +171,7 @@ Global Zustand state:
 
 Pure presentation logic.
 UI reacts to data - it does not implement salary rules.
+Duty/Meal Allowance shifts are rendered as `Duty` in the English print view and `תפקיד` in the Hebrew print view.
 
 ---
 
@@ -179,6 +186,8 @@ Responsible for assembling domain structures:
 - `DayPayMapBuilder`
 - `WorkDaysForMonthBuilder`
 
+`ShiftSegmentBuilder` owns cross-day orchestration. It splits a cross-day shift at 06:00 of the following day and calculates each part with the appropriate work-day metadata. The calculator resolves the segments for each part; it does not own the cross-day workflow.
+
 ### Calculators
 
 Pure calculation logic organized by concern:
@@ -190,6 +199,8 @@ Pure calculation logic organized by concern:
 - **Meal allowance**: eligibility & rate calculation, with timeline-based rate lookup
 - **Fixed segments**: sick, vacation and earned Shabbat credit
 - **Holiday day-type classification**: Hebcal-based
+
+The base progression is accumulated across the shift: the first configured standard-hours interval is 100%, the next two hours are 125%, and the remaining hours are 150%. Special 150%/200% segments and a 06:00 cross-day split do not incorrectly restart that progression. The evening `hours20` segment is emitted only when the qualifying period reaches at least three hours; the qualifying window is evaluated against the applicable regular or pre-special period.
 
 #### Shabbat Credit Terminology
 
@@ -304,7 +315,7 @@ bun run test:ci
 
 ### End-to-End Tests
 
-Playwright covers the guest daily-work-table flow using the August 2026 fixture. The test selects the month, enters vacation days, creates regular and cross-day shifts, and compares the daily and monthly results with the expected-results fixture.
+Playwright covers the guest daily-work-table flow with a shared fixture runner. The scenarios select a month, enter day statuses, create regular and cross-day shifts, and compare daily and monthly results with expected-results fixtures for August 2026, March 2022, October 2021, and October 2025.
 
 Install the Playwright browser once after installing dependencies:
 
@@ -330,9 +341,15 @@ The E2E inputs and expected outputs are stored in:
 ```text
 e2e/
 ├── fixtures/
-│   ├── august-2026.json
-│   └── august-2026.results.json
-└── work-table-august-2026.spec.ts
+│   ├── august-2026.json / august-2026.results.json
+│   ├── march-2022.json / march-2022.result.json
+│   ├── october-2021.json / october-2021.result.json
+│   └── october-2025.json / october-2025.result.json
+├── work-table-fixture.ts
+├── work-table-august-2026.spec.ts
+├── work-table-march-2022.spec.ts
+├── work-table-october-2021.spec.ts
+└── work-table-october-2025.spec.ts
 ```
 
 The Playwright web server starts Vite on `127.0.0.1` and uses the `/shiftly` base path. Hebcal is mocked by the test so the scenario remains deterministic.
@@ -418,6 +435,7 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   ├── adapters/               # External data and domain-to-view adapters
 │   ├── app/                    # Application composition root
 │   │   ├── domain/             # Domain instance and application-facing types
+│   │   ├── types/              # Application and UI view models
 │   │   ├── providers/          # Auth, direction, domain and snackbar providers
 │   │   └── routes/             # Application and language-aware routing
 │   ├── constants/              # Shared domain and UI constants

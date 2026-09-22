@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { RegularByDayCalculator } from "@/domain/calculator/regular/regularByDay.calculator";
 import type { RegularInput, RegularConfig } from "@/domain/types/data-shapes";
-import { WorkDayType } from "@/constants/fields.constant";
+import { WorkDayType } from "@/domain/constants";
 
 describe("RegularByDayCalculator", () => {
   let calculator: RegularByDayCalculator;

@@ -1,4 +1,5 @@
-import { PayBreakdownViewModel, ShiftPayMap } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
+import { ShiftPayMap } from "@/domain";
 
 const emptySegment = (percent: number) => ({ hours: 0, percent });
 

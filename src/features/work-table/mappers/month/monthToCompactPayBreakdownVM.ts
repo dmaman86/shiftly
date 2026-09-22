@@ -1,4 +1,7 @@
-import { CompactPayBreakdownVM, PayBreakdownViewModel } from "@/domain";
+import type {
+  CompactPayBreakdownVM,
+  PayBreakdownViewModel,
+} from "@/app/types";
 import { computeTotalPay } from "@/utils";
 
 export const monthToCompactPayBreakdownVM = (

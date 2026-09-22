@@ -1,4 +1,4 @@
-import { WorkDayStatus, WorkDayType } from "@/constants";
+import { WorkDayStatus, WorkDayType } from "@/domain/constants";
 import { Builder, Calculator, Reducer } from "./core-behaviors";
 import {
   DailyPerDiemInfo,
@@ -13,8 +13,9 @@ import {
   MealAllowanceRates,
   PerDiemShiftInfo,
   CalendarEvent,
-  WorkDayInfo,
+  DomainWorkDay,
   WorkDayMeta,
+  LabeledSegmentRange,
 } from "./types";
 import { MealAllowanceDayInfo } from "./bundles";
 
@@ -27,6 +28,14 @@ export interface RegularCalculator extends Calculator<
   RegularBreakdown
 > {
   createEmpty(): RegularBreakdown;
+}
+
+export interface ShiftRegularCalculator extends RegularCalculator {
+  calculateFromSegments(params: {
+    segments: LabeledSegmentRange[];
+    standardHours: number;
+    meta: WorkDayMeta;
+  }): RegularBreakdown;
 }
 
 export type PerDiemShiftParams = {
@@ -64,7 +73,7 @@ export type WorkDaysForMonthBuilder = Builder<
     month: number;
     eventMap: Record<string, CalendarEvent[]>;
   },
-  WorkDayInfo[]
+  DomainWorkDay[]
 >;
 
 export type HolidayCalculator = Calculator<

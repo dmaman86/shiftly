@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { WorkDayInfoResolver } from "@/domain/resolve/workdayinfo.resolver";
 import { DateService } from "@/domain/services/date.service";
-import { WorkDayType } from "@/constants/fields.constant";
-import type { WorkDayInfo } from "@/domain/types/types";
+import { WorkDayType } from "@/domain/constants";
+import type { DomainWorkDay } from "@/domain/types/types";
 
 describe("WorkDayInfoResolver", () => {
   let resolver: WorkDayInfoResolver;
-  type WorkDayTestCase = WorkDayInfo & { weekdayLabel: string };
+  type WorkDayTestCase = DomainWorkDay & { weekdayLabel: string };
 
   beforeEach(() => {
     resolver = new WorkDayInfoResolver(new DateService());

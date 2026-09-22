@@ -1,4 +1,5 @@
-import { MealAllowanceRates, PayBreakdownViewModel } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
+import { MealAllowanceRates } from "@/domain";
 
 export type PayRowVM = {
   /** Stable domain identifier used by salary-summary edits and React keys. */

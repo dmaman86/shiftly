@@ -2,7 +2,7 @@ import { renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
-import { WorkDayStatus } from "@/constants";
+import { WorkDayStatus } from "@/domain/constants";
 import type { DateService, Shift } from "@/domain";
 import {
   WorkTableDayStateContext,

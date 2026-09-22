@@ -18,6 +18,7 @@
   "headers": {
     "day": "Day",
     "description": "Description",
+    "duty": "Duty",
     "sick": "Sick",
     "vacation": "Vacation",
     "hours": "Hours",

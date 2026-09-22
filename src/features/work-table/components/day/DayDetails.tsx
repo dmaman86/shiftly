@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
-import { PayBreakdownViewModel } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
 import { formatValue } from "@/utils";
 import { breakdownToDetailGroups, DetailGroupData } from "../../mappers/day";
 import { shabbatCreditHoursFromSpecial } from "../../helpers";

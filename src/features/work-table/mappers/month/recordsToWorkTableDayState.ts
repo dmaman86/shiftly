@@ -1,5 +1,6 @@
-import { WorkDayStatus } from "@/constants";
-import type { Shift, ShiftMapBuilder, WorkDayInfo } from "@/domain";
+import { WorkDayStatus } from "@/domain/constants";
+import type { Shift, ShiftMapBuilder } from "@/domain";
+import type { WorkDayInfo } from "@/app/types";
 import type { ShiftRecord } from "@/services/shift/shift.service";
 import type { WorkDayRecord } from "@/services/workDay/workDay.service";
 import type { WorkTableDayState } from "../../context/workTableDayState/workTableDayStateContext";

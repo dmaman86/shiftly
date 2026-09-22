@@ -6,7 +6,7 @@ vi.mock("@/services/supabase/supabase.client", () => ({
   supabase: { from: fromMock },
 }));
 
-import { WorkDayStatus } from "@/constants";
+import { WorkDayStatus } from "@/domain/constants";
 import { workDayService } from "@/services/workDay/workDay.service";
 
 describe("workDayService", () => {
