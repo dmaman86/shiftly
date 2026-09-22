@@ -6,6 +6,7 @@ export * from "./types/services";
 export * from "./types/domain.types.ts";
 
 export * from "./types/global.d";
+export * from "./constants";
 
 export * from "./builder";
 

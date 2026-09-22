@@ -18,13 +18,12 @@ import { useTranslation } from "react-i18next";
 
 import { dayToPayBreakdownVM } from "@/adapters";
 import { DomainContextType } from "@/app";
-import { WorkDayType } from "@/constants";
+import { WorkDayType } from "@/domain/constants";
 import {
-  calculateDayFromShifts,
-  PayBreakdownViewModel,
   Shift,
   WorkDayMeta,
 } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
 import { useGlobalState } from "@/hooks";
 import { WorkParametersInputs } from "@/features/config";
 import {
@@ -219,12 +218,10 @@ export const CalculationExampleCard = ({
       .filter((shift) => domain.services.shiftService.isValidShiftDuration(shift))
       .sort((left, right) => left.start.date.getTime() - right.start.date.getTime());
 
-    const { dayPayMap, shiftPayMaps } = calculateDayFromShifts({
-      dayPayMapBuilder: domain.payMap.dayPayMapBuilder,
+    const { dayPayMap, shiftPayMaps } = domain.payMap.calculateDayFromShifts({
       meta,
       month,
       shifts: validShifts,
-      shiftMapBuilder: domain.payMap.shiftMapBuilder,
       standardHours,
       year,
     });

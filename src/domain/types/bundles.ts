@@ -13,6 +13,7 @@ import {
   PerDiemMonthReducer,
   PerDiemRateCalculator,
   RegularCalculator,
+  ShiftRegularCalculator,
 } from "./services";
 import { LabeledSegmentRange } from "./types";
 
@@ -22,6 +23,10 @@ export type PayCalculationBundle = {
     Calculator<LabeledSegmentRange[], ExtraBreakdown>;
   special: Reducer<SpecialBreakdown> &
     Calculator<LabeledSegmentRange[], SpecialBreakdown>;
+};
+
+export type ShiftPayCalculationBundle = Omit<PayCalculationBundle, "regular"> & {
+  regular: ShiftRegularCalculator;
 };
 
 export type WorkDayReducerBundle = {

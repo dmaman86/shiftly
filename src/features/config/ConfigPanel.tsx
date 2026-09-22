@@ -15,7 +15,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { WorkParametersInputs } from "./WorkParametersInputs";
-import { SYSTEM_START_YEAR } from "@/constants";
+import { SYSTEM_START_YEAR } from "@/app/constants";
 import { useTranslation } from "react-i18next";
 
 type ConfigPanelProps = {

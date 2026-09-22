@@ -1,4 +1,4 @@
-import { TableHeader, TableViewMode } from "@/domain";
+import { TableHeader, TableViewMode } from "@/app/types/table.types";
 import { TableCell, TableHead, TableRow } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { filterHeadersByViewMode } from "../../helpers";

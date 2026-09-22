@@ -5,8 +5,9 @@ import { PickersDay, PickersDayProps } from "@mui/x-date-pickers/PickersDay";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
-import { WorkDayInfo } from "@/domain";
-import { SYSTEM_START_YEAR, WorkDayStatus } from "@/constants";
+import type { WorkDayInfo } from "@/app/types";
+import { SYSTEM_START_YEAR } from "@/app/constants";
+import { WorkDayStatus } from "@/domain/constants";
 import { DomainContextType } from "@/app";
 import { AuthControls } from "@/features/auth";
 import { useGlobalState } from "@/hooks";

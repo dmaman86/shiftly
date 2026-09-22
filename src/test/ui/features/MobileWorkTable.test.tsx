@@ -3,8 +3,8 @@ import { describe, expect, it, vi } from "vitest";
 import { format } from "date-fns";
 
 import type { DomainContextType } from "@/app";
-import { WorkDayType } from "@/constants";
-import type { WorkDayInfo } from "@/domain";
+import { WorkDayType } from "@/domain/constants";
+import type { WorkDayInfo } from "@/app/types";
 import { MobileWorkTable } from "@/features/work-table/components/month/MobileWorkTable";
 import { fireEvent, renderWithTheme, screen } from "@/test/ui/utils";
 

@@ -15,14 +15,12 @@ import AddIcon from "@mui/icons-material/Add";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
-import { WorkDayInfo } from "@/domain";
+import type { WorkDayInfo } from "@/app/types";
+import { WorkDayStatus, WorkDayType, HolidayKey } from "@/domain/constants";
 import {
-  WorkDayStatus,
-  WorkDayType,
-  HolidayKey,
   headersTable,
   tableColumnWidths,
-} from "@/constants";
+} from "@/app/constants";
 import {
   CompactDayRow,
   countTableColumns,

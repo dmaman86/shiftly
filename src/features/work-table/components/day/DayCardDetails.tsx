@@ -9,7 +9,7 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useTranslation } from "react-i18next";
 
-import { PayBreakdownViewModel } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
 import { formatValue } from "@/utils";
 import { breakdownToDetailGroups, DetailItem } from "../../mappers/day";
 import { shabbatCreditHoursFromSpecial } from "../../helpers";

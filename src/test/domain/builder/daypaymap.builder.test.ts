@@ -10,7 +10,7 @@ import { DefaultMealAllowanceCalculator } from "@/domain/calculator/mealallowanc
 import { LargeMealAllowanceCalculator } from "@/domain/calculator/mealallowance/large-mealallowance.calculator";
 import { SmallMealAllowanceCalculator } from "@/domain/calculator/mealallowance/small-mealallowance.calculator";
 import { TimelineMealAllowanceRateCalculator } from "@/domain/calculator/mealallowance/timeline-meal-allowance-rate.calculator";
-import { WorkDayStatus, WorkDayType } from "@/constants/fields.constant";
+import { WorkDayStatus, WorkDayType } from "@/domain/constants";
 import type { ShiftPayMap, WorkDayMeta, PayCalculationBundle, FixedSegmentBundle, PerDiemBundle, MealAllowanceBundle } from "@/domain";
 
 describe("DefaultDayPayMapBuilder", () => {

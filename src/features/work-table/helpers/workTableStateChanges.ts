@@ -1,4 +1,4 @@
-import { WorkDayStatus } from "@/constants";
+import { WorkDayStatus } from "@/domain/constants";
 import type { Shift } from "@/domain";
 import type { WorkTableDayState } from "../context/workTableDayState/workTableDayStateContext";
 

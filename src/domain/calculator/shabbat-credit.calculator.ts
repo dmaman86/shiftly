@@ -1,6 +1,6 @@
-import { WorkDayType } from "@/constants";
+import { WorkDayType } from "@/domain/constants";
 import type { Segment, WorkDayMap } from "../types/data-shapes";
-import type { WorkDayInfo } from "../types/types";
+import type { DomainWorkDay } from "../types/types";
 
 type ShabbatCreditDayPayMap = Pick<
   WorkDayMap,
@@ -17,7 +17,7 @@ export type ShabbatCreditAllocation = {
 };
 
 export const allocateShabbatCredit = (params: {
-  workDays: ReadonlyArray<Pick<WorkDayInfo, "meta">>;
+  workDays: ReadonlyArray<Pick<DomainWorkDay, "meta">>;
   dailyPayMaps: Readonly<Record<string, ShabbatCreditDayPayMap>>;
   standardHours: number;
   carriedOverHours?: number;

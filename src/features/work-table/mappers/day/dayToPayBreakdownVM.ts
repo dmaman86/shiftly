@@ -1,8 +1,8 @@
 import {
   applyShabbatCreditToSegment,
   WorkDayMap,
-  PayBreakdownViewModel,
 } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
 import { calculateActualHours } from "@/utils";
 
 export const dayToPayBreakdownVM = (

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Typography, Box, Stack, Card, CardContent } from "@mui/material";
 
 import { DomainContextType } from "@/app";
+import type { PayBreakdownViewModel } from "@/app/types";
 import { analyticsService } from "@/services";
 import { formatValue } from "@/utils";
 import {
@@ -12,7 +13,6 @@ import {
   useMonthlySalarySummary,
 } from "@/features/salary-summary";
 import { useGlobalState } from "@/hooks";
-import type { PayBreakdownViewModel } from "@/domain";
 
 export const MonthlySalarySummary = ({
   domain,

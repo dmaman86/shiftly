@@ -1,4 +1,5 @@
-import { CompactPayBreakdownVM, WorkDayMap } from "@/domain";
+import type { CompactPayBreakdownVM } from "@/app/types";
+import { WorkDayMap } from "@/domain";
 import { dayToPayBreakdownVM } from "./dayToPayBreakdownVM";
 import { calculateActualHours, computeTotalPay } from "@/utils";
 

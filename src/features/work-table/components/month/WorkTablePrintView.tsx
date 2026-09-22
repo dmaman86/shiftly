@@ -13,13 +13,12 @@ import {
 import { useTranslation } from "react-i18next";
 
 import { dayToPayBreakdownVM } from "@/adapters";
-import { WorkDayStatus, WorkDayType } from "@/constants";
+import { WorkDayStatus, WorkDayType } from "@/domain/constants";
 import { DomainContextType } from "@/app";
-import {
-  calculateDayFromShifts,
+import type {
   PayBreakdownViewModel,
   WorkDayInfo,
-} from "@/domain";
+} from "@/app/types";
 import { useGlobalState } from "@/hooks";
 import { formatValue, groupByShabbat } from "@/utils";
 import { dayToCompactPayBreakdownVM } from "../../mappers/day/dayToCompactPayBreakdownVM";
@@ -65,12 +64,10 @@ const PrintDayRow = ({
     const validShifts = Object.values(shiftEntries)
       .filter((entry) => entry.payMap !== null)
       .map((entry) => entry.shift);
-    const { dayPayMap } = calculateDayFromShifts({
-      dayPayMapBuilder: domain.payMap.dayPayMapBuilder,
+    const { dayPayMap } = domain.payMap.calculateDayFromShifts({
       meta: workDay.meta,
       month,
       shifts: validShifts,
-      shiftMapBuilder: domain.payMap.shiftMapBuilder,
       standardHours,
       status,
       year,
@@ -100,6 +97,7 @@ const PrintDayRow = ({
   const weekdayLabel = days[dateService.getWeekday(workDay.meta.date)];
   const dayLabel = dayInfoResolver.formatWorkDayLabel(workDay, weekdayLabel);
   const shifts = Object.values(shiftEntries).map(({ shift }) => shift);
+  const hasDutyShift = shifts.some((shift) => shift.isDuty);
   const formatShiftTimes = (field: "start" | "end") =>
     shifts
       .map(({ [field]: timeField }) =>
@@ -123,7 +121,9 @@ const PrintDayRow = ({
       <TableCell sx={{ whiteSpace: "pre-line" }}>{formatShiftTimes("start")}</TableCell>
       <TableCell sx={{ whiteSpace: "pre-line" }}>{formatShiftTimes("end")}</TableCell>
       <TableCell>
-        {status === WorkDayStatus.sick
+        {hasDutyShift
+          ? t("headers.duty")
+          : status === WorkDayStatus.sick
           ? t("headers.sick")
           : status === WorkDayStatus.vacation
             ? t("headers.vacation")

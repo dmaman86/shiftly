@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { DefaultHolidayCalculator } from "@/domain/calculator/holiday.calculator";
 import { CalendarEventKind } from "@/domain";
-import { Weekend, WorkDayType } from "@/constants";
+import { Weekend, WorkDayType } from "@/domain/constants";
 
 describe("DefaultHolidayCalculator", () => {
   let calculator: DefaultHolidayCalculator;

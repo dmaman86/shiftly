@@ -3,7 +3,7 @@ import { Alert, Button, CircularProgress, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { DomainContextType } from "@/app";
-import { WorkDayInfo } from "@/domain";
+import type { WorkDayInfo } from "@/app/types";
 import { useWorkTableMonthSession } from "@/features/work-table/hooks/month/useWorkTableMonthSession";
 
 type WorkTableDayStateHydratorProps = {

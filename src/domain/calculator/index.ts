@@ -19,3 +19,7 @@ export {
 } from "./shabbat-credit.calculator.ts";
 export type { ShabbatCreditAllocation } from "./shabbat-credit.calculator.ts";
 export { calculateDayFromShifts } from "./day-from-shifts.calculator.ts";
+export type {
+  ComposedDayCalculationParams,
+  DayFromShiftsCalculation,
+} from "./day-from-shifts.calculator.ts";

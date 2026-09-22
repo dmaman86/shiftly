@@ -3,7 +3,7 @@ import { ShiftSegmentBuilder } from "@/domain/builder/shiftSegment.builder";
 import { ShiftSegmentCalculator } from "@/domain/calculator/shiftSegment.calculator";
 import { ShiftService } from "@/domain/services/shift.service";
 import { DateService } from "@/domain/services/date.service";
-import { WorkDayType } from "@/constants/fields.constant";
+import { WorkDayType } from "@/domain/constants";
 import type { Shift } from "@/domain/types/data-shapes";
 import type { WorkDayMeta } from "@/domain/types/types";
 

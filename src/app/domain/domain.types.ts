@@ -10,6 +10,8 @@ import {
   ShiftService,
   TimelineMealAllowanceRateCalculator,
   WorkDaysForMonthBuilder,
+  ComposedDayCalculationParams,
+  DayFromShiftsCalculation,
 } from "@/domain";
 
 export type DomainContextType = {
@@ -18,6 +20,9 @@ export type DomainContextType = {
     dayPayMapBuilder: DayPayMapBuilder;
     monthPayMapCalculator: MonthPayMapReducer;
     workDaysMonthBuilder: WorkDaysForMonthBuilder;
+    calculateDayFromShifts: (
+      params: ComposedDayCalculationParams,
+    ) => DayFromShiftsCalculation;
   };
   resolvers: {
     holidayResolver: HolidayCalculator;

@@ -2,7 +2,8 @@ import type { useTranslation } from "react-i18next";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import { PayBreakdownViewModel, MealAllowanceRates } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
+import { MealAllowanceRates } from "@/domain";
 
 import {
   createAllowanceSectionFactory,

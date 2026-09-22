@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useCallback } from "react";
 
-import { WorkDayStatus } from "@/constants";
+import { WorkDayStatus } from "@/domain/constants";
 import {
   emptyDayState,
   ShiftEntries,

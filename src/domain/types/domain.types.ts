@@ -18,8 +18,12 @@ import { DefaultDayPayMapBuilder } from "../builder/daypaymap.builder";
 import { DefaultWorkDaysForMonthBuilder } from "../builder/workdaysformonth.builder";
 import { MonthPayMapReducer } from "../reducer/month-pay-map.reducer";
 import { RegularBreakdown } from "./data-shapes";
-import { RegularCalculator } from "./services";
+import { RegularCalculator, ShiftRegularCalculator } from "./services";
 import { Reducer } from "./core-behaviors";
+import type {
+  ComposedDayCalculationParams,
+  DayFromShiftsCalculation,
+} from "../calculator/day-from-shifts.calculator";
 
 export interface CoreServices {
   dateService: DateService;
@@ -39,7 +43,7 @@ export interface RateCalculators {
 
 export interface Calculators {
   regular: {
-    byShift: RegularCalculator;
+    byShift: ShiftRegularCalculator;
     byDay: RegularCalculator;
     accumulator: Reducer<RegularBreakdown>;
   };
@@ -96,6 +100,9 @@ export interface PayMapPipeline {
     dayPayMapBuilder: DefaultDayPayMapBuilder;
     monthPayMapCalculator: MonthPayMapReducer;
     workDaysForMonthBuilder: DefaultWorkDaysForMonthBuilder;
+    calculateDayFromShifts: (
+      params: ComposedDayCalculationParams,
+    ) => DayFromShiftsCalculation;
   };
   resolvers: Resolvers;
   rateCalculators: RateCalculators;

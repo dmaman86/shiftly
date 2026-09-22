@@ -4,7 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import DirectionsCarOutlinedIcon from "@mui/icons-material/DirectionsCarOutlined";
 import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
 import { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
-import { tableColumnWidths } from "@/constants";
+import { tableColumnWidths } from "@/app/constants";
 import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { ShiftTimeInput, useShiftEditor } from "@/features/work-table";

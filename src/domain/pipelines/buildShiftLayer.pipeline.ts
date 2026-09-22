@@ -1,6 +1,6 @@
 import { DefaultShiftMapBuilder, ShiftSegmentBuilder } from "../builder";
 import { ShiftSegmentCalculator } from "../calculator";
-import { PayCalculationBundle } from "../types/bundles";
+import { ShiftPayCalculationBundle } from "../types/bundles";
 import { BuildShiftLayerParams, ShiftLayer } from "../types/domain.types";
 
 export const buildShiftLayer = ({
@@ -14,7 +14,7 @@ export const buildShiftLayer = ({
     shiftService,
   );
 
-  const shiftsCalculators: PayCalculationBundle = {
+  const shiftsCalculators: ShiftPayCalculationBundle = {
     regular: calculators.regular.byShift,
     extra: calculators.extra,
     special: calculators.special,

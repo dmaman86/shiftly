@@ -28,7 +28,7 @@ import {
   useGlobalState,
 } from "@/hooks";
 import { groupByShabbat } from "@/utils";
-import { headersTable } from "@/constants";
+import { headersTable } from "@/app/constants";
 import {
   CompactDayRow,
   MobileWorkTable,
@@ -41,7 +41,12 @@ import {
   exportWorkTablePdf,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
-import { CompactPayBreakdownVM, PayBreakdownViewModel, ShabbatCreditAllocation, WorkDayInfo } from "@/domain";
+import type {
+  CompactPayBreakdownVM,
+  PayBreakdownViewModel,
+  WorkDayInfo,
+} from "@/app/types";
+import { ShabbatCreditAllocation } from "@/domain";
 import { FeatureBoundary } from "@/layout";
 
 type WorkTableProps = {

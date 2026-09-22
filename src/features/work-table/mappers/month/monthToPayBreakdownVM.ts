@@ -1,8 +1,8 @@
 import {
   applyShabbatCreditToSegment,
   MonthPayMap,
-  PayBreakdownViewModel,
 } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
 import { calculateActualHours } from "@/utils";
 
 export const monthToPayBreakdownVM = (

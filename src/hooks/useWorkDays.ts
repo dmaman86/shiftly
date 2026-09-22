@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { WorkDayType } from "@/constants";
+import { WorkDayType } from "@/domain/constants";
 import { buildEventMap } from "@/adapters";
 import { DomainContextType } from "@/app";
 import { hebcalService, analyticsService } from "@/services";

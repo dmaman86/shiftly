@@ -1,4 +1,4 @@
-import { WorkDayType } from "@/constants";
+import { WorkDayType } from "@/domain/constants";
 import type {
   LabeledSegmentRange,
   Point,
@@ -6,6 +6,12 @@ import type {
 } from "../types/types";
 import type { Calculator } from "../types/core-behaviors";
 import type { DateService } from "../services/date.service";
+
+type SegmentDefinition = {
+  point: Point;
+  percent: number;
+  key: LabeledSegmentRange["key"];
+};
 
 export class ShiftSegmentCalculator implements Calculator<
   {
@@ -15,20 +21,17 @@ export class ShiftSegmentCalculator implements Calculator<
   LabeledSegmentRange[]
 > {
   private readonly fieldMinutes = {
-    fullDay: 1440,
-    minExtraShift: 4 * 60,
-    minSpecialPartialHours20: 3 * 60,
     min06: 6 * 60,
     min14: 14 * 60,
-    min17: 17 * 60,
     min22: 22 * 60,
+    fullDay: 1440,
+    eveningQualification: 3 * 60,
   };
 
   private readonly fieldShiftPercent = {
     hours50: 0.5,
     hours20: 0.2,
     hours100: 1.0,
-    hours125: 1.25,
     hours150: 1.5,
     hours200: 2.0,
   };
@@ -40,46 +43,59 @@ export class ShiftSegmentCalculator implements Calculator<
     meta: WorkDayMeta;
   }): LabeledSegmentRange[] {
     const { point, meta } = params;
+    if (point.start >= point.end) return [];
 
-    const source = (() => {
-      switch (meta.typeDay) {
-        case WorkDayType.Regular:
-          return this.getRegularMap();
-        case WorkDayType.SpecialPartialStart:
-          return this.getSpecialPartialMap(meta.date);
-        case WorkDayType.SpecialFull:
-          return this.getSpecialFullMap();
-      }
-    })();
-
-    const segments = this.findSegments(point, source);
+    const definitions = this.getDefinitions(meta);
     const qualifiesForHours20 = this.qualifiesForHours20(point, meta);
 
-    return segments.map((segment) => {
-      if (segment.key !== "hours20" || qualifiesForHours20) {
-        return segment;
+    return definitions.flatMap((definition) => {
+      const start = Math.max(definition.point.start, point.start);
+      const end = Math.min(definition.point.end, point.end);
+      if (start >= end) return [];
+
+      if (definition.key !== "hours20" || qualifiesForHours20) {
+        return [{
+          point: { start, end },
+          percent: definition.percent,
+          key: definition.key,
+        }];
       }
 
-      return {
-        ...segment,
+      return [{
+        point: { start, end },
         percent: this.fieldShiftPercent.hours100,
-        key: "hours100",
-      };
+        key: "hours100" as const,
+      }];
     });
   }
 
   private qualifiesForHours20(point: Point, meta: WorkDayMeta): boolean {
-    if (meta.typeDay === WorkDayType.SpecialPartialStart) {
-      const specialStart = this.dateService.getSpecialStartMinutes(meta.date);
-      const hoursBeforeSpecialStart = Math.min(point.end, specialStart) - point.start;
+    const eveningStart = this.fieldMinutes.min14;
+    const eveningEnd =
+      meta.typeDay === WorkDayType.SpecialPartialStart
+        ? this.dateService.getSpecialStartMinutes(meta.date)
+        : this.fieldMinutes.min22;
 
-      return hoursBeforeSpecialStart > this.fieldMinutes.minSpecialPartialHours20;
-    }
+    const qualifyingStart = Math.max(point.start, eveningStart);
+    const qualifyingEnd = Math.min(point.end, eveningEnd);
 
-    return point.end - point.start >= this.fieldMinutes.minExtraShift;
+    return (
+      qualifyingEnd - qualifyingStart >= this.fieldMinutes.eveningQualification
+    );
   }
 
-  private getRegularMap(): LabeledSegmentRange[] {
+  private getDefinitions(meta: WorkDayMeta): SegmentDefinition[] {
+    switch (meta.typeDay) {
+      case WorkDayType.Regular:
+        return this.getRegularDefinitions();
+      case WorkDayType.SpecialPartialStart:
+        return this.getSpecialPartialDefinitions(meta.date);
+      case WorkDayType.SpecialFull:
+        return this.getSpecialFullDefinitions();
+    }
+  }
+
+  private getRegularDefinitions(): SegmentDefinition[] {
     return [
       {
         point: { start: 0, end: this.fieldMinutes.min06 },
@@ -87,18 +103,12 @@ export class ShiftSegmentCalculator implements Calculator<
         key: "hours50",
       },
       {
-        point: {
-          start: this.fieldMinutes.min06,
-          end: this.fieldMinutes.min17 - 1,
-        },
+        point: { start: this.fieldMinutes.min06, end: this.fieldMinutes.min14 },
         percent: this.fieldShiftPercent.hours100,
         key: "hours100",
       },
       {
-        point: {
-          start: this.fieldMinutes.min14,
-          end: this.fieldMinutes.min22,
-        },
+        point: { start: this.fieldMinutes.min14, end: this.fieldMinutes.min22 },
         percent: this.fieldShiftPercent.hours20,
         key: "hours20",
       },
@@ -113,7 +123,7 @@ export class ShiftSegmentCalculator implements Calculator<
     ];
   }
 
-  private getSpecialPartialMap(date: string): LabeledSegmentRange[] {
+  private getSpecialPartialDefinitions(date: string): SegmentDefinition[] {
     const specialStart = this.dateService.getSpecialStartMinutes(date);
 
     return [
@@ -123,15 +133,12 @@ export class ShiftSegmentCalculator implements Calculator<
         key: "hours50",
       },
       {
-        point: {
-          start: this.fieldMinutes.min06,
-          end: this.fieldMinutes.min17 - 1,
-        },
+        point: { start: this.fieldMinutes.min06, end: this.fieldMinutes.min14 },
         percent: this.fieldShiftPercent.hours100,
         key: "hours100",
       },
       {
-        point: { start: this.fieldMinutes.min14, end: specialStart - 1 },
+        point: { start: this.fieldMinutes.min14, end: specialStart },
         percent: this.fieldShiftPercent.hours20,
         key: "hours20",
       },
@@ -151,7 +158,7 @@ export class ShiftSegmentCalculator implements Calculator<
     ];
   }
 
-  private getSpecialFullMap(): LabeledSegmentRange[] {
+  private getSpecialFullDefinitions(): SegmentDefinition[] {
     return [
       {
         point: { start: 0, end: this.fieldMinutes.min06 },
@@ -172,29 +179,5 @@ export class ShiftSegmentCalculator implements Calculator<
         key: "shabbat200",
       },
     ];
-  }
-
-  private findSegments(
-    target: Point,
-    src: LabeledSegmentRange[],
-  ): LabeledSegmentRange[] {
-    const starts = src.map((s) => s.point.start);
-    const ends = src.map((s) => s.point.end);
-
-    const i = starts.filter((s) => s <= target.start).length - 1;
-    const j = ends.findIndex((e) => e >= target.end);
-
-    if (i === -1 || j === -1 || i > j) return [];
-
-    const result: LabeledSegmentRange[] = [];
-    for (let k = i; k <= j; k++) {
-      const { point, percent, key } = src[k];
-      const segStart = Math.max(point.start, target.start);
-      const segEnd = Math.min(point.end, target.end);
-      if (segStart < segEnd) {
-        result.push({ point: { start: segStart, end: segEnd }, percent, key });
-      }
-    }
-    return result;
   }
 }

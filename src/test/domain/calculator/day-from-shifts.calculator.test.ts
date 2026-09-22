@@ -1,4 +1,4 @@
-import { WorkDayStatus, WorkDayType } from "@/constants";
+import { WorkDayStatus, WorkDayType } from "@/domain/constants";
 import { buildPayMapPipeline, calculateDayFromShifts, Shift } from "@/domain";
 
 const pipeline = buildPayMapPipeline();

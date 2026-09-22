@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { DomainContextType } from "@/app";
-import { PayBreakdownViewModel } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
 import {
   buildSectionsSalary,
   applyQuantityOverrides,

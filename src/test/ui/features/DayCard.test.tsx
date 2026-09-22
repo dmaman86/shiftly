@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { DomainContextType } from "@/app";
-import { WorkDayStatus, WorkDayType } from "@/constants";
-import type { PayBreakdownViewModel, WorkDayInfo } from "@/domain";
+import { WorkDayStatus, WorkDayType } from "@/domain/constants";
+import type { PayBreakdownViewModel, WorkDayInfo } from "@/app/types";
 import { DayCard } from "@/features/work-table/components/day/DayCard";
 import { renderWithTheme, screen } from "@/test/ui/utils";
 

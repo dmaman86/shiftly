@@ -7,6 +7,7 @@ import {
   buildResolvers,
   buildShiftLayer,
 } from "./pipelines";
+import { calculateDayFromShifts } from "./calculator/day-from-shifts.calculator";
 import { PayMapPipeline } from "./types/domain.types";
 
 export const buildPayMapPipeline = (): PayMapPipeline => {
@@ -40,6 +41,12 @@ export const buildPayMapPipeline = (): PayMapPipeline => {
       dayPayMapBuilder: dayLayer.dayPayMapBuilder,
       monthPayMapCalculator: monthLayer.monthPayMapCalculator,
       workDaysForMonthBuilder: dayLayer.workDaysForMonthBuilder,
+      calculateDayFromShifts: (params) =>
+        calculateDayFromShifts({
+          ...params,
+          dayPayMapBuilder: dayLayer.dayPayMapBuilder,
+          shiftMapBuilder: shiftLayer.shiftMapBuilder,
+        }),
     },
     resolvers: {
       workDayInfoResolver: resolvers.workDayInfoResolver,

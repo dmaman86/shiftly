@@ -21,7 +21,7 @@
     "2022-03-02": {
       "status": "normal",
       "breakdown": {
-        "totalHours": 8.483333333333333,
+      "totalHours": 8.483333333333333,
         "actualHours": 8.483333333333333,
         "regular": {
           "hours100": {
@@ -261,7 +261,7 @@
     "2022-03-11": {
       "status": "normal",
       "breakdown": {
-        "totalHours": 8.533333333333333,
+      "totalHours": 8.533333333333333,
         "actualHours": 8.533333333333333,
         "regular": {
           "hours100": {
@@ -280,7 +280,7 @@
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 2.9833333333333334
+            "hours": 3
           },
           "hours50": {
             "percent": 0.5,

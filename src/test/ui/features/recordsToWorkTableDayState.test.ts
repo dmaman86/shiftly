@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { WorkDayType } from "@/constants";
-import type { ShiftMapBuilder, WorkDayInfo } from "@/domain";
+import { WorkDayType } from "@/domain/constants";
+import type { ShiftMapBuilder } from "@/domain";
+import type { WorkDayInfo } from "@/app/types";
 import type { ShiftRecord } from "@/services/shift/shift.service";
 import { recordsToWorkTableDayState } from "@/features/work-table/mappers/month/recordsToWorkTableDayState";
 

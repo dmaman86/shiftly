@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import i18n from "@/i18n";
-import { PayBreakdownViewModel } from "@/domain";
+import type { PayBreakdownViewModel } from "@/app/types";
 import { DayDetails } from "@/features/work-table/components/day/DayDetails";
 import { renderWithTheme, screen } from "@/test/ui/utils";
 

@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { WorkDayType } from "@/constants";
-import { allocateShabbatCredit, WorkDayInfo } from "@/domain";
+import { WorkDayType } from "@/domain/constants";
+import { allocateShabbatCredit, DomainWorkDay } from "@/domain";
 
 const createWorkDay = (
   date: string,
   typeDay = WorkDayType.Regular,
-): Pick<WorkDayInfo, "meta"> => ({
+): Pick<DomainWorkDay, "meta"> => ({
   meta: {
     date,
     typeDay,

@@ -3,10 +3,10 @@ import { DateService } from "../services/date.service";
 import {
   CalendarEvent,
   CalendarEventMap,
-  WorkDayInfo,
+  DomainWorkDay,
 } from "../types/types";
 import { WorkDaysForMonthBuilder } from "../types/services";
-import { WorkDayType } from "@/constants";
+import { WorkDayType } from "@/domain/constants";
 
 export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
   constructor(
@@ -21,10 +21,10 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
     year: number;
     month: number;
     eventMap: CalendarEventMap;
-  }): WorkDayInfo[] {
+  }): DomainWorkDay[] {
     const { year, month, eventMap } = params;
     const daysInMonth = this.dateService.getDaysInMonth(year, month);
-    const workDays: WorkDayInfo[] = [];
+    const workDays: DomainWorkDay[] = [];
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month - 1, day);
@@ -40,7 +40,7 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
           ? events.map((event) => event.holidayKey).find(Boolean)
           : undefined;
 
-      const row: WorkDayInfo = {
+      const row: DomainWorkDay = {
         meta: {
           date: formattedDate,
           typeDay: typeDay,

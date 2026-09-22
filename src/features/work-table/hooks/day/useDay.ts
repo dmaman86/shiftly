@@ -1,7 +1,6 @@
 import { useCallback, useMemo } from "react";
 
 import {
-  calculateDayFromShifts,
   Shift,
   ShiftPayMap,
   WorkDayMeta,
@@ -24,9 +23,9 @@ export const useDay = ({
   year,
   month,
 }: UseDayProps) => {
-  const daymapBuilder = domain.payMap.dayPayMapBuilder;
   const { status, setStatus, shiftEntries, setShiftEntries } =
     useWorkTableDayState(meta.date);
+  const { calculateDayFromShifts } = domain.payMap;
 
   const addShift = useCallback((shift: Shift) => {
     setShiftEntries((prev) => {
@@ -63,11 +62,9 @@ export const useDay = ({
       .map((entry) => entry.shift);
 
     return calculateDayFromShifts({
-      dayPayMapBuilder: daymapBuilder,
       meta,
       month,
       shifts: validShifts,
-      shiftMapBuilder: domain.payMap.shiftMapBuilder,
       standardHours,
       status,
       year,
@@ -79,8 +76,7 @@ export const useDay = ({
     standardHours,
     year,
     month,
-    daymapBuilder,
-    domain.payMap.shiftMapBuilder,
+    calculateDayFromShifts,
   ]);
 
   return {

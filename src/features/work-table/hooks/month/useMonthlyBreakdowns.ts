@@ -1,9 +1,12 @@
 import { useMemo } from "react";
-import type { MonthPayMapReducer, PayBreakdownViewModel } from "@/domain";
+import type { MonthPayMapReducer } from "@/domain";
+import type {
+  CompactPayBreakdownVM,
+  PayBreakdownViewModel,
+} from "@/app/types";
 import { monthToPayBreakdownVM } from "@/adapters";
 import { useGlobalBreakdown } from "@/hooks";
 import { monthToCompactPayBreakdownVM } from "../../mappers/month/monthToCompactPayBreakdownVM";
-import type { CompactPayBreakdownVM } from "@/domain";
 
 type UseMonthlyBreakdownsParams = {
   monthPayMapCalculator: MonthPayMapReducer;
