@@ -96,7 +96,11 @@
     "region_label": "פירוט שכר יומי",
     "points": "נקודות",
     "hours_used": "שעות שנוצלו",
-    "shabbat_credit_generated": "ביום זה נוצרו {{hours}} שעות זכות שבת."
+    "shabbat_credit_generated": "ביום זה נוצרו {{hours}} שעות זכות שבת.",
+    "shabbat_credit_applied": "ביום זה נוצלו {{used}} שעות מתוך {{total}} שעות זכות שבת שנצברו.",
+    "shabbat_credit_editable_hint": "ניתן עדיין להוסיף משמרת או לסמן את היום כמחלה או חופשה.",
+    "shabbat_credit_status_hint": "יש לבטל את סטטוס המחלה או החופשה כדי להוסיף משמרת.",
+    "shabbat_credit_special_day_hint": "ניתן להוסיף משמרת; מחלה וחופשה אינן זמינות ביום זה."
   },
   "month_details": {
     "show": "הצג פרטי חודש",

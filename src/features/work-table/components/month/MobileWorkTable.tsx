@@ -13,12 +13,14 @@ import { AuthControls } from "@/features/auth";
 import { useGlobalState } from "@/hooks";
 import { useWorkTableDayState } from "../../hooks/day/useWorkTableDayState";
 import { DayCard } from "../day/DayCard";
+import { getCalendarDayIndicators } from "./calendarDayIndicators";
 
 type MobileWorkTableProps = {
   domain: DomainContextType;
   workDays: WorkDayInfo[];
   currentDate: string;
   shabbatCreditHoursByDate: Record<string, number>;
+  shabbatCreditTotalHours: number;
 };
 
 type CalendarDayProps = PickersDayProps & {
@@ -38,8 +40,11 @@ const CalendarDay = ({
     status !== WorkDayStatus.normal || Object.keys(shiftEntries).length > 0;
   const hasWorkDay = workDayDates.has(dateKey);
   const hasShabbatCredit = (shabbatCreditHoursByDate[dateKey] ?? 0) > 0;
-  const showWorkIndicator = hasWorkDay && (hasEdits || Boolean(other.today));
-  const showCreditIndicator = hasWorkDay && hasShabbatCredit;
+  const { showWorkIndicator, showCreditIndicator } = getCalendarDayIndicators({
+    hasWorkDay,
+    hasEdits,
+    hasShabbatCredit,
+  });
   const showIndicator = showWorkIndicator || showCreditIndicator;
   const indicatorPosition = (hasMultipleIndicators: boolean, offset: string) =>
     hasMultipleIndicators ? `calc(50% ${offset} 4px)` : "50%";
@@ -91,6 +96,7 @@ export const MobileWorkTable = ({
   workDays,
   currentDate,
   shabbatCreditHoursByDate,
+  shabbatCreditTotalHours,
 }: MobileWorkTableProps) => {
   const { t, i18n } = useTranslation("work-table");
   const { dateService } = domain.services;
@@ -193,6 +199,7 @@ export const MobileWorkTable = ({
         workDay={selectedWorkDay}
         isCurrentDay={activeSelectedDate === currentDate}
         shabbatCreditHours={shabbatCreditHoursByDate[activeSelectedDate] ?? 0}
+        shabbatCreditTotalHours={shabbatCreditTotalHours}
       />
     </Stack>
   );
