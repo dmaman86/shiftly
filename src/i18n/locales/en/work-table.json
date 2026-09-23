@@ -96,7 +96,11 @@
     "region_label": "Day pay breakdown",
     "points": "Points",
     "hours_used": "Hours used",
-    "shabbat_credit_generated": "This day generated {{hours}} Shabbat Credit hours."
+    "shabbat_credit_generated": "This day generated {{hours}} Shabbat Credit hours.",
+    "shabbat_credit_applied": "This day used {{used}} of {{total}} accrued Shabbat Credit hours.",
+    "shabbat_credit_editable_hint": "You can still add a shift or mark this day as sick or vacation.",
+    "shabbat_credit_status_hint": "Clear the sick or vacation status to add a shift.",
+    "shabbat_credit_special_day_hint": "You can add a shift; sick and vacation are not available for this day."
   },
   "month_details": {
     "show": "Show month details",

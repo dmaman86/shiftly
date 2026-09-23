@@ -120,7 +120,7 @@ describe("DayCard", () => {
     expect(scrollIntoViewMock).toHaveBeenCalledOnce();
     expect(scrollIntoViewMock).toHaveBeenCalledWith({
       behavior: "smooth",
-      block: "start",
+      block: "center",
     });
   });
 
@@ -135,6 +135,20 @@ describe("DayCard", () => {
 
     expect(container.querySelector('[aria-current="date"]')).not.toBeInTheDocument();
     expect(scrollIntoViewMock).not.toHaveBeenCalled();
+  });
+
+  it("explains applied Shabbat Credit and available actions", () => {
+    renderWithTheme(
+      <DayCard
+        domain={domainStub}
+        workDay={workDay}
+        shabbatCreditHours={6.67}
+        shabbatCreditTotalHours={10}
+      />,
+    );
+
+    expect(screen.getByText("day_details.shabbat_credit_applied")).toBeInTheDocument();
+    expect(screen.getByText("day_details.shabbat_credit_editable_hint")).toBeInTheDocument();
   });
 
   it("starts collapsed regardless of the selected day", () => {

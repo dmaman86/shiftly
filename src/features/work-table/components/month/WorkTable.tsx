@@ -154,6 +154,9 @@ export const WorkTable = ({
                     shabbatCreditHoursByDate={
                       shabbatCreditAllocation.appliedHoursByDate
                     }
+                    shabbatCreditTotalHours={
+                      shabbatCreditAllocation.totalAvailableHours
+                    }
                   />
                 </FeatureBoundary>
                 <MonthSummaryCard

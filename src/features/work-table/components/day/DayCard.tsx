@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import {
+  Alert,
   Box,
   Checkbox,
   Chip,
@@ -25,6 +26,7 @@ type DayCardProps = {
   workDay: WorkDayInfo;
   isCurrentDay?: boolean;
   shabbatCreditHours: number;
+  shabbatCreditTotalHours?: number;
 };
 
 export const DayCard = ({
@@ -32,6 +34,7 @@ export const DayCard = ({
   workDay,
   isCurrentDay = false,
   shabbatCreditHours,
+  shabbatCreditTotalHours = shabbatCreditHours,
 }: DayCardProps) => {
   const { dateService } = domain.services;
   const { dayInfoResolver } = domain.resolvers;
@@ -39,13 +42,15 @@ export const DayCard = ({
   const tHoliday = (key: string) =>
     t(`holidays.${key}` as `holidays.${HolidayKey}`);
   const cardRef = useRef<HTMLDivElement>(null);
+  const addShiftSectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isCurrentDay) return;
 
-    cardRef.current?.scrollIntoView({
+    const scrollTarget = addShiftSectionRef.current ?? cardRef.current;
+    scrollTarget?.scrollIntoView({
       behavior: "smooth",
-      block: "start",
+      block: "center",
     });
   }, [isCurrentDay]);
 
@@ -144,6 +149,26 @@ export const DayCard = ({
         </Box>
       )}
 
+      {shabbatCreditHours > 0 && (
+        <Alert severity="info" sx={{ borderRadius: 0 }}>
+          <Typography variant="body2">
+            {t("day_details.shabbat_credit_applied", {
+              used: formatValue(shabbatCreditHours),
+              total: formatValue(shabbatCreditTotalHours),
+            })}
+          </Typography>
+          <Typography variant="caption" display="block">
+            {t(
+              specialFullDay
+                ? "day_details.shabbat_credit_special_day_hint"
+                : isEditable
+                  ? "day_details.shabbat_credit_editable_hint"
+                  : "day_details.shabbat_credit_status_hint",
+            )}
+          </Typography>
+        </Alert>
+      )}
+
       {/* Add-shift column + shifts column, mirroring the desktop table's
           rowSpan'd add-shift cell sitting beside the shift-cell columns. */}
       {(isEditable || shifts.length > 0) && (
@@ -157,6 +182,7 @@ export const DayCard = ({
             borderTop: "1px solid",
             borderColor: "divider",
           }}
+          ref={addShiftSectionRef}
         >
           {isEditable && (
             <Box sx={{ display: "flex", alignItems: "center", flexShrink: 0 }}>

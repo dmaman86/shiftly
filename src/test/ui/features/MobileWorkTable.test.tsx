@@ -6,6 +6,7 @@ import type { DomainContextType } from "@/app";
 import { WorkDayType } from "@/domain/constants";
 import type { WorkDayInfo } from "@/app/types";
 import { MobileWorkTable } from "@/features/work-table/components/month/MobileWorkTable";
+import { getCalendarDayIndicators } from "@/features/work-table/components/month/calendarDayIndicators";
 import { fireEvent, renderWithTheme, screen } from "@/test/ui/utils";
 
 vi.mock("react-i18next", () => ({
@@ -96,6 +97,38 @@ const workDays: WorkDayInfo[] = [
 ];
 
 describe("MobileWorkTable", () => {
+  describe("calendar day indicators", () => {
+    it.each([
+      {
+        name: "today without edits or Shabbat Credit",
+        input: { hasWorkDay: true, hasEdits: false, hasShabbatCredit: false },
+        expected: { showWorkIndicator: false, showCreditIndicator: false },
+      },
+      {
+        name: "today with Shabbat Credit but without edits",
+        input: { hasWorkDay: true, hasEdits: false, hasShabbatCredit: true },
+        expected: { showWorkIndicator: false, showCreditIndicator: true },
+      },
+      {
+        name: "today with edits but without Shabbat Credit",
+        input: { hasWorkDay: true, hasEdits: true, hasShabbatCredit: false },
+        expected: { showWorkIndicator: true, showCreditIndicator: false },
+      },
+      {
+        name: "today with edits and Shabbat Credit",
+        input: { hasWorkDay: true, hasEdits: true, hasShabbatCredit: true },
+        expected: { showWorkIndicator: true, showCreditIndicator: true },
+      },
+      {
+        name: "a non-today work day with edits and Shabbat Credit",
+        input: { hasWorkDay: true, hasEdits: true, hasShabbatCredit: true },
+        expected: { showWorkIndicator: true, showCreditIndicator: true },
+      },
+    ])("shows the correct indicators for $name", ({ input, expected }) => {
+      expect(getCalendarDayIndicators(input)).toEqual(expected);
+    });
+  });
+
   it("remounts DayCard when the selected day changes", () => {
     mountedDates.length = 0;
 
@@ -105,6 +138,7 @@ describe("MobileWorkTable", () => {
         workDays={workDays}
         currentDate="2026-09-15"
         shabbatCreditHoursByDate={{}}
+        shabbatCreditTotalHours={0}
       />,
     );
 
