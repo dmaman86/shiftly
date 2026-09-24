@@ -29,12 +29,15 @@ import {
   useDayController,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
+import type { ShabbatCreditUsage } from "@/domain";
 
 type DayRowProps = {
   domain: DomainContextType;
   workDay: WorkDayInfo;
   isLastInWeek?: boolean;
   shabbatCreditHours: number;
+  shabbatCreditUsage?: ShabbatCreditUsage;
+  shabbatCreditTotalHours?: number;
 };
 
 export const DayRow = ({
@@ -42,6 +45,8 @@ export const DayRow = ({
   workDay,
   isLastInWeek,
   shabbatCreditHours,
+  shabbatCreditUsage,
+  shabbatCreditTotalHours = shabbatCreditHours,
 }: DayRowProps) => {
   const { dateService } = domain.services;
   const { dayInfoResolver } = domain.resolvers;
@@ -306,6 +311,8 @@ export const DayRow = ({
               id={detailsId}
               showAbsence={!specialFullDay}
               showShabbatCreditUsed={eligibleForShabbatCredit}
+              shabbatCreditUsage={shabbatCreditUsage}
+              shabbatCreditTotalHours={shabbatCreditTotalHours}
             />
           </Collapse>
         </TableCell>

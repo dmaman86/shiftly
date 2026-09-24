@@ -54,6 +54,7 @@ type FixtureTestOptions = {
   title: string;
   inputFile: string;
   resultFile: string;
+  language?: "en" | "he";
   hebcalItems?: Array<{
     date: string;
     title: string;
@@ -62,13 +63,13 @@ type FixtureTestOptions = {
   }>;
 };
 
-const monthName = (year: number, month: number) =>
-  new Intl.DateTimeFormat("en-US", { month: "long" }).format(
+const monthName = (year: number, month: number, locale: string) =>
+  new Intl.DateTimeFormat(locale, { month: "long" }).format(
     new Date(year, month - 1, 1),
   );
 
-const shortMonthName = (year: number, month: number) =>
-  new Intl.DateTimeFormat("en-US", { month: "short" }).format(
+const shortMonthName = (year: number, month: number, locale: string) =>
+  new Intl.DateTimeFormat(locale, { month: "short" }).format(
     new Date(year, month - 1, 1),
   );
 
@@ -87,7 +88,13 @@ const formatValue = (value: number) =>
   Math.abs(value) < 0.005 ? "" : value.toFixed(2);
 
 const formatSalary = (value: number) =>
-  value > 0 ? `₪${formatValue(value)}` : "";
+  value > 0
+    ? `₪${(
+        Math.round(
+          (value + Number.EPSILON * Math.max(1, Math.abs(value))) * 100,
+        ) / 100
+      ).toFixed(2)}`
+    : "";
 
 const dayRows = (page: Page, date: string) =>
   page.locator(`[data-testid="work-day-row-${date}"]`);
@@ -107,21 +114,48 @@ const expectDayDetail = async (
 const fillTimeField = async (
   field: ReturnType<Page["getByTestId"]>,
   time: string,
+  labels: { hours: string; minutes: string },
 ) => {
   const [hours, minutes] = time.split(":");
-  await field.getByRole("spinbutton", { name: "Hours" }).fill(hours);
-  await field.getByRole("spinbutton", { name: "Minutes" }).fill(minutes);
-  await field.getByRole("spinbutton", { name: "Minutes" }).press("Tab");
+  const hoursInput = field.getByRole("spinbutton", { name: labels.hours });
+  const minutesInput = field.getByRole("spinbutton", {
+    name: labels.minutes,
+  });
+  await hoursInput.fill(hours);
+  await minutesInput.fill(minutes);
+  await minutesInput.press("Tab");
 };
 
 export const defineWorkTableFixtureTest = ({
   title,
   inputFile,
   resultFile,
+  language = "en",
   hebcalItems = [],
 }: FixtureTestOptions) => {
   const input = loadJson<WorkTableFixture>(inputFile);
   const expected = loadJson<WorkTableResults>(resultFile);
+  const locale = language === "he" ? "he-IL" : "en-US";
+  const labels =
+    language === "he"
+      ? {
+          chooseDate: /בחר תאריך|בחירת תאריך/i,
+          month: "חודש",
+          year: "שנה",
+          hours: "שעות",
+          minutes: "דקות",
+          showDayDetails: /הצג פרטי יום/i,
+          hideDayDetails: /הסתר פרטי יום/i,
+        }
+      : {
+          chooseDate: /choose date/i,
+          month: "Month",
+          year: "Year",
+          hours: "Hours",
+          minutes: "Minutes",
+          showDayDetails: /show day details/i,
+          hideDayDetails: /hide day details/i,
+        };
 
   test(title, async ({ page }) => {
     await page.route(
@@ -137,11 +171,11 @@ export const defineWorkTableFixtureTest = ({
       }),
     );
 
-    await page.goto("en/daily");
-    await page.getByRole("button", { name: /choose date/i }).click();
-    const monthInput = page.getByRole("spinbutton", { name: "Month" });
-    const yearInput = page.getByRole("spinbutton", { name: "Year" });
-    const targetMonth = monthName(input.year, input.month);
+    await page.goto(`${language}/daily`);
+    await page.getByRole("button", { name: labels.chooseDate }).click();
+    const monthInput = page.getByRole("spinbutton", { name: labels.month });
+    const yearInput = page.getByRole("spinbutton", { name: labels.year });
+    const targetMonth = monthName(input.year, input.month, locale);
 
     await monthInput.fill(targetMonth);
     await monthInput.press("Tab");
@@ -150,7 +184,7 @@ export const defineWorkTableFixtureTest = ({
 
     if ((await monthInput.textContent())?.trim() !== targetMonth) {
       await page
-        .getByText(shortMonthName(input.year, input.month), { exact: true })
+        .getByText(shortMonthName(input.year, input.month, locale), { exact: true })
         .click();
     }
 
@@ -158,7 +192,7 @@ export const defineWorkTableFixtureTest = ({
     await expect(yearInput).toHaveText(String(input.year));
     const datePickerPopup = page.locator(".MuiPickersPopper-root");
     if (await datePickerPopup.isVisible()) {
-      await page.getByRole("button", { name: /choose date/i }).click();
+      await page.getByRole("button", { name: labels.chooseDate }).click();
     }
 
     const firstDate = `${input.year}-${String(input.month).padStart(2, "0")}-01`;
@@ -197,8 +231,8 @@ export const defineWorkTableFixtureTest = ({
       const startTime = formatTime(shift.start_time, input.timeZone);
       const endTime = formatTime(shift.end_time, input.timeZone);
 
-      await fillTimeField(startField, startTime);
-      await fillTimeField(endField, endTime);
+      await fillTimeField(startField, startTime, labels);
+      await fillTimeField(endField, endTime, labels);
 
       if (shift.start_time.slice(0, 10) !== shift.end_time.slice(0, 10)) {
         const crossDayToggle = shiftRow
@@ -246,10 +280,10 @@ export const defineWorkTableFixtureTest = ({
 
       const detailsRow = page.getByTestId(`work-day-row-${date}`).first();
       const detailsButton = detailsRow.getByRole("button", {
-        name: /show day details/i,
+        name: labels.showDayDetails,
       });
       const expandedDetailsButton = detailsRow.getByRole("button", {
-        name: /hide day details/i,
+        name: labels.hideDayDetails,
       });
 
       await expect(detailsButton).toBeVisible();

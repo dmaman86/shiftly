@@ -1,18 +1,13 @@
 import type { SpecialBreakdown } from "../../types/data-shapes";
-import type { LabeledSegmentRange } from "../../types/types";
-import type { Calculator, Reducer } from "../../types/core-behaviors";
+import type { ClassifiedInterval } from "../../types/types";
+import { selectSpecialIntervals } from "../../classification";
+import type { Reducer } from "../../types/core-behaviors";
 
-export class SpecialCalculator
-  implements
-    Calculator<LabeledSegmentRange[], SpecialBreakdown>,
-    Reducer<SpecialBreakdown>
-{
+export class SpecialCalculator implements Reducer<SpecialBreakdown> {
   private readonly fieldShiftPercent: Record<string, number> = {
     hours150: 1.5,
     hours200: 2,
   };
-
-  constructor() {}
 
   createEmpty(): SpecialBreakdown {
     return {
@@ -21,21 +16,16 @@ export class SpecialCalculator
     };
   }
 
-  calculate(labeledSegments: LabeledSegmentRange[]): SpecialBreakdown {
-    const sum = (key: keyof SpecialBreakdown) =>
-      labeledSegments
-        .filter((s) => s.key === key)
-        .reduce((acc, seg) => acc + (seg.point.end - seg.point.start) / 60, 0);
+  calculateClassified(intervals: ClassifiedInterval[]): SpecialBreakdown {
+    const specialIntervals = selectSpecialIntervals(intervals);
+    const sum = (rule: "special150" | "special200") =>
+      specialIntervals
+        .filter((interval) => interval.rule === rule)
+        .reduce((total, interval) => total + (interval.point.end - interval.point.start) / 60, 0);
 
     return {
-      shabbat150: {
-        percent: this.fieldShiftPercent.hours150,
-        hours: sum("shabbat150"),
-      },
-      shabbat200: {
-        percent: this.fieldShiftPercent.hours200,
-        hours: sum("shabbat200"),
-      },
+      shabbat150: { percent: this.fieldShiftPercent.hours150, hours: sum("special150") },
+      shabbat200: { percent: this.fieldShiftPercent.hours200, hours: sum("special200") },
     };
   }
 

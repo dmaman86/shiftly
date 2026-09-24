@@ -14,6 +14,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 import type { WorkDayInfo } from "@/app/types";
 import { WorkDayStatus, WorkDayType, HolidayKey } from "@/domain/constants";
+import type { ShabbatCreditUsage } from "@/domain";
 import { DomainContextType } from "@/app";
 import { formatValue } from "@/utils";
 import { CollapsibleCard, StatTile } from "@/components";
@@ -27,6 +28,7 @@ type DayCardProps = {
   isCurrentDay?: boolean;
   shabbatCreditHours: number;
   shabbatCreditTotalHours?: number;
+  shabbatCreditUsage?: ShabbatCreditUsage;
 };
 
 export const DayCard = ({
@@ -35,6 +37,7 @@ export const DayCard = ({
   isCurrentDay = false,
   shabbatCreditHours,
   shabbatCreditTotalHours = shabbatCreditHours,
+  shabbatCreditUsage,
 }: DayCardProps) => {
   const { dateService } = domain.services;
   const { dayInfoResolver } = domain.resolvers;
@@ -85,6 +88,7 @@ export const DayCard = ({
       regionLabel={t("day_details.region_label")}
       expandedLabel={t("day_details.hide")}
       collapsedLabel={t("day_details.show")}
+      data-testid={`work-day-card-${workDay.meta.date}`}
       headerSx={{ alignItems: "flex-start", p: 1.5, pb: 1 }}
       sx={{ scrollMarginTop: 16 }}
       header={
@@ -157,6 +161,18 @@ export const DayCard = ({
               total: formatValue(shabbatCreditTotalHours),
             })}
           </Typography>
+          {shabbatCreditUsage?.sources.map((source) => (
+            <Typography key={`${source.source}-${source.date ?? "previous-month"}`} variant="caption" display="block">
+              {source.source === "previous-month"
+                ? t("day_details.shabbat_credit_source_previous_month", {
+                    hours: formatValue(source.hours),
+                  })
+                : t("day_details.shabbat_credit_source_day", {
+                    hours: formatValue(source.hours),
+                    date: source.date,
+                  })}
+            </Typography>
+          ))}
           <Typography variant="caption" display="block">
             {t(
               specialFullDay
@@ -187,7 +203,11 @@ export const DayCard = ({
           {isEditable && (
             <Box sx={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
               <Tooltip title={t("table.add_shift_label")}>
-                <IconButton size="small" onClick={handleAddShift}>
+              <IconButton
+                size="small"
+                data-testid={`work-day-add-shift-${workDay.meta.date}`}
+                onClick={handleAddShift}
+              >
                   <AddIcon fontSize="small" />
                 </IconButton>
               </Tooltip>

@@ -15,7 +15,7 @@ vi.mock("@/app", () => ({
     },
     resolvers: {
       holidayResolver: pipelineInstance.rateCalculators.holiday,
-      perDiemResolver: pipelineInstance.rateCalculators.perDiemRate,
+      perDiemResolver: pipelineInstance.rateCalculators.perDiem,
       dayInfoResolver: pipelineInstance.resolvers.workDayInfoResolver,
       monthResolver: pipelineInstance.resolvers.monthResolver,
       mealAllowanceRateResolver:

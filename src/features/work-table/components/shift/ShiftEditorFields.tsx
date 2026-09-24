@@ -45,6 +45,7 @@ export const ShiftCrossDayDutyControls = ({
       }
     >
       <Checkbox
+        data-testid="shift-cross-day-toggle"
         checked={crossDay}
         onChange={(event) => onToggleNextDay(event.target.checked)}
         size="small"
@@ -80,7 +81,12 @@ export const ShiftCrossDayDutyControls = ({
 
       <Tooltip title={t("shift_row.tooltip_duty")}>
         <span>
-          <IconButton size="small" onClick={onToggleDuty} sx={{ p: 0.75 }}>
+          <IconButton
+            size="small"
+            data-testid="shift-duty-toggle"
+            onClick={onToggleDuty}
+            sx={{ p: 0.75 }}
+          >
             {shift.isDuty ? (
               <DirectionsCarIcon fontSize="small" color="primary" />
             ) : (
@@ -105,6 +111,7 @@ type ShiftEditorFieldsProps = {
   onToggleNextDay: (checked: boolean) => void;
   shift: Shift;
   showLabels?: boolean;
+  testIdPrefix?: string;
 };
 
 export const ShiftEditorFields = ({
@@ -119,6 +126,7 @@ export const ShiftEditorFields = ({
   onToggleNextDay,
   shift,
   showLabels = true,
+  testIdPrefix,
 }: ShiftEditorFieldsProps) => {
   const { t } = useTranslation("work-table");
   const editorActions = (
@@ -148,6 +156,7 @@ export const ShiftEditorFields = ({
         value={shift.start.date}
         onChange={(value) => onChange("start", value)}
         disabled={disabled}
+        testId={testIdPrefix ? `${testIdPrefix}-start-time` : undefined}
       />
       <Tooltip title={hasOverlap ? t("shift_row.tooltip_overlap") : ""}>
         <span>
@@ -157,6 +166,7 @@ export const ShiftEditorFields = ({
             onChange={(value) => onChange("end", value)}
             disabled={disabled}
             error={hasError || hasOverlap}
+            testId={testIdPrefix ? `${testIdPrefix}-end-time` : undefined}
           />
         </span>
       </Tooltip>

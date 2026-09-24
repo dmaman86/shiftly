@@ -1,16 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { LargeMealAllowanceCalculator } from "@/domain/calculator/mealallowance/large-mealallowance.calculator";
-import { SmallMealAllowanceCalculator } from "@/domain/calculator/mealallowance/small-mealallowance.calculator";
-import { DefaultMealAllowanceCalculator } from "@/domain/calculator/mealallowance/meal-allowance.calculator";
+import { TimelineMealAllowanceCalculator } from "@/domain/calculator/mealallowance/timeline-meal-allowance.calculator";
 import type { MealAllowanceDayInfo } from "@/domain/types/bundles";
 
-describe("DefaultMealAllowanceCalculator", () => {
-  const calculator = new DefaultMealAllowanceCalculator(
-    new LargeMealAllowanceCalculator(),
-    new SmallMealAllowanceCalculator(),
-  );
-  const rates = { small: 50, large: 100 };
+describe("TimelineMealAllowanceCalculator allowance policy", () => {
+  const calculator = new TimelineMealAllowanceCalculator();
+  const rates = { small: 14.5, large: 21.1 };
 
   const calculate = (
     totalHours: number,
@@ -23,7 +18,7 @@ describe("DefaultMealAllowanceCalculator", () => {
       isFieldDutyDay,
     };
 
-    return calculator.calculate({ day, rates });
+    return calculator.calculateAllowance({ day, year: 2024, month: 10 });
   };
 
   it("returns an empty allowance", () => {
@@ -40,10 +35,10 @@ describe("DefaultMealAllowanceCalculator", () => {
     });
   });
 
-  it("returns the small allowance for a night shift of 10 hours", () => {
+  it("prioritizes the large allowance at exactly 10 hours", () => {
     expect(calculate(10, 6)).toEqual({
-      large: { points: 0, amount: 0 },
-      small: { points: 1, amount: rates.small },
+      large: { points: 1, amount: rates.large },
+      small: { points: 0, amount: 0 },
     });
   });
 
@@ -54,7 +49,10 @@ describe("DefaultMealAllowanceCalculator", () => {
     });
   });
 
-  it("returns no allowance when neither condition is met", () => {
-    expect(calculate(8, 4)).toEqual(calculator.createEmpty());
+  it("returns the small allowance at exactly 4 night hours", () => {
+    expect(calculate(8, 4)).toEqual({
+      large: { points: 0, amount: 0 },
+      small: { points: 1, amount: rates.small },
+    });
   });
 });

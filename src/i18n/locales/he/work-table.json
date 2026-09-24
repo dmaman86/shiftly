@@ -12,6 +12,8 @@
   "nav_link_rules": "כללי החישוב",
   "nav_hint_example": "רוצה לנסות חישוב עם המשמרות שלך? עבור ל",
   "nav_link_example": "דוגמת חישוב אינטראקטיבית",
+  "nav_hint_demo": "רוצה לצפות בהדגמה של Shiftly? עבור ל",
+  "nav_link_demo": "סרטון הדגמה",
   "feature_name_work_table": "טבלת ימי עבודה",
   "feature_name_salary_summary": "סיכום שכר חודשי",
   "daily_salary_header": "שכר יומי",
@@ -98,6 +100,8 @@
     "hours_used": "שעות שנוצלו",
     "shabbat_credit_generated": "ביום זה נוצרו {{hours}} שעות זכות שבת.",
     "shabbat_credit_applied": "ביום זה נוצלו {{used}} שעות מתוך {{total}} שעות זכות שבת שנצברו.",
+    "shabbat_credit_source_day": "{{hours}} שעות מתאריך {{date}}.",
+    "shabbat_credit_source_previous_month": "{{hours}} שעות מהחודש הקודם.",
     "shabbat_credit_editable_hint": "ניתן עדיין להוסיף משמרת או לסמן את היום כמחלה או חופשה.",
     "shabbat_credit_status_hint": "יש לבטל את סטטוס המחלה או החופשה כדי להוסיף משמרת.",
     "shabbat_credit_special_day_hint": "ניתן להוסיף משמרת; מחלה וחופשה אינן זמינות ביום זה."

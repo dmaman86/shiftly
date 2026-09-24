@@ -54,7 +54,7 @@ export const buildPayMapPipeline = (): PayMapPipeline => {
     },
     rateCalculators: {
       holiday: rateCalculators.holiday,
-      perDiemRate: rateCalculators.perDiemRate,
+      perDiem: rateCalculators.perDiem,
       mealAllowanceRate: rateCalculators.mealAllowanceRate,
     },
     services: {

@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { DefaultPerDiemDayCalculator } from "@/domain/calculator/perdiem/perdiem-day.calculator";
+import { TimelinePerDiemCalculator } from "@/domain/calculator/perdiem/timeline-per-diem.calculator";
 import type { PerDiemShiftInfo } from "@/domain/types/types";
 
-describe("DefaultPerDiemDayCalculator", () => {
-  let calculator: DefaultPerDiemDayCalculator;
+describe("TimelinePerDiemCalculator day", () => {
+  let calculator: TimelinePerDiemCalculator;
 
   beforeEach(() => {
-    calculator = new DefaultPerDiemDayCalculator();
+    calculator = new TimelinePerDiemCalculator();
   });
 
   describe("calculate", () => {
@@ -16,7 +16,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 4 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -33,7 +33,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 6 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 50 });
+        const result = calculator.calculateDay({ shifts, rate: 50 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -50,7 +50,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 7.99 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 75 });
+        const result = calculator.calculateDay({ shifts, rate: 75 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -68,7 +68,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 2.5 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -87,7 +87,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 8 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -104,7 +104,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 10 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 60 });
+        const result = calculator.calculateDay({ shifts, rate: 60 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -121,7 +121,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 11.99 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 80 });
+        const result = calculator.calculateDay({ shifts, rate: 80 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -139,7 +139,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 3.5 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -158,7 +158,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 12 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -175,7 +175,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 15 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 90 });
+        const result = calculator.calculateDay({ shifts, rate: 90 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -192,7 +192,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 24 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -210,7 +210,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 4.5 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -229,7 +229,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 0 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -246,7 +246,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 3 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -263,7 +263,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 3.99 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -282,7 +282,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: false, hours: 8 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: false,
@@ -300,7 +300,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: false, hours: 4 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: false,
@@ -318,7 +318,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: false, hours: 10 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         // Should be tier A (6 hours field duty only)
         expect(result).toEqual({
@@ -339,7 +339,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 8 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -358,7 +358,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 2 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 50 });
+        const result = calculator.calculateDay({ shifts, rate: 50 });
 
         // 3 + 2 = 5 field duty hours = tier A
         expect(result).toEqual({
@@ -378,7 +378,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 12 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 50 });
+        const result = calculator.calculateDay({ shifts, rate: 50 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -395,7 +395,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 8 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 200 });
+        const result = calculator.calculateDay({ shifts, rate: 200 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -412,7 +412,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 4 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 75.5 });
+        const result = calculator.calculateDay({ shifts, rate: 75.5 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -429,7 +429,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 12 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 0 });
+        const result = calculator.calculateDay({ shifts, rate: 0 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -446,7 +446,7 @@ describe("DefaultPerDiemDayCalculator", () => {
       it("should handle empty shifts array", () => {
         const shifts: PerDiemShiftInfo[] = [];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: false,
@@ -463,7 +463,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 8 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result.diemInfo.tier).toBe("B");
         expect(result.diemInfo.points).toBe(2);
@@ -474,7 +474,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 12 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result.diemInfo.tier).toBe("C");
         expect(result.diemInfo.points).toBe(3);
@@ -488,7 +488,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 3 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -505,7 +505,7 @@ describe("DefaultPerDiemDayCalculator", () => {
           { isFieldDutyShift: true, hours: 4.001 },
         ];
 
-        const result = calculator.calculate({ shifts, rate: 100 });
+        const result = calculator.calculateDay({ shifts, rate: 100 });
 
         expect(result).toEqual({
           isFieldDutyDay: true,
@@ -526,7 +526,7 @@ describe("DefaultPerDiemDayCalculator", () => {
 
         const originalShifts = JSON.parse(JSON.stringify(shifts));
 
-        calculator.calculate({ shifts, rate: 100 });
+        calculator.calculateDay({ shifts, rate: 100 });
 
         expect(shifts).toEqual(originalShifts);
       });

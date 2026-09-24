@@ -1,5 +1,5 @@
-import { MealAllowanceDayInfo } from "./bundles";
 import { WorkDayMeta } from "./types";
+import type { ClassifiedTimeline } from "./types";
 
 // --- Primitives ---
 export interface Segment {
@@ -66,11 +66,13 @@ export interface BasePayMap {
 // shift level
 export interface ShiftPayMap extends BasePayMap {
   perDiemShift: { isFieldDutyShift: boolean; hours: number };
+  classifiedTimeline: ClassifiedTimeline;
 }
 
 // day level
 export interface WorkDayMap {
   workMap: BasePayMap;
+  classifiedTimeline?: ClassifiedTimeline;
   hours100Sick: Segment;
   hours100Vacation: Segment;
   earnedShabbatCredit: Segment;
@@ -105,11 +107,6 @@ export type RegularInput = {
   totalHours: number;
   standardHours: number;
   meta: WorkDayMeta;
-};
-
-export type MealAllowanceCalcParams = {
-  day: MealAllowanceDayInfo;
-  rate: number;
 };
 
 export type WorkPayPart = Pick<MonthPayMap, "regular" | "extra" | "special">;

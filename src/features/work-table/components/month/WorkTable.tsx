@@ -154,6 +154,9 @@ export const WorkTable = ({
                     shabbatCreditHoursByDate={
                       shabbatCreditAllocation.appliedHoursByDate
                     }
+                    shabbatCreditUsageByDate={
+                      shabbatCreditAllocation.usageByDate
+                    }
                     shabbatCreditTotalHours={
                       shabbatCreditAllocation.totalAvailableHours
                     }
@@ -220,6 +223,14 @@ export const WorkTable = ({
                                   shabbatCreditAllocation.appliedHoursByDate[
                                     day.meta.date
                                   ] ?? 0
+                                }
+                                shabbatCreditUsage={
+                                  shabbatCreditAllocation.usageByDate[
+                                    day.meta.date
+                                  ]
+                                }
+                                shabbatCreditTotalHours={
+                                  shabbatCreditAllocation.totalAvailableHours
                                 }
                               />
                             </FeatureBoundary>

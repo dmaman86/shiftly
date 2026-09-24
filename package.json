@@ -23,6 +23,8 @@
     "test:e2e": "bunx playwright test",
     "test:e2e:ui": "bunx playwright test --ui",
     "test:e2e:headed": "bunx playwright test --headed",
+    "test:e2e:ui:august-2026": "PLAYWRIGHT_VIDEO=on bunx playwright test e2e/work-table-august-2026-he.spec.ts --project=chromium --output=test-results/august-2026",
+    "test:e2e:ui:august-2026:mobile": "PLAYWRIGHT_VIDEO=on bunx playwright test e2e/work-table-august-2026-mobile-he.spec.ts --project=mobile --output=test-results/august-2026-mobile",
     "predeploy": "bun run typecheck && bun run lint && bun run test:ci && bun run build",
     "deploy": "gh-pages -d dist"
   },

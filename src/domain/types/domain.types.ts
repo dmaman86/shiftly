@@ -4,15 +4,11 @@ import { ShiftService } from "../services/shift.service";
 import { DefaultHolidayCalculator } from "../calculator/holiday.calculator";
 import { DefaultMonthResolver } from "../resolve/month.resolver";
 import { WorkDayInfoResolver } from "../resolve/workdayinfo.resolver";
-import { TimelinePerDiemRateCalculator } from "../calculator/perdiem/timeline-per-diem-rate.calculator";
-import { TimelineMealAllowanceRateCalculator } from "../calculator/mealallowance/timeline-meal-allowance-rate.calculator";
+import { TimelineMealAllowanceCalculator } from "../calculator/mealallowance/timeline-meal-allowance.calculator";
+import { TimelinePerDiemCalculator } from "../calculator/perdiem/timeline-per-diem.calculator";
 import { ExtraCalculator } from "../calculator/extra/extra.calculator";
 import { SpecialCalculator } from "../calculator/special/special.calculator";
 import { FixedSegmentCalculator } from "../calculator/fixed-segment.calculator";
-import { LargeMealAllowanceCalculator } from "../calculator/mealallowance/large-mealallowance.calculator";
-import { SmallMealAllowanceCalculator } from "../calculator/mealallowance/small-mealallowance.calculator";
-import { DefaultPerDiemDayCalculator } from "../calculator/perdiem/perdiem-day.calculator";
-import { DefaultPerDiemMonthCalculator } from "../calculator/perdiem/perdiem-month.calculator";
 import { DefaultShiftMapBuilder } from "../builder/shiftmap.builder";
 import { DefaultDayPayMapBuilder } from "../builder/daypaymap.builder";
 import { DefaultWorkDaysForMonthBuilder } from "../builder/workdaysformonth.builder";
@@ -37,8 +33,8 @@ export interface Resolvers {
 
 export interface RateCalculators {
   holiday: DefaultHolidayCalculator;
-  perDiemRate: TimelinePerDiemRateCalculator;
-  mealAllowanceRate: TimelineMealAllowanceRateCalculator;
+  perDiem: TimelinePerDiemCalculator;
+  mealAllowanceRate: TimelineMealAllowanceCalculator;
 }
 
 export interface Calculators {
@@ -55,12 +51,7 @@ export interface Calculators {
     earnedShabbatCredit: FixedSegmentCalculator;
   };
   mealAllowance: {
-    large: LargeMealAllowanceCalculator;
-    small: SmallMealAllowanceCalculator;
-  };
-  perDiem: {
-    day: DefaultPerDiemDayCalculator;
-    month: DefaultPerDiemMonthCalculator;
+    calculator: TimelineMealAllowanceCalculator;
   };
 }
 

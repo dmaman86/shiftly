@@ -1,31 +1,9 @@
 import { WorkDayType, HolidayKey } from "../constants";
-
-import {
-  DailyPerDiemInfo,
-  ExtraBreakdown,
-  RegularBreakdown,
-  Shift,
-  SpecialBreakdown,
-} from "./data-shapes";
-
-export interface WorkDayMapByShift {
-  id: string;
-  regular: RegularBreakdown;
-  extra: ExtraBreakdown;
-  special: SpecialBreakdown;
-  totalHours: number;
-}
+import { ExtraBreakdown, SpecialBreakdown } from "./data-shapes";
 
 export interface PerDiemShiftInfo {
   isFieldDutyShift: boolean;
   hours: number;
-}
-
-export interface DayShift {
-  id: string;
-  shift: Shift;
-  breakdown: WorkDayMapByShift;
-  perDiemShift: DailyPerDiemInfo;
 }
 
 export interface WorkDayMeta {
@@ -49,6 +27,31 @@ export interface LabeledSegmentRange {
   point: Point;
   percent: number;
   key: SegmentKey;
+}
+
+export type TimelineCategory = "regular" | "special";
+
+export type TimelineRule =
+  | "regular"
+  | "evening"
+  | "night"
+  | "special150"
+  | "special200";
+
+/**
+ * Explicit classification representation introduced alongside the legacy
+ * rate-key representation. It is intentionally not yet the public pay-map
+ * output so existing consumers can migrate incrementally.
+ */
+export interface ClassifiedInterval {
+  point: Point;
+  category: TimelineCategory;
+  rule: TimelineRule;
+  sourceShiftId?: string;
+}
+
+export interface ClassifiedTimeline {
+  intervals: ClassifiedInterval[];
 }
 
 export interface DomainWorkDay {
@@ -89,8 +92,6 @@ export interface MonthResolver {
   resolveDefaultMonth(year: number): number;
   getCurrentYear(): number;
 }
-
-export type MealAllowanceKind = "SMALL" | "LARGE";
 
 export interface MealAllowanceRates {
   small: number;

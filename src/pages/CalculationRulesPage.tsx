@@ -24,17 +24,19 @@ import {
   AccountProfileCard,
   CalculationExampleCard,
 } from "@/features";
-import { useDomain, useGlobalState } from "@/hooks";
+import { useDeviceType, useDomain, useGlobalState } from "@/hooks";
 import { analyticsService } from "@/services";
 
 export const CalculationRulesPage = () => {
   const domain = useDomain();
   const { standardHours } = useGlobalState();
+  const { isMobile } = useDeviceType();
   const { t } = useTranslation("pages");
   const { hash } = useLocation();
 
   const std = Number(standardHours);
   const cr = "calculation_rules_page";
+  const demoVideoSrc = `${import.meta.env.BASE_URL}demos/${isMobile ? "video-mobile.webm" : "video-desktop.webm"}`;
 
   const track = (section: string) =>
     analyticsService.track({ name: "calculation_rules_accordion_expanded", params: { section } });
@@ -77,6 +79,31 @@ export const CalculationRulesPage = () => {
             defaultExpanded={hash === "#interactive-example"}
             domain={domain}
           />
+
+          <RuleCard id="demo" title={t(`${cr}.card_demo.title`)}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              {t(`${cr}.card_demo.sub_title`)}
+            </Typography>
+
+            <Box
+              component="video"
+              controls
+              playsInline
+              preload="metadata"
+              src={demoVideoSrc}
+              aria-label={t(`${cr}.card_demo.video_aria_label`)}
+              sx={{
+                display: "block",
+                width: isMobile ? "auto" : "100%",
+                height: isMobile ? "min(560px, 75vh)" : "auto",
+                maxWidth: "100%",
+                objectFit: "contain",
+                borderRadius: 1,
+                bgcolor: "common.black",
+                mx: "auto",
+              }}
+            />
+          </RuleCard>
 
           {/* Daily time split */}
           <RuleCard title={t(`${cr}.card_extra_hours.title`)}>

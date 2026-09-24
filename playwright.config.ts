@@ -11,16 +11,22 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:4173/shiftly/",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
+    video: process.env.PLAYWRIGHT_VIDEO === "on" ? "on" : "off",
   },
   projects: [
     {
       name: "chromium",
+      testIgnore: /work-table-august-2026-mobile-he\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "mobile",
+      testMatch: /work-table-august-2026-mobile-he\.spec\.ts/,
+      use: { ...devices["Pixel 10"] },
     },
   ],
   webServer: {
-    command:
-      "bun run dev -- --host=127.0.0.1 --port=4173 --strictPort",
+    command: "bun run dev -- --host=127.0.0.1 --port=4173 --strictPort",
     url: "http://127.0.0.1:4173/shiftly/",
     timeout: 180_000,
     env: {

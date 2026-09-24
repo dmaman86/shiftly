@@ -14,6 +14,18 @@ export type ShabbatCreditAllocation = {
   usedHours: number;
   unusedHours: number;
   appliedHoursByDate: Record<string, number>;
+  usageByDate: Record<string, ShabbatCreditUsage>;
+};
+
+export type ShabbatCreditSource = {
+  source: "day" | "previous-month";
+  date?: string;
+  hours: number;
+};
+
+export type ShabbatCreditUsage = {
+  totalHours: number;
+  sources: ShabbatCreditSource[];
 };
 
 export const allocateShabbatCredit = (params: {
@@ -31,6 +43,20 @@ export const allocateShabbatCredit = (params: {
 
   let remainingHours = totalAvailableHours;
   const appliedHoursByDate: Record<string, number> = {};
+  const usageByDate: Record<string, ShabbatCreditUsage> = {};
+  const sources: ShabbatCreditSource[] = [
+    ...(carriedOverHours > 0
+      ? [{ source: "previous-month" as const, hours: carriedOverHours }]
+      : []),
+    ...Object.entries(params.dailyPayMaps)
+      .filter(([, day]) => day.earnedShabbatCredit.hours > 0)
+      .sort(([leftDate], [rightDate]) => leftDate.localeCompare(rightDate))
+      .map(([date, day]) => ({
+        source: "day" as const,
+        date,
+        hours: day.earnedShabbatCredit.hours,
+      })),
+  ];
 
   const chronologicalDays = [...params.workDays].sort((a, b) =>
     a.meta.date.localeCompare(b.meta.date),
@@ -50,6 +76,26 @@ export const allocateShabbatCredit = (params: {
 
       if (appliedHours > 0) {
         appliedHoursByDate[meta.date] = appliedHours;
+        let remainingForDay = appliedHours;
+        const usageSources: ShabbatCreditSource[] = [];
+
+        for (const source of sources) {
+          if (remainingForDay <= 0 || source.hours <= 0) continue;
+
+          const sourceHours = Math.min(source.hours, remainingForDay);
+          usageSources.push({
+            source: source.source,
+            ...(source.date ? { date: source.date } : {}),
+            hours: sourceHours,
+          });
+          source.hours -= sourceHours;
+          remainingForDay -= sourceHours;
+        }
+
+        usageByDate[meta.date] = {
+          totalHours: appliedHours,
+          sources: usageSources,
+        };
         remainingHours -= appliedHours;
       }
     }
@@ -62,6 +108,7 @@ export const allocateShabbatCredit = (params: {
     usedHours: totalAvailableHours - remainingHours,
     unusedHours: remainingHours,
     appliedHoursByDate,
+    usageByDate,
   };
 };
 

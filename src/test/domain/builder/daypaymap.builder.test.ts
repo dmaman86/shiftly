@@ -4,12 +4,8 @@ import { RegularByDayCalculator } from "@/domain/calculator/regular/regularByDay
 import { ExtraCalculator } from "@/domain/calculator/extra/extra.calculator";
 import { SpecialCalculator } from "@/domain/calculator/special/special.calculator";
 import { FixedSegmentCalculator } from "@/domain/calculator/fixed-segment.calculator";
-import { DefaultPerDiemDayCalculator } from "@/domain/calculator/perdiem/perdiem-day.calculator";
-import { TimelinePerDiemRateCalculator } from "@/domain/calculator/perdiem/timeline-per-diem-rate.calculator";
-import { DefaultMealAllowanceCalculator } from "@/domain/calculator/mealallowance/meal-allowance.calculator";
-import { LargeMealAllowanceCalculator } from "@/domain/calculator/mealallowance/large-mealallowance.calculator";
-import { SmallMealAllowanceCalculator } from "@/domain/calculator/mealallowance/small-mealallowance.calculator";
-import { TimelineMealAllowanceRateCalculator } from "@/domain/calculator/mealallowance/timeline-meal-allowance-rate.calculator";
+import { TimelinePerDiemCalculator } from "@/domain/calculator/perdiem/timeline-per-diem.calculator";
+import { TimelineMealAllowanceCalculator } from "@/domain/calculator/mealallowance/timeline-meal-allowance.calculator";
 import { WorkDayStatus, WorkDayType } from "@/domain/constants";
 import type { ShiftPayMap, WorkDayMeta, PayCalculationBundle, FixedSegmentBundle, PerDiemBundle, MealAllowanceBundle } from "@/domain";
 
@@ -48,18 +44,12 @@ describe("DefaultDayPayMapBuilder", () => {
 
     // Setup per diem
     perDiemBundle = {
-      calculator: new DefaultPerDiemDayCalculator(),
-      rateResolver: new TimelinePerDiemRateCalculator(),
+      calculator: new TimelinePerDiemCalculator(),
     };
 
     // Setup meal allowance
-    const largeCalculator = new LargeMealAllowanceCalculator();
-    const smallCalculator = new SmallMealAllowanceCalculator();
-    const mealResolver = new DefaultMealAllowanceCalculator(largeCalculator, smallCalculator);
-
     mealAllowanceBundle = {
-      resolver: mealResolver,
-      rateResolver: new TimelineMealAllowanceRateCalculator(),
+      calculator: new TimelineMealAllowanceCalculator(),
     };
 
     // Create builder
@@ -90,26 +80,64 @@ describe("DefaultDayPayMapBuilder", () => {
     shabbat150Hours: number = 0,
     shabbat200Hours: number = 0,
     isFieldDuty: boolean = false
-  ): ShiftPayMap => ({
-    regular: {
-      hours100: { percent: 1, hours: regularHours },
-      hours125: { percent: 1.25, hours: 0 },
-      hours150: { percent: 1.5, hours: 0 },
-    },
-    extra: {
-      hours20: { percent: 0.2, hours: extraHours20 },
-      hours50: { percent: 0.5, hours: extraHours50 },
-    },
-    special: {
-      shabbat150: { percent: 1.5, hours: shabbat150Hours },
-      shabbat200: { percent: 2.0, hours: shabbat200Hours },
-    },
-    totalHours,
-    perDiemShift: {
-      isFieldDutyShift: isFieldDuty,
-      hours: totalHours,
-    },
-  });
+  ): ShiftPayMap => {
+    const special150Start = Math.max(totalHours - shabbat150Hours - shabbat200Hours, 0) * 60;
+    const special200Start = special150Start + shabbat150Hours * 60;
+    const classifiedTimeline = [
+      ...(totalHours > shabbat150Hours + shabbat200Hours
+        ? [{
+            point: {
+              start: 0,
+              end: special150Start,
+            },
+            category: "regular" as const,
+            rule: "regular" as const,
+          }]
+        : []),
+      ...(shabbat150Hours > 0
+        ? [{
+            point: {
+              start: special150Start,
+              end: special200Start,
+            },
+            category: "special" as const,
+            rule: "special150" as const,
+          }]
+        : []),
+      ...(shabbat200Hours > 0
+        ? [{
+            point: {
+              start: special200Start,
+              end: special200Start + shabbat200Hours * 60,
+            },
+            category: "special" as const,
+            rule: "special200" as const,
+          }]
+        : []),
+    ];
+
+    return {
+      regular: {
+        hours100: { percent: 1, hours: regularHours },
+        hours125: { percent: 1.25, hours: 0 },
+        hours150: { percent: 1.5, hours: 0 },
+      },
+      extra: {
+        hours20: { percent: 0.2, hours: extraHours20 },
+        hours50: { percent: 0.5, hours: extraHours50 },
+      },
+      special: {
+        shabbat150: { percent: 1.5, hours: shabbat150Hours },
+        shabbat200: { percent: 2.0, hours: shabbat200Hours },
+      },
+      totalHours,
+      perDiemShift: {
+        isFieldDutyShift: isFieldDuty,
+        hours: totalHours,
+      },
+      classifiedTimeline: { intervals: classifiedTimeline },
+    };
+  };
 
   describe("build - Non-working days", () => {
     it("should build sick day with standard hours", () => {
@@ -296,6 +324,66 @@ describe("DefaultDayPayMapBuilder", () => {
 
       expect(result.totalHours).toBe(16);
     });
+
+    it("should apply regular progression once across multiple shifts", () => {
+      const shifts = [
+        createShiftPayMap(4, 4),
+        createShiftPayMap(5, 5),
+      ];
+
+      const result = builder.build({
+        shifts,
+        status: WorkDayStatus.normal,
+        meta: createMeta(),
+        standardHours: 6.67,
+        year: 2024,
+        month: 1,
+      });
+
+      expect(result.workMap.regular.hours100.hours).toBe(6.67);
+      expect(result.workMap.regular.hours125.hours).toBe(2);
+      expect(result.workMap.regular.hours150.hours).toBeCloseTo(0.33, 10);
+    });
+
+    it("should expose one ordered classified timeline for all shifts", () => {
+      const firstShift = createShiftPayMap(2, 2);
+      firstShift.classifiedTimeline = {
+        intervals: [
+          {
+            point: { start: 600, end: 720 },
+            category: "regular",
+            rule: "regular",
+            sourceShiftId: "first",
+          },
+        ],
+      };
+
+      const secondShift = createShiftPayMap(2, 0, 0, 0, 2);
+      secondShift.classifiedTimeline = {
+        intervals: [
+          {
+            point: { start: 1320, end: 1440 },
+            category: "special",
+            rule: "special150",
+            sourceShiftId: "second",
+          },
+        ],
+      };
+
+      const result = builder.build({
+        shifts: [secondShift, firstShift],
+        status: WorkDayStatus.normal,
+        meta: createMeta(),
+        standardHours: 8.75,
+        year: 2024,
+        month: 1,
+      });
+
+      expect(result.classifiedTimeline?.intervals).toEqual([
+        expect.objectContaining({ sourceShiftId: "first" }),
+        expect.objectContaining({ sourceShiftId: "second" }),
+      ]);
+    });
   });
 
   describe("build - Shabbat/Special days", () => {
@@ -480,7 +568,7 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(result.mealAllowance.small.points).toBe(0);
     });
 
-    it("should not give a large allowance at exactly 10 daily hours", () => {
+    it("should give a large allowance at exactly 10 daily hours", () => {
       const shifts = [createShiftPayMap(10, 10)];
 
       const result = builder.build({
@@ -492,7 +580,7 @@ describe("DefaultDayPayMapBuilder", () => {
         month: 1,
       });
 
-      expect(result.mealAllowance.large.points).toBe(0);
+      expect(result.mealAllowance.large.points).toBe(1);
       expect(result.mealAllowance.small.points).toBe(0);
     });
 
@@ -528,7 +616,7 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(result.mealAllowance.small.points).toBe(1);
     });
 
-    it("should not give a small allowance at exactly 4 night hours", () => {
+    it("should give a small allowance at exactly 4 night hours", () => {
       const shifts = [createShiftPayMap(8, 4, 0, 4)];
 
       const result = builder.build({
@@ -541,7 +629,7 @@ describe("DefaultDayPayMapBuilder", () => {
       });
 
       expect(result.mealAllowance.large.points).toBe(0);
-      expect(result.mealAllowance.small.points).toBe(0);
+      expect(result.mealAllowance.small.points).toBe(1);
     });
 
     it("should give a small allowance above 4 night hours", () => {
@@ -653,8 +741,8 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(callArgs.standardHours).toBe(8.75);
     });
 
-    it("should call perDiem calculator calculate", () => {
-      const calculateSpy = vi.spyOn(perDiemBundle.calculator, "calculate");
+    it("should call perDiem day calculator", () => {
+      const calculateSpy = vi.spyOn(perDiemBundle.calculator, "calculateDay");
       
       const shifts = [createShiftPayMap(8, 8, 0, 0, 0, 0, true)];
 
@@ -670,8 +758,8 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(calculateSpy).toHaveBeenCalled();
     });
 
-    it("should call perDiem rateResolver", () => {
-      const resolveSpy = vi.spyOn(perDiemBundle.rateResolver, "calculate");
+    it("should call perDiem rate calculator", () => {
+      const resolveSpy = vi.spyOn(perDiemBundle.calculator, "calculateRate");
       
       const shifts = [createShiftPayMap(8, 8)];
 
@@ -688,7 +776,10 @@ describe("DefaultDayPayMapBuilder", () => {
     });
 
     it("should call meal allowance resolver", () => {
-      const resolveSpy = vi.spyOn(mealAllowanceBundle.resolver, "calculate");
+      const resolveSpy = vi.spyOn(
+        mealAllowanceBundle.calculator,
+        "calculateAllowance",
+      );
       
       const shifts = [createShiftPayMap(8, 8)];
 

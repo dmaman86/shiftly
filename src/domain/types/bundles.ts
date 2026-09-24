@@ -1,28 +1,27 @@
 import { FixedSegmentCalculator } from "../calculator";
-import { MealAllowanceMonthReducer } from "../reducer";
-import { Calculator, Reducer } from "./core-behaviors";
+import { Reducer } from "./core-behaviors";
 import {
   ExtraBreakdown,
   RegularBreakdown,
   SpecialBreakdown,
 } from "./data-shapes";
 import {
-  MealAllowanceLogicCalculator,
-  MealAllowanceRateCalculator,
-  PerDiemDayCalculator,
-  PerDiemMonthReducer,
-  PerDiemRateCalculator,
+  MealAllowanceCalculator,
+  PerDiemCalculator,
   RegularCalculator,
   ShiftRegularCalculator,
 } from "./services";
-import { LabeledSegmentRange } from "./types";
+import { ClassifiedInterval } from "./types";
+
+type ClassifiedIntervalCalculator<Output> = {
+  calculateClassified: (intervals: ClassifiedInterval[]) => Output;
+};
 
 export type PayCalculationBundle = {
   regular: RegularCalculator;
-  extra: Reducer<ExtraBreakdown> &
-    Calculator<LabeledSegmentRange[], ExtraBreakdown>;
+  extra: Reducer<ExtraBreakdown> & ClassifiedIntervalCalculator<ExtraBreakdown>;
   special: Reducer<SpecialBreakdown> &
-    Calculator<LabeledSegmentRange[], SpecialBreakdown>;
+    ClassifiedIntervalCalculator<SpecialBreakdown>;
 };
 
 export type ShiftPayCalculationBundle = Omit<PayCalculationBundle, "regular"> & {
@@ -42,18 +41,11 @@ export type FixedSegmentBundle = {
 };
 
 export type PerDiemBundle = {
-  calculator: PerDiemDayCalculator;
-  rateResolver: PerDiemRateCalculator;
+  calculator: PerDiemCalculator;
 };
 
 export type MealAllowanceBundle = {
-  resolver: MealAllowanceLogicCalculator;
-  rateResolver: MealAllowanceRateCalculator;
-};
-
-export type MealAllowanceMonthBundle = {
-  perDiem: PerDiemMonthReducer;
-  mealAllowance: MealAllowanceMonthReducer;
+  calculator: MealAllowanceCalculator;
 };
 
 export type MealAllowanceDayInfo = {

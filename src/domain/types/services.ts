@@ -10,12 +10,11 @@ import {
   WorkDayMap,
 } from "./data-shapes";
 import {
-  MealAllowanceRates,
   PerDiemShiftInfo,
   CalendarEvent,
   DomainWorkDay,
   WorkDayMeta,
-  LabeledSegmentRange,
+  ClassifiedInterval,
 } from "./types";
 import { MealAllowanceDayInfo } from "./bundles";
 
@@ -28,22 +27,14 @@ export interface RegularCalculator extends Calculator<
   RegularBreakdown
 > {
   createEmpty(): RegularBreakdown;
-}
-
-export interface ShiftRegularCalculator extends RegularCalculator {
-  calculateFromSegments(params: {
-    segments: LabeledSegmentRange[];
+  calculateClassified: (params: {
+    intervals: ClassifiedInterval[];
     standardHours: number;
     meta: WorkDayMeta;
-  }): RegularBreakdown;
+  }) => RegularBreakdown;
 }
 
-export type PerDiemShiftParams = {
-  shift: Shift;
-  isFieldDutyShift: boolean;
-};
-
-// export type MonthPayMapReducer = Reducer<MonthPayMap, WorkDayMap>;
+export type ShiftRegularCalculator = RegularCalculator;
 
 export type ShiftMapBuilder = Builder<
   {
@@ -84,40 +75,23 @@ export type HolidayCalculator = Calculator<
   WorkDayType
 >;
 
-export type PerDiemRateCalculator = Calculator<
-  {
-    year: number;
-    month: number;
-  },
-  number
->;
-
-export type MealAllowanceRateCalculator = Calculator<
-  {
-    year: number;
-    month: number;
-  },
-  MealAllowanceRates
->;
-
-export interface MealAllowanceLogicCalculator extends Calculator<
-  {
-    day: MealAllowanceDayInfo;
-    rates: MealAllowanceRates;
-  },
-  MealAllowance
-> {
+export interface MealAllowanceCalculator {
   createEmpty(): MealAllowance;
+  calculateAllowance(params: {
+    day: MealAllowanceDayInfo;
+    year: number;
+    month: number;
+  }): MealAllowance;
 }
 
-export type PerDiemDayCalculator = Calculator<
-  {
+export interface PerDiemCalculator {
+  calculateRate(params: { year: number; month: number }): number;
+  calculateDay(params: {
     shifts: PerDiemShiftInfo[];
     rate: number;
-  },
-  DailyPerDiemInfo
->;
+  }): DailyPerDiemInfo;
+}
+
+export type PerDiemRateResolver = Pick<PerDiemCalculator, "calculateRate">;
 
 export type PerDiemMonthReducer = Reducer<PerDiemInfo>;
-
-// export type MealAllowanceMonthReducer = Reducer<MealAllowance>;

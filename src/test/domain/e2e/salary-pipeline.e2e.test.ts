@@ -78,7 +78,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
       // Verify rate calculators
       expect(pipeline.rateCalculators).toBeDefined();
       expect(pipeline.rateCalculators.holiday).toBeDefined();
-      expect(pipeline.rateCalculators.perDiemRate).toBeDefined();
+      expect(pipeline.rateCalculators.perDiem).toBeDefined();
       expect(pipeline.rateCalculators.mealAllowanceRate).toBeDefined();
 
       // Verify services

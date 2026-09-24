@@ -62,4 +62,8 @@ export type AnalyticsEvent =
   | {
       name: "calculation_example_link_clicked";
       params: { source: "daily" | "monthly" };
+    }
+  | {
+      name: "calculation_demo_link_clicked";
+      params: { source: "daily" };
     };

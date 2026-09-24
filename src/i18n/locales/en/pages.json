@@ -15,6 +15,11 @@
   "calculation_rules_page": {
     "title": "Calculation Rules",
     "sub_title": "This screen displays the rules and data used to calculate hours and bonuses, including an interactive example for checking the calculation.",
+    "card_demo": {
+      "title": "🎥 Shiftly Demo",
+      "sub_title": "Watch a guided demo of the workday calculation flow on your device.",
+      "video_aria_label": "Shiftly application demo"
+    },
     "example": {
       "title": "🧮 Interactive Calculation Example",
       "description": "Choose a day type and enter one or more shifts to see how hours and bonuses are calculated.",

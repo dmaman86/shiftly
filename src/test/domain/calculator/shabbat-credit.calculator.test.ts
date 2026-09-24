@@ -44,6 +44,16 @@ describe("allocateShabbatCredit", () => {
         "2026-08-02": 8,
         "2026-08-03": 2,
       },
+      usageByDate: {
+        "2026-08-02": {
+          totalHours: 8,
+          sources: [{ source: "day", date: "2026-08-08", hours: 8 }],
+        },
+        "2026-08-03": {
+          totalHours: 2,
+          sources: [{ source: "day", date: "2026-08-08", hours: 2 }],
+        },
+      },
     });
   });
 
@@ -135,5 +145,30 @@ describe("allocateShabbatCredit", () => {
     expect(result.usedHours).toBe(2);
     expect(result.unusedHours).toBe(7);
     expect(result.appliedHoursByDate).toEqual({ "2026-08-07": 2 });
+  });
+
+  it("explains usage using previous-month and day sources", () => {
+    const result = allocateShabbatCredit({
+      workDays: [
+        createWorkDay("2026-08-02"),
+        createWorkDay("2026-08-08", WorkDayType.SpecialFull),
+      ],
+      dailyPayMaps: {
+        "2026-08-02": createPayMap(1),
+        "2026-08-08": createPayMap(10, 6),
+      },
+      standardHours: 8,
+      carriedOverHours: 2,
+    });
+
+    expect(result.usageByDate).toEqual({
+      "2026-08-02": {
+        totalHours: 7,
+        sources: [
+          { source: "previous-month", hours: 2 },
+          { source: "day", date: "2026-08-08", hours: 5 },
+        ],
+      },
+    });
   });
 });

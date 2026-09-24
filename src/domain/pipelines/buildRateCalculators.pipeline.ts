@@ -1,14 +1,14 @@
 import {
   DefaultHolidayCalculator,
-  TimelineMealAllowanceRateCalculator,
-  TimelinePerDiemRateCalculator,
+  TimelineMealAllowanceCalculator,
+  TimelinePerDiemCalculator,
 } from "../calculator";
 import { RateCalculators } from "../types/domain.types";
 
 export const buildRateCalculators = (): RateCalculators => {
   return {
     holiday: new DefaultHolidayCalculator(),
-    perDiemRate: new TimelinePerDiemRateCalculator(),
-    mealAllowanceRate: new TimelineMealAllowanceRateCalculator(),
+    perDiem: new TimelinePerDiemCalculator(),
+    mealAllowanceRate: new TimelineMealAllowanceCalculator(),
   };
 };

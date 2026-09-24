@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import { TimeField } from "@mui/x-date-pickers";
 
 interface ShiftTimeInputProps {
@@ -18,28 +19,29 @@ export const ShiftTimeInput = ({
   testId,
 }: ShiftTimeInputProps) => {
   return (
-    <TimeField
-      size="small"
-      label={label}
-      value={value}
-      disabled={disabled}
-      error={error}
-      data-testid={testId}
-      onChange={onChange}
-      format="HH:mm"
-      ampm={false}
-      sx={{
-        width: 80,
-        maxWidth: 80,
-        "& .MuiInputBase-root": {
-          fontSize: "0.875rem",
-        },
-        "& .MuiInputBase-input": {
-          py: 0.75,
-          px: 1,
-          textAlign: "center",
-        },
-      }}
-    />
+    <Box data-testid={testId}>
+      <TimeField
+        size="small"
+        label={label}
+        value={value}
+        disabled={disabled}
+        error={error}
+        onChange={onChange}
+        format="HH:mm"
+        ampm={false}
+        sx={{
+          width: 80,
+          maxWidth: 80,
+          "& .MuiInputBase-root": {
+            fontSize: "0.875rem",
+          },
+          "& .MuiInputBase-input": {
+            py: 0.75,
+            px: 1,
+            textAlign: "center",
+          },
+        }}
+      />
+    </Box>
   );
 };

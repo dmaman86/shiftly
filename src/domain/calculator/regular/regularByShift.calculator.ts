@@ -2,7 +2,11 @@ import { WorkDayType } from "@/domain/constants";
 import { BaseRegularCalculator } from "./baseRegular.calculator";
 import type { Calculator } from "../../types/core-behaviors";
 import type { RegularBreakdown, RegularInput } from "../../types/data-shapes";
-import type { LabeledSegmentRange, WorkDayMeta } from "../../types/types";
+import type {
+  ClassifiedInterval,
+  WorkDayMeta,
+} from "../../types/types";
+import { selectRegularIntervals } from "../../classification";
 
 export class RegularByShiftCalculator
   extends BaseRegularCalculator
@@ -42,52 +46,21 @@ export class RegularByShiftCalculator
     };
   }
 
-  calculateFromSegments(params: {
-    segments: LabeledSegmentRange[];
+  calculateClassified(params: {
+    intervals: ClassifiedInterval[];
     standardHours: number;
     meta: WorkDayMeta;
   }): RegularBreakdown {
-    const result = this.createEmpty();
-    let elapsedHours = 0;
-
-    const segments = [...params.segments].sort(
-      (a, b) => a.point.start - b.point.start,
+    const regularHours = selectRegularIntervals(params.intervals).reduce(
+      (total, interval) =>
+        total + (interval.point.end - interval.point.start) / 60,
+      0,
     );
 
-    for (const segment of segments) {
-      const durationHours = (segment.point.end - segment.point.start) / 60;
-      if (durationHours <= 0) continue;
-
-      if (segment.key === "shabbat150" || segment.key === "shabbat200") {
-        // Special-rate hours replace the base progression. Once a shift has
-        // crossed a special segment, subsequent regular hours continue at
-        // 150% instead of restarting at 100% or entering the 125% tier.
-        elapsedHours = Math.max(
-          elapsedHours + durationHours,
-          params.standardHours + this.config.midTierThreshold,
-        );
-        continue;
-      }
-
-      const availableAt100 = Math.max(params.standardHours - elapsedHours, 0);
-      const hours100 = Math.min(durationHours, availableAt100);
-      result.hours100.hours += hours100;
-      elapsedHours += hours100;
-
-      const remainingAfter100 = durationHours - hours100;
-      const availableAt125 = Math.max(
-        this.config.midTierThreshold - Math.max(elapsedHours - params.standardHours, 0),
-        0,
-      );
-      const hours125 = Math.min(remainingAfter100, availableAt125);
-      result.hours125.hours += hours125;
-      elapsedHours += hours125;
-
-      const hours150 = remainingAfter100 - hours125;
-      result.hours150.hours += hours150;
-      elapsedHours += hours150;
-    }
-
-    return result;
+    return this.calculate({
+      totalHours: regularHours,
+      standardHours: params.standardHours,
+      meta: params.meta,
+    });
   }
 }
