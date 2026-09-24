@@ -113,6 +113,29 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                     {t("nav_link_example")}
                   </MuiLink>
                 </Stack>
+                <Stack
+                  direction="row"
+                  spacing={0.5}
+                  flexWrap="wrap"
+                  justifyContent="center"
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t("nav_hint_demo")}
+                  </Typography>
+                  <MuiLink
+                    component={RouterLink}
+                    to="../account-and-rules#demo"
+                    variant="body2"
+                    onClick={() =>
+                      analyticsService.track({
+                        name: "calculation_demo_link_clicked",
+                        params: { source: "daily" },
+                      })
+                    }
+                  >
+                    {t("nav_link_demo")}
+                  </MuiLink>
+                </Stack>
                 <Box sx={{ pt: 1 }}>
                   <AuthControls />
                 </Box>

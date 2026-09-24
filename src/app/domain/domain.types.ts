@@ -5,10 +5,10 @@ import {
   HolidayCalculator,
   MonthPayMapReducer,
   MonthResolver,
-  PerDiemRateCalculator,
+  PerDiemRateResolver,
   ShiftMapBuilder,
   ShiftService,
-  TimelineMealAllowanceRateCalculator,
+  TimelineMealAllowanceCalculator,
   WorkDaysForMonthBuilder,
   ComposedDayCalculationParams,
   DayFromShiftsCalculation,
@@ -26,10 +26,10 @@ export type DomainContextType = {
   };
   resolvers: {
     holidayResolver: HolidayCalculator;
-    perDiemResolver: PerDiemRateCalculator;
+    perDiemResolver: PerDiemRateResolver;
     dayInfoResolver: DayInfoResolver;
     monthResolver: MonthResolver;
-    mealAllowanceRateResolver: TimelineMealAllowanceRateCalculator;
+    mealAllowanceRateResolver: TimelineMealAllowanceCalculator;
   };
   services: {
     dateService: DateService;

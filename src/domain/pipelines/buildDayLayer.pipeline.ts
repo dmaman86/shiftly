@@ -2,7 +2,6 @@ import {
   DefaultDayPayMapBuilder,
   DefaultWorkDaysForMonthBuilder,
 } from "../builder";
-import { DefaultMealAllowanceCalculator } from "../calculator";
 import {
   FixedSegmentBundle,
   MealAllowanceBundle,
@@ -31,18 +30,11 @@ export const buildDayLayer = ({
   };
 
   const perDiemBundle: PerDiemBundle = {
-    calculator: calculators.perDiem.day,
-    rateResolver: rateCalculators.perDiemRate,
+    calculator: rateCalculators.perDiem,
   };
 
-  const mealAllowanceResolver = new DefaultMealAllowanceCalculator(
-    calculators.mealAllowance.large,
-    calculators.mealAllowance.small,
-  );
-
   const mealAllowanceBundle: MealAllowanceBundle = {
-    resolver: mealAllowanceResolver,
-    rateResolver: rateCalculators.mealAllowanceRate,
+    calculator: calculators.mealAllowance.calculator,
   };
 
   const dayPayMapBuilder = new DefaultDayPayMapBuilder(

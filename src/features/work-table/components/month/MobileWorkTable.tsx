@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
 import type { WorkDayInfo } from "@/app/types";
+import type { ShabbatCreditUsage } from "@/domain";
 import { SYSTEM_START_YEAR } from "@/app/constants";
 import { WorkDayStatus } from "@/domain/constants";
 import { DomainContextType } from "@/app";
@@ -20,6 +21,7 @@ type MobileWorkTableProps = {
   workDays: WorkDayInfo[];
   currentDate: string;
   shabbatCreditHoursByDate: Record<string, number>;
+  shabbatCreditUsageByDate?: Readonly<Record<string, ShabbatCreditUsage>>;
   shabbatCreditTotalHours: number;
 };
 
@@ -54,6 +56,7 @@ const CalendarDay = ({
     <PickersDay
       {...other}
       day={day}
+      data-testid={`mobile-calendar-day-${dateKey}`}
       sx={
         showIndicator
           ? {
@@ -96,6 +99,7 @@ export const MobileWorkTable = ({
   workDays,
   currentDate,
   shabbatCreditHoursByDate,
+  shabbatCreditUsageByDate = {},
   shabbatCreditTotalHours,
 }: MobileWorkTableProps) => {
   const { t, i18n } = useTranslation("work-table");
@@ -200,6 +204,7 @@ export const MobileWorkTable = ({
         isCurrentDay={activeSelectedDate === currentDate}
         shabbatCreditHours={shabbatCreditHoursByDate[activeSelectedDate] ?? 0}
         shabbatCreditTotalHours={shabbatCreditTotalHours}
+        shabbatCreditUsage={shabbatCreditUsageByDate[activeSelectedDate]}
       />
     </Stack>
   );

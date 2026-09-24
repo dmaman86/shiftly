@@ -12,6 +12,8 @@
   "nav_link_rules": "Calculation Rules",
   "nav_hint_example": "Want to try your own shifts? Go to",
   "nav_link_example": "Interactive Calculation Example",
+  "nav_hint_demo": "Want to watch a Shiftly demo? Go to",
+  "nav_link_demo": "Demo Video",
   "feature_name_work_table": "Work Days Table",
   "feature_name_salary_summary": "Monthly Salary Summary",
   "daily_salary_header": "Daily Salary",
@@ -98,6 +100,8 @@
     "hours_used": "Hours used",
     "shabbat_credit_generated": "This day generated {{hours}} Shabbat Credit hours.",
     "shabbat_credit_applied": "This day used {{used}} of {{total}} accrued Shabbat Credit hours.",
+    "shabbat_credit_source_day": "{{hours}} hours from {{date}}.",
+    "shabbat_credit_source_previous_month": "{{hours}} hours from the previous month.",
     "shabbat_credit_editable_hint": "You can still add a shift or mark this day as sick or vacation.",
     "shabbat_credit_status_hint": "Clear the sick or vacation status to add a shift.",
     "shabbat_credit_special_day_hint": "You can add a shift; sick and vacation are not available for this day."

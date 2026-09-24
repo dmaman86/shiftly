@@ -1,12 +1,9 @@
 import {
-  DefaultPerDiemDayCalculator,
-  DefaultPerDiemMonthCalculator,
   ExtraCalculator,
   FixedSegmentCalculator,
-  LargeMealAllowanceCalculator,
   RegularByDayCalculator,
   RegularByShiftCalculator,
-  SmallMealAllowanceCalculator,
+  TimelineMealAllowanceCalculator,
   SpecialCalculator,
 } from "../calculator";
 import { RegularByMonthAccumulator } from "../reducer";
@@ -24,11 +21,8 @@ export const buildCalculators = (): Calculators => {
   const vacationCalculator = new FixedSegmentCalculator();
   const earnedShabbatCreditCalculator = new FixedSegmentCalculator();
 
-  const largeMealAllowanceCalculator = new LargeMealAllowanceCalculator();
-  const smallMealAllowanceCalculator = new SmallMealAllowanceCalculator();
+  const mealAllowanceCalculator = new TimelineMealAllowanceCalculator();
 
-  const perDiemDayCalculator = new DefaultPerDiemDayCalculator();
-  const perDiemMonthCalculator = new DefaultPerDiemMonthCalculator();
 
   return {
     regular: {
@@ -44,12 +38,7 @@ export const buildCalculators = (): Calculators => {
       earnedShabbatCredit: earnedShabbatCreditCalculator,
     },
     mealAllowance: {
-      large: largeMealAllowanceCalculator,
-      small: smallMealAllowanceCalculator,
-    },
-    perDiem: {
-      day: perDiemDayCalculator,
-      month: perDiemMonthCalculator,
+      calculator: mealAllowanceCalculator,
     },
   };
 };

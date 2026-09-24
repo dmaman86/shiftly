@@ -1,4 +1,5 @@
 import { ShiftSegmentBuilder } from "./shiftSegment.builder";
+import { classifyLabeledSegments } from "../classification";
 import { ShiftService } from "../services/shift.service";
 import { ShiftPayCalculationBundle } from "../types/bundles";
 import { ShiftMapBuilder } from "../types/services";
@@ -26,14 +27,23 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     const { shift, meta, standardHours, isFieldDutyShift } = params;
 
     const labeledSegments = this.segmentBuilder.build({ shift, meta });
+    const classifiedTimeline = {
+      intervals: classifyLabeledSegments({
+        segments: labeledSegments,
+        sourceShiftId: shift.id,
+      }),
+    };
 
     const totalHours = this.shiftService.getDurationShift(shift);
 
-    const extra = extraCalculator.calculate(labeledSegments);
-    const special = specialCalculator.calculate(labeledSegments);
-
-    const regular = regularCalculator.calculateFromSegments({
-      segments: labeledSegments,
+    const extra = extraCalculator.calculateClassified(
+      classifiedTimeline.intervals,
+    );
+    const special = specialCalculator.calculateClassified(
+      classifiedTimeline.intervals,
+    );
+    const regular = regularCalculator.calculateClassified({
+      intervals: classifiedTimeline.intervals,
       standardHours,
       meta,
     });
@@ -49,6 +59,7 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
       special,
       totalHours,
       perDiemShift,
+      classifiedTimeline,
     };
   }
 }

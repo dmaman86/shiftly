@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { DefaultPerDiemMonthCalculator } from "@/domain/calculator/perdiem/perdiem-month.calculator";
+import { DefaultPerDiemMonthReducer } from "@/domain/reducer/perdiem-month.reducer";
 import type { PerDiemInfo } from "@/domain/types/data-shapes";
 
-describe("DefaultPerDiemMonthCalculator", () => {
-  let calculator: DefaultPerDiemMonthCalculator;
+describe("DefaultPerDiemMonthReducer", () => {
+  let calculator: DefaultPerDiemMonthReducer;
 
   beforeEach(() => {
-    calculator = new DefaultPerDiemMonthCalculator();
+    calculator = new DefaultPerDiemMonthReducer();
   });
 
   describe("createEmpty", () => {

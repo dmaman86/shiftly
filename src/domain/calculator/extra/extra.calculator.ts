@@ -1,18 +1,13 @@
 import type { ExtraBreakdown } from "../../types/data-shapes";
-import type { LabeledSegmentRange } from "../../types/types";
-import type { Calculator, Reducer } from "../../types/core-behaviors";
+import type { ClassifiedInterval } from "../../types/types";
+import { selectRegularIntervals } from "../../classification";
+import type { Reducer } from "../../types/core-behaviors";
 
-export class ExtraCalculator
-  implements
-    Calculator<LabeledSegmentRange[], ExtraBreakdown>,
-    Reducer<ExtraBreakdown>
-{
+export class ExtraCalculator implements Reducer<ExtraBreakdown> {
   private readonly fieldShiftPercent: Record<string, number> = {
     hours20: 0.2,
     hours50: 0.5,
   };
-  constructor() {}
-
   createEmpty(): ExtraBreakdown {
     return {
       hours20: { percent: this.fieldShiftPercent.hours20, hours: 0 },
@@ -20,21 +15,16 @@ export class ExtraCalculator
     };
   }
 
-  calculate(labeledSegments: LabeledSegmentRange[]): ExtraBreakdown {
-    const sum = (key: keyof ExtraBreakdown) =>
-      labeledSegments
-        .filter((s) => s.key === key)
-        .reduce((acc, seg) => acc + (seg.point.end - seg.point.start) / 60, 0);
+  calculateClassified(intervals: ClassifiedInterval[]): ExtraBreakdown {
+    const regularIntervals = selectRegularIntervals(intervals);
+    const sum = (rule: "evening" | "night") =>
+      regularIntervals
+        .filter((interval) => interval.rule === rule)
+        .reduce((total, interval) => total + (interval.point.end - interval.point.start) / 60, 0);
 
     return {
-      hours20: {
-        percent: this.fieldShiftPercent.hours20,
-        hours: sum("hours20"),
-      },
-      hours50: {
-        percent: this.fieldShiftPercent.hours50,
-        hours: sum("hours50"),
-      },
+      hours20: { percent: this.fieldShiftPercent.hours20, hours: sum("evening") },
+      hours50: { percent: this.fieldShiftPercent.hours50, hours: sum("night") },
     };
   }
 

@@ -7,6 +7,10 @@ describe("formatValue", () => {
     expect(formatValue(-0.0000001)).toBe("");
     expect(formatValue(0)).toBe("");
   });
+
+  it("rounds currency values consistently at half-cent boundaries", () => {
+    expect(formatValue(803.8549999999999)).toBe("803.86");
+  });
 });
 
 describe("calculateActualHours", () => {

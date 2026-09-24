@@ -44,6 +44,7 @@ export const ShiftCard = ({
 
   return (
     <Box
+      data-testid={`work-day-shift-card-${shift.id}`}
       sx={{
         display: "flex",
         alignItems: "center",
@@ -82,6 +83,7 @@ export const ShiftCard = ({
         onToggleDuty={toggleDuty}
         onToggleNextDay={handleToggleNextDay}
         shift={localShift}
+        testIdPrefix="mobile-shift"
       />
     </Box>
   );

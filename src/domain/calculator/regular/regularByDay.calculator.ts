@@ -2,6 +2,8 @@ import { WorkDayType } from "@/domain/constants";
 import { BaseRegularCalculator } from "./baseRegular.calculator";
 import type { Calculator } from "../../types/core-behaviors";
 import type { RegularBreakdown, RegularInput } from "../../types/data-shapes";
+import type { ClassifiedInterval, WorkDayMeta } from "../../types/types";
+import { selectRegularIntervals } from "../../classification";
 
 
 export class RegularByDayCalculator
@@ -27,5 +29,23 @@ export class RegularByDayCalculator
         hours: overflow125,
       },
     };
+  }
+
+  calculateClassified(params: {
+    intervals: ClassifiedInterval[];
+    standardHours: number;
+    meta: WorkDayMeta;
+  }): RegularBreakdown {
+    const regularHours = selectRegularIntervals(params.intervals).reduce(
+      (total, interval) =>
+        total + (interval.point.end - interval.point.start) / 60,
+      0,
+    );
+
+    return this.calculate({
+      totalHours: regularHours,
+      standardHours: params.standardHours,
+      meta: params.meta,
+    });
   }
 }

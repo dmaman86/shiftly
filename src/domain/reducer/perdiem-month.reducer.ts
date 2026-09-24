@@ -1,7 +1,7 @@
-import type { PerDiemInfo } from "../../types/data-shapes";
-import type { PerDiemMonthReducer } from "../../types/services";
+import type { PerDiemInfo } from "../types/data-shapes";
+import type { PerDiemMonthReducer } from "../types/services";
 
-export class DefaultPerDiemMonthCalculator implements PerDiemMonthReducer {
+export class DefaultPerDiemMonthReducer implements PerDiemMonthReducer {
   createEmpty() {
     return { tier: null, points: 0, amount: 0 };
   }

@@ -18,4 +18,6 @@ export * from "./resolve";
 
 export * from "./services";
 
+export * from "./classification";
+
 export { buildPayMapPipeline } from "./composition.ts";

@@ -110,6 +110,14 @@ describe("DefaultShiftMapBuilder", () => {
       expect(result.extra).toBeDefined();
       expect(result.special).toBeDefined();
       expect(result.perDiemShift).toBeDefined();
+      expect(result.classifiedTimeline?.intervals).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            category: "regular",
+            sourceShiftId: "test-shift-1",
+          }),
+        ]),
+      );
     });
 
     it("should calculate regular hours correctly for 8-hour shift", () => {
@@ -546,8 +554,8 @@ describe("DefaultShiftMapBuilder", () => {
       expect(getDurationSpy).toHaveBeenCalledWith(shift);
     });
 
-    it("should call extraCalculator.calculate", () => {
-      const calcSpy = vi.spyOn(extraCalculator, "calculate");
+    it("should calculate extra rates from classified intervals", () => {
+      const calcSpy = vi.spyOn(extraCalculator, "calculateClassified");
       
       const shift = createShift(8, 0, 16, 0);
       const meta = createMeta();
@@ -562,8 +570,8 @@ describe("DefaultShiftMapBuilder", () => {
       expect(calcSpy).toHaveBeenCalled();
     });
 
-    it("should call specialCalculator.calculate", () => {
-      const calcSpy = vi.spyOn(specialCalculator, "calculate");
+    it("should calculate special rates from classified intervals", () => {
+      const calcSpy = vi.spyOn(specialCalculator, "calculateClassified");
       
       const shift = createShift(8, 0, 16, 0);
       const meta = createMeta();
@@ -578,8 +586,8 @@ describe("DefaultShiftMapBuilder", () => {
       expect(calcSpy).toHaveBeenCalled();
     });
 
-    it("should call regularCalculator.calculate with adjusted hours", () => {
-      const calcSpy = vi.spyOn(regularCalculator, "calculateFromSegments");
+    it("should calculate regular rates from classified intervals", () => {
+      const calcSpy = vi.spyOn(regularCalculator, "calculateClassified");
       
       const shift = createShift(8, 0, 16, 0);
       const meta = createMeta();
@@ -597,7 +605,7 @@ describe("DefaultShiftMapBuilder", () => {
       expect(callArgs.meta).toBe(meta);
     });
 
-    it("should calculate regular hours from non-special labeled segments", () => {
+    it("should calculate regular hours from non-special classified intervals", () => {
       vi.spyOn(segmentBuilder, "build").mockReturnValue([
         {
           key: "hours100",
@@ -610,7 +618,7 @@ describe("DefaultShiftMapBuilder", () => {
           point: { start: 120, end: 480 },
         },
       ]);
-      const calcSpy = vi.spyOn(regularCalculator, "calculateFromSegments");
+      const calcSpy = vi.spyOn(regularCalculator, "calculateClassified");
 
       const shift = createShift(8, 0, 16, 0);
       const meta = createMeta();
@@ -623,16 +631,18 @@ describe("DefaultShiftMapBuilder", () => {
       });
 
       expect(calcSpy).toHaveBeenCalledWith({
-        segments: [
+        intervals: [
           {
-            key: "hours100",
-            percent: 1,
+            category: "regular",
+            rule: "regular",
             point: { start: 0, end: 120 },
+            sourceShiftId: "test-shift-1",
           },
           {
-            key: "shabbat150",
-            percent: 1.5,
+            category: "special",
+            rule: "special150",
             point: { start: 120, end: 480 },
+            sourceShiftId: "test-shift-1",
           },
         ],
         standardHours: 8.75,

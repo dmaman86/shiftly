@@ -2,6 +2,7 @@ import {
   FixedSegmentMonthReducer,
   MealAllowanceMonthReducer,
   MonthPayMapReducer,
+  DefaultPerDiemMonthReducer,
 } from "../reducer";
 import { WorkDayMonthReducer } from "../reducer/workday-month.reducer";
 import { FixedSegmentBundle, WorkDayReducerBundle } from "../types/bundles";
@@ -30,7 +31,7 @@ export const buildMonthLayer = ({
     workPayMonthReducer,
     fixedMonthReducer,
     allowancesMonthReducer,
-    calculators.perDiem.month,
+    new DefaultPerDiemMonthReducer(),
   );
 
   return {

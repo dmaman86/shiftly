@@ -11,6 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 import type { PayBreakdownViewModel } from "@/app/types";
+import type { ShabbatCreditUsage } from "@/domain";
 import { formatValue } from "@/utils";
 import { breakdownToDetailGroups, DetailGroupData } from "../../mappers/day";
 import { shabbatCreditHoursFromSpecial } from "../../helpers";
@@ -21,6 +22,8 @@ type DayDetailsProps = {
   showAbsence?: boolean;
   showAllowances?: boolean;
   showShabbatCreditUsed?: boolean;
+  shabbatCreditUsage?: ShabbatCreditUsage;
+  shabbatCreditTotalHours?: number;
 };
 
 type DetailGroupProps = Omit<DetailGroupData, "key"> & {
@@ -122,6 +125,8 @@ export const DayDetails = ({
   showAbsence = true,
   showAllowances = true,
   showShabbatCreditUsed = false,
+  shabbatCreditUsage,
+  shabbatCreditTotalHours = 0,
 }: DayDetailsProps) => {
   const { t } = useTranslation("work-table");
 
@@ -159,6 +164,33 @@ export const DayDetails = ({
           {t("day_details.shabbat_credit_generated", {
             hours: formatValue(generatedShabbatCreditHours),
           })}
+        </Alert>
+      )}
+      {shabbatCreditUsage && shabbatCreditUsage.sources.length > 0 && (
+        <Alert severity="info" sx={{ gridColumn: "1 / -1" }}>
+          <Box component="span">
+            {t("day_details.shabbat_credit_applied", {
+              used: formatValue(breakdown.appliedShabbatCredit.hours),
+              total: formatValue(shabbatCreditTotalHours),
+            })}
+          </Box>
+          {" — "}
+          {shabbatCreditUsage.sources.map((source, index) => (
+            <Box
+              component="span"
+              key={`${source.source}-${source.date ?? "previous-month"}`}
+            >
+              {index > 0 && " + "}
+              {source.source === "previous-month"
+                ? t("day_details.shabbat_credit_source_previous_month", {
+                    hours: formatValue(source.hours),
+                  })
+                : t("day_details.shabbat_credit_source_day", {
+                    hours: formatValue(source.hours),
+                    date: source.date,
+                  })}
+            </Box>
+          ))}
         </Alert>
       )}
       <Box
