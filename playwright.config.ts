@@ -26,7 +26,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "bun run dev -- --host=127.0.0.1 --port=4173 --strictPort",
+    // CI tests the prebuilt ./dist (the deployed artifact); locally the dev server avoids a rebuild.
+    command: process.env.CI
+      ? "bun run preview -- --host=127.0.0.1 --port=4173 --strictPort"
+      : "bun run dev -- --host=127.0.0.1 --port=4173 --strictPort",
     url: "http://127.0.0.1:4173/shiftly/",
     timeout: 180_000,
     env: {
