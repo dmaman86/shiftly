@@ -41,6 +41,7 @@ import {
   exportWorkTablePdf,
 } from "@/features/work-table";
 import { DomainContextType } from "@/app";
+import { analyticsService } from "@/services";
 import type {
   CompactPayBreakdownVM,
   PayBreakdownViewModel,
@@ -78,16 +79,21 @@ export const WorkTable = ({
   const currentDate = domain.services.dateService.formatDate(new Date());
   const copyrightYear = new Date().getFullYear();
 
-  // Group workdays by week (ending on Shabbat/Saturday)
-  // groupByShabbat is O(n), with n bounded by the number of days in the month.
-  // Memoization avoids rebuilding the groups when unrelated state changes trigger a render.
   const groupByWeeks = useMemo(() => groupByShabbat(workDays), [workDays]);
 
   return (
     <Card sx={{ mb: 3 }}>
       <CardContent>
         {/* Header */}
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 1, mb: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1,
+            mb: 1,
+          }}
+        >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <CalendarMonthIcon color="primary" />
             <Typography variant="h6" fontWeight="bold">
@@ -101,7 +107,9 @@ export const WorkTable = ({
             size="small"
             variant="outlined"
             disabled={isExporting}
-            startIcon={isExporting ? <CircularProgress size={16} /> : <DownloadIcon />}
+            startIcon={
+              isExporting ? <CircularProgress size={16} /> : <DownloadIcon />
+            }
             onClick={async () => {
               if (!printViewRef.current) return;
               setIsExporting(true);
@@ -119,9 +127,15 @@ export const WorkTable = ({
                     ]
                       .filter(Boolean)
                       .join("  |  "),
-                    footer: tCommon("footer.copyright", { year: copyrightYear }),
+                    footer: tCommon("footer.copyright", {
+                      year: copyrightYear,
+                    }),
                     direction: "rtl",
                   },
+                });
+                analyticsService.track({
+                  name: "work_table_pdf_exported",
+                  params: { month, year },
                 });
               } catch (error) {
                 console.error("Failed to export work table PDF", error);
@@ -271,9 +285,7 @@ export const WorkTable = ({
               workDays={workDays}
               monthName={monthNames[month - 1]}
               pdfMetadataHeader={[
-                user?.email
-                  ? `${t("table.pdf_email")}: ${user.email}`
-                  : null,
+                user?.email ? `${t("table.pdf_email")}: ${user.email}` : null,
                 `${t("table.pdf_base_rate")}: ${baseRate}`,
                 `${t("table.pdf_standard_hours")}: ${standardHours}`,
               ]
