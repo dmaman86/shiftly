@@ -4,9 +4,10 @@ import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
-import { SnackbarProvider } from "notistack";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { AppSnackbarProvider } from "@/app/providers/snackbar/AppSnackbarProvider";
+import { AuthContext } from "@/app/providers/auth/authContext";
 import {
   initialGlobalState,
   type GlobalState,
@@ -90,11 +91,24 @@ export function renderWithProviders(
 
     if (withSnackbar) {
       component = (
-        <SnackbarProvider maxSnack={3}>
+        <AppSnackbarProvider>
           {component}
-        </SnackbarProvider>
+        </AppSnackbarProvider>
       );
     }
+
+    component = (
+      <AuthContext.Provider
+        value={{
+          session: null,
+          user: null,
+          isLoading: false,
+          initializationError: null,
+        }}
+      >
+        {component}
+      </AuthContext.Provider>
+    );
 
     if (withRouter) {
       component = (

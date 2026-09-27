@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const authMock = vi.hoisted(() => ({ user: null as { id: string } | null }));
@@ -8,6 +8,7 @@ const globalStateMock = vi.hoisted(() => ({
   month: 8,
   standardHours: 6.67,
   baseRate: 0,
+  initializeMonth: vi.fn(),
   updateStandardHours: vi.fn(),
   updateBaseRate: vi.fn(),
 }));
@@ -32,9 +33,17 @@ vi.mock("@/services", async (importOriginal) => {
   return { ...actual, monthlyConfigService: () => serviceMock };
 });
 
-import { useMonthlyConfigSync } from "@/features/config/hooks/useMonthlyConfigSync";
+import { MonthlyDataProvider } from "@/features/monthly-data/MonthlyDataProvider";
 
-describe("useMonthlyConfigSync", () => {
+const monthlyDataElement = () => (
+  <MonthlyDataProvider>
+    <div />
+  </MonthlyDataProvider>
+);
+
+const renderMonthlyDataProvider = () => render(monthlyDataElement());
+
+describe("MonthlyDataProvider", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     authMock.user = null;
@@ -42,6 +51,7 @@ describe("useMonthlyConfigSync", () => {
     globalStateMock.month = 8;
     globalStateMock.standardHours = 6.67;
     globalStateMock.baseRate = 0;
+    globalStateMock.initializeMonth.mockReset();
     globalStateMock.updateStandardHours.mockReset();
     globalStateMock.updateBaseRate.mockReset();
     snackbarMock.error.mockReset();
@@ -55,13 +65,19 @@ describe("useMonthlyConfigSync", () => {
   });
 
   it("does nothing in guest mode", async () => {
-    renderHook(() => useMonthlyConfigSync());
+    renderMonthlyDataProvider();
     await act(async () => {
       await vi.advanceTimersByTimeAsync(1000);
     });
 
     expect(serviceMock.fetch).not.toHaveBeenCalled();
     expect(serviceMock.upsert).not.toHaveBeenCalled();
+  });
+
+  it("initializes guest monthly state with defaults", () => {
+    renderMonthlyDataProvider();
+
+    expect(globalStateMock.initializeMonth).toHaveBeenCalledWith(2026, 8);
   });
 
   it("hydrates the global config from the persisted record on mount", async () => {
@@ -73,7 +89,7 @@ describe("useMonthlyConfigSync", () => {
         }),
     });
 
-    renderHook(() => useMonthlyConfigSync());
+    renderMonthlyDataProvider();
     await act(async () => {
       await vi.advanceTimersByTimeAsync(0);
     });
@@ -87,7 +103,7 @@ describe("useMonthlyConfigSync", () => {
     authMock.user = { id: "user-1" };
     serviceMock.fetch.mockReturnValue({ call: () => Promise.resolve({ data: null }) });
 
-    renderHook(() => useMonthlyConfigSync());
+    renderMonthlyDataProvider();
     await act(async () => {
       await vi.advanceTimersByTimeAsync(0);
     });
@@ -102,37 +118,12 @@ describe("useMonthlyConfigSync", () => {
       call: () => Promise.resolve({ error: "connection lost" }),
     });
 
-    renderHook(() => useMonthlyConfigSync());
+    renderMonthlyDataProvider();
     await act(async () => {
       await vi.advanceTimersByTimeAsync(0);
     });
 
     expect(snackbarMock.error).toHaveBeenCalledWith("connection lost");
-  });
-
-  it("writes debounced local changes back to Supabase once hydrated", async () => {
-    authMock.user = { id: "user-1" };
-    serviceMock.fetch.mockReturnValue({ call: () => Promise.resolve({ data: null }) });
-
-    const { rerender } = renderHook(() => useMonthlyConfigSync());
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(0);
-    });
-
-    globalStateMock.standardHours = 7;
-    globalStateMock.baseRate = 65;
-    rerender();
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(500);
-    });
-
-    expect(serviceMock.upsert).toHaveBeenCalledWith("user-1", {
-      year: 2026,
-      month: 8,
-      standard_hours: 7,
-      base_rate: 65,
-    });
   });
 
   it("does not write before hydration has resolved", async () => {
@@ -142,7 +133,7 @@ describe("useMonthlyConfigSync", () => {
       call: () => new Promise((resolve) => (resolveFetch = resolve)),
     });
 
-    renderHook(() => useMonthlyConfigSync());
+    renderMonthlyDataProvider();
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(500);
@@ -166,13 +157,13 @@ describe("useMonthlyConfigSync", () => {
         }),
     });
 
-    const { rerender } = renderHook(() => useMonthlyConfigSync());
+    const { rerender } = renderMonthlyDataProvider();
     await act(async () => {
       await vi.advanceTimersByTimeAsync(0);
     });
 
     globalStateMock.baseRate = 47.48;
-    rerender();
+    rerender(monthlyDataElement());
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(500);
@@ -182,5 +173,28 @@ describe("useMonthlyConfigSync", () => {
       "user-1",
       expect.objectContaining({ base_rate: 48.47 }),
     );
+  });
+
+  it("ignores a stale response after navigating to another month", async () => {
+    authMock.user = { id: "user-1" };
+    let resolveFirstFetch: (value: { data: null }) => void = () => {};
+    serviceMock.fetch
+      .mockReturnValueOnce({
+        call: () => new Promise((resolve) => (resolveFirstFetch = resolve)),
+      })
+      .mockReturnValueOnce({ call: () => Promise.resolve({ data: null }) });
+
+    const { rerender } = renderMonthlyDataProvider();
+    globalStateMock.month = 9;
+    rerender(monthlyDataElement());
+
+    await act(async () => {
+      resolveFirstFetch({ data: null });
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    expect(globalStateMock.updateStandardHours).not.toHaveBeenCalled();
+    expect(globalStateMock.updateBaseRate).not.toHaveBeenCalled();
+    expect(serviceMock.fetch).toHaveBeenNthCalledWith(2, "user-1", 2026, 9);
   });
 });

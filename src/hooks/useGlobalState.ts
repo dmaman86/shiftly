@@ -5,6 +5,7 @@ export const useGlobalState = () => {
   const month = useGlobalStore((state) => state.config.month);
   const standardHours = useGlobalStore((state) => state.config.standardHours);
   const baseRate = useGlobalStore((state) => state.config.baseRate);
+  const initializeMonth = useGlobalStore((state) => state.initializeMonth);
   const updateYear = useGlobalStore((state) => state.updateYear);
   const updateMonth = useGlobalStore((state) => state.updateMonth);
   const updateStandardHours = useGlobalStore((state) => state.updateStandardHours);
@@ -18,6 +19,7 @@ export const useGlobalState = () => {
     month,
     standardHours,
     baseRate,
+    initializeMonth,
     updateYear,
     updateMonth,
     updateStandardHours,
