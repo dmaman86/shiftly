@@ -433,9 +433,9 @@ Tests are split by what each level proves:
 | Unit (Vitest) | Domain rules, services, mappers, and components |
 | Integration (Vitest) | Every golden month fixture through the app's calculation path, without a browser |
 | Desktop E2E (Playwright, Chromium) | Full month entry through the table in English and Hebrew, plus the tablet-width layout |
-| Mobile E2E (Playwright, Android + iPhone) | Full month entry through the calendar and day card, shift editing, and menu navigation without horizontal overflow |
+| Mobile E2E (Playwright, Android + iPhone) | Month selection in the modal picker, shift editing, and menu navigation without horizontal overflow; full month entry through the calendar and day card on Android |
 
-Mobile specs run on two profiles: `android` (Pixel 10, Chromium) and `iphone` (iPhone 15, WebKit). Every test runs with a frozen clock (`e2e/support/app.ts`), so scenarios do not depend on the current date.
+Mobile specs run on two profiles: `android` (Pixel 10, Chromium) and `iphone` (iPhone 15, WebKit). The full-month flow is Android-only because headless WebKit on Linux CI needs several minutes for it, and month results do not depend on the browser engine. Every test runs with a frozen clock (`e2e/support/app.ts`), so scenarios do not depend on the current date.
 
 Install the Playwright browsers once after installing dependencies:
 
@@ -470,7 +470,8 @@ e2e/
 │   ├── work-table-month.spec.ts
 │   └── tablet-layout.spec.ts
 └── mobile/           # "android" and "iphone" projects
-    ├── work-table-month.spec.ts
+    ├── work-table-month.spec.ts   # Android only
+    ├── month-picker.spec.ts
     ├── shift-editing.spec.ts
     └── navigation.spec.ts
 ```

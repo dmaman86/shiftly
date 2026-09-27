@@ -646,9 +646,9 @@ bun run test:ci
 | Unit (Vitest) | כללי הדומיין, שירותים, mappers ורכיבים |
 | Integration (Vitest) | כל fixture של חודש מלא דרך מסלול החישוב של האפליקציה, ללא דפדפן |
 | Desktop E2E (Playwright, Chromium) | הזנת חודש מלא דרך הטבלה באנגלית ובעברית, וכן פריסה ברוחב טאבלט |
-| Mobile E2E (Playwright, Android + iPhone) | הזנת חודש מלא דרך לוח השנה וכרטיס היום, עריכת משמרות וניווט בתפריט ללא גלילה אופקית |
+| Mobile E2E (Playwright, Android + iPhone) | בחירת חודש בבורר המודאלי, עריכת משמרות וניווט בתפריט ללא גלילה אופקית; הזנת חודש מלא דרך לוח השנה וכרטיס היום ב־Android |
 
-בדיקות המובייל רצות על שני פרופילים: `android` (Pixel 10, Chromium) ו־`iphone` (iPhone 15, WebKit). כל הבדיקות רצות עם שעון קבוע (`e2e/support/app.ts`), כך שהתרחישים אינם תלויים בתאריך הנוכחי.
+בדיקות המובייל רצות על שני פרופילים: `android` (Pixel 10, Chromium) ו־`iphone` (iPhone 15, WebKit). זרימת החודש המלא רצה רק ב־Android, משום ש־WebKit ללא ממשק ב־Linux של ה־CI זקוק לכמה דקות עבורה, ותוצאות החודש אינן תלויות במנוע הדפדפן. כל הבדיקות רצות עם שעון קבוע (`e2e/support/app.ts`), כך שהתרחישים אינם תלויים בתאריך הנוכחי.
 
 יש להתקין את דפדפני Playwright פעם אחת לאחר התקנת התלויות:
 
@@ -683,7 +683,8 @@ e2e/
 │   ├── work-table-month.spec.ts
 │   └── tablet-layout.spec.ts
 └── mobile/           # פרויקטים "android" ו־"iphone"
-    ├── work-table-month.spec.ts
+    ├── work-table-month.spec.ts   # Android בלבד
+    ├── month-picker.spec.ts
     ├── shift-editing.spec.ts
     └── navigation.spec.ts
 ```

@@ -15,6 +15,9 @@ export default defineConfig({
   },
   // Desktop specs run once; mobile specs run on one Android (Chromium) and one
   // iPhone (WebKit) profile to catch engine-specific touch/picker/layout issues.
+  // The full-month entry flow runs on Android only: headless WebKit on Linux CI
+  // needs several minutes for it, and the month results do not depend on the
+  // engine. WebKit still covers the same controls through the smaller specs.
   projects: [
     {
       name: "desktop",
@@ -29,6 +32,7 @@ export default defineConfig({
     {
       name: "iphone",
       testDir: "./e2e/mobile",
+      testIgnore: /work-table-month\.spec\.ts/,
       use: { ...devices["iPhone 15"] },
     },
   ],

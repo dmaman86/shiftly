@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
 import { prepareApp } from "../support/app";
+import { selectMonthInDialog } from "../support/mobile";
 import {
   formatHours,
   formatTableSalary,
@@ -14,18 +15,11 @@ import {
  * Critical mobile flow: pick the month in the modal picker, enter a whole month
  * through the calendar + day card, and check that the day cards and month
  * summary show the golden results. Detailed breakdowns are covered on desktop
- * and in the Vitest integration test.
+ * and in the Vitest integration test. Android only (see playwright.config.ts).
  */
 
 const SCENARIO = "august-2026";
 const { input, expected } = loadMonthScenario(SCENARIO);
-
-const monthLabel = new Intl.DateTimeFormat("he-IL", { month: "long" }).format(
-  new Date(input.year, input.month - 1, 1),
-);
-const shortMonthLabel = new Intl.DateTimeFormat("he-IL", { month: "short" }).format(
-  new Date(input.year, input.month - 1, 1),
-);
 
 const STATUS_LABELS = { sick: "מחלה", vacation: "חופש" } as const;
 
@@ -48,13 +42,7 @@ test(`fills and calculates the ${SCENARIO} work table on mobile (he)`, async ({ 
   await prepareApp(page, { holidays: input.holidays });
   await page.goto("he/daily");
 
-  await page.getByRole("button", { name: /בחירת תאריך|בחר תאריך/i }).click();
-  const datePickerDialog = page.getByRole("dialog");
-  await datePickerDialog.getByText(shortMonthLabel, { exact: true }).click();
-  await datePickerDialog.getByRole("button", { name: "אישור" }).click();
-  await expect(
-    page.getByRole("heading", { name: `שעות חודש ${monthLabel} ${input.year}` }),
-  ).toBeVisible();
+  await selectMonthInDialog(page, input.year, input.month);
 
   const standardHoursInput = page.locator('input[name="standardHours"]');
   const baseRateInput = page.locator('input[name="baseRate"]');
