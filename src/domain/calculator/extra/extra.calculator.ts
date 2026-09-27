@@ -1,6 +1,4 @@
 import type { ExtraBreakdown } from "../../types/data-shapes";
-import type { ClassifiedInterval } from "../../types/types";
-import { selectRegularIntervals } from "../../classification";
 import type { Reducer } from "../../types/core-behaviors";
 
 export class ExtraCalculator implements Reducer<ExtraBreakdown> {
@@ -12,19 +10,6 @@ export class ExtraCalculator implements Reducer<ExtraBreakdown> {
     return {
       hours20: { percent: this.fieldShiftPercent.hours20, hours: 0 },
       hours50: { percent: this.fieldShiftPercent.hours50, hours: 0 },
-    };
-  }
-
-  calculateClassified(intervals: ClassifiedInterval[]): ExtraBreakdown {
-    const regularIntervals = selectRegularIntervals(intervals);
-    const sum = (rule: "evening" | "night") =>
-      regularIntervals
-        .filter((interval) => interval.rule === rule)
-        .reduce((total, interval) => total + (interval.point.end - interval.point.start) / 60, 0);
-
-    return {
-      hours20: { percent: this.fieldShiftPercent.hours20, hours: sum("evening") },
-      hours50: { percent: this.fieldShiftPercent.hours50, hours: sum("night") },
     };
   }
 

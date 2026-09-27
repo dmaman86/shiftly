@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import type { ArchitectureTarget } from "./config";
-import { normalizeMermaid } from "./diagram";
+import type { ArchitectureTarget } from "./config.ts";
+import { normalizeMermaid } from "./diagram.ts";
 
 export interface ConceptualDiagram {
   status: "available" | "unavailable";

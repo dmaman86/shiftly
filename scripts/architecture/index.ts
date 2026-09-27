@@ -1,9 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { architectureConfig, resolveRepositoryPath } from "./config";
-import { createDiagramGenerator } from "./diagram";
-import { createGitService } from "./git";
-import { createArchitectureHistory } from "./history";
+import { architectureConfig, resolveRepositoryPath } from "./config.ts";
+import { createDiagramGenerator } from "./diagram.ts";
+import { createGitService } from "./git.ts";
+import { createArchitectureHistory } from "./history.ts";
 
 const parseArguments = () => {
   const targetIndex = process.argv.indexOf("--target");

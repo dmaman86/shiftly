@@ -1,5 +1,5 @@
 import { WorkDayMeta } from "./types";
-import type { ClassifiedTimeline } from "./types";
+import type { TimelineInterval } from "./types";
 
 // --- Primitives ---
 export interface Segment {
@@ -66,13 +66,12 @@ export interface BasePayMap {
 // shift level
 export interface ShiftPayMap extends BasePayMap {
   perDiemShift: { isFieldDutyShift: boolean; hours: number };
-  classifiedTimeline: ClassifiedTimeline;
+  timeline: TimelineInterval[];
 }
 
 // day level
 export interface WorkDayMap {
   workMap: BasePayMap;
-  classifiedTimeline?: ClassifiedTimeline;
   hours100Sick: Segment;
   hours100Vacation: Segment;
   earnedShabbatCredit: Segment;

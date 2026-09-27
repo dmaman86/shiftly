@@ -12,7 +12,7 @@ import {
   SpecialBreakdown,
   WorkDayMap,
 } from "../types/data-shapes";
-import { ClassifiedInterval, PerDiemShiftInfo, WorkDayMeta } from "../types/types";
+import { PerDiemShiftInfo, TimelineInterval, WorkDayMeta } from "../types/types";
 
 export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
   constructor(
@@ -71,19 +71,19 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
     let special = this.payCalculators.special.createEmpty();
     let totalHours = 0;
     const perDiemShifts: PerDiemShiftInfo[] = [];
-    const classifiedIntervals: ClassifiedInterval[] = [];
+    const timelineIntervals: TimelineInterval[] = [];
 
     for (const shift of shifts) {
       extra = this.payCalculators.extra.accumulate(extra, shift.extra);
       special = this.payCalculators.special.accumulate(special, shift.special);
       perDiemShifts.push(shift.perDiemShift);
       totalHours += shift.totalHours;
-      classifiedIntervals.push(...shift.classifiedTimeline.intervals);
+      timelineIntervals.push(...shift.timeline);
     }
 
-    classifiedIntervals.sort((a, b) => a.point.start - b.point.start);
+    timelineIntervals.sort((a, b) => a.point.start - b.point.start);
 
-    return { extra, special, totalHours, perDiemShifts, classifiedIntervals };
+    return { extra, special, totalHours, perDiemShifts, timelineIntervals };
   }
 
   private calculatePerDiem(
@@ -133,13 +133,13 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
       special,
       totalHours,
       perDiemShifts,
-      classifiedIntervals,
+      timelineIntervals,
     } = this.accumulateShiftInputs(shifts);
 
     const totalExtraShabbat =
       special.shabbat150.hours + special.shabbat200.hours;
-    const regular = this.payCalculators.regular.calculateClassified({
-      intervals: classifiedIntervals,
+    const regular = this.payCalculators.regular.calculateFromTimeline({
+      intervals: timelineIntervals,
       standardHours,
       meta,
     });
@@ -168,8 +168,6 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
       totalHours,
       mealAllowance,
     };
-
-    result.classifiedTimeline = { intervals: classifiedIntervals };
 
     return result;
   }

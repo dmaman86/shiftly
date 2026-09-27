@@ -1,16 +1,18 @@
-import { ShiftSegmentBuilder } from "./shiftSegment.builder";
-import { classifyLabeledSegments } from "../classification";
 import { ShiftService } from "../services/shift.service";
-import { ShiftPayCalculationBundle } from "../types/bundles";
 import { ShiftMapBuilder } from "../types/services";
 import { Shift, ShiftPayMap } from "../types/data-shapes";
 import { WorkDayMeta } from "../types/types";
+import type { DateService } from "../services/date.service";
+import { classifyShiftTimeline, normalizeShiftTimeline } from "../timeline";
+import type { TimelineShiftPayCalculator } from "../calculator/timeline-shift-pay.calculator";
 
 export class DefaultShiftMapBuilder implements ShiftMapBuilder {
   constructor(
-    private readonly segmentBuilder: ShiftSegmentBuilder,
-    private readonly shiftsCalculators: ShiftPayCalculationBundle,
     private readonly shiftService: ShiftService,
+    private readonly timelineLayer: {
+      dateService: DateService;
+      payCalculator: TimelineShiftPayCalculator;
+    },
   ) {}
 
   build(params: {
@@ -19,34 +21,25 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     standardHours: number;
     isFieldDutyShift: boolean;
   }): ShiftPayMap {
-    const {
-      regular: regularCalculator,
-      extra: extraCalculator,
-      special: specialCalculator,
-    } = this.shiftsCalculators;
     const { shift, meta, standardHours, isFieldDutyShift } = params;
-
-    const labeledSegments = this.segmentBuilder.build({ shift, meta });
-    const classifiedTimeline = {
-      intervals: classifyLabeledSegments({
-        segments: labeledSegments,
-        sourceShiftId: shift.id,
-      }),
-    };
-
-    const totalHours = this.shiftService.getDurationShift(shift);
-
-    const extra = extraCalculator.calculateClassified(
-      classifiedTimeline.intervals,
-    );
-    const special = specialCalculator.calculateClassified(
-      classifiedTimeline.intervals,
-    );
-    const regular = regularCalculator.calculateClassified({
-      intervals: classifiedTimeline.intervals,
-      standardHours,
-      meta,
+    const normalizedTimeline = normalizeShiftTimeline({
+      shift,
+      shiftService: this.shiftService,
     });
+    const timeline = normalizedTimeline
+      ? classifyShiftTimeline({
+          timeline: normalizedTimeline,
+          meta,
+          dateService: this.timelineLayer.dateService,
+        })
+      : [];
+    const timelinePay = this.timelineLayer.payCalculator.calculate({
+      intervals: timeline,
+      standardHours,
+    });
+    const totalHours = normalizedTimeline
+      ? this.shiftService.getDurationShift(shift)
+      : 0;
 
     const perDiemShift = {
       hours: totalHours,
@@ -54,12 +47,12 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     };
 
     return {
-      regular,
-      extra,
-      special,
+      regular: timelinePay.regular,
+      extra: timelinePay.extra,
+      special: timelinePay.special,
       totalHours,
       perDiemShift,
-      classifiedTimeline,
+      timeline,
     };
   }
 }
