@@ -256,7 +256,7 @@ describe("SalaryCardSection", () => {
       const zeroSection: SalarySectionConfig = {
         ...mockSection,
         buildRows: () => [
-          { label: "100%", quantity: 0, rate: 50, total: 0 },
+          { id: "regular100", label: "100%", quantity: 0, rate: 50, total: 0 },
         ],
       };
 

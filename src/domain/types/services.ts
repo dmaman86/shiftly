@@ -14,7 +14,7 @@ import {
   CalendarEvent,
   DomainWorkDay,
   WorkDayMeta,
-  ClassifiedInterval,
+  TimelineInterval,
 } from "./types";
 import { MealAllowanceDayInfo } from "./bundles";
 
@@ -27,8 +27,8 @@ export interface RegularCalculator extends Calculator<
   RegularBreakdown
 > {
   createEmpty(): RegularBreakdown;
-  calculateClassified: (params: {
-    intervals: ClassifiedInterval[];
+  calculateFromTimeline: (params: {
+    intervals: TimelineInterval[];
     standardHours: number;
     meta: WorkDayMeta;
   }) => RegularBreakdown;

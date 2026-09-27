@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { cruise, format } from "dependency-cruiser";
-import type { ArchitectureTarget } from "./config";
-import { createConceptualDiagram } from "./conceptual";
+import type { ArchitectureTarget } from "./config.ts";
+import { createConceptualDiagram } from "./conceptual.ts";
 
 export interface ArchitectureDiagram {
   status: "available" | "unavailable";

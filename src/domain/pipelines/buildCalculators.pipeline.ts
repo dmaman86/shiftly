@@ -2,7 +2,6 @@ import {
   ExtraCalculator,
   FixedSegmentCalculator,
   RegularByDayCalculator,
-  RegularByShiftCalculator,
   TimelineMealAllowanceCalculator,
   SpecialCalculator,
 } from "../calculator";
@@ -10,7 +9,6 @@ import { RegularByMonthAccumulator } from "../reducer";
 import { Calculators } from "../types/domain.types";
 
 export const buildCalculators = (): Calculators => {
-  const regularByShift = new RegularByShiftCalculator();
   const regularByDay = new RegularByDayCalculator();
   const regularAccumulator = new RegularByMonthAccumulator();
 
@@ -26,7 +24,6 @@ export const buildCalculators = (): Calculators => {
 
   return {
     regular: {
-      byShift: regularByShift,
       byDay: regularByDay,
       accumulator: regularAccumulator,
     },

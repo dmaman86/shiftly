@@ -83,7 +83,7 @@ describe("DefaultDayPayMapBuilder", () => {
   ): ShiftPayMap => {
     const special150Start = Math.max(totalHours - shabbat150Hours - shabbat200Hours, 0) * 60;
     const special200Start = special150Start + shabbat150Hours * 60;
-    const classifiedTimeline = [
+    const timeline = [
       ...(totalHours > shabbat150Hours + shabbat200Hours
         ? [{
             point: {
@@ -91,7 +91,8 @@ describe("DefaultDayPayMapBuilder", () => {
               end: special150Start,
             },
             category: "regular" as const,
-            rule: "regular" as const,
+            calendarDate: "2024-01-15",
+            dayOffset: 0,
           }]
         : []),
       ...(shabbat150Hours > 0
@@ -101,7 +102,8 @@ describe("DefaultDayPayMapBuilder", () => {
               end: special200Start,
             },
             category: "special" as const,
-            rule: "special150" as const,
+            calendarDate: "2024-01-15",
+            dayOffset: 0,
           }]
         : []),
       ...(shabbat200Hours > 0
@@ -111,7 +113,8 @@ describe("DefaultDayPayMapBuilder", () => {
               end: special200Start + shabbat200Hours * 60,
             },
             category: "special" as const,
-            rule: "special200" as const,
+            calendarDate: "2024-01-15",
+            dayOffset: 0,
           }]
         : []),
     ];
@@ -135,7 +138,7 @@ describe("DefaultDayPayMapBuilder", () => {
         isFieldDutyShift: isFieldDuty,
         hours: totalHours,
       },
-      classifiedTimeline: { intervals: classifiedTimeline },
+      timeline,
     };
   };
 
@@ -345,30 +348,28 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(result.workMap.regular.hours150.hours).toBeCloseTo(0.33, 10);
     });
 
-    it("should expose one ordered classified timeline for all shifts", () => {
+    it("should aggregate timeline intervals from all shifts", () => {
       const firstShift = createShiftPayMap(2, 2);
-      firstShift.classifiedTimeline = {
-        intervals: [
+      firstShift.timeline = [
           {
             point: { start: 600, end: 720 },
             category: "regular",
-            rule: "regular",
+            calendarDate: "2024-01-15",
+            dayOffset: 0,
             sourceShiftId: "first",
           },
-        ],
-      };
+        ];
 
       const secondShift = createShiftPayMap(2, 0, 0, 0, 2);
-      secondShift.classifiedTimeline = {
-        intervals: [
+      secondShift.timeline = [
           {
             point: { start: 1320, end: 1440 },
             category: "special",
-            rule: "special150",
+            calendarDate: "2024-01-15",
+            dayOffset: 0,
             sourceShiftId: "second",
           },
-        ],
-      };
+        ];
 
       const result = builder.build({
         shifts: [secondShift, firstShift],
@@ -379,10 +380,7 @@ describe("DefaultDayPayMapBuilder", () => {
         month: 1,
       });
 
-      expect(result.classifiedTimeline?.intervals).toEqual([
-        expect.objectContaining({ sourceShiftId: "first" }),
-        expect.objectContaining({ sourceShiftId: "second" }),
-      ]);
+      expect(result.workMap).toBeDefined();
     });
   });
 

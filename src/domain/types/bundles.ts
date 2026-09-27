@@ -5,27 +5,12 @@ import {
   RegularBreakdown,
   SpecialBreakdown,
 } from "./data-shapes";
-import {
-  MealAllowanceCalculator,
-  PerDiemCalculator,
-  RegularCalculator,
-  ShiftRegularCalculator,
-} from "./services";
-import { ClassifiedInterval } from "./types";
-
-type ClassifiedIntervalCalculator<Output> = {
-  calculateClassified: (intervals: ClassifiedInterval[]) => Output;
-};
+import { MealAllowanceCalculator, PerDiemCalculator, RegularCalculator } from "./services";
 
 export type PayCalculationBundle = {
   regular: RegularCalculator;
-  extra: Reducer<ExtraBreakdown> & ClassifiedIntervalCalculator<ExtraBreakdown>;
-  special: Reducer<SpecialBreakdown> &
-    ClassifiedIntervalCalculator<SpecialBreakdown>;
-};
-
-export type ShiftPayCalculationBundle = Omit<PayCalculationBundle, "regular"> & {
-  regular: ShiftRegularCalculator;
+  extra: Reducer<ExtraBreakdown>;
+  special: Reducer<SpecialBreakdown>;
 };
 
 export type WorkDayReducerBundle = {

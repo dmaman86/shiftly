@@ -1,5 +1,4 @@
 import { WorkDayType, HolidayKey } from "../constants";
-import { ExtraBreakdown, SpecialBreakdown } from "./data-shapes";
 
 export interface PerDiemShiftInfo {
   isFieldDutyShift: boolean;
@@ -18,41 +17,28 @@ export interface Point {
   end: number;
 }
 
-export type SegmentKey =
-  | "hours100"
-  | keyof ExtraBreakdown
-  | keyof SpecialBreakdown;
-
-export interface LabeledSegmentRange {
+/**
+ * A shift represented on one continuous minute axis, before salary rules are
+ * applied. The axis starts at the shift's calendar day midnight.
+ */
+export interface NormalizedShiftTimeline {
+  sourceShiftId: string;
   point: Point;
-  percent: number;
-  key: SegmentKey;
 }
 
-export type TimelineCategory = "regular" | "special";
-
-export type TimelineRule =
-  | "regular"
-  | "evening"
-  | "night"
-  | "special150"
-  | "special200";
-
-/**
- * Explicit classification representation introduced alongside the legacy
- * rate-key representation. It is intentionally not yet the public pay-map
- * output so existing consumers can migrate incrementally.
- */
-export interface ClassifiedInterval {
+export interface TimelineInterval {
   point: Point;
   category: TimelineCategory;
-  rule: TimelineRule;
+  calendarDate: string;
+  dayOffset: number;
   sourceShiftId?: string;
 }
 
-export interface ClassifiedTimeline {
-  intervals: ClassifiedInterval[];
+export interface TimelineSlice extends TimelineInterval {
+  localPoint: Point;
 }
+
+export type TimelineCategory = "regular" | "special";
 
 export interface DomainWorkDay {
   meta: WorkDayMeta;

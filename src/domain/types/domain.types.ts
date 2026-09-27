@@ -14,7 +14,7 @@ import { DefaultDayPayMapBuilder } from "../builder/daypaymap.builder";
 import { DefaultWorkDaysForMonthBuilder } from "../builder/workdaysformonth.builder";
 import { MonthPayMapReducer } from "../reducer/month-pay-map.reducer";
 import { RegularBreakdown } from "./data-shapes";
-import { RegularCalculator, ShiftRegularCalculator } from "./services";
+import { RegularCalculator } from "./services";
 import { Reducer } from "./core-behaviors";
 import type {
   ComposedDayCalculationParams,
@@ -39,7 +39,6 @@ export interface RateCalculators {
 
 export interface Calculators {
   regular: {
-    byShift: ShiftRegularCalculator;
     byDay: RegularCalculator;
     accumulator: Reducer<RegularBreakdown>;
   };
@@ -58,7 +57,6 @@ export interface Calculators {
 export interface BuildShiftLayerParams {
   dateService: DateService;
   shiftService: ShiftService;
-  calculators: Calculators;
 }
 
 export interface ShiftLayer {

@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import type { DomainContextType } from "@/app";
+import { WorkDayType } from "@/domain/constants";
 import type { Shift, ShiftPayMap, WorkDayMeta } from "@/domain";
 import { useShiftEditor } from "@/features/work-table/hooks/shift/useShiftEditor";
 
@@ -15,7 +16,7 @@ const createShift = (endHour: number): Shift => ({
 const meta: WorkDayMeta = {
   crossDayContinuation: false,
   date: "2026-08-10",
-  typeDay: 0,
+  typeDay: WorkDayType.Regular,
 };
 
 const createDomain = (payMap: ShiftPayMap) =>

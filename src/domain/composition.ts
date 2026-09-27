@@ -21,7 +21,6 @@ export const buildPayMapPipeline = (): PayMapPipeline => {
   const shiftLayer = buildShiftLayer({
     dateService: services.dateService,
     shiftService: services.shiftService,
-    calculators,
   });
 
   const dayLayer = buildDayLayer({

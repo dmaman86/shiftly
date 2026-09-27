@@ -16,6 +16,7 @@ describe("ConfigPanel", () => {
       dayPayMapBuilder: pipelineInstance.payMap.dayPayMapBuilder,
       monthPayMapCalculator: pipelineInstance.payMap.monthPayMapCalculator,
       workDaysMonthBuilder: pipelineInstance.payMap.workDaysForMonthBuilder,
+      calculateDayFromShifts: pipelineInstance.payMap.calculateDayFromShifts,
     },
     resolvers: {
       holidayResolver: pipelineInstance.rateCalculators.holiday,

@@ -1,9 +1,9 @@
 import { access, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { ArchitectureConfig, ArchitectureTarget } from "./config";
-import { resolveRepositoryPath } from "./config";
-import type { ArchitectureDiagram } from "./diagram";
-import type { GitService } from "./git";
+import type { ArchitectureConfig, ArchitectureTarget } from "./config.ts";
+import { resolveRepositoryPath } from "./config.ts";
+import type { ArchitectureDiagram } from "./diagram.ts";
+import type { GitService } from "./git.ts";
 
 interface Snapshot {
   tag: string;
