@@ -91,6 +91,8 @@ describe("DefaultDayPayMapBuilder", () => {
               end: special150Start,
             },
             category: "regular" as const,
+            calendarDate: "2024-01-15",
+            dayOffset: 0,
           }]
         : []),
       ...(shabbat150Hours > 0
@@ -100,6 +102,8 @@ describe("DefaultDayPayMapBuilder", () => {
               end: special200Start,
             },
             category: "special" as const,
+            calendarDate: "2024-01-15",
+            dayOffset: 0,
           }]
         : []),
       ...(shabbat200Hours > 0
@@ -109,6 +113,8 @@ describe("DefaultDayPayMapBuilder", () => {
               end: special200Start + shabbat200Hours * 60,
             },
             category: "special" as const,
+            calendarDate: "2024-01-15",
+            dayOffset: 0,
           }]
         : []),
     ];
@@ -348,6 +354,8 @@ describe("DefaultDayPayMapBuilder", () => {
           {
             point: { start: 600, end: 720 },
             category: "regular",
+            calendarDate: "2024-01-15",
+            dayOffset: 0,
             sourceShiftId: "first",
           },
         ];
@@ -357,6 +365,8 @@ describe("DefaultDayPayMapBuilder", () => {
           {
             point: { start: 1320, end: 1440 },
             category: "special",
+            calendarDate: "2024-01-15",
+            dayOffset: 0,
             sourceShiftId: "second",
           },
         ];
