@@ -13,16 +13,23 @@ export default defineConfig({
     screenshot: "only-on-failure",
     video: process.env.PLAYWRIGHT_VIDEO === "on" ? "on" : "off",
   },
+  // Desktop specs run once; mobile specs run on one Android (Chromium) and one
+  // iPhone (WebKit) profile to catch engine-specific touch/picker/layout issues.
   projects: [
     {
-      name: "chromium",
-      testIgnore: /work-table-august-2026-mobile-he\.spec\.ts/,
+      name: "desktop",
+      testDir: "./e2e/desktop",
       use: { ...devices["Desktop Chrome"] },
     },
     {
-      name: "mobile",
-      testMatch: /work-table-august-2026-mobile-he\.spec\.ts/,
+      name: "android",
+      testDir: "./e2e/mobile",
       use: { ...devices["Pixel 10"] },
+    },
+    {
+      name: "iphone",
+      testDir: "./e2e/mobile",
+      use: { ...devices["iPhone 15"] },
     },
   ],
   webServer: {

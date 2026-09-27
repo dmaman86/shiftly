@@ -53,10 +53,11 @@ export const MonthSummaryCard = ({
           bgcolor: "action.hover",
         }}
       >
-        <StatTile label={t("headers.actual_hours")} value={formatValue(breakdown.actualHours)} />
-        <StatTile label={t("headers.total_hours")} value={formatValue(breakdown.totalHours)} />
-        <StatTile label={t("headers.regular")} value={formatValue(breakdown.regularHours)} />
-        <StatTile label={t("headers.extras")} value={formatValue(breakdown.extraHours)} />
+        {/* Test ids match the desktop table footer so E2E assertions work on both layouts. */}
+        <StatTile label={t("headers.actual_hours")} value={formatValue(breakdown.actualHours)} testId="work-table-month-total-actual-hours" />
+        <StatTile label={t("headers.total_hours")} value={formatValue(breakdown.totalHours)} testId="work-table-month-total-total-hours" />
+        <StatTile label={t("headers.regular")} value={formatValue(breakdown.regularHours)} testId="work-table-month-total-regular-hours" />
+        <StatTile label={t("headers.extras")} value={formatValue(breakdown.extraHours)} testId="work-table-month-total-extra-hours" />
         {breakdown.dailySalary !== undefined && (
           <Box sx={{ gridColumn: "span 2" }}>
             <StatTile
@@ -65,6 +66,7 @@ export const MonthSummaryCard = ({
                 breakdown.dailySalary > 0 ? `₪${formatValue(breakdown.dailySalary)}` : "—"
               }
               emphasize
+              testId="work-table-month-total-salary"
             />
           </Box>
         )}

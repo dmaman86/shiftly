@@ -124,8 +124,9 @@ jobs:
           name: dist
           path: dist
 
+      # Chromium runs the desktop and Android projects; WebKit runs the iPhone project.
       - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium
+        run: bunx playwright install --with-deps chromium webkit
 
       # In CI, playwright.config.ts serves ./dist via `vite preview`,
       # so the exact artifact that gets deployed is the one under test.

@@ -4,9 +4,15 @@ type StatTileProps = {
   label: string;
   value: string;
   emphasize?: boolean;
+  testId?: string;
 };
 
-export const StatTile = ({ label, value, emphasize = false }: StatTileProps) => (
+export const StatTile = ({
+  label,
+  value,
+  emphasize = false,
+  testId,
+}: StatTileProps) => (
   <Box sx={{ textAlign: "center" }}>
     <Typography
       variant="caption"
@@ -19,6 +25,7 @@ export const StatTile = ({ label, value, emphasize = false }: StatTileProps) => 
       variant={emphasize ? "h6" : "body2"}
       fontWeight={700}
       color={emphasize ? "primary.main" : "text.primary"}
+      data-testid={testId}
     >
       {value}
     </Typography>

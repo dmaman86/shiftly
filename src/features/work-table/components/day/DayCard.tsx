@@ -76,6 +76,7 @@ export const DayCard = ({
   const weekdayLabel = days[dateService.getWeekday(workDay.meta.date)];
   const dayLabel = dayInfoResolver.formatWorkDayLabel(workDay, weekdayLabel);
   const detailsId = `day-card-details-${workDay.meta.date}`;
+  const statTestIdPrefix = `work-day-${workDay.meta.date}`;
   const eligibleForShabbatCredit =
     workDay.meta.typeDay === WorkDayType.Regular ||
     workDay.meta.typeDay === WorkDayType.SpecialPartialStart;
@@ -132,6 +133,7 @@ export const DayCard = ({
                     e.target.checked ? WorkDayStatus.sick : WorkDayStatus.normal,
                   )
                 }
+                slotProps={{ input: { "aria-label": t("headers.sick") } }}
                 sx={{ p: 0.5 }}
               />
               <Typography variant="body2">{t("headers.sick")}</Typography>
@@ -145,6 +147,7 @@ export const DayCard = ({
                     e.target.checked ? WorkDayStatus.vacation : WorkDayStatus.normal,
                   )
                 }
+                slotProps={{ input: { "aria-label": t("headers.vacation") } }}
                 sx={{ p: 0.5 }}
               />
               <Typography variant="body2">{t("headers.vacation")}</Typography>
@@ -248,10 +251,11 @@ export const DayCard = ({
           bgcolor: "action.hover",
         }}
       >
-        <StatTile label={t("headers.actual_hours")} value={formatValue(compactBreakdown.actualHours)} />
-        <StatTile label={t("headers.total_hours")} value={formatValue(compactBreakdown.totalHours)} />
-        <StatTile label={t("headers.regular")} value={formatValue(compactBreakdown.regularHours)} />
-        <StatTile label={t("headers.extras")} value={formatValue(compactBreakdown.extraHours)} />
+        {/* Test ids match the desktop DayRow so E2E assertions work on both layouts. */}
+        <StatTile label={t("headers.actual_hours")} value={formatValue(compactBreakdown.actualHours)} testId={`${statTestIdPrefix}-actual-hours`} />
+        <StatTile label={t("headers.total_hours")} value={formatValue(compactBreakdown.totalHours)} testId={`${statTestIdPrefix}-total-hours`} />
+        <StatTile label={t("headers.regular")} value={formatValue(compactBreakdown.regularHours)} testId={`${statTestIdPrefix}-regular-hours`} />
+        <StatTile label={t("headers.extras")} value={formatValue(compactBreakdown.extraHours)} testId={`${statTestIdPrefix}-extra-hours`} />
         {compactBreakdown.dailySalary !== undefined && (
           <Box sx={{ gridColumn: "span 2" }}>
             <StatTile
@@ -262,6 +266,7 @@ export const DayCard = ({
                   : "—"
               }
               emphasize
+              testId={`${statTestIdPrefix}-salary`}
             />
           </Box>
         )}
