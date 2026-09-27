@@ -1,0 +1,31 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#a6adc8"
+    secondaryColor: "#45475a"
+    secondaryTextColor: "#cdd6f4"
+    secondaryBorderColor: "#cba6f7"
+    tertiaryColor: "#585b70"
+    tertiaryTextColor: "#cdd6f4"
+    tertiaryBorderColor: "#f9e2af"
+    clusterBkg: "#181825"
+    clusterBorder: "#cba6f7"
+    edgeLabelBackground: "#1e1e2e"
+---
+flowchart TB
+    components["{Reducer | Calculator | Builder}"]
+    breakdowns["{Pay Breakdowns | Time-based Aggregations}"]
+    bundles["{PayCalculationBundle | WorkDayReducerBundle | FixedSegmentBundle | PerDiemBundle | MealAllowanceBundle}"]
+    layers["{CoreServices | Resolvers | Calculators | RateCalculators | ShiftLayer | DayLayer | MonthLayer}"]
+    pipeline["PayMapPipeline"]
+
+    components -->|"operate on"| breakdowns
+    components -->|"implemented by"| layers
+    breakdowns -->|"grouped into"| bundles
+    bundles -->|"composed in"| layers
+    layers -->|"integrated into"| pipeline

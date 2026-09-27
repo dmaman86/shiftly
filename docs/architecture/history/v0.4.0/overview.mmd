@@ -1,0 +1,39 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#a6adc8"
+    secondaryColor: "#45475a"
+    secondaryTextColor: "#cdd6f4"
+    secondaryBorderColor: "#cba6f7"
+    tertiaryColor: "#585b70"
+    tertiaryTextColor: "#cdd6f4"
+    tertiaryBorderColor: "#f9e2af"
+    clusterBkg: "#181825"
+    clusterBorder: "#cba6f7"
+    edgeLabelBackground: "#1e1e2e"
+---
+flowchart TB
+    user["User"]
+    e2e["E2E Testing System<br/>(Playwright, Fixtures)"]
+
+    subgraph shiftly["Shiftly Application System"]
+      client["Client Application<br/>(UI, Routing, Global State)"]
+      domain["Domain Logic Engine<br/>(PayMap Pipeline, Builders, Calculators)"]
+      supabase["Supabase Services<br/>(Auth, Edge Functions, Client)"]
+
+      client --> domain
+      client --> supabase
+    end
+
+    google["Google Auth Service"]
+    database["PostgreSQL Database<br/>(User Data, RLS)"]
+
+    user --> client
+    e2e --> client
+    google --> client
+    supabase --> database
