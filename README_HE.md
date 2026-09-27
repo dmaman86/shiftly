@@ -136,6 +136,68 @@ Shiftly אינה ממדלת עבודה כסוגי משמרות קבועים. ה�
 
 כל כלל מופעל ברמה הטבעית שלו, והתוצאה מצטברת באופן דטרמיניסטי.
 
+### סקירת מערכת
+
+התרשים הקונספטואלי הבא מציג את גבולות המערכת ואת הקשרים המרכזיים:
+
+```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#a6adc8"
+    secondaryColor: "#45475a"
+    secondaryTextColor: "#cdd6f4"
+    clusterBkg: "#181825"
+    clusterBorder: "#cba6f7"
+    edgeLabelBackground: "#1e1e2e"
+---
+flowchart TB
+    user["User"]
+    e2e["E2E Testing System<br/>(Playwright, Fixtures)"]
+
+    subgraph shiftly["Shiftly Application System"]
+      client["Client Application<br/>(UI, Routing, Global State)"]
+      domain["Domain Logic Engine<br/>(PayMap Pipeline, Builders, Calculators)"]
+      supabase["Supabase Services<br/>(Auth, Edge Functions, Client)"]
+
+      client --> domain
+      client --> supabase
+    end
+
+    google["Google Auth Service"]
+    database["PostgreSQL Database<br/>(User Data, RLS)"]
+
+    user --> client
+    e2e --> client
+    google --> client
+    supabase --> database
+```
+
+### תרשימי ארכיטקטורה מפורטים
+
+- [Domain](docs/architecture/generated/domain.mmd)
+- [Work Table](docs/architecture/generated/work-table.mmd)
+- [Application State](docs/architecture/generated/application-state.mmd)
+- [Data](docs/architecture/generated/data.mmd)
+- [Architecture history](docs/architecture/history/)
+
+ליצירת התרשימים הנוכחיים מחדש:
+
+```bash
+bun run docs:architecture
+```
+
+ליצירת snapshots היסטוריים מחדש:
+
+```bash
+bun run docs:architecture:history
+```
+
 ---
 
 ## שכבות מערכת
@@ -338,8 +400,12 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 ├── .github/
 │   ├── assets/                 # צילומי מסך לקובצי README
 │   └── workflows/              # CI, בדיקות pull request ופריסה
+├── docs/
+│   └── architecture/           # תרשימי ארכיטקטורה וגרסאות היסטוריות
 ├── e2e/                         # בדיקות Playwright מקצה לקצה ו-fixtures
 ├── playwright.config.ts         # הגדרות Playwright
+├── scripts/
+│   └── architecture/           # מחוללי תרשימי Mermaid
 ├── src/
 │   ├── adapters/               # מתאמי מידע חיצוני והמרה מהדומיין לתצוגה
 │   ├── app/                    # שורש ההרכבה של האפליקציה
@@ -362,15 +428,37 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 │   │   ├── auth/               # פקדי התחברות Google
 │   │   ├── calculation-rules/  # כללים ודוגמת חישוב אינטראקטיבית
 │   │   ├── config/             # פרמטרי עבודה ושמירת תצורה חודשית
-│   │   │   └── hooks/          # סנכרון תצורה חודשית
-│   │   ├── feedback/           # התראות משוב למשתמש
-│   │   ├── info-dialog/        # חלונית מידע על האפליקציה
-│   │   ├── monthly-pay/        # שכר חודשי נגזר והקצאת זכות שבת
-│   │   │   └── hooks/          # חישוב הקצאה ושמירת יתרת זכות שבת
-│   │   ├── salary-summary/     # רכיבי שכר חודשי ומודלי תצוגה
+│   │   ├── feedback/           # התראות ומשוב למשתמש
+│   │   ├── info-dialog/        # חלון מידע על האפליקציה
+│   │   ├── monthly-data/       # טעינה ושמירה של תצורה חודשית
+│   │   ├── monthly-pay/        # שכר חודשי מחושב והקצאת זיכוי שבת
+│   │   │   └── hooks/          # חישוב הקצאה ושמירת העברה
+│   │   ├── salary-summary/     # רכיבי שכר חודשיים ומודלי תצוגה
 │   │   │   ├── components/     # תצוגת סיכום השכר
-│   │   │   ├── helpers/        # בניית סעיפי השכר
+│   │   │   ├── helpers/        # בניית מקטעי השכר
 │   │   │   ├── hooks/          # hooks לתיאום סיכום השכר
+│   │   │   ├── mappers/        # מיפוי שורות שכר וקצבאות
+│   │   │   └── vm/             # מודלי תצוגה של סיכום השכר
+│   │   ├── work-table/         # עריכת חודש/יום/משמרת ותצוגות חישוב
+│   │   │   ├── assets/         # נכסי פיצ'ר טבלת העבודה
+│   │   │   ├── components/     # רכיבים לפי חודש, יום ומשמרת
+│   │   │   ├── context/        # context למצב עריכת יום העבודה
+│   │   │   ├── helpers/        # שינויי מצב ועזרי ייצוא PDF
+│   │   │   ├── hooks/          # hooks לפי חודש, יום ומשמרת
+│   │   │   └── mappers/        # מיפויים לפי חודש, יום ומשמרת
+│   │   └── workday-timeline/   # ציר זמן חזותי של המשמרות
+│   ├── hooks/          # hooks לתיאום סיכום השכר
+│   │   │   ├── mappers/        # מיפוי שורות שכר וקצבאות
+│   │   │   └── vm/             # מודלי תצוגה של סיכום השכר
+│   │   ├── work-table/         # עריכת חודש/יום/משמרת ותצוגות חישוב
+│   │   │   ├── assets/         # נכסי פיצ'ר טבלת העבודה
+│   │   │   ├── components/     # רכיבים לפי חודש, יום ומשמרת
+│   │   │   ├── context/        # context למצב עריכת יום העבודה
+│   │   │   ├── helpers/        # שינויי מצב ועזרי ייצוא PDF
+│   │   │   ├── hooks/          # hooks לפי חודש, יום ומשמרת
+│   │   │   └── mappers/        # מיפויים לפי חודש, יום ומשמרת
+│   │   └── workday-timeline/   # ציר זמן חזותי של המשמרות
+│   ├── hooks/          # hooks לתיאום סיכום השכר
 │   │   │   ├── mappers/        # מיפוי שורות שכר והטבות
 │   │   │   └── vm/             # מודלי תצוגה של סיכום השכר
 │   │   ├── work-table/         # עריכה וחישוב רספונסיביים לפי חודש, יום ומשמרת

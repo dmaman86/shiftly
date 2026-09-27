@@ -1,0 +1,42 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#a6adc8"
+    secondaryColor: "#45475a"
+    secondaryTextColor: "#cdd6f4"
+    secondaryBorderColor: "#cba6f7"
+    tertiaryColor: "#585b70"
+    tertiaryTextColor: "#cdd6f4"
+    tertiaryBorderColor: "#f9e2af"
+    clusterBkg: "#181825"
+    clusterBorder: "#cba6f7"
+    edgeLabelBackground: "#1e1e2e"
+---
+flowchart LR
+    subgraph workTable["Work Table Feature"]
+      workTableUi["WorkTable & DayRow<br/>(UI Components)"]
+      workTableState["WorkTableDayStateProvider<br/>useWorkTableMonthSession<br/>(State Management)"]
+      workTableMappers["Work Table Mappers"]
+
+      workTableUi -->|"uses/updates"| workTableState
+      workTableState -->|"transforms data"| workTableMappers
+    end
+
+    subgraph salarySummary["Salary Summary Feature"]
+      salaryUi["MonthlySalarySummary<br/>& SalaryCardSection<br/>(UI Components)"]
+      salaryMappers["Salary Summary Mappers"]
+
+      salaryUi -->|"processes data"| salaryMappers
+    end
+
+    globalStore["Global State Store"]
+
+    workTableState -->|"persists/hydrates"| globalStore
+    workTableMappers -->|"updates breakdowns"| globalStore
+    globalStore -->|"provides aggregated data"| salaryUi
+    salaryUi -->|"reads breakdowns"| globalStore

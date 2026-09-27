@@ -1,0 +1,32 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#a6adc8"
+    secondaryColor: "#45475a"
+    secondaryTextColor: "#cdd6f4"
+    secondaryBorderColor: "#cba6f7"
+    tertiaryColor: "#585b70"
+    tertiaryTextColor: "#cdd6f4"
+    tertiaryBorderColor: "#f9e2af"
+    clusterBkg: "#181825"
+    clusterBorder: "#cba6f7"
+    edgeLabelBackground: "#1e1e2e"
+---
+flowchart LR
+    features["Application Features"]
+    monthlyData["Monthly Data Provider<br/>(Hydration & Persistence)"]
+    services["Feature Services<br/>(Monthly Config, Work Days, Shifts, Account)"]
+    adapters["Data Adapters<br/>(Domain-to-View Models)"]
+    supabase["Supabase Client & CRUD"]
+    database["PostgreSQL Database<br/>(RLS-Protected Tables)"]
+
+    features -->|"reads and updates"| monthlyData
+    monthlyData -->|"uses"| services
+    features -->|"maps results through"| adapters
+    services -->|"persists and queries"| supabase
+    supabase -->|"reads and writes"| database

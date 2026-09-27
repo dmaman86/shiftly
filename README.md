@@ -136,6 +136,71 @@ The central separation is:
 Each stage is deterministic, independently testable, and preserves the
 distinction between timeline boundaries and business-rule resets.
 
+### System Overview
+
+The following conceptual diagram shows the main system boundaries and relationships:
+
+```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#a6adc8"
+    secondaryColor: "#45475a"
+    secondaryTextColor: "#cdd6f4"
+    secondaryBorderColor: "#cba6f7"
+    tertiaryColor: "#585b70"
+    tertiaryTextColor: "#cdd6f4"
+    clusterBkg: "#181825"
+    clusterBorder: "#cba6f7"
+    edgeLabelBackground: "#1e1e2e"
+---
+flowchart TB
+    user["User"]
+    e2e["E2E Testing System<br/>(Playwright, Fixtures)"]
+
+    subgraph shiftly["Shiftly Application System"]
+      client["Client Application<br/>(UI, Routing, Global State)"]
+      domain["Domain Logic Engine<br/>(PayMap Pipeline, Builders, Calculators)"]
+      supabase["Supabase Services<br/>(Auth, Edge Functions, Client)"]
+
+      client --> domain
+      client --> supabase
+    end
+
+    google["Google Auth Service"]
+    database["PostgreSQL Database<br/>(User Data, RLS)"]
+
+    user --> client
+    e2e --> client
+    google --> client
+    supabase --> database
+```
+
+### Detailed Architecture Diagrams
+
+- [Domain](docs/architecture/generated/domain.mmd)
+- [Work Table](docs/architecture/generated/work-table.mmd)
+- [Application State](docs/architecture/generated/application-state.mmd)
+- [Data](docs/architecture/generated/data.mmd)
+- [Architecture history](docs/architecture/history/)
+
+Regenerate the current diagrams with:
+
+```bash
+bun run docs:architecture
+```
+
+Regenerate historical snapshots with:
+
+```bash
+bun run docs:architecture:history
+```
+
 ---
 
 ## Architectural Layers
@@ -475,8 +540,12 @@ The function validates the signed-in user's JWT and deletes that same user from 
 ├── .github/
 │   ├── assets/                 # README screenshots
 │   └── workflows/              # CI, pull-request checks, deployment
+├── docs/
+│   └── architecture/           # Generated conceptual diagrams and tag history
 ├── e2e/                         # Playwright end-to-end tests and fixtures
 ├── playwright.config.ts         # Playwright configuration
+├── scripts/
+│   └── architecture/           # Mermaid architecture generators
 ├── src/
 │   ├── adapters/               # External data and domain-to-view adapters
 │   ├── app/                    # Application composition root
@@ -499,9 +568,9 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   │   ├── auth/               # Google sign-in controls
 │   │   ├── calculation-rules/  # Rules and interactive calculation example
 │   │   ├── config/             # Work parameters and persisted monthly config
-│   │   │   └── hooks/          # Monthly configuration synchronization
 │   │   ├── feedback/           # User feedback notifications
 │   │   ├── info-dialog/        # Application information dialog
+│   │   ├── monthly-data/       # Monthly configuration hydration and persistence
 │   │   ├── monthly-pay/        # Derived monthly pay and Shabbat credit allocation
 │   │   │   └── hooks/          # Allocation calculation and carry-over persistence
 │   │   ├── salary-summary/     # Monthly salary components and view models
@@ -511,6 +580,7 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   │   │   ├── mappers/        # Pay-row and allowance mapping
 │   │   │   └── vm/             # Salary summary view models
 │   │   ├── work-table/         # Responsive month/day/shift editing and calculation views
+│   │   │   ├── assets/         # Work-table feature assets
 │   │   │   ├── components/     # Components grouped by month, day and shift
 │   │   │   ├── context/        # Editable work-table day state context
 │   │   │   ├── helpers/        # State changes and PDF export helpers
@@ -659,14 +729,14 @@ End time is next day; system asks to confirm crossing day.
 
 Detailed breakdown showing all calculation components for a single day.
 
-|                                   Collapsed Details                                   |                                   Expanded Details                                   |
-| :-----------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: |
+|                                         Collapsed Details                                         |                                         Expanded Details                                         |
+| :-----------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------: |
 | ![Desktop breakdown with collapsed details](./.github/assets/screenshots/breakdown-summary-1.png) | ![Desktop breakdown with expanded details](./.github/assets/screenshots/breakdown-summary-2.png) |
 
 #### Daily Breakdown - Mobile View
 
-|                                  Collapsed Details                                  |                                  Expanded Details                                  |
-| :---------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
+|                                        Collapsed Details                                        |                                        Expanded Details                                        |
+| :---------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------: |
 | ![Mobile breakdown with collapsed details](./.github/assets/screenshots/breakdown-mobile-1.png) | ![Mobile breakdown with expanded details](./.github/assets/screenshots/breakdown-mobile-2.png) |
 
 #### Monthly Summary
