@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { AppProviders } from "./providers";
 import { AppRoutes } from "./routes";
 import { ErrorBoundary, ErrorFallback, Layout } from "@/layout";
+import { MonthlyDataProvider } from "@/features";
 
 export const App = () => {
   return (
@@ -17,9 +18,11 @@ export const App = () => {
         }}
       >
         <AppProviders>
-          <Layout>
-            <AppRoutes />
-          </Layout>
+          <MonthlyDataProvider>
+            <Layout>
+              <AppRoutes />
+            </Layout>
+          </MonthlyDataProvider>
         </AppProviders>
       </ErrorBoundary>
     </BrowserRouter>

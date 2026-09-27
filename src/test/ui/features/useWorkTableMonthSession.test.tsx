@@ -157,7 +157,7 @@ describe("useWorkTableMonthSession", () => {
   });
 
   it("does not re-fetch and clobber local edits when standardHours changes after mount", async () => {
-    // Regression test: useMonthlyConfigSync hydrates standardHours shortly
+    // Regression test: monthly data initialization hydrates standardHours shortly
     // after mount. That must not re-trigger this hydration and overwrite a
     // status the user just set locally with a stale full-state dispatch.
     authMock.user = { id: "user-1" };

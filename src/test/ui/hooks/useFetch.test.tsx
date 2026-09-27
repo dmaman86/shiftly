@@ -32,4 +32,64 @@ describe("useFetch", () => {
       error: "Invalid Hebcal response: items must be an array",
     });
   });
+
+  it("keeps loading while concurrent requests are pending", async () => {
+    let resolveFirst!: (value: { data: string }) => void;
+    let resolveSecond!: (value: { data: string }) => void;
+    const firstCall = new Promise<{ data: string }>((resolve) => {
+      resolveFirst = resolve;
+    });
+    const secondCall = new Promise<{ data: string }>((resolve) => {
+      resolveSecond = resolve;
+    });
+    const { result } = renderHook(() => useFetch());
+
+    let firstResult!: Promise<unknown>;
+    let secondResult!: Promise<unknown>;
+    await act(async () => {
+      firstResult = result.current.callEndPoint({ call: () => firstCall });
+      secondResult = result.current.callEndPoint({ call: () => secondCall });
+    });
+
+    expect(result.current.loading).toBe(true);
+
+    await act(async () => {
+      resolveSecond({ data: "second" });
+      await secondResult;
+    });
+
+    expect(result.current.loading).toBe(true);
+
+    await act(async () => {
+      resolveFirst({ data: "first" });
+      await firstResult;
+    });
+
+    expect(result.current.loading).toBe(false);
+  });
+
+  it("cancels every active controller", async () => {
+    const firstController = new AbortController();
+    const secondController = new AbortController();
+    const firstCall = new Promise<{ data: string }>(() => undefined);
+    const secondCall = new Promise<{ data: string }>(() => undefined);
+    const { result } = renderHook(() => useFetch());
+
+    await act(async () => {
+      void result.current.callEndPoint({
+        call: () => firstCall,
+        controller: firstController,
+      });
+      void result.current.callEndPoint({
+        call: () => secondCall,
+        controller: secondController,
+      });
+    });
+
+    act(() => result.current.cancelEndPoint());
+
+    expect(firstController.signal.aborted).toBe(true);
+    expect(secondController.signal.aborted).toBe(true);
+    expect(result.current.loading).toBe(false);
+  });
 });

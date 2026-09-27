@@ -13,6 +13,7 @@ export interface GlobalState {
 }
 
 export interface GlobalStore extends GlobalState {
+  initializeMonth: (year: number, month: number) => void;
   updateYear: (year: number) => void;
   updateMonth: (month: number) => void;
   updateStandardHours: (standardHours: number) => void;
@@ -25,10 +26,14 @@ export interface GlobalStore extends GlobalState {
 
 const now = new Date();
 
+export const defaultMonthlyConfig = {
+  standardHours: 6.67,
+  baseRate: 0,
+} as const;
+
 export const initialGlobalState: GlobalState = {
   config: {
-    standardHours: 6.67,
-    baseRate: 0,
+    ...defaultMonthlyConfig,
     year: now.getFullYear(),
     month: now.getMonth() + 1,
   },
@@ -39,6 +44,11 @@ const resetMonthData = () => ({ dailyPayMaps: {} });
 
 export const useGlobalStore = create<GlobalStore>((set) => ({
   ...initialGlobalState,
+  initializeMonth: (year, month) =>
+    set({
+      config: { ...defaultMonthlyConfig, year, month },
+      ...resetMonthData(),
+    }),
   updateYear: (year) =>
     set((state) => ({
       config: { ...state.config, year },

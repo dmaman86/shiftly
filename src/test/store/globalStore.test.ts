@@ -39,4 +39,22 @@ describe("globalStore", () => {
     expect(result.config.month).toBe(10);
     expect(result.dailyPayMaps).toEqual({});
   });
+
+  it("initializes a month with default editable config and empty data", () => {
+    const store = useGlobalStore.getState();
+    store.updateStandardHours(8);
+    store.updateBaseRate(75);
+    store.updateDayPayMap("2026-09-01", createDayPayMap(4));
+
+    store.initializeMonth(2027, 1);
+    const result = useGlobalStore.getState();
+
+    expect(result.config).toEqual({
+      standardHours: 6.67,
+      baseRate: 0,
+      year: 2027,
+      month: 1,
+    });
+    expect(result.dailyPayMaps).toEqual({});
+  });
 });

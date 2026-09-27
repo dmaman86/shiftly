@@ -74,6 +74,11 @@ export type ApiResponse<T> =
   | { data: T; error?: never }
   | { data?: never; error: string };
 
+export interface EndpointCall<T> {
+  call: () => Promise<ApiResponse<T>>;
+  controller?: AbortController;
+}
+
 export interface DayInfoResolver {
   isSpecialFullDay(day: DomainWorkDay): boolean;
   isPartialHolidayStart(day: DomainWorkDay): boolean;

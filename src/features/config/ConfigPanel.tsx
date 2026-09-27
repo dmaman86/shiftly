@@ -6,14 +6,22 @@ import {
   CardContent,
   Stack,
 } from "@mui/material";
+import { useEffect } from "react";
 import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-import { useGlobalState } from "@/hooks";
+import {
+  useAppSnackbar,
+  useAuth,
+  useFetch,
+  useGlobalState,
+} from "@/hooks";
 import { DomainContextType } from "@/app";
+import { monthlyConfigService } from "@/services";
+import { useMonthlyConfigHydration } from "@/features/monthly-data/monthlyConfigHydrationContext";
 import { WorkParametersInputs } from "./WorkParametersInputs";
 import { SYSTEM_START_YEAR } from "@/app/constants";
 import { useTranslation } from "react-i18next";
@@ -27,7 +35,47 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
   const { t } = useTranslation();
   const { t: tWT } = useTranslation("work-table");
   const monthNames = tWT("months", { returnObjects: true }) as string[];
-  const { year, month, updateYear, updateMonth } = useGlobalState();
+  const { year, month, standardHours, baseRate, updateYear, updateMonth } =
+    useGlobalState();
+  const { user } = useAuth();
+  const { callEndPoint } = useFetch();
+  const snackbar = useAppSnackbar();
+  const { configReady, contextKey, hydratedValues } = useMonthlyConfigHydration();
+
+  useEffect(() => {
+    if (!user || !configReady || contextKey !== `${user.id}:${year}:${month}`) {
+      return;
+    }
+
+    if (
+      hydratedValues?.standardHours === standardHours &&
+      hydratedValues.baseRate === baseRate
+    ) {
+      return;
+    }
+
+    void callEndPoint(
+      monthlyConfigService().upsert(user.id, {
+        year,
+        month,
+        standard_hours: standardHours,
+        base_rate: baseRate,
+      }),
+    ).then((result) => {
+      if (result.error) snackbar.error(result.error);
+    });
+  }, [
+    baseRate,
+    callEndPoint,
+    configReady,
+    contextKey,
+    hydratedValues,
+    month,
+    snackbar,
+    standardHours,
+    user,
+    year,
+  ]);
 
   const { monthResolver } = domain.resolvers;
 
