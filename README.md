@@ -426,12 +426,21 @@ bun run test:ci
 
 ### End-to-End Tests
 
-Playwright covers the guest daily-work-table flow with a shared fixture runner. The scenarios select a month, enter day statuses, create regular and cross-day shifts, and compare daily and monthly results with expected-results fixtures for August 2026, March 2022, October 2021, and October 2025.
+Tests are split by what each level proves:
 
-Install the Playwright browser once after installing dependencies:
+| Level | Scope |
+|---|---|
+| Unit (Vitest) | Domain rules, services, mappers, and components |
+| Integration (Vitest) | Every golden month fixture through the app's calculation path, without a browser |
+| Desktop E2E (Playwright, Chromium) | Full month entry through the table in English and Hebrew, plus the tablet-width layout |
+| Mobile E2E (Playwright, Android + iPhone) | Month selection in the modal picker, shift editing, and menu navigation without horizontal overflow; full month entry through the calendar and day card on Android |
+
+Mobile specs run on two profiles: `android` (Pixel 10, Chromium) and `iphone` (iPhone 15, WebKit). The full-month flow is Android-only because headless WebKit on Linux CI needs several minutes for it, and month results do not depend on the browser engine. Every test runs with a frozen clock (`e2e/support/app.ts`), so scenarios do not depend on the current date.
+
+Install the Playwright browsers once after installing dependencies:
 
 ```bash
-bunx playwright install chromium
+bunx playwright install chromium webkit
 ```
 
 Run the end-to-end test suite:
@@ -447,24 +456,30 @@ bun run test:e2e:ui
 bun run test:e2e:headed
 ```
 
-The E2E inputs and expected outputs are stored in:
+The golden month scenarios (inputs and expected outputs) are stored in:
 
 ```text
 e2e/
 ├── fixtures/
-│   ├── august-2026.json / august-2026.results.json
+│   ├── august-2026.json / august-2026.result.json
 │   ├── march-2022.json / march-2022.result.json
 │   ├── october-2021.json / october-2021.result.json
 │   └── october-2025.json / october-2025.result.json
-├── work-table-fixture.ts
-├── work-table-august-2026.spec.ts
-├── work-table-march-2022.spec.ts
-├── work-table-october-2021.spec.ts
-└── work-table-october-2025.spec.ts
+├── support/          # Shared scenario loading, formatting, and app setup
+├── desktop/          # "desktop" project
+│   ├── work-table-month.spec.ts
+│   └── tablet-layout.spec.ts
+└── mobile/           # "android" and "iphone" projects
+    ├── work-table-month.spec.ts   # Android only
+    ├── month-picker.spec.ts
+    ├── shift-editing.spec.ts
+    └── navigation.spec.ts
 ```
 
-The Playwright web server starts Vite on `127.0.0.1` and uses the `/shiftly` base path. Hebcal is mocked by the test so the scenario remains deterministic.
-The main and pull-request GitHub Actions workflows install Chromium and run the E2E suite automatically.
+Every fixture is verified by the Vitest integration test `src/test/integration/work-table-month-fixtures.test.ts`, which runs the same calculation path as the app without a browser. Playwright drives only the August 2026 scenario through the UI.
+
+Locally, the Playwright web server starts the Vite dev server on `127.0.0.1` with the `/shiftly` base path. In CI it serves the prebuilt `dist/` with `vite preview`. Hebcal is mocked by the tests so scenarios stay deterministic.
+The CI workflow installs Chromium and WebKit and runs the E2E suite automatically.
 
 ### Quality Checks and Production Build
 

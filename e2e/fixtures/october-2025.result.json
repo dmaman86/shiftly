@@ -1096,7 +1096,7 @@
         },
         "appliedShabbatCredit": {
           "percent": 1,
-          "hours": 0
+          "hours": 4.82
         },
         "perDiemPoints": 0,
         "perDiemAmount": 0,
@@ -1189,7 +1189,7 @@
       "extra": {
         "hours20": {
           "percent": 0.2,
-          "hours": 30.200000000000003
+          "hours": 30.233333333333334
         },
         "hours50": {
           "percent": 0.5,

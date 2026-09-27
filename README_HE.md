@@ -639,12 +639,21 @@ bun run test:ci
 
 ### בדיקות End-to-End
 
-Playwright מכסה את זרימת העבודה של טבלת העבודה היומית במצב אורח באמצעות runner משותף ל־fixtures. התרחישים בוחרים חודש, מזינים סטטוסי ימים, יוצרים משמרות רגילות ומשמרות החוצות חצות, ומשווים את התוצאות היומיות והחודשיות לקובצי תוצאות צפויים עבור אוגוסט 2026, מרץ 2022, אוקטובר 2021 ואוקטובר 2025.
+הבדיקות מחולקות לפי מה שכל רמה מוכיחה:
 
-יש להתקין את דפדפן Chromium פעם אחת לאחר התקנת התלויות:
+| רמה | היקף |
+|---|---|
+| Unit (Vitest) | כללי הדומיין, שירותים, mappers ורכיבים |
+| Integration (Vitest) | כל fixture של חודש מלא דרך מסלול החישוב של האפליקציה, ללא דפדפן |
+| Desktop E2E (Playwright, Chromium) | הזנת חודש מלא דרך הטבלה באנגלית ובעברית, וכן פריסה ברוחב טאבלט |
+| Mobile E2E (Playwright, Android + iPhone) | בחירת חודש בבורר המודאלי, עריכת משמרות וניווט בתפריט ללא גלילה אופקית; הזנת חודש מלא דרך לוח השנה וכרטיס היום ב־Android |
+
+בדיקות המובייל רצות על שני פרופילים: `android` (Pixel 10, Chromium) ו־`iphone` (iPhone 15, WebKit). זרימת החודש המלא רצה רק ב־Android, משום ש־WebKit ללא ממשק ב־Linux של ה־CI זקוק לכמה דקות עבורה, ותוצאות החודש אינן תלויות במנוע הדפדפן. כל הבדיקות רצות עם שעון קבוע (`e2e/support/app.ts`), כך שהתרחישים אינם תלויים בתאריך הנוכחי.
+
+יש להתקין את דפדפני Playwright פעם אחת לאחר התקנת התלויות:
 
 ```bash
-bunx playwright install chromium
+bunx playwright install chromium webkit
 ```
 
 הרצת בדיקות הקצה לקצה:
@@ -660,24 +669,30 @@ bun run test:e2e:ui
 bun run test:e2e:headed
 ```
 
-קובצי הקלט והתוצאות הצפויות נמצאים תחת:
+תרחישי החודש המלאים (קובצי הקלט והתוצאות הצפויות) נמצאים תחת:
 
 ```text
 e2e/
 ├── fixtures/
-│   ├── august-2026.json / august-2026.results.json
+│   ├── august-2026.json / august-2026.result.json
 │   ├── march-2022.json / march-2022.result.json
 │   ├── october-2021.json / october-2021.result.json
 │   └── october-2025.json / october-2025.result.json
-├── work-table-fixture.ts
-├── work-table-august-2026.spec.ts
-├── work-table-march-2022.spec.ts
-├── work-table-october-2021.spec.ts
-└── work-table-october-2025.spec.ts
+├── support/          # טעינת תרחישים, עיצוב ערכים והכנת האפליקציה
+├── desktop/          # פרויקט "desktop"
+│   ├── work-table-month.spec.ts
+│   └── tablet-layout.spec.ts
+└── mobile/           # פרויקטים "android" ו־"iphone"
+    ├── work-table-month.spec.ts   # Android בלבד
+    ├── month-picker.spec.ts
+    ├── shift-editing.spec.ts
+    └── navigation.spec.ts
 ```
 
-שרת ה־E2E מפעיל את Vite על `127.0.0.1` ומשתמש בנתיב הבסיס `/shiftly`. שירות Hebcal מדומה בבדיקה כדי לשמור על תרחיש דטרמיניסטי.
-ה־workflows הראשיים של GitHub ושל pull request מתקינים Chromium ומריצים את חבילת בדיקות ה־E2E באופן אוטומטי.
+כל ה־fixtures נבדקים בבדיקת האינטגרציה של Vitest `src/test/integration/work-table-month-fixtures.test.ts`, שמריצה את אותו מסלול חישוב של האפליקציה ללא דפדפן. Playwright מריץ דרך הממשק רק את תרחיש אוגוסט 2026.
+
+מקומית, שרת ה־E2E מפעיל את שרת הפיתוח של Vite על `127.0.0.1` עם נתיב הבסיס `/shiftly`. ב־CI הוא מגיש את `dist/` המוכן מראש באמצעות `vite preview`. שירות Hebcal מדומה בבדיקות כדי לשמור על תרחישים דטרמיניסטיים.
+ה־workflow של ה־CI מתקין Chromium ו־WebKit ומריץ את חבילת בדיקות ה־E2E באופן אוטומטי.
 
 ### בדיקות איכות ובניית גרסת Production
 
