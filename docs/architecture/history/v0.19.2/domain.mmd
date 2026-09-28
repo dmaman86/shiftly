@@ -32,14 +32,15 @@ flowchart TD
   node_resolvers -->|"uses"| node_services
   node_monthreducer -->|"aggregates"| node_resolvers
 
-  click node_composition "https://github.com/dmaman86/shiftly/blob/main/src/domain/composition.ts"
-  click node_shiftbuilder "https://github.com/dmaman86/shiftly/blob/main/src/domain/builder/shiftmap.builder.ts"
-  click node_daybuilder "https://github.com/dmaman86/shiftly/blob/main/src/domain/builder/daypaymap.builder.ts"
-  click node_timeline "https://github.com/dmaman86/shiftly/blob/main/src/domain/timeline/classify-shift-timeline.ts"
-  click node_calculators "https://github.com/dmaman86/shiftly/blob/main/src/domain/pipelines/buildCalculators.pipeline.ts"
-  click node_monthreducer "https://github.com/dmaman86/shiftly/blob/main/src/domain/reducer/month-pay-map.reducer.ts"
-  click node_resolvers "https://github.com/dmaman86/shiftly/blob/main/src/domain/resolve/month.resolver.ts"
-  click node_services "https://github.com/dmaman86/shiftly/blob/main/src/domain/services/shift.service.ts"
+  click node_composition "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/domain/composition.ts"
+  click node_shiftbuilder "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/domain/builder/shiftmap.builder.ts"
+  click node_daybuilder "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/domain/builder/daypaymap.builder.ts"
+  click node_timeline "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/domain/timeline/classify-shift-timeline.ts"
+  click node_calculators "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/domain/pipelines/buildCalculators.pipeline.ts"
+  click node_monthreducer "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/domain/reducer/month-pay-map.reducer.ts"
+  click node_resolvers "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/domain/resolve/month.resolver.ts"
+  click node_services "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/domain/services/shift.service.ts"
 
   classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
   class node_composition,node_shiftbuilder,node_daybuilder,node_timeline,node_calculators,node_monthreducer,node_resolvers,node_services toneAmber
+

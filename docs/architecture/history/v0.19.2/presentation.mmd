@@ -1,0 +1,49 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+flowchart TD
+  subgraph group_ui["User experience"]
+    node_app["Application shell<br/>[App.tsx]"]
+    node_routes["Application routes<br/>[AppRoutes.tsx]"]
+    node_daily["Daily page<br/>[DailyPage.tsx]"]
+    node_monthly["Monthly summary<br/>[MonthlySummaryPage.tsx]"]
+    node_rules["Calculation rules<br/>[CalculationRulesPage.tsx]"]
+    node_worktable["Work table<br/>[WorkTable.tsx]"]
+    node_daycontroller["Day controller<br/>[useDayController.ts]"]
+    node_salary["Salary summary<br/>[MonthlySalarySummary.tsx]"]
+    node_dayviews["Day pay breakdown<br/>[dayToPayBreadownVM.ts]"]
+    node_monthbreakdown["Month pay breakdown<br/>[monthToPayBreakdownVM.ts]"]
+  end
+
+  node_app -->|"renders"| node_routes
+  node_routes -->|"routes to"| node_daily
+  node_routes -->|"routes to"| node_monthly
+  node_routes -->|"routes to"| node_rules
+  node_daily -->|"presents"| node_worktable
+  node_worktable -->|"delegates day interactions"| node_daycontroller
+  node_daycontroller -->|"maps"| node_dayviews
+  node_monthly -->|"shows totals"| node_salary
+  node_monthly -->|"maps monthly pay"| node_monthbreakdown
+
+  click node_app "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/app/App.tsx"
+  click node_routes "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/app/routes/AppRoutes.tsx"
+  click node_daily "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/pages/DailyPage.tsx"
+  click node_monthly "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/pages/MonthlySummaryPage.tsx"
+  click node_rules "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/pages/CalculationRulesPage.tsx"
+  click node_worktable "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/features/work-table/components/month/WorkTable.tsx"
+  click node_daycontroller "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/features/work-table/hooks/day/useDayController.ts"
+  click node_salary "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/features/salary-summary/components/MonthlySalarySummary.tsx"
+  click node_dayviews "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/adapters/dayToPayBreadownVM.ts"
+  click node_monthbreakdown "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/adapters/monthToPayBreakdownVM.ts"
+
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  class node_app,node_routes,node_daily,node_monthly,node_rules,node_worktable,node_daycontroller,node_salary,node_dayviews,node_monthbreakdown toneBlue
+

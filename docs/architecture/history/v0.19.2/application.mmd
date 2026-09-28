@@ -1,0 +1,48 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+flowchart TD
+  subgraph group_composition["Application composition"]
+    node_domaininstance["Domain instance<br/>[domain.instance.ts]"]
+    node_providers["Application providers<br/>[AppProviders.tsx]"]
+    node_auth["Authentication provider<br/>[AuthProvider.tsx]"]
+    node_domainprovider["Domain provider<br/>[DomainProvider.tsx]"]
+  end
+
+  subgraph group_state["Application state"]
+    node_monthlydata["Monthly data provider<br/>[MonthlyDataProvider.tsx]"]
+    node_session["Month session<br/>[useWorkTableMonthSession.ts]"]
+    node_daystate["Day-state context<br/>[WorkTableDayStateProvider.tsx]"]
+    node_globalstate["Global state<br/>[globalStore.ts]"]
+  end
+
+  node_providers -->|"installs"| node_auth
+  node_providers -->|"installs"| node_domainprovider
+  node_domainprovider -->|"exposes"| node_domaininstance
+  node_monthlydata -->|"coordinates"| node_session
+  node_session -->|"reads user"| node_auth
+  node_session -->|"hydrates and observes"| node_daystate
+  node_session -->|"replaces pay maps"| node_globalstate
+  node_daystate -->|"updates"| node_globalstate
+  node_domaininstance -->|"serves domain operations"| node_session
+
+  click node_domaininstance "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/app/domain/domain.instance.ts"
+  click node_providers "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/app/providers/AppProviders.tsx"
+  click node_auth "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/app/providers/auth/AuthProvider.tsx"
+  click node_domainprovider "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/app/providers/domain/DomainProvider.tsx"
+  click node_monthlydata "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/features/monthly-data/MonthlyDataProvider.tsx"
+  click node_session "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
+  click node_daystate "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
+  click node_globalstate "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/store/globalStore.ts"
+
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class node_domaininstance,node_providers,node_auth,node_domainprovider,node_monthlydata,node_session,node_daystate,node_globalstate toneMint
+

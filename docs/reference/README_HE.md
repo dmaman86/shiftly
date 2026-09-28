@@ -2,21 +2,6 @@
 
 # Shiftly - מערכת לניהול שעות וחישוב שכר
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://dmaman86.github.io/shiftly/?utm_source=github&utm_medium=readme)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dmaman86/shiftly)
-![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
-![Zustand](https://img.shields.io/badge/Zustand-5.0.15-433E38?logo=react&logoColor=white)
-![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?logo=reactquery&logoColor=white)
-![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
-![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-2.112.4-3ECF8E?logo=supabase&logoColor=white)
-
-[![CI](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml/badge.svg)](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
-[![codecov](https://codecov.io/gh/dmaman86/shiftly/branch/main/graph/badge.svg)](https://codecov.io/gh/dmaman86/shiftly)
-![License](https://img.shields.io/badge/license-MIT-blue)
-
 > 📘 גרסה באנגלית זמינה כאן: [README.md](./README.md)
 
 מערכת זו היא אפליקציה לניהול שעות עבודה וחישוב שכר מבוססת על **React + TypeScript**.
@@ -138,7 +123,8 @@ Shiftly אינה ממדלת עבודה כסוגי משמרות קבועים. ה�
 
 ### סקירת מערכת
 
-התרשים הקונספטואלי הבא מציג את גבולות המערכת ואת הקשרים המרכזיים:
+<details>
+<summary>Overview</summary>
 
 ```mermaid
 ---
@@ -149,60 +135,97 @@ config:
     primaryColor: "#313244"
     primaryTextColor: "#cdd6f4"
     primaryBorderColor: "#89b4fa"
-    lineColor: "#a6adc8"
-    secondaryColor: "#45475a"
-    secondaryTextColor: "#cdd6f4"
-    clusterBkg: "#181825"
-    clusterBorder: "#cba6f7"
-    edgeLabelBackground: "#1e1e2e"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
 ---
-flowchart TB
-    user["User"]
-    e2e["E2E Testing System<br/>(Playwright, Fixtures)"]
+flowchart TD
+  subgraph group_presentation["Presentation"]
+    layer_presentation["User experience"]
+  end
 
-    subgraph shiftly["Shiftly Application System"]
-      client["Client Application<br/>(UI, Routing, Global State)"]
-      domain["Domain Logic Engine<br/>(PayMap Pipeline, Builders, Calculators)"]
-      supabase["Supabase Services<br/>(Auth, Edge Functions, Client)"]
+  subgraph group_application["Application"]
+    layer_application["Composition, routing and state"]
+  end
 
-      client --> domain
-      client --> supabase
-    end
+  subgraph group_domain["Domain"]
+    layer_domain["Payroll calculation"]
+  end
 
-    google["Google Auth Service"]
-    database["PostgreSQL Database<br/>(User Data, RLS)"]
+  subgraph group_data["Infrastructure and data"]
+    layer_data["Services, adapters and persistence"]
+  end
 
-    user --> client
-    e2e --> client
-    google --> client
-    supabase --> database
+  layer_presentation --> layer_application
+  layer_application --> layer_domain
+  layer_application --> layer_data
+
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class layer_presentation toneBlue
+  class layer_application toneMint
+  class layer_domain toneAmber
+  class layer_data toneRose
 ```
 
-### תרשימי ארכיטקטורה מפורטים
-
-- [Domain](../../docs/architecture/generated/domain.mmd)
-- [Work Table](../../docs/architecture/generated/work-table.mmd)
-- [Application State](../../docs/architecture/generated/application-state.mmd)
-- [Data](../../docs/architecture/generated/data.mmd)
-- [Architecture history](../../docs/architecture/history/)
-
-ליצירת התרשימים הנוכחיים מחדש:
-
-```bash
-npm run docs:architecture
-```
-
-ליצירת snapshots היסטוריים מחדש:
-
-```bash
-npm run docs:architecture:history
-```
-
----
+</details>
 
 ## שכבות מערכת
 
 ### דומיין
+<details>
+<summary>Domain</summary>
+
+```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+flowchart TD
+  subgraph group_domain["Payroll domain"]
+    node_composition["Domain composition<br/>[composition.ts]"]
+    node_shiftbuilder["Shift map builder<br/>[shiftmap.builder.ts]"]
+    node_daybuilder["Day pay builder<br/>[daypaymap.builder.ts]"]
+    node_timeline["Timeline classification<br/>[classify-shift-timeline.ts]"]
+    node_calculators["Pay calculators<br/>[buildCalculators.pipeline.ts]"]
+    node_monthreducer["Month pay reducers<br/>[month-pay-map.reducer.ts]"]
+    node_resolvers["Resolvers<br/>[month.resolver.ts]"]
+    node_services["Domain services<br/>[shift.service.ts]"]
+  end
+
+  node_composition -->|"assembles"| node_shiftbuilder
+  node_composition -->|"assembles"| node_daybuilder
+  node_composition -->|"assembles"| node_calculators
+  node_shiftbuilder -->|"classifies timeline"| node_timeline
+  node_shiftbuilder -->|"uses"| node_calculators
+  node_daybuilder -->|"uses"| node_calculators
+  node_daybuilder -->|"resolves"| node_resolvers
+  node_monthreducer -->|"uses"| node_calculators
+  node_resolvers -->|"uses"| node_services
+  node_monthreducer -->|"aggregates"| node_resolvers
+
+  click node_composition "https://github.com/dmaman86/shiftly/blob/main/src/domain/composition.ts"
+  click node_shiftbuilder "https://github.com/dmaman86/shiftly/blob/main/src/domain/builder/shiftmap.builder.ts"
+  click node_daybuilder "https://github.com/dmaman86/shiftly/blob/main/src/domain/builder/daypaymap.builder.ts"
+  click node_timeline "https://github.com/dmaman86/shiftly/blob/main/src/domain/timeline/classify-shift-timeline.ts"
+  click node_calculators "https://github.com/dmaman86/shiftly/blob/main/src/domain/pipelines/buildCalculators.pipeline.ts"
+  click node_monthreducer "https://github.com/dmaman86/shiftly/blob/main/src/domain/reducer/month-pay-map.reducer.ts"
+  click node_resolvers "https://github.com/dmaman86/shiftly/blob/main/src/domain/resolve/month.resolver.ts"
+  click node_services "https://github.com/dmaman86/shiftly/blob/main/src/domain/services/shift.service.ts"
+
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  class node_composition,node_shiftbuilder,node_daybuilder,node_timeline,node_calculators,node_monthreducer,node_resolvers,node_services toneAmber
+```
+
+</details>
 
 שכבת הדומיין מכילה לוגיקה עסקית טהורה ואינה תלויה ב-React, בניהול המצב או בספריות חיצוניות.
 
@@ -226,23 +249,141 @@ npm run docs:architecture:history
 - **Composition**
   חיבור מרכזי של רכיבי הדומיין דרך `pipelines/`. ה־API הציבורי של הדומיין מורכב ב־`src/domain/composition.ts` ונחשף לאפליקציה דרך `src/app/domain/domain.instance.ts`.
 
-### טיפוסי האפליקציה וה־UI
+\n\n
 
+### תצוגה
+<details>
+<summary>Presentation</summary>
+
+```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+flowchart TD
+  subgraph group_ui["User experience"]
+    node_app["Application shell<br/>[App.tsx]"]
+    node_routes["Application routes<br/>[AppRoutes.tsx]"]
+    node_daily["Daily page<br/>[DailyPage.tsx]"]
+    node_monthly["Monthly summary<br/>[MonthlySummaryPage.tsx]"]
+    node_rules["Calculation rules<br/>[CalculationRulesPage.tsx]"]
+    node_worktable["Work table<br/>[WorkTable.tsx]"]
+    node_daycontroller["Day controller<br/>[useDayController.ts]"]
+    node_salary["Salary summary<br/>[MonthlySalarySummary.tsx]"]
+    node_dayviews["Day pay breakdown<br/>[dayToPayBreadownVM.ts]"]
+    node_monthbreakdown["Month pay breakdown<br/>[monthToPayBreakdownVM.ts]"]
+  end
+
+  node_app -->|"renders"| node_routes
+  node_routes -->|"routes to"| node_daily
+  node_routes -->|"routes to"| node_monthly
+  node_routes -->|"routes to"| node_rules
+  node_daily -->|"presents"| node_worktable
+  node_worktable -->|"delegates day interactions"| node_daycontroller
+  node_daycontroller -->|"maps"| node_dayviews
+  node_monthly -->|"shows totals"| node_salary
+  node_monthly -->|"maps monthly pay"| node_monthbreakdown
+
+  click node_app "https://github.com/dmaman86/shiftly/blob/main/src/app/App.tsx"
+  click node_routes "https://github.com/dmaman86/shiftly/blob/main/src/app/routes/AppRoutes.tsx"
+  click node_daily "https://github.com/dmaman86/shiftly/blob/main/src/pages/DailyPage.tsx"
+  click node_monthly "https://github.com/dmaman86/shiftly/blob/main/src/pages/MonthlySummaryPage.tsx"
+  click node_rules "https://github.com/dmaman86/shiftly/blob/main/src/pages/CalculationRulesPage.tsx"
+  click node_worktable "https://github.com/dmaman86/shiftly/blob/main/src/features/work-table/components/month/WorkTable.tsx"
+  click node_daycontroller "https://github.com/dmaman86/shiftly/blob/main/src/features/work-table/hooks/day/useDayController.ts"
+  click node_salary "https://github.com/dmaman86/shiftly/blob/main/src/features/salary-summary/components/MonthlySalarySummary.tsx"
+  click node_dayviews "https://github.com/dmaman86/shiftly/blob/main/src/adapters/dayToPayBreadownVM.ts"
+  click node_monthbreakdown "https://github.com/dmaman86/shiftly/blob/main/src/adapters/monthToPayBreakdownVM.ts"
+
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  class node_app,node_routes,node_daily,node_monthly,node_rules,node_worktable,node_daycontroller,node_salary,node_dayviews,node_monthbreakdown toneBlue
+```
+
+</details>
+
+#### טיפוסי האפליקציה וה־UI
 `src/app/` הוא שורש ההרכבה של האפליקציה. הוא יוצר את מופע הדומיין המורכב ומנגיש ל־React פעולות דומיין בלי לייבא ישירות פונקציות תזמור. לדוגמה, קוד האפליקציה קורא ל־`domain.payMap.calculateDayFromShifts(...)`.
 
 חוזי הדומיין נשארים תחת `src/domain/types`. מודלים המיועדים ל־UI, כגון `PayBreakdownViewModel`, `CompactPayBreakdownVM` ו־`WorkDayInfo`, נמצאים תחת `src/app/types`, משום שהם מתארים תצוגה ומצב אפליקטיבי ולא חוקי דומיין. Adapters וממפים של ה־features ממירים תוצאות דומיין למודלים האלו.
 
-### Adapters
+\n\n
 
-המרת אובייקטי דומיין למודלי תצוגה עבור ה-UI, תוך שמירה על ניתוק מלא מהדומיין.
-
-### Hooks
-
+#### Hooks
 שכבת תיאום דקה בין ה-UI, הדומיין וה-state.
 אינה מכילה לוגיקה עסקית.
 
-### ניהול מצב
+\n\n
 
+#### רכיבי UI
+רכיבי תצוגה בלבד.
+ה-UI מגיב לנתונים מחושבים ואינם מכיל חוקי שכר.
+
+---
+
+### אפליקציה
+<details>
+<summary>Application</summary>
+
+```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+flowchart TD
+  subgraph group_composition["Application composition"]
+    node_domaininstance["Domain instance<br/>[domain.instance.ts]"]
+    node_providers["Application providers<br/>[AppProviders.tsx]"]
+    node_auth["Authentication provider<br/>[AuthProvider.tsx]"]
+    node_domainprovider["Domain provider<br/>[DomainProvider.tsx]"]
+  end
+
+  subgraph group_state["Application state"]
+    node_monthlydata["Monthly data provider<br/>[MonthlyDataProvider.tsx]"]
+    node_session["Month session<br/>[useWorkTableMonthSession.ts]"]
+    node_daystate["Day-state context<br/>[WorkTableDayStateProvider.tsx]"]
+    node_globalstate["Global state<br/>[globalStore.ts]"]
+  end
+
+  node_providers -->|"installs"| node_auth
+  node_providers -->|"installs"| node_domainprovider
+  node_domainprovider -->|"exposes"| node_domaininstance
+  node_monthlydata -->|"coordinates"| node_session
+  node_session -->|"reads user"| node_auth
+  node_session -->|"hydrates and observes"| node_daystate
+  node_session -->|"replaces pay maps"| node_globalstate
+  node_daystate -->|"updates"| node_globalstate
+  node_domaininstance -->|"serves domain operations"| node_session
+
+  click node_domaininstance "https://github.com/dmaman86/shiftly/blob/main/src/app/domain/domain.instance.ts"
+  click node_providers "https://github.com/dmaman86/shiftly/blob/main/src/app/providers/AppProviders.tsx"
+  click node_auth "https://github.com/dmaman86/shiftly/blob/main/src/app/providers/auth/AuthProvider.tsx"
+  click node_domainprovider "https://github.com/dmaman86/shiftly/blob/main/src/app/providers/domain/DomainProvider.tsx"
+  click node_monthlydata "https://github.com/dmaman86/shiftly/blob/main/src/features/monthly-data/MonthlyDataProvider.tsx"
+  click node_session "https://github.com/dmaman86/shiftly/blob/main/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
+  click node_daystate "https://github.com/dmaman86/shiftly/blob/main/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
+  click node_globalstate "https://github.com/dmaman86/shiftly/blob/main/src/store/globalStore.ts"
+
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class node_domaininstance,node_providers,node_auth,node_domainprovider,node_monthlydata,node_session,node_daystate,node_globalstate toneMint
+```
+
+</details>
+
+#### ניהול מצב
 - **Zustand** מנהל את הגדרות התקופה הגלובליות ואת מפות השכר היומיות
 - **React Context** מחזיק אימות, הזרקת תלויות, גבולות אינטגרציה ואת מצב העריכה הנוכחי של טבלת העבודה
 - **TanStack Query** מתאם קריאות וכתיבות מאומתות של טבלת העבודה מול Supabase
@@ -253,13 +394,72 @@ npm run docs:architecture:history
 - `src/store/globalStore.ts`
 - `src/store/globalBreakdown.ts`
 
-### רכיבי UI
+### נתונים
+<details>
+<summary>Data</summary>
 
-רכיבי תצוגה בלבד.
-ה-UI מגיב לנתונים מחושבים ואינם מכיל חוקי שכר.
+```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+flowchart TD
+  subgraph group_services["Services and integrations"]
+    node_shiftservice["Shift service<br/>[shift.service.ts]"]
+    node_workdayservice["Workday service<br/>[workDay.service.ts]"]
+    node_monthlyconfig["Monthly config service<br/>[monthlyConfig.service.ts]"]
+    node_account["Account service<br/>[account.service.ts]"]
+    node_hebcal["Hebcal service<br/>[hebcal.service.ts]"]
+    node_analytics["Analytics service<br/>[analytics.service.ts]"]
+    node_supabase["Supabase client and CRUD<br/>[supabase.client.ts]"]
+  end
+
+  subgraph group_adapters["Adapters"]
+    node_dayadapter["Day pay breakdown adapter<br/>[dayToPayBreadownVM.ts]"]
+    node_monthadapter["Month pay breakdown adapter<br/>[monthToPayBreakdownVM.ts]"]
+  end
+
+  node_persistence[("Persisted application data")]
+  node_hebcalapi{{"Hebcal API"}}
+
+  node_shiftservice -->|"uses"| node_supabase
+  node_workdayservice -->|"uses"| node_supabase
+  node_monthlyconfig -->|"uses"| node_supabase
+  node_account -->|"uses"| node_supabase
+  node_supabase -->|"reads and writes"| node_persistence
+  node_hebcal -->|"fetches holidays"| node_hebcalapi
+  node_dayadapter -->|"maps domain output"| node_monthadapter
+  node_analytics -->|"tracks application events"| node_supabase
+
+  click node_shiftservice "https://github.com/dmaman86/shiftly/blob/main/src/services/shift/shift.service.ts"
+  click node_workdayservice "https://github.com/dmaman86/shiftly/blob/main/src/services/workDay/workDay.service.ts"
+  click node_monthlyconfig "https://github.com/dmaman86/shiftly/blob/main/src/services/monthlyConfig/monthlyConfig.service.ts"
+  click node_account "https://github.com/dmaman86/shiftly/blob/main/src/services/account/account.service.ts"
+  click node_hebcal "https://github.com/dmaman86/shiftly/blob/main/src/services/hebcal/hebcal.service.ts"
+  click node_analytics "https://github.com/dmaman86/shiftly/blob/main/src/services/analytics/analytics.service.ts"
+  click node_supabase "https://github.com/dmaman86/shiftly/blob/main/src/services/supabase/supabase.client.ts"
+  click node_dayadapter "https://github.com/dmaman86/shiftly/blob/main/src/adapters/dayToPayBreadownVM.ts"
+  click node_monthadapter "https://github.com/dmaman86/shiftly/blob/main/src/adapters/monthToPayBreakdownVM.ts"
+
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
+  class node_shiftservice,node_workdayservice,node_monthlyconfig,node_account,node_hebcal,node_analytics,node_supabase toneRose
+  class node_dayadapter,node_monthadapter,node_persistence,node_hebcalapi toneNeutral
+```
+
+</details>
+
+#### Adapters
+המרת אובייקטי דומיין למודלי תצוגה עבור ה-UI, תוך שמירה על ניתוק מלא מהדומיין.
 
 ---
-
 ## מושגי דומיין
 
 ### Builders
