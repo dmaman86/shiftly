@@ -33,6 +33,7 @@
     "success": "Thank you! Feedback received"
   },
   "auth": {
+    "guest_mode_notice": "Guest mode: calculations run in real time, but your data is not saved. Sign in for free to keep your shifts in the cloud.",
     "sign_in_benefit": "Sign in for free to save your shifts and settings, and access them from any device.",
     "sign_in_with_google": "Continue with Google",
     "sign_out": "Sign out",

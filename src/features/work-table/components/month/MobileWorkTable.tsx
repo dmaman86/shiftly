@@ -10,7 +10,7 @@ import type { ShabbatCreditUsage } from "@/domain";
 import { SYSTEM_START_YEAR } from "@/app/constants";
 import { WorkDayStatus } from "@/domain/constants";
 import { DomainContextType } from "@/app";
-import { AuthControls } from "@/features/auth";
+import { GuestModeNotice } from "@/features/auth";
 import { useGlobalState } from "@/hooks";
 import { useWorkTableDayState } from "../../hooks/day/useWorkTableDayState";
 import { DayCard } from "../day/DayCard";
@@ -195,7 +195,7 @@ export const MobileWorkTable = ({
         />
       </Box>
 
-      <AuthControls />
+      <GuestModeNotice />
 
       <DayCard
         key={selectedWorkDay.meta.date}
