@@ -131,13 +131,13 @@
           "hours": 0
         },
         "perDiemPoints": 2,
-        "perDiemAmount": 67.8,
+        "perDiemAmount": 63.2,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 67.8
+      "salary": 63.2
     },
     "2021-10-03": {
       "status": "normal",
@@ -431,13 +431,13 @@
           "hours": 0
         },
         "perDiemPoints": 2,
-        "perDiemAmount": 67.8,
+        "perDiemAmount": 63.2,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 67.8
+      "salary": 63.2
     },
     "2021-10-10": {
       "status": "normal",
@@ -971,13 +971,13 @@
           "hours": 0
         },
         "perDiemPoints": 2,
-        "perDiemAmount": 67.8,
+        "perDiemAmount": 63.2,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 1,
-        "smallAmount": 13.5
+        "smallAmount": 12.6
       },
-      "salary": 81.3
+      "salary": 75.8
     },
     "2021-10-23": {
       "status": "normal",
@@ -1031,13 +1031,13 @@
           "hours": 0
         },
         "perDiemPoints": 2,
-        "perDiemAmount": 67.8,
+        "perDiemAmount": 63.2,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 67.8
+      "salary": 63.2
     },
     "2021-10-24": {
       "status": "vacation",
@@ -1213,11 +1213,11 @@
         "perDiemPoints": 0,
         "perDiemAmount": 0,
         "largePoints": 1,
-        "largeAmount": 19.7,
+        "largeAmount": 18.3,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 19.7
+      "salary": 18.3
     },
     "2021-10-28": {
       "status": "normal",
@@ -1275,9 +1275,9 @@
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 1,
-        "smallAmount": 13.5
+        "smallAmount": 12.6
       },
-      "salary": 13.5
+      "salary": 12.6
     },
     "2021-10-31": {
       "status": "normal",
@@ -1391,12 +1391,12 @@
         "hours": 22.15
       },
       "perDiemPoints": 8,
-      "perDiemAmount": 271.2,
+      "perDiemAmount": 252.8,
       "largePoints": 1,
-      "largeAmount": 19.7,
+      "largeAmount": 18.3,
       "smallPoints": 2,
-      "smallAmount": 27
+      "smallAmount": 25.2
     },
-    "salary": 317.9
+    "salary": 296.3
   }
 }
