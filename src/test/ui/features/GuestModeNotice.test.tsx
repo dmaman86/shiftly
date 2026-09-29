@@ -69,6 +69,8 @@ describe("GuestModeNotice", () => {
       provider: "google",
       options: { redirectTo: window.location.href },
     });
+    // Without this mark the guest's month would be discarded after the redirect.
+    expect(sessionStorage.getItem("shiftly:guest-draft:pending-import")).not.toBeNull();
   });
 
   it("renders nothing for signed-in users", () => {

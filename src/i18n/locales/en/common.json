@@ -32,6 +32,17 @@
     "not_sure": "Not sure",
     "success": "Thank you! Feedback received"
   },
+  "guest_draft": {
+    "conflict_title": "You already have saved data for {{monthName}} {{year}}",
+    "conflict_description": "Saved: {{savedCount}} shifts · Entered as guest: {{draftCount}} shifts. Which data do you want to keep?",
+    "keep_saved": "Keep saved data",
+    "replace": "Replace with guest data",
+    "error_title": "Your guest shifts were not saved",
+    "error_description": "We could not save the shifts you entered as a guest to your account. Your data is kept on this page - try again, or discard it.",
+    "retry": "Try again",
+    "discard": "Discard guest shifts",
+    "import_success": "The shifts you entered as a guest were saved to your account."
+  },
   "auth": {
     "guest_mode_notice": "Guest mode: calculations run in real time, but your data is not saved. Sign in for free to keep your shifts in the cloud.",
     "sign_in_benefit": "Sign in for free to save your shifts and settings, and access them from any device.",

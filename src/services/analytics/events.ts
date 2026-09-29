@@ -70,4 +70,11 @@ export type AnalyticsEvent =
   | {
       name: "calculation_demo_link_clicked";
       params: { source: "daily" };
+    }
+  | {
+      name: "guest_draft_import_resolved";
+      params: {
+        outcome: "imported" | "replaced" | "kept" | "discarded_after_error";
+        shift_count: number;
+      };
     };

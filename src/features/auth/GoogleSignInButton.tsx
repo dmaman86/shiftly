@@ -2,6 +2,7 @@ import { Button, type ButtonProps } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 import { useAppSnackbar, useFetch } from "@/hooks";
+import { guestDraftStorage } from "@/services/guestDraft";
 import { supabase } from "@/services/supabase/supabase.client";
 import { fromSupabaseResult } from "@/utils";
 
@@ -34,6 +35,10 @@ export const GoogleSignInButton = ({ size, sx }: GoogleSignInButtonProps) => {
   const { loading: signingIn, callEndPoint } = useFetch();
 
   const handleSignInWithGoogle = async () => {
+    // Set before the redirect: it is what lets the guest's month be imported
+    // after OAuth returns, instead of being discarded as a plain reload.
+    guestDraftStorage.markPendingImport();
+
     const result = await callEndPoint({
       call: async () =>
         fromSupabaseResult(
