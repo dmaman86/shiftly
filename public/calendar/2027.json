@@ -1,0 +1,300 @@
+{
+  "items": [
+    {
+      "date": "2027-02-07",
+      "title": "Family Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-03-22",
+      "title": "Erev Purim",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-03-23",
+      "title": "Purim",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-04-17",
+      "title": "Yom HaAliyah",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-04-21",
+      "title": "Erev Pesach",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-04-22",
+      "title": "Pesach I",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2027-04-23",
+      "title": "Pesach II (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-04-24",
+      "title": "Pesach III (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-04-25",
+      "title": "Pesach IV (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-04-26",
+      "title": "Pesach V (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-04-27",
+      "title": "Pesach VI (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-04-28",
+      "title": "Pesach VII",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2027-05-04",
+      "title": "Yom HaShoah",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-05-11",
+      "title": "Yom HaZikaron",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-05-12",
+      "title": "Yom HaAtzma’ut",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-05-17",
+      "title": "Herzl Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-06-04",
+      "title": "Yom Yerushalayim",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-06-10",
+      "title": "Erev Shavuot",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-06-11",
+      "title": "Shavuot",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2027-08-03",
+      "title": "Jabotinsky Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-08-11",
+      "title": "Erev Tish’a B’Av",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-08-12",
+      "title": "Tish’a B’Av",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-10-01",
+      "title": "Erev Rosh Hashana",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-10-02",
+      "title": "Rosh Hashana 5788",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2027-10-03",
+      "title": "Rosh Hashana II",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2027-10-10",
+      "title": "Erev Yom Kippur",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-10-11",
+      "title": "Yom Kippur",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2027-10-15",
+      "title": "Erev Sukkot",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-10-16",
+      "title": "Sukkot I",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2027-10-17",
+      "title": "Sukkot II (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-10-18",
+      "title": "Sukkot III (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-10-19",
+      "title": "Sukkot IV (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-10-20",
+      "title": "Sukkot V (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-10-21",
+      "title": "Sukkot VI (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-10-22",
+      "title": "Sukkot VII (Hoshana Raba)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-10-23",
+      "title": "Shmini Atzeret",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2027-11-07",
+      "title": "Yom HaAliyah School Observance",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-11-11",
+      "title": "Yitzhak Rabin Memorial Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-11-29",
+      "title": "Sigd",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-12-06",
+      "title": "Ben-Gurion Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2027-12-24",
+      "title": "Chanukah: 1 Candle",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-12-25",
+      "title": "Chanukah: 2 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-12-26",
+      "title": "Chanukah: 3 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-12-27",
+      "title": "Chanukah: 4 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-12-28",
+      "title": "Chanukah: 5 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-12-29",
+      "title": "Chanukah: 6 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-12-30",
+      "title": "Chanukah: 7 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2027-12-31",
+      "title": "Chanukah: 8 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    }
+  ]
+}

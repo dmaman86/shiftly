@@ -1,0 +1,306 @@
+{
+  "items": [
+    {
+      "date": "2022-02-01",
+      "title": "Family Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-03-16",
+      "title": "Erev Purim",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-03-17",
+      "title": "Purim",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-04-11",
+      "title": "Yom HaAliyah",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-04-15",
+      "title": "Erev Pesach",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-04-16",
+      "title": "Pesach I",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2022-04-17",
+      "title": "Pesach II (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-04-18",
+      "title": "Pesach III (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-04-19",
+      "title": "Pesach IV (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-04-20",
+      "title": "Pesach V (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-04-21",
+      "title": "Pesach VI (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-04-22",
+      "title": "Pesach VII",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2022-04-28",
+      "title": "Yom HaShoah",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-05-04",
+      "title": "Yom HaZikaron",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-05-05",
+      "title": "Yom HaAtzma’ut",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-05-11",
+      "title": "Herzl Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-05-29",
+      "title": "Yom Yerushalayim",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-06-04",
+      "title": "Erev Shavuot",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-06-05",
+      "title": "Shavuot",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2022-07-28",
+      "title": "Jabotinsky Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-08-06",
+      "title": "Erev Tish’a B’Av",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-08-07",
+      "title": "Tish’a B’Av (observed)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-09-25",
+      "title": "Erev Rosh Hashana",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-09-26",
+      "title": "Rosh Hashana 5783",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2022-09-27",
+      "title": "Rosh Hashana II",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2022-10-04",
+      "title": "Erev Yom Kippur",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-10-05",
+      "title": "Yom Kippur",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2022-10-09",
+      "title": "Erev Sukkot",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-10-10",
+      "title": "Sukkot I",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2022-10-11",
+      "title": "Sukkot II (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-10-12",
+      "title": "Sukkot III (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-10-13",
+      "title": "Sukkot IV (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-10-14",
+      "title": "Sukkot V (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-10-15",
+      "title": "Sukkot VI (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-10-16",
+      "title": "Sukkot VII (Hoshana Raba)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-10-17",
+      "title": "Shmini Atzeret",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2022-11-01",
+      "title": "Yom HaAliyah School Observance",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-11-06",
+      "title": "Yitzhak Rabin Memorial Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-11-23",
+      "title": "Sigd",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-11-30",
+      "title": "Ben-Gurion Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2022-12-18",
+      "title": "Chanukah: 1 Candle",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-12-19",
+      "title": "Chanukah: 2 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-12-20",
+      "title": "Chanukah: 3 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-12-21",
+      "title": "Chanukah: 4 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-12-22",
+      "title": "Chanukah: 5 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-12-23",
+      "title": "Chanukah: 6 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-12-24",
+      "title": "Chanukah: 7 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-12-25",
+      "title": "Chanukah: 8 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2022-12-26",
+      "title": "Chanukah: 8th Day",
+      "category": "holiday",
+      "subcat": "major"
+    }
+  ]
+}

@@ -1,0 +1,324 @@
+{
+  "items": [
+    {
+      "date": "2036-01-01",
+      "title": "Chanukah: 8 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-01-02",
+      "title": "Chanukah: 8th Day",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-01-21",
+      "title": "Hebrew Language Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-02-28",
+      "title": "Family Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-03-12",
+      "title": "Erev Purim",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-03-13",
+      "title": "Purim",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-04-07",
+      "title": "Yom HaAliyah",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-04-11",
+      "title": "Erev Pesach",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-04-12",
+      "title": "Pesach I",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2036-04-13",
+      "title": "Pesach II (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-04-14",
+      "title": "Pesach III (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-04-15",
+      "title": "Pesach IV (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-04-16",
+      "title": "Pesach V (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-04-17",
+      "title": "Pesach VI (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-04-18",
+      "title": "Pesach VII",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2036-04-24",
+      "title": "Yom HaShoah",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-04-30",
+      "title": "Yom HaZikaron",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-05-01",
+      "title": "Yom HaAtzma’ut",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-05-07",
+      "title": "Herzl Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-05-25",
+      "title": "Yom Yerushalayim",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-05-31",
+      "title": "Erev Shavuot",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-06-01",
+      "title": "Shavuot",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2036-07-24",
+      "title": "Jabotinsky Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-08-02",
+      "title": "Erev Tish’a B’Av",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-08-03",
+      "title": "Tish’a B’Av (observed)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-09-21",
+      "title": "Erev Rosh Hashana",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-09-22",
+      "title": "Rosh Hashana 5797",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2036-09-23",
+      "title": "Rosh Hashana II",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2036-09-30",
+      "title": "Erev Yom Kippur",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-10-01",
+      "title": "Yom Kippur",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2036-10-05",
+      "title": "Erev Sukkot",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-10-06",
+      "title": "Sukkot I",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2036-10-07",
+      "title": "Sukkot II (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-10-08",
+      "title": "Sukkot III (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-10-09",
+      "title": "Sukkot IV (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-10-10",
+      "title": "Sukkot V (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-10-11",
+      "title": "Sukkot VI (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-10-12",
+      "title": "Sukkot VII (Hoshana Raba)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-10-13",
+      "title": "Shmini Atzeret",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2036-10-28",
+      "title": "Yom HaAliyah School Observance",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-11-02",
+      "title": "Yitzhak Rabin Memorial Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-11-19",
+      "title": "Sigd",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-11-25",
+      "title": "Ben-Gurion Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2036-12-13",
+      "title": "Chanukah: 1 Candle",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-12-14",
+      "title": "Chanukah: 2 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-12-15",
+      "title": "Chanukah: 3 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-12-16",
+      "title": "Chanukah: 4 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-12-17",
+      "title": "Chanukah: 5 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-12-18",
+      "title": "Chanukah: 6 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-12-19",
+      "title": "Chanukah: 7 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-12-20",
+      "title": "Chanukah: 8 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2036-12-21",
+      "title": "Chanukah: 8th Day",
+      "category": "holiday",
+      "subcat": "major"
+    }
+  ]
+}

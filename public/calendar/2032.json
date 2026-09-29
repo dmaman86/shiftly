@@ -1,0 +1,318 @@
+{
+  "items": [
+    {
+      "date": "2032-01-05",
+      "title": "Hebrew Language Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-02-12",
+      "title": "Family Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-02-25",
+      "title": "Erev Purim",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-02-26",
+      "title": "Purim",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-03-22",
+      "title": "Yom HaAliyah",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-03-26",
+      "title": "Erev Pesach",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-03-27",
+      "title": "Pesach I",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2032-03-28",
+      "title": "Pesach II (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-03-29",
+      "title": "Pesach III (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-03-30",
+      "title": "Pesach IV (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-03-31",
+      "title": "Pesach V (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-04-01",
+      "title": "Pesach VI (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-04-02",
+      "title": "Pesach VII",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2032-04-08",
+      "title": "Yom HaShoah",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-04-14",
+      "title": "Yom HaZikaron",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-04-15",
+      "title": "Yom HaAtzma’ut",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-04-21",
+      "title": "Herzl Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-05-09",
+      "title": "Yom Yerushalayim",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-05-15",
+      "title": "Erev Shavuot",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-05-16",
+      "title": "Shavuot",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2032-07-08",
+      "title": "Jabotinsky Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-07-17",
+      "title": "Erev Tish’a B’Av",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-07-18",
+      "title": "Tish’a B’Av (observed)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-09-05",
+      "title": "Erev Rosh Hashana",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-09-06",
+      "title": "Rosh Hashana 5793",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2032-09-07",
+      "title": "Rosh Hashana II",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2032-09-14",
+      "title": "Erev Yom Kippur",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-09-15",
+      "title": "Yom Kippur",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2032-09-19",
+      "title": "Erev Sukkot",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-09-20",
+      "title": "Sukkot I",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2032-09-21",
+      "title": "Sukkot II (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-09-22",
+      "title": "Sukkot III (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-09-23",
+      "title": "Sukkot IV (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-09-24",
+      "title": "Sukkot V (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-09-25",
+      "title": "Sukkot VI (CH’’M)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-09-26",
+      "title": "Sukkot VII (Hoshana Raba)",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-09-27",
+      "title": "Shmini Atzeret",
+      "category": "holiday",
+      "subcat": "major",
+      "yomtov": true
+    },
+    {
+      "date": "2032-10-12",
+      "title": "Yom HaAliyah School Observance",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-10-17",
+      "title": "Yitzhak Rabin Memorial Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-11-03",
+      "title": "Sigd",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-11-09",
+      "title": "Ben-Gurion Day",
+      "category": "holiday",
+      "subcat": "modern"
+    },
+    {
+      "date": "2032-11-27",
+      "title": "Chanukah: 1 Candle",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-11-28",
+      "title": "Chanukah: 2 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-11-29",
+      "title": "Chanukah: 3 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-11-30",
+      "title": "Chanukah: 4 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-12-01",
+      "title": "Chanukah: 5 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-12-02",
+      "title": "Chanukah: 6 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-12-03",
+      "title": "Chanukah: 7 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-12-04",
+      "title": "Chanukah: 8 Candles",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-12-05",
+      "title": "Chanukah: 8th Day",
+      "category": "holiday",
+      "subcat": "major"
+    },
+    {
+      "date": "2032-12-23",
+      "title": "Hebrew Language Day",
+      "category": "holiday",
+      "subcat": "modern"
+    }
+  ]
+}

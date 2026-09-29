@@ -12,22 +12,25 @@ const ANALYTICS_HOSTS =
   /https:\/\/(www\.googletagmanager\.com|www\.google-analytics\.com|analytics\.google\.com|stats\.g\.doubleclick\.net)\//;
 
 /**
- * Makes a page deterministic: frozen clock, no analytics, and a mocked Hebcal
- * response so holiday classification comes only from the scenario.
+ * Makes a page deterministic: frozen clock, no analytics, and mocked calendar
+ * sources (static files and the Hebcal fallback) so holiday classification
+ * comes only from the scenario.
  */
 export const prepareApp = async (
   page: Page,
   { holidays = [] }: { holidays?: HolidayItem[] } = {},
 ) => {
-  await page.clock.setFixedTime(FIXED_NOW);
-  await page.route(ANALYTICS_HOSTS, (route) => route.abort());
-  await page.route("https://www.hebcal.com/hebcal/**", (route) =>
+  const fulfillHolidays: Parameters<Page["route"]>[1] = (route) =>
     route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({ items: holidays }),
-    }),
-  );
+    });
+
+  await page.clock.setFixedTime(FIXED_NOW);
+  await page.route(ANALYTICS_HOSTS, (route) => route.abort());
+  await page.route("**/calendar/*.json", fulfillHolidays);
+  await page.route("https://www.hebcal.com/hebcal/**", fulfillHolidays);
 };
 
 /** Pixels the document extends past the viewport width; 0 means no horizontal page scroll. */
