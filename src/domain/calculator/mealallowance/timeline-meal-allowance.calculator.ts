@@ -2,6 +2,9 @@ import type { MealAllowance } from "../../types/data-shapes";
 import type { MealAllowanceDayInfo } from "../../types/bundles";
 import type { MealAllowanceRates } from "../../types/types";
 
+const LARGE_ALLOWANCE_MIN_TOTAL_HOURS = 10;
+const SMALL_ALLOWANCE_MIN_NIGHT_HOURS = 4;
+
 /** Owns historical rates and daily meal-allowance eligibility. */
 export class TimelineMealAllowanceCalculator {
   private readonly timeline: Array<{
@@ -9,7 +12,10 @@ export class TimelineMealAllowanceCalculator {
     month: number;
     rates: MealAllowanceRates;
   }> = [
-    { year: 2000, month: 1, rates: { small: 13.5, large: 19.7 } },
+    // Pre-July 2021 rates: verify the effective date and source.
+    { year: 2000, month: 1, rates: { small: 11.8, large: 17.1 } },
+    { year: 2021, month: 7, rates: { small: 12.6, large: 18.3 } },
+    { year: 2022, month: 10, rates: { small: 13.5, large: 19.7 } },
     { year: 2024, month: 9, rates: { small: 14.5, large: 21.1 } },
   ];
 
@@ -53,7 +59,10 @@ export class TimelineMealAllowanceCalculator {
   }
 
   private calculateLarge(day: MealAllowanceDayInfo, rate: number) {
-    if (day.totalHours >= 10 && !day.isFieldDutyDay) {
+    if (
+      day.totalHours >= LARGE_ALLOWANCE_MIN_TOTAL_HOURS &&
+      !day.isFieldDutyDay
+    ) {
       return { points: 1, amount: rate };
     }
 
@@ -61,7 +70,9 @@ export class TimelineMealAllowanceCalculator {
   }
 
   private calculateSmall(day: MealAllowanceDayInfo, rate: number) {
-    if (day.nightHours >= 4) return { points: 1, amount: rate };
+    if (day.nightHours >= SMALL_ALLOWANCE_MIN_NIGHT_HOURS) {
+      return { points: 1, amount: rate };
+    }
 
     return { points: 0, amount: 0 };
   }

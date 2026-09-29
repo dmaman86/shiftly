@@ -1,9 +1,17 @@
 import type { PerDiemCalculator } from "../../types/services";
 import type { PerDiemShiftInfo } from "../../types/types";
 
+const TIER_C_MIN_HOURS = 12;
+const TIER_B_MIN_HOURS = 8;
+const TIER_A_MIN_HOURS = 4;
+
 export class TimelinePerDiemCalculator implements PerDiemCalculator {
   private readonly timeline = [
-    { year: 2000, month: 1, rateA: 33.9 },
+    // Provisional historical dates: verify against the authoritative source.
+    { year: 2015, month: 11, rateA: 29.5 },
+    { year: 2021, month: 1, rateA: 31.6 },
+    // Verified effective dates.
+    { year: 2022, month: 10, rateA: 33.9 },
     { year: 2024, month: 9, rateA: 36.3 },
   ];
 
@@ -53,9 +61,15 @@ export class TimelinePerDiemCalculator implements PerDiemCalculator {
     tier: "A" | "B" | "C" | null;
     points: number;
   } {
-    if (totalHours >= 12) return { tier: "C", points: 3 };
-    if (totalHours >= 8) return { tier: "B", points: 2 };
-    if (totalHours >= 4) return { tier: "A", points: 1 };
+    if (totalHours >= TIER_C_MIN_HOURS) {
+      return { tier: "C", points: 3 };
+    }
+    if (totalHours >= TIER_B_MIN_HOURS) {
+      return { tier: "B", points: 2 };
+    }
+    if (totalHours >= TIER_A_MIN_HOURS) {
+      return { tier: "A", points: 1 };
+    }
     return { tier: null, points: 0 };
   }
 }

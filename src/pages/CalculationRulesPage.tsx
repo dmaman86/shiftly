@@ -80,7 +80,13 @@ export const CalculationRulesPage = () => {
             domain={domain}
           />
 
-          <RuleCard id="demo" title={t(`${cr}.card_demo.title`)}>
+          <RuleCard
+            id="demo"
+            title={t(`${cr}.card_demo.title`)}
+            collapsible
+            defaultExpanded={hash === "#demo"}
+            onExpand={() => track("demo")}
+          >
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               {t(`${cr}.card_demo.sub_title`)}
             </Typography>
