@@ -1,0 +1,41 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+flowchart TD
+  subgraph group_presentation["Presentation"]
+    layer_presentation["User experience"]
+  end
+
+  subgraph group_application["Application"]
+    layer_application["Composition, routing and state"]
+  end
+
+  subgraph group_domain["Domain"]
+    layer_domain["Payroll calculation"]
+  end
+
+  subgraph group_data["Infrastructure and data"]
+    layer_data["Services, adapters and persistence"]
+  end
+
+  layer_presentation --> layer_application
+  layer_application --> layer_domain
+  layer_application --> layer_data
+
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class layer_presentation toneBlue
+  class layer_application toneMint
+  class layer_domain toneAmber
+  class layer_data toneRose
+
