@@ -13,7 +13,6 @@ import {
   Alert,
   Divider,
   TableCell,
-  Stack,
   Button,
   CircularProgress,
 } from "@mui/material";
@@ -40,6 +39,7 @@ import {
   WorkTablePrintView,
   exportWorkTablePdf,
 } from "@/features/work-table";
+import { GuestModeNotice } from "@/features/auth";
 import { DomainContextType } from "@/app";
 import { analyticsService } from "@/services";
 import type {
@@ -150,37 +150,33 @@ export const WorkTable = ({
         </Box>
         <Divider sx={{ mb: 2 }} />
 
+        {!isMobile && <GuestModeNotice sx={{ mb: 2 }} />}
+
         <WorkTableDayStateProvider
           ownerKey={JSON.stringify([userId, year, month])}
         >
           <WorkTableDayStateHydrator domain={domain} workDays={workDays}>
             {isMobile ? (
-              <Stack spacing={1.5}>
-                <FeatureBoundary
-                  featureName={t("feature_name_work_table")}
-                  errorContext="MobileWorkTable"
-                  resetKeys={[year, month]}
-                >
-                  <MobileWorkTable
-                    domain={domain}
-                    workDays={workDays}
-                    currentDate={currentDate}
-                    shabbatCreditHoursByDate={
-                      shabbatCreditAllocation.appliedHoursByDate
-                    }
-                    shabbatCreditUsageByDate={
-                      shabbatCreditAllocation.usageByDate
-                    }
-                    shabbatCreditTotalHours={
-                      shabbatCreditAllocation.totalAvailableHours
-                    }
-                  />
-                </FeatureBoundary>
-                <MonthSummaryCard
-                  breakdown={monthBreakdown}
-                  fullBreakdown={monthFullBreakdown}
+              <FeatureBoundary
+                featureName={t("feature_name_work_table")}
+                errorContext="MobileWorkTable"
+                resetKeys={[year, month]}
+              >
+                <MobileWorkTable
+                  domain={domain}
+                  workDays={workDays}
+                  currentDate={currentDate}
+                  shabbatCreditHoursByDate={
+                    shabbatCreditAllocation.appliedHoursByDate
+                  }
+                  shabbatCreditUsageByDate={
+                    shabbatCreditAllocation.usageByDate
+                  }
+                  shabbatCreditTotalHours={
+                    shabbatCreditAllocation.totalAvailableHours
+                  }
                 />
-              </Stack>
+              </FeatureBoundary>
             ) : (
               <Paper
                 variant="outlined"
@@ -363,6 +359,14 @@ export const WorkTable = ({
             {t("table.hint_auto_update")}
           </Typography>
         </Box>
+        {isMobile && (
+          <Box sx={{ mt: 2 }}>
+            <MonthSummaryCard
+              breakdown={monthBreakdown}
+              fullBreakdown={monthFullBreakdown}
+            />
+          </Box>
+        )}
       </CardContent>
     </Card>
   );
