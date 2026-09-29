@@ -1,0 +1,46 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+flowchart TD
+  subgraph group_domain["Payroll domain"]
+    node_composition["Domain composition<br/>[composition.ts]"]
+    node_shiftbuilder["Shift map builder<br/>[shiftmap.builder.ts]"]
+    node_daybuilder["Day pay builder<br/>[daypaymap.builder.ts]"]
+    node_timeline["Timeline classification<br/>[classify-shift-timeline.ts]"]
+    node_calculators["Pay calculators<br/>[buildCalculators.pipeline.ts]"]
+    node_monthreducer["Month pay reducers<br/>[month-pay-map.reducer.ts]"]
+    node_resolvers["Resolvers<br/>[month.resolver.ts]"]
+    node_services["Domain services<br/>[shift.service.ts]"]
+  end
+
+  node_composition -->|"assembles"| node_shiftbuilder
+  node_composition -->|"assembles"| node_daybuilder
+  node_composition -->|"assembles"| node_calculators
+  node_shiftbuilder -->|"classifies timeline"| node_timeline
+  node_shiftbuilder -->|"uses"| node_calculators
+  node_daybuilder -->|"uses"| node_calculators
+  node_daybuilder -->|"resolves"| node_resolvers
+  node_monthreducer -->|"uses"| node_calculators
+  node_resolvers -->|"uses"| node_services
+  node_monthreducer -->|"aggregates"| node_resolvers
+
+  click node_composition "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/domain/composition.ts"
+  click node_shiftbuilder "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/domain/builder/shiftmap.builder.ts"
+  click node_daybuilder "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/domain/builder/daypaymap.builder.ts"
+  click node_timeline "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/domain/timeline/classify-shift-timeline.ts"
+  click node_calculators "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/domain/pipelines/buildCalculators.pipeline.ts"
+  click node_monthreducer "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/domain/reducer/month-pay-map.reducer.ts"
+  click node_resolvers "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/domain/resolve/month.resolver.ts"
+  click node_services "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/domain/services/shift.service.ts"
+
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  class node_composition,node_shiftbuilder,node_daybuilder,node_timeline,node_calculators,node_monthreducer,node_resolvers,node_services toneAmber
+

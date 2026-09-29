@@ -46,20 +46,21 @@ flowchart TD
   node_dayadapter -->|"maps domain output"| node_monthadapter
   node_analytics -->|"tracks application events"| node_supabase
 
-  click node_shiftservice "https://github.com/dmaman86/shiftly/blob/main/src/services/shift/shift.service.ts"
-  click node_workdayservice "https://github.com/dmaman86/shiftly/blob/main/src/services/workDay/workDay.service.ts"
-  click node_monthlyconfig "https://github.com/dmaman86/shiftly/blob/main/src/services/monthlyConfig/monthlyConfig.service.ts"
-  click node_account "https://github.com/dmaman86/shiftly/blob/main/src/services/account/account.service.ts"
-  click node_guestdraftservice "https://github.com/dmaman86/shiftly/blob/main/src/services/guestDraft/guestDraft.service.ts"
-  click node_guestdraftstorage "https://github.com/dmaman86/shiftly/blob/main/src/services/guestDraft/guestDraft.storage.ts"
-  click node_calendar "https://github.com/dmaman86/shiftly/blob/main/src/services/calendar/calendar.service.ts"
-  click node_hebcal "https://github.com/dmaman86/shiftly/blob/main/src/services/hebcal/hebcal.service.ts"
-  click node_analytics "https://github.com/dmaman86/shiftly/blob/main/src/services/analytics/analytics.service.ts"
-  click node_supabase "https://github.com/dmaman86/shiftly/blob/main/src/services/supabase/supabase.client.ts"
-  click node_dayadapter "https://github.com/dmaman86/shiftly/blob/main/src/adapters/dayToPayBreadownVM.ts"
-  click node_monthadapter "https://github.com/dmaman86/shiftly/blob/main/src/adapters/monthToPayBreakdownVM.ts"
+  click node_shiftservice "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/shift/shift.service.ts"
+  click node_workdayservice "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/workDay/workDay.service.ts"
+  click node_monthlyconfig "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/monthlyConfig/monthlyConfig.service.ts"
+  click node_account "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/account/account.service.ts"
+  click node_guestdraftservice "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/guestDraft/guestDraft.service.ts"
+  click node_guestdraftstorage "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/guestDraft/guestDraft.storage.ts"
+  click node_calendar "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/calendar/calendar.service.ts"
+  click node_hebcal "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/hebcal/hebcal.service.ts"
+  click node_analytics "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/analytics/analytics.service.ts"
+  click node_supabase "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/supabase/supabase.client.ts"
+  click node_dayadapter "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/adapters/dayToPayBreadownVM.ts"
+  click node_monthadapter "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/adapters/monthToPayBreakdownVM.ts"
 
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
   classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
   class node_shiftservice,node_workdayservice,node_monthlyconfig,node_account,node_guestdraftservice,node_guestdraftstorage,node_calendar,node_hebcal,node_analytics,node_supabase toneRose
   class node_dayadapter,node_monthadapter,node_persistence,node_sessionstorage,node_staticcalendar,node_hebcalapi toneNeutral
+
