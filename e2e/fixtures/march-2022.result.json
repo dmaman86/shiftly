@@ -190,13 +190,13 @@
           "hours": 0
         },
         "perDiemPoints": 3,
-        "perDiemAmount": 101.69999999999999,
+        "perDiemAmount": 94.80000000000001,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 1,
-        "smallAmount": 13.5
+        "smallAmount": 12.6
       },
-      "salary": 115.19999999999999
+      "salary": 107.4
     },
     "2022-03-09": {
       "status": "normal",
@@ -310,13 +310,13 @@
           "hours": 0
         },
         "perDiemPoints": 2,
-        "perDiemAmount": 67.8,
+        "perDiemAmount": 63.2,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 67.8
+      "salary": 63.2
     },
     "2022-03-13": {
       "status": "sick",
@@ -550,13 +550,13 @@
           "hours": 0
         },
         "perDiemPoints": 2,
-        "perDiemAmount": 67.8,
+        "perDiemAmount": 63.2,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 67.8
+      "salary": 63.2
     },
     "2022-03-19": {
       "status": "normal",
@@ -610,13 +610,13 @@
           "hours": 0
         },
         "perDiemPoints": 2,
-        "perDiemAmount": 67.8,
+        "perDiemAmount": 63.2,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 67.8
+      "salary": 63.2
     },
     "2022-03-20": {
       "status": "normal",
@@ -670,13 +670,13 @@
           "hours": 0
         },
         "perDiemPoints": 3,
-        "perDiemAmount": 101.69999999999999,
+        "perDiemAmount": 94.80000000000001,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 1,
-        "smallAmount": 13.5
+        "smallAmount": 12.6
       },
-      "salary": 115.19999999999999
+      "salary": 107.4
     },
     "2022-03-22": {
       "status": "sick",
@@ -850,13 +850,13 @@
           "hours": 0
         },
         "perDiemPoints": 2,
-        "perDiemAmount": 67.8,
+        "perDiemAmount": 63.2,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 67.8
+      "salary": 63.2
     },
     "2022-03-25": {
       "status": "normal",
@@ -910,13 +910,13 @@
           "hours": 0
         },
         "perDiemPoints": 2,
-        "perDiemAmount": 67.8,
+        "perDiemAmount": 63.2,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 67.8
+      "salary": 63.2
     },
     "2022-03-27": {
       "status": "vacation",
@@ -1090,13 +1090,13 @@
           "hours": 0
         },
         "perDiemPoints": 2,
-        "perDiemAmount": 67.8,
+        "perDiemAmount": 63.2,
         "largePoints": 0,
         "largeAmount": 0,
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 67.8
+      "salary": 63.2
     },
     "2022-03-31": {
       "status": "normal",
@@ -1210,12 +1210,12 @@
         "hours": 19.533333333333335
       },
       "perDiemPoints": 18,
-      "perDiemAmount": 610.1999999999999,
+      "perDiemAmount": 568.8,
       "largePoints": 0,
       "largeAmount": 0,
       "smallPoints": 2,
-      "smallAmount": 27
+      "smallAmount": 25.2
     },
-    "salary": 637.1999999999999
+    "salary": 594
   }
 }
