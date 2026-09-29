@@ -18,6 +18,8 @@ import {
 import { recordsToWorkTableDayState } from "../../mappers/month/recordsToWorkTableDayState";
 import { workTableStateToDailyPayMaps } from "../../mappers/month/workTableStateToDailyPayMaps";
 import { useDebouncedShiftUpserts } from "./useDebouncedShiftUpserts";
+import { useGuestDraftCapture } from "./useGuestDraftCapture";
+import { useGuestDraftImportGate } from "@/features/guest-draft/guestDraftImportContext";
 
 type WorkTableMonthSessionProps = {
   domain: DomainContextType;
@@ -51,10 +53,20 @@ export const useWorkTableMonthSession = ({
   const { state, dispatch, hydrated, setHydrated } = useWorkTableDayStateContext();
   const { user, isLoading: isAuthLoading } = useAuth();
   const snackbar = useAppSnackbar();
-  const { year, month, standardHours } = useGlobalState();
+  const { year, month, standardHours, baseRate } = useGlobalState();
   const replaceDailyPayMaps = useGlobalStore((store) => store.replaceDailyPayMaps);
+  const { ready: guestDraftReady } = useGuestDraftImportGate();
   const userId = user?.id;
   const previousStateRef = useRef<typeof state | null>(null);
+
+  useGuestDraftCapture({
+    enabled: !isAuthLoading && !userId,
+    state,
+    year,
+    month,
+    standardHours,
+    baseRate,
+  });
 
   const dailyPayMaps = useMemo(() => {
     if (workDays.length === 0 && Object.keys(state).length === 0) {
@@ -73,7 +85,10 @@ export const useWorkTableMonthSession = ({
 
   const query = useQuery({
     queryKey: ["workTable", userId, year, month],
-    enabled: workDays.length > 0 && !!userId && !isAuthLoading && !hydrated,
+    // Waits for a pending guest draft import, otherwise it would hydrate the
+    // pre-import snapshot.
+    enabled:
+      workDays.length > 0 && !!userId && !isAuthLoading && guestDraftReady && !hydrated,
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: "always",

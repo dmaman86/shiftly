@@ -8,6 +8,7 @@ import {
 } from "@/hooks";
 import { monthlyConfigService } from "@/services";
 import { defaultMonthlyConfig } from "@/store/globalStore";
+import { useGuestDraftImportGate } from "@/features/guest-draft/guestDraftImportContext";
 import {
   MonthlyConfigHydrationContext,
   getMonthlyContextKey,
@@ -37,11 +38,15 @@ export const MonthlyDataProvider = ({ children }: MonthlyDataProviderProps) => {
   const contextKey = getMonthlyContextKey(user?.id, year, month);
   const configReady =
     hydratedContextKey === contextKey && hydratedValues !== null;
+  const { ready: guestDraftReady } = useGuestDraftImportGate();
+  // Only gates signed-in hydration; a guest never loads anything, so their
+  // config is not reset when the gate opens.
+  const canHydrate = !!user && guestDraftReady;
 
   useEffect(() => {
     initializeMonth(year, month);
 
-    if (!user) return;
+    if (!user || !canHydrate) return;
 
     let cancelled = false;
     const key = getMonthlyContextKey(user.id, year, month);
@@ -77,6 +82,7 @@ export const MonthlyDataProvider = ({ children }: MonthlyDataProviderProps) => {
     };
   }, [
     callEndPoint,
+    canHydrate,
     initializeMonth,
     month,
     snackbar,
