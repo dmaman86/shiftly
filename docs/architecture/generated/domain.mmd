@@ -10,14 +10,14 @@ config:
     edgeLabelBackground: "#ffffff"
 ---
 flowchart TD
-  subgraph group_domain["Payroll domain"]
+  subgraph group_domain["@shiftly/domain — payroll engine"]
     node_composition["Domain composition<br/>[composition.ts]"]
     node_shiftbuilder["Shift map builder<br/>[shiftmap.builder.ts]"]
     node_daybuilder["Day pay builder<br/>[daypaymap.builder.ts]"]
     node_timeline["Timeline classification<br/>[classify-shift-timeline.ts]"]
     node_calculators["Pay calculators<br/>[buildCalculators.pipeline.ts]"]
     node_monthreducer["Month pay reducers<br/>[month-pay-map.reducer.ts]"]
-    node_resolvers["Resolvers<br/>[month.resolver.ts]"]
+    node_resolvers["Workday info resolver<br/>[workdayinfo.resolver.ts]"]
     node_services["Domain services<br/>[shift.service.ts]"]
   end
 
@@ -32,14 +32,14 @@ flowchart TD
   node_resolvers -->|"uses"| node_services
   node_monthreducer -->|"aggregates"| node_resolvers
 
-  click node_composition "https://github.com/dmaman86/shiftly/blob/main/src/domain/composition.ts"
-  click node_shiftbuilder "https://github.com/dmaman86/shiftly/blob/main/src/domain/builder/shiftmap.builder.ts"
-  click node_daybuilder "https://github.com/dmaman86/shiftly/blob/main/src/domain/builder/daypaymap.builder.ts"
-  click node_timeline "https://github.com/dmaman86/shiftly/blob/main/src/domain/timeline/classify-shift-timeline.ts"
-  click node_calculators "https://github.com/dmaman86/shiftly/blob/main/src/domain/pipelines/buildCalculators.pipeline.ts"
-  click node_monthreducer "https://github.com/dmaman86/shiftly/blob/main/src/domain/reducer/month-pay-map.reducer.ts"
-  click node_resolvers "https://github.com/dmaman86/shiftly/blob/main/src/domain/resolve/month.resolver.ts"
-  click node_services "https://github.com/dmaman86/shiftly/blob/main/src/domain/services/shift.service.ts"
+  click node_composition "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/composition.ts"
+  click node_shiftbuilder "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/shiftmap.builder.ts"
+  click node_daybuilder "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/daypaymap.builder.ts"
+  click node_timeline "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/timeline/classify-shift-timeline.ts"
+  click node_calculators "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildCalculators.pipeline.ts"
+  click node_monthreducer "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reducer/month-pay-map.reducer.ts"
+  click node_resolvers "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/resolve/workdayinfo.resolver.ts"
+  click node_services "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/services/shift.service.ts"
 
   classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
   class node_composition,node_shiftbuilder,node_daybuilder,node_timeline,node_calculators,node_monthreducer,node_resolvers,node_services toneAmber

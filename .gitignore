@@ -34,4 +34,4 @@ test-results/
 
 # Internal documentation (not for repo)
 DELEGATION_*.md
-src/test/ui/README.md
+apps/web/src/test/ui/README.md

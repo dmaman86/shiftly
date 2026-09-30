@@ -1,5 +1,5 @@
 /**
- * Generates public/calendar/{year}.json from Hebcal so the app never depends
+ * Generates apps/web/public/calendar/{year}.json from Hebcal so the app never depends
  * on Hebcal at runtime. Jewish holidays are deterministic, so the output only
  * needs regenerating when the year range is extended.
  *
@@ -10,12 +10,12 @@
  */
 import { mkdir, writeFile } from "node:fs/promises";
 
-import { buildHebcalUrl } from "../src/services/hebcal/hebcal.request.ts";
+import { buildHebcalUrl } from "../apps/web/src/services/hebcal/hebcal.request.ts";
 
-// Must stay aligned with SYSTEM_START_YEAR in src/app/constants/ui.constant.ts.
+// Must stay aligned with SYSTEM_START_YEAR in apps/web/src/app/constants/ui.constant.ts.
 const FIRST_YEAR = 2015;
 const LAST_YEAR = 2040;
-const OUTPUT_DIR = new URL("../public/calendar/", import.meta.url);
+const OUTPUT_DIR = new URL("../apps/web/public/calendar/", import.meta.url);
 
 interface CalendarItem {
   date: string;

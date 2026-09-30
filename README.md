@@ -19,16 +19,16 @@ transparent, testable domain model.
 
 ## Quick start
 
-Requirements: Node.js 24. Bun 1.3.14 is the preferred package manager, but the
-scripts can be run with npm or Bun.
+Requirements: Node.js 24 and Bun 1.3.14. Install with Bun to link the workspace
+packages; this repository uses Bun's `workspace:*` dependency protocol.
 
 ```bash
 git clone https://github.com/dmaman86/shiftly.git
 cd shiftly
 nvm install
 nvm use
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 Open `http://localhost:5173/shiftly`.
@@ -40,18 +40,23 @@ Open `http://localhost:5173/shiftly`.
 - [Architecture documentation](docs/architecture/)
 - [Generated architecture diagrams](docs/architecture/generated/)
 - [Architecture history](docs/architecture/history/)
+- [Independent payroll engine](packages/domain/README.md)
+- [Workspace migration and validation](docs/domain-workspace-migration.md)
 
 ## Common commands
 
 ```bash
-npm run typecheck
-npm run lint
-npm run test:ci
-npm run test:e2e
+bun run typecheck
+bun run lint
+bun run test:ci
+bun run build
+bun run test:e2e
 ```
 
-The same scripts can be invoked through Bun when using the repository's
-preferred package manager.
+The web lives in `apps/web` and consumes `@shiftly/domain` from `packages/domain`.
+Run `bun run dev:domain` in a second terminal when editing engine sources so the
+compiled package updates while Vite is running. CI gates deployment on engine
+and web checks, then tests the production build with Playwright.
 
 ## License
 
