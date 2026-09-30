@@ -138,35 +138,47 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
+%% Source: main (HEAD). Layers are derived from modules present at this commit. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
+%% Arrows aggregate source dependencies, including type imports.
 flowchart TD
-  subgraph group_presentation["Presentation"]
-    layer_presentation["User experience"]
-  end
-
-  subgraph group_application["Application"]
-    layer_application["Web app: composition, routing and state"]
-  end
-
-  subgraph group_domain["Domain"]
-    layer_domain["@shiftly/domain package<br/>Payroll calculation engine"]
-  end
-
   subgraph group_data["Infrastructure and data"]
-    layer_data["Services, adapters and persistence"]
+    layer_data["Application services and adapters"]
   end
-
-  layer_presentation --> layer_application
-  layer_application --> layer_domain
-  layer_application --> layer_data
-
-  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
-  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
-  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  subgraph group_ui["Presentation"]
+    layer_ui["React presentation"]
+  end
+  subgraph group_app["Application"]
+    layer_app["Application composition and hooks<br/>Zustand state"]
+  end
+  subgraph group_domain["Payroll logic"]
+    layer_domain["@shiftly/domain — standalone payroll engine"]
+  end
+  layer_data -->|"depends on"| layer_domain
+  layer_data -->|"depends on"| layer_app
+  layer_ui -->|"depends on"| layer_app
+  layer_ui -->|"depends on"| layer_data
+  layer_app -->|"depends on"| layer_domain
+  layer_app -->|"depends on"| layer_ui
+  layer_app -->|"depends on"| layer_data
+  layer_ui -->|"depends on"| layer_domain
+  layer_data -->|"depends on"| layer_ui
+  external_supabase{{"Supabase SDK"}}
+  layer_app -->|"uses"| external_supabase
+  e2e["Playwright E2E"]
+  e2e -.->|"exercises UI"| layer_ui
+  click e2e "https://github.com/dmaman86/shiftly/blob/main/playwright.config.ts"
+  click layer_data "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
-  class layer_presentation toneBlue
-  class layer_application toneMint
-  class layer_domain toneAmber
   class layer_data toneRose
+  click layer_ui "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/App.tsx"
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  class layer_ui toneBlue
+  click layer_app "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/store/globalStore.ts"
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class layer_app toneMint
+  click layer_domain "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/composition.ts"
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  class layer_domain toneAmber
 ```
 
 </details>
@@ -189,40 +201,82 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
+%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
 flowchart TD
-  subgraph group_domain["@shiftly/domain — payroll engine"]
-    node_composition["Domain composition<br/>[composition.ts]"]
-    node_shiftbuilder["Shift map builder<br/>[shiftmap.builder.ts]"]
-    node_daybuilder["Day pay builder<br/>[daypaymap.builder.ts]"]
-    node_timeline["Timeline classification<br/>[classify-shift-timeline.ts]"]
-    node_calculators["Pay calculators<br/>[buildCalculators.pipeline.ts]"]
-    node_monthreducer["Month pay reducers<br/>[month-pay-map.reducer.ts]"]
-    node_resolvers["Workday info resolver<br/>[workdayinfo.resolver.ts]"]
-    node_services["Domain services<br/>[shift.service.ts]"]
+  subgraph group_domain["Payroll logic"]
+    node_0["composition<br/>[packages/domain/src/composition.ts]"]
+    node_1["buildDayLayer.pipeline<br/>[packages/domain/src/pipelines/buildDayLayer.pipeline.ts]"]
+    node_2["buildResolvers.pipeline<br/>[packages/domain/src/pipelines/buildResolvers.pipeline.ts]"]
+    node_3["buildMonthLayer.pipeline<br/>[packages/domain/src/pipelines/buildMonthLayer.pipeline.ts]"]
+    node_4["buildCalculators.pipeline<br/>[packages/domain/src/pipelines/buildCalculators.pipeline.ts]"]
+    node_5["buildCoreServices.pipeline<br/>[packages/domain/src/pipelines/buildCoreServices.pipeline.ts]"]
+    node_6["shiftmap.builder<br/>[packages/domain/src/builder/shiftmap.builder.ts]"]
+    node_7["daypaymap.builder<br/>[packages/domain/src/builder/daypaymap.builder.ts]"]
+    node_8["workdaysformonth.builder<br/>[packages/domain/src/builder/workdaysformonth.builder.ts]"]
+    node_9["timeline-shift-pay.calculator<br/>[packages/domain/src/calculator/timeline-shift-pay.calculator.ts]"]
+    node_10["classify-shift-timeline<br/>[packages/domain/src/timeline/classify-shift-timeline.ts]"]
+    node_11["month-pay-map.reducer<br/>[packages/domain/src/reducer/month-pay-map.reducer.ts]"]
+    node_12["workdayinfo.resolver<br/>[packages/domain/src/resolve/workdayinfo.resolver.ts]"]
+    node_13["date.service<br/>[packages/domain/src/services/date.service.ts]"]
+    node_14["shift.service<br/>[packages/domain/src/services/shift.service.ts]"]
+    node_15["perdiem-month.reducer<br/>[packages/domain/src/reducer/perdiem-month.reducer.ts]"]
+    node_16["workday-month.reducer<br/>[packages/domain/src/reducer/workday-month.reducer.ts]"]
+    node_17["fixed-segment-month.reducer<br/>[packages/domain/src/reducer/fixed-segment-month.reducer.ts]"]
+    node_18["meal-allowance-month.reducer<br/>[packages/domain/src/reducer/meal-allowance-month.reducer.ts]"]
+    node_19["buildShiftLayer.pipeline<br/>[packages/domain/src/pipelines/buildShiftLayer.pipeline.ts]"]
   end
-
-  node_composition -->|"assembles"| node_shiftbuilder
-  node_composition -->|"assembles"| node_daybuilder
-  node_composition -->|"assembles"| node_calculators
-  node_shiftbuilder -->|"classifies timeline"| node_timeline
-  node_shiftbuilder -->|"uses"| node_calculators
-  node_daybuilder -->|"uses"| node_calculators
-  node_daybuilder -->|"resolves"| node_resolvers
-  node_monthreducer -->|"uses"| node_calculators
-  node_resolvers -->|"uses"| node_services
-  node_monthreducer -->|"aggregates"| node_resolvers
-
-  click node_composition "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/composition.ts"
-  click node_shiftbuilder "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/shiftmap.builder.ts"
-  click node_daybuilder "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/daypaymap.builder.ts"
-  click node_timeline "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/timeline/classify-shift-timeline.ts"
-  click node_calculators "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildCalculators.pipeline.ts"
-  click node_monthreducer "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reducer/month-pay-map.reducer.ts"
-  click node_resolvers "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/resolve/workdayinfo.resolver.ts"
-  click node_services "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/services/shift.service.ts"
-
+  node_0 -->|"depends on"| node_4
+  node_0 -->|"depends on"| node_5
+  node_0 -->|"depends on"| node_1
+  node_0 -->|"depends on"| node_3
+  node_0 -->|"depends on"| node_2
+  node_0 -->|"depends on"| node_19
+  node_1 -->|"depends on"| node_7
+  node_1 -->|"depends on"| node_8
+  node_2 -->|"depends on"| node_12
+  node_3 -->|"depends on"| node_17
+  node_3 -->|"depends on"| node_18
+  node_3 -->|"depends on"| node_11
+  node_3 -->|"depends on"| node_15
+  node_3 -->|"depends on"| node_16
+  node_5 -->|"depends on"| node_13
+  node_5 -->|"depends on"| node_14
+  node_6 -->|"depends on"| node_14
+  node_6 -->|"depends on"| node_13
+  node_6 -->|"depends on"| node_10
+  node_6 -->|"depends on"| node_9
+  node_8 -->|"depends on"| node_12
+  node_8 -->|"depends on"| node_13
+  node_10 -->|"depends on"| node_13
+  node_11 -->|"depends on"| node_17
+  node_11 -->|"depends on"| node_18
+  node_11 -->|"depends on"| node_16
+  node_14 -->|"depends on"| node_13
+  node_19 -->|"depends on"| node_6
+  node_19 -->|"depends on"| node_9
+  click node_0 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/composition.ts"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildDayLayer.pipeline.ts"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildResolvers.pipeline.ts"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildMonthLayer.pipeline.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildCalculators.pipeline.ts"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildCoreServices.pipeline.ts"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/shiftmap.builder.ts"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/daypaymap.builder.ts"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/workdaysformonth.builder.ts"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/timeline-shift-pay.calculator.ts"
+  click node_10 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/timeline/classify-shift-timeline.ts"
+  click node_11 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reducer/month-pay-map.reducer.ts"
+  click node_12 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/resolve/workdayinfo.resolver.ts"
+  click node_13 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/services/date.service.ts"
+  click node_14 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/services/shift.service.ts"
+  click node_15 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reducer/perdiem-month.reducer.ts"
+  click node_16 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reducer/workday-month.reducer.ts"
+  click node_17 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reducer/fixed-segment-month.reducer.ts"
+  click node_18 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reducer/meal-allowance-month.reducer.ts"
+  click node_19 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildShiftLayer.pipeline.ts"
   classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
-  class node_composition,node_shiftbuilder,node_daybuilder,node_timeline,node_calculators,node_monthreducer,node_resolvers,node_services toneAmber
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15,node_16,node_17,node_18,node_19 toneAmber
 ```
 
 </details>
@@ -267,43 +321,57 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
+%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
 flowchart TD
-  subgraph group_ui["User experience"]
-    node_app["Application shell<br/>[App.tsx]"]
-    node_routes["Application routes<br/>[AppRoutes.tsx]"]
-    node_daily["Daily page<br/>[DailyPage.tsx]"]
-    node_monthly["Monthly summary<br/>[MonthlySummaryPage.tsx]"]
-    node_rules["Calculation rules<br/>[CalculationRulesPage.tsx]"]
-    node_worktable["Work table<br/>[WorkTable.tsx]"]
-    node_daycontroller["Day controller<br/>[useDayController.ts]"]
-    node_salary["Salary summary<br/>[MonthlySalarySummary.tsx]"]
-    node_dayviews["Day pay breakdown<br/>[dayToPayBreadownVM.ts]"]
-    node_monthbreakdown["Month pay breakdown<br/>[monthToPayBreakdownVM.ts]"]
+  subgraph group_ui["Presentation"]
+    node_0["App<br/>[apps/web/src/app/App.tsx]"]
+    node_1["AppRoutes<br/>[apps/web/src/app/routes/AppRoutes.tsx]"]
+    node_2["DailyPage<br/>[apps/web/src/pages/DailyPage.tsx]"]
+    node_3["MonthlySummaryPage<br/>[apps/web/src/pages/MonthlySummaryPage.tsx]"]
+    node_4["CalculationRulesPage<br/>[apps/web/src/pages/CalculationRulesPage.tsx]"]
+    node_5["WorkTable<br/>[apps/web/src/features/work-table/components/month/WorkTable.tsx]"]
+    node_6["GuestModeNotice<br/>[apps/web/src/features/auth/GuestModeNotice.tsx]"]
+    node_7["GoogleSignInButton<br/>[apps/web/src/features/auth/GoogleSignInButton.tsx]"]
+    node_8["GuestDraftConflictDialog<br/>[apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx]"]
+    node_9["MonthlySalarySummary<br/>[apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx]"]
   end
-
-  node_app -->|"renders"| node_routes
-  node_routes -->|"routes to"| node_daily
-  node_routes -->|"routes to"| node_monthly
-  node_routes -->|"routes to"| node_rules
-  node_daily -->|"presents"| node_worktable
-  node_worktable -->|"delegates day interactions"| node_daycontroller
-  node_daycontroller -->|"maps"| node_dayviews
-  node_monthly -->|"shows totals"| node_salary
-  node_monthly -->|"maps monthly pay"| node_monthbreakdown
-
-  click node_app "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/App.tsx"
-  click node_routes "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AppRoutes.tsx"
-  click node_daily "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/DailyPage.tsx"
-  click node_monthly "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/MonthlySummaryPage.tsx"
-  click node_rules "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/CalculationRulesPage.tsx"
-  click node_worktable "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/components/month/WorkTable.tsx"
-  click node_daycontroller "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/day/useDayController.ts"
-  click node_salary "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx"
-  click node_dayviews "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreadownVM.ts"
-  click node_monthbreakdown "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
-
+  subgraph group_app["Application and state"]
+    node_10["useDayController<br/>[apps/web/src/features/work-table/hooks/day/useDayController.ts]"]
+  end
+  subgraph group_data["Infrastructure and adapters"]
+    node_11["dayToPayBreadownVM<br/>[apps/web/src/adapters/dayToPayBreadownVM.ts]"]
+    node_12["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
+  end
+  node_0 -->|"depends on"| node_1
+  node_1 -->|"depends on"| node_2
+  node_1 -->|"depends on"| node_3
+  node_1 -->|"depends on"| node_4
+  node_2 -->|"depends on"| node_5
+  node_2 -->|"depends on"| node_9
+  node_3 -->|"depends on"| node_9
+  node_5 -->|"depends on"| node_6
+  node_6 -->|"depends on"| node_7
+  node_10 -->|"depends on"| node_11
+  click node_0 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/App.tsx"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AppRoutes.tsx"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/DailyPage.tsx"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/MonthlySummaryPage.tsx"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/CalculationRulesPage.tsx"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/components/month/WorkTable.tsx"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GuestModeNotice.tsx"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GoogleSignInButton.tsx"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx"
+  click node_10 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/day/useDayController.ts"
+  click node_11 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreadownVM.ts"
+  click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
   classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
-  class node_app,node_routes,node_daily,node_monthly,node_rules,node_worktable,node_daycontroller,node_salary,node_dayviews,node_monthbreakdown toneBlue
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9 toneBlue
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class node_10 toneMint
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class node_11,node_12 toneRose
 ```
 
 </details>
@@ -343,42 +411,61 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
+%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
 flowchart TD
-  subgraph group_composition["apps/web — application composition"]
-    node_domaininstance["Domain instance<br/>[domain.instance.ts]"]
-    node_providers["Application providers<br/>[AppProviders.tsx]"]
-    node_auth["Authentication provider<br/>[AuthProvider.tsx]"]
-    node_domainprovider["Domain provider<br/>[DomainProvider.tsx]"]
+  subgraph group_app["Application and state"]
+    node_0["AppProviders<br/>[apps/web/src/app/providers/AppProviders.tsx]"]
+    node_1["AuthProvider<br/>[apps/web/src/app/providers/auth/AuthProvider.tsx]"]
+    node_2["DomainProvider<br/>[apps/web/src/app/providers/domain/DomainProvider.tsx]"]
+    node_3["domain.instance<br/>[apps/web/src/app/domain/domain.instance.ts]"]
+    node_4["MonthlyDataProvider<br/>[apps/web/src/features/monthly-data/MonthlyDataProvider.tsx]"]
+    node_5["GuestDraftImportProvider<br/>[apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx]"]
+    node_6["useGuestDraftCapture<br/>[apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts]"]
+    node_7["useWorkTableMonthSession<br/>[apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts]"]
+    node_8["WorkTableDayStateProvider<br/>[apps/web/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx]"]
+    node_9["globalStore<br/>[apps/web/src/store/globalStore.ts]"]
+    node_10["useAuth<br/>[apps/web/src/hooks/useAuth.ts]"]
+    node_11["useDomain<br/>[apps/web/src/hooks/useDomain.ts]"]
+    node_12["useGlobalState<br/>[apps/web/src/hooks/useGlobalState.ts]"]
+    node_13["month.resolver<br/>[apps/web/src/app/months/month.resolver.ts]"]
+    node_14["workdayinfo.presenter<br/>[apps/web/src/app/domain/workdayinfo.presenter.ts]"]
   end
-
-  subgraph group_state["Application state"]
-    node_monthlydata["Monthly data provider<br/>[MonthlyDataProvider.tsx]"]
-    node_session["Month session<br/>[useWorkTableMonthSession.ts]"]
-    node_daystate["Day-state context<br/>[WorkTableDayStateProvider.tsx]"]
-    node_globalstate["Global state<br/>[globalStore.ts]"]
-  end
-
-  node_providers -->|"installs"| node_auth
-  node_providers -->|"installs"| node_domainprovider
-  node_domainprovider -->|"exposes"| node_domaininstance
-  node_monthlydata -->|"coordinates"| node_session
-  node_session -->|"reads user"| node_auth
-  node_session -->|"hydrates and observes"| node_daystate
-  node_session -->|"replaces pay maps"| node_globalstate
-  node_daystate -->|"updates"| node_globalstate
-  node_domaininstance -->|"serves domain operations"| node_session
-
-  click node_domaininstance "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/domain.instance.ts"
-  click node_providers "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/AppProviders.tsx"
-  click node_auth "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/auth/AuthProvider.tsx"
-  click node_domainprovider "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/DomainProvider.tsx"
-  click node_monthlydata "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyDataProvider.tsx"
-  click node_session "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
-  click node_daystate "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
-  click node_globalstate "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/store/globalStore.ts"
-
+  node_0 -->|"depends on"| node_1
+  node_0 -->|"depends on"| node_2
+  node_2 -->|"depends on"| node_3
+  node_3 -->|"depends on"| node_13
+  node_3 -->|"depends on"| node_14
+  node_4 -->|"depends on"| node_10
+  node_4 -->|"depends on"| node_12
+  node_4 -->|"depends on"| node_9
+  node_5 -->|"depends on"| node_10
+  node_5 -->|"depends on"| node_11
+  node_5 -->|"depends on"| node_12
+  node_7 -->|"depends on"| node_10
+  node_7 -->|"depends on"| node_12
+  node_7 -->|"depends on"| node_9
+  node_7 -->|"depends on"| node_6
+  node_12 -->|"depends on"| node_9
+  node_1 -->|"imports"| external_supabase
+  external_supabase{{"Supabase SDK"}}
+  click node_0 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/AppProviders.tsx"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/auth/AuthProvider.tsx"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/DomainProvider.tsx"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/domain.instance.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyDataProvider.tsx"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/store/globalStore.ts"
+  click node_10 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useAuth.ts"
+  click node_11 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useDomain.ts"
+  click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useGlobalState.ts"
+  click node_13 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/months/month.resolver.ts"
+  click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/workdayinfo.presenter.ts"
   classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
-  class node_domaininstance,node_providers,node_auth,node_domainprovider,node_monthlydata,node_session,node_daystate,node_globalstate toneMint
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14 toneMint
 ```
 
 </details>
@@ -410,48 +497,63 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
+%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
 flowchart TD
-  subgraph group_services["Services and integrations"]
-    node_shiftservice["Shift service<br/>[shift.service.ts]"]
-    node_workdayservice["Workday service<br/>[workDay.service.ts]"]
-    node_monthlyconfig["Monthly config service<br/>[monthlyConfig.service.ts]"]
-    node_account["Account service<br/>[account.service.ts]"]
-    node_hebcal["Hebcal service<br/>[hebcal.service.ts]"]
-    node_analytics["Analytics service<br/>[analytics.service.ts]"]
-    node_supabase["Supabase client and CRUD<br/>[supabase.client.ts]"]
+  subgraph group_data["Infrastructure and adapters"]
+    node_0["supabase.crud<br/>[apps/web/src/services/supabase/supabase.crud.ts]"]
+    node_1["supabase.client<br/>[apps/web/src/services/supabase/supabase.client.ts]"]
+    node_2["shift.service<br/>[apps/web/src/services/shift/shift.service.ts]"]
+    node_3["hebcal.service<br/>[apps/web/src/services/hebcal/hebcal.service.ts]"]
+    node_4["account.service<br/>[apps/web/src/services/account/account.service.ts]"]
+    node_5["workDay.service<br/>[apps/web/src/services/workDay/workDay.service.ts]"]
+    node_6["calendar.service<br/>[apps/web/src/services/calendar/calendar.service.ts]"]
+    node_7["analytics.service<br/>[apps/web/src/services/analytics/analytics.service.ts]"]
+    node_8["guestDraft.service<br/>[apps/web/src/services/guestDraft/guestDraft.service.ts]"]
+    node_9["monthlyConfig.service<br/>[apps/web/src/services/monthlyConfig/monthlyConfig.service.ts]"]
+    node_10["guestDraft.storage<br/>[apps/web/src/services/guestDraft/guestDraft.storage.ts]"]
+    node_11["hebcal.request<br/>[apps/web/src/services/hebcal/hebcal.request.ts]"]
+    node_12["gtag<br/>[apps/web/src/services/analytics/gtag.ts]"]
+    node_13["event.adapter<br/>[apps/web/src/adapters/event.adapter.ts]"]
+    node_14["dayToPayBreadownVM<br/>[apps/web/src/adapters/dayToPayBreadownVM.ts]"]
+    node_15["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
   end
-
-  subgraph group_adapters["Adapters"]
-    node_dayadapter["Day pay breakdown adapter<br/>[dayToPayBreadownVM.ts]"]
-    node_monthadapter["Month pay breakdown adapter<br/>[monthToPayBreakdownVM.ts]"]
-  end
-
-  node_persistence[("Persisted application data")]
-  node_hebcalapi{{"Hebcal API"}}
-
-  node_shiftservice -->|"uses"| node_supabase
-  node_workdayservice -->|"uses"| node_supabase
-  node_monthlyconfig -->|"uses"| node_supabase
-  node_account -->|"uses"| node_supabase
-  node_supabase -->|"reads and writes"| node_persistence
-  node_hebcal -->|"fetches holidays"| node_hebcalapi
-  node_dayadapter -->|"maps domain output"| node_monthadapter
-  node_analytics -->|"tracks application events"| node_supabase
-
-  click node_shiftservice "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/shift/shift.service.ts"
-  click node_workdayservice "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/workDay/workDay.service.ts"
-  click node_monthlyconfig "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
-  click node_account "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/account/account.service.ts"
-  click node_hebcal "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/hebcal/hebcal.service.ts"
-  click node_analytics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/analytics.service.ts"
-  click node_supabase "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
-  click node_dayadapter "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreadownVM.ts"
-  click node_monthadapter "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
-
+  node_0 -->|"depends on"| node_1
+  node_2 -->|"depends on"| node_0
+  node_3 -->|"depends on"| node_11
+  node_4 -->|"depends on"| node_1
+  node_5 -->|"depends on"| node_0
+  node_8 -->|"depends on"| node_1
+  node_8 -->|"depends on"| node_10
+  node_9 -->|"depends on"| node_0
+  node_10 -->|"depends on"| node_2
+  node_10 -->|"depends on"| node_5
+  node_1 -->|"imports"| external_supabase
+  node_3 -->|"imports"| external_http
+  node_6 -->|"imports"| external_http
+  node_7 -->|"calls"| external_analytics
+  node_12 -->|"calls"| external_analytics
+  external_supabase{{"Supabase SDK"}}
+  external_http{{"HTTP client (axios)"}}
+  external_analytics{{"Google Analytics (gtag)"}}
+  click node_0 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.crud.ts"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/shift/shift.service.ts"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/hebcal/hebcal.service.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/account/account.service.ts"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/workDay/workDay.service.ts"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/calendar/calendar.service.ts"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/analytics.service.ts"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.service.ts"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
+  click node_10 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.storage.ts"
+  click node_11 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/hebcal/hebcal.request.ts"
+  click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/gtag.ts"
+  click node_13 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/event.adapter.ts"
+  click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreadownVM.ts"
+  click node_15 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
-  classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
-  class node_shiftservice,node_workdayservice,node_monthlyconfig,node_account,node_hebcal,node_analytics,node_supabase toneRose
-  class node_dayadapter,node_monthadapter,node_persistence,node_hebcalapi toneNeutral
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15 toneRose
 ```
 
 </details>

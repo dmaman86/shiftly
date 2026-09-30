@@ -1,0 +1,68 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+%% Source: v0.19.4 (release candidate; source HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+flowchart TD
+  subgraph group_data["Infrastructure and adapters"]
+    node_0["supabase.crud<br/>[apps/web/src/services/supabase/supabase.crud.ts]"]
+    node_1["supabase.client<br/>[apps/web/src/services/supabase/supabase.client.ts]"]
+    node_2["shift.service<br/>[apps/web/src/services/shift/shift.service.ts]"]
+    node_3["hebcal.service<br/>[apps/web/src/services/hebcal/hebcal.service.ts]"]
+    node_4["account.service<br/>[apps/web/src/services/account/account.service.ts]"]
+    node_5["workDay.service<br/>[apps/web/src/services/workDay/workDay.service.ts]"]
+    node_6["calendar.service<br/>[apps/web/src/services/calendar/calendar.service.ts]"]
+    node_7["analytics.service<br/>[apps/web/src/services/analytics/analytics.service.ts]"]
+    node_8["guestDraft.service<br/>[apps/web/src/services/guestDraft/guestDraft.service.ts]"]
+    node_9["monthlyConfig.service<br/>[apps/web/src/services/monthlyConfig/monthlyConfig.service.ts]"]
+    node_10["guestDraft.storage<br/>[apps/web/src/services/guestDraft/guestDraft.storage.ts]"]
+    node_11["hebcal.request<br/>[apps/web/src/services/hebcal/hebcal.request.ts]"]
+    node_12["gtag<br/>[apps/web/src/services/analytics/gtag.ts]"]
+    node_13["event.adapter<br/>[apps/web/src/adapters/event.adapter.ts]"]
+    node_14["dayToPayBreadownVM<br/>[apps/web/src/adapters/dayToPayBreadownVM.ts]"]
+    node_15["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
+  end
+  node_0 -->|"depends on"| node_1
+  node_2 -->|"depends on"| node_0
+  node_3 -->|"depends on"| node_11
+  node_4 -->|"depends on"| node_1
+  node_5 -->|"depends on"| node_0
+  node_8 -->|"depends on"| node_1
+  node_8 -->|"depends on"| node_10
+  node_9 -->|"depends on"| node_0
+  node_10 -->|"depends on"| node_2
+  node_10 -->|"depends on"| node_5
+  node_1 -->|"imports"| external_supabase
+  node_3 -->|"imports"| external_http
+  node_6 -->|"imports"| external_http
+  node_7 -->|"calls"| external_analytics
+  node_12 -->|"calls"| external_analytics
+  external_supabase{{"Supabase SDK"}}
+  external_http{{"HTTP client (axios)"}}
+  external_analytics{{"Google Analytics (gtag)"}}
+  click node_0 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/supabase/supabase.crud.ts"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/supabase/supabase.client.ts"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/shift/shift.service.ts"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/hebcal/hebcal.service.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/account/account.service.ts"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/workDay/workDay.service.ts"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/calendar/calendar.service.ts"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/analytics/analytics.service.ts"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/guestDraft/guestDraft.service.ts"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
+  click node_10 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/guestDraft/guestDraft.storage.ts"
+  click node_11 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/hebcal/hebcal.request.ts"
+  click node_12 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/services/analytics/gtag.ts"
+  click node_13 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/adapters/event.adapter.ts"
+  click node_14 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/adapters/dayToPayBreadownVM.ts"
+  click node_15 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/adapters/monthToPayBreakdownVM.ts"
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15 toneRose

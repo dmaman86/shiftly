@@ -6,34 +6,48 @@ config:
     primaryColor: "#313244"
     primaryTextColor: "#cdd6f4"
     primaryBorderColor: "#89b4fa"
-    lineColor: "#a6adc8"
-    secondaryColor: "#45475a"
-    secondaryTextColor: "#cdd6f4"
-    secondaryBorderColor: "#cba6f7"
-    tertiaryColor: "#585b70"
-    tertiaryTextColor: "#cdd6f4"
-    tertiaryBorderColor: "#f9e2af"
-    clusterBkg: "#181825"
-    clusterBorder: "#cba6f7"
-    edgeLabelBackground: "#1e1e2e"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
 ---
-flowchart TB
-    user["User"]
-    e2e["E2E Testing System<br/>(Playwright, Fixtures)"]
-
-    subgraph shiftly["Shiftly Application System"]
-      client["Client Application<br/>(UI, Routing, Global State)"]
-      domain["Domain Logic Engine<br/>(PayMap Pipeline, Builders, Calculators)"]
-      supabase["Supabase Services<br/>(Auth, Edge Functions, Client)"]
-
-      client --> domain
-      client --> supabase
-    end
-
-    google["Google Auth Service"]
-    database["PostgreSQL Database<br/>(User Data, RLS)"]
-
-    user --> client
-    e2e --> client
-    google --> client
-    supabase --> database
+%% Source: v0.18.0 (v0.18.0). Layers are derived from modules present at this commit. Commit: 2b9d0774c770d8826cc51ef9c542faa6fc4fb75d.
+%% Arrows aggregate source dependencies, including type imports.
+flowchart TD
+  subgraph group_data["Infrastructure and data"]
+    layer_data["Application services and adapters"]
+  end
+  subgraph group_ui["Presentation"]
+    layer_ui["React presentation"]
+  end
+  subgraph group_app["Application"]
+    layer_app["Application composition and hooks<br/>Zustand state"]
+  end
+  subgraph group_domain["Payroll logic"]
+    layer_domain["Payroll domain (src/domain)"]
+  end
+  layer_data -->|"depends on"| layer_domain
+  layer_ui -->|"depends on"| layer_app
+  layer_app -->|"depends on"| layer_domain
+  layer_app -->|"depends on"| layer_ui
+  layer_app -->|"depends on"| layer_data
+  layer_ui -->|"depends on"| layer_domain
+  layer_domain -->|"depends on"| layer_ui
+  layer_ui -->|"depends on"| layer_data
+  layer_data -->|"depends on"| layer_ui
+  layer_data -->|"depends on"| layer_app
+  external_supabase{{"Supabase SDK"}}
+  layer_app -->|"uses"| external_supabase
+  e2e["Playwright E2E"]
+  e2e -.->|"exercises UI"| layer_ui
+  click e2e "https://github.com/dmaman86/shiftly/blob/v0.18.0/playwright.config.ts"
+  click layer_data "https://github.com/dmaman86/shiftly/blob/v0.18.0/src/services/supabase/supabase.client.ts"
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class layer_data toneRose
+  click layer_ui "https://github.com/dmaman86/shiftly/blob/v0.18.0/src/app/App.tsx"
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  class layer_ui toneBlue
+  click layer_app "https://github.com/dmaman86/shiftly/blob/v0.18.0/src/store/globalStore.ts"
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class layer_app toneMint
+  click layer_domain "https://github.com/dmaman86/shiftly/blob/v0.18.0/src/domain/composition.ts"
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  class layer_domain toneAmber

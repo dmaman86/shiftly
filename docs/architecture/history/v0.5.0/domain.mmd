@@ -6,26 +6,76 @@ config:
     primaryColor: "#313244"
     primaryTextColor: "#cdd6f4"
     primaryBorderColor: "#89b4fa"
-    lineColor: "#a6adc8"
-    secondaryColor: "#45475a"
-    secondaryTextColor: "#cdd6f4"
-    secondaryBorderColor: "#cba6f7"
-    tertiaryColor: "#585b70"
-    tertiaryTextColor: "#cdd6f4"
-    tertiaryBorderColor: "#f9e2af"
-    clusterBkg: "#181825"
-    clusterBorder: "#cba6f7"
-    edgeLabelBackground: "#1e1e2e"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
 ---
-flowchart TB
-    components["{Reducer | Calculator | Builder}"]
-    breakdowns["{Pay Breakdowns | Time-based Aggregations}"]
-    bundles["{PayCalculationBundle | WorkDayReducerBundle | FixedSegmentBundle | PerDiemBundle | MealAllowanceBundle}"]
-    layers["{CoreServices | Resolvers | Calculators | RateCalculators | ShiftLayer | DayLayer | MonthLayer}"]
-    pipeline["PayMapPipeline"]
-
-    components -->|"operate on"| breakdowns
-    components -->|"implemented by"| layers
-    breakdowns -->|"grouped into"| bundles
-    bundles -->|"composed in"| layers
-    layers -->|"integrated into"| pipeline
+%% Source: v0.5.0 (v0.5.0). Module dependencies include type imports. Commit: 716173a0213126f8096c489da0bc315b063b3deb.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+flowchart TD
+  subgraph group_domain["Payroll logic"]
+    node_0["composition<br/>[src/domain/composition.ts]"]
+    node_1["regular.factory<br/>[src/domain/factory/regular.factory.ts]"]
+    node_2["fixed-segment.factory<br/>[src/domain/factory/fixed-segment.factory.ts]"]
+    node_3["buildDayLayer.pipeline<br/>[src/domain/pipelines/buildDayLayer.pipeline.ts]"]
+    node_4["buildResolvers.pipeline<br/>[src/domain/pipelines/buildResolvers.pipeline.ts]"]
+    node_5["buildMonthLayer.pipeline<br/>[src/domain/pipelines/buildMonthLayer.pipeline.ts]"]
+    node_6["buildCalculators.pipeline<br/>[src/domain/pipelines/buildCalculators.pipeline.ts]"]
+    node_7["buildCoreServices.pipeline<br/>[src/domain/pipelines/buildCoreServices.pipeline.ts]"]
+    node_8["shiftmap.builder<br/>[src/domain/builder/shiftmap.builder.ts]"]
+    node_9["daypaymap.builder<br/>[src/domain/builder/daypaymap.builder.ts]"]
+    node_10["workdaysformonth.builder<br/>[src/domain/builder/workdaysformonth.builder.ts]"]
+    node_11["month-pay-map.reducer<br/>[src/domain/reducer/month-pay-map.reducer.ts]"]
+    node_12["workdayinfo.resolver<br/>[src/domain/resolve/workdayinfo.resolver.ts]"]
+    node_13["date.service<br/>[src/domain/services/date.service.ts]"]
+    node_14["shift.service<br/>[src/domain/services/shift.service.ts]"]
+    node_15["workday-month.reducer<br/>[src/domain/reducer/workday-month.reducer.ts]"]
+    node_16["fixed-segment-month.reducer<br/>[src/domain/reducer/fixed-segment-month.reducer.ts]"]
+    node_17["meal-allowance-month.reducer<br/>[src/domain/reducer/meal-allowance-month.reducer.ts]"]
+    node_18["buildShiftLayer.pipeline<br/>[src/domain/pipelines/buildShiftLayer.pipeline.ts]"]
+  end
+  node_0 -->|"depends on"| node_6
+  node_0 -->|"depends on"| node_7
+  node_0 -->|"depends on"| node_3
+  node_0 -->|"depends on"| node_5
+  node_0 -->|"depends on"| node_4
+  node_0 -->|"depends on"| node_18
+  node_3 -->|"depends on"| node_9
+  node_3 -->|"depends on"| node_10
+  node_4 -->|"depends on"| node_12
+  node_5 -->|"depends on"| node_16
+  node_5 -->|"depends on"| node_17
+  node_5 -->|"depends on"| node_11
+  node_5 -->|"depends on"| node_15
+  node_6 -->|"depends on"| node_2
+  node_6 -->|"depends on"| node_1
+  node_7 -->|"depends on"| node_13
+  node_7 -->|"depends on"| node_14
+  node_8 -->|"depends on"| node_14
+  node_10 -->|"depends on"| node_12
+  node_10 -->|"depends on"| node_13
+  node_11 -->|"depends on"| node_17
+  node_11 -->|"depends on"| node_16
+  node_11 -->|"depends on"| node_15
+  node_14 -->|"depends on"| node_13
+  node_18 -->|"depends on"| node_8
+  click node_0 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/composition.ts"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/factory/regular.factory.ts"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/factory/fixed-segment.factory.ts"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/pipelines/buildDayLayer.pipeline.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/pipelines/buildResolvers.pipeline.ts"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/pipelines/buildMonthLayer.pipeline.ts"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/pipelines/buildCalculators.pipeline.ts"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/pipelines/buildCoreServices.pipeline.ts"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/builder/shiftmap.builder.ts"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/builder/daypaymap.builder.ts"
+  click node_10 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/builder/workdaysformonth.builder.ts"
+  click node_11 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/reducer/month-pay-map.reducer.ts"
+  click node_12 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/resolve/workdayinfo.resolver.ts"
+  click node_13 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/services/date.service.ts"
+  click node_14 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/services/shift.service.ts"
+  click node_15 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/reducer/workday-month.reducer.ts"
+  click node_16 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/reducer/fixed-segment-month.reducer.ts"
+  click node_17 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/reducer/meal-allowance-month.reducer.ts"
+  click node_18 "https://github.com/dmaman86/shiftly/blob/v0.5.0/src/domain/pipelines/buildShiftLayer.pipeline.ts"
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15,node_16,node_17,node_18 toneAmber

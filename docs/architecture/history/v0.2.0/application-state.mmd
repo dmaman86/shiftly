@@ -6,29 +6,29 @@ config:
     primaryColor: "#313244"
     primaryTextColor: "#cdd6f4"
     primaryBorderColor: "#89b4fa"
-    lineColor: "#a6adc8"
-    secondaryColor: "#45475a"
-    secondaryTextColor: "#cdd6f4"
-    secondaryBorderColor: "#cba6f7"
-    tertiaryColor: "#585b70"
-    tertiaryTextColor: "#cdd6f4"
-    tertiaryBorderColor: "#f9e2af"
-    clusterBkg: "#181825"
-    clusterBorder: "#cba6f7"
-    edgeLabelBackground: "#1e1e2e"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
 ---
-flowchart TB
-    components["React Components"]
-    globalStateHook["useGlobalState Hook"]
-    globalBreakdownHook["useGlobalBreakdown Hook"]
-    globalStore["Zustand Global Store<br/>(useGlobalStore)"]
-    breakdownCalculator["Global Breakdown Calculator<br/>(calculateGlobalBreakdown)"]
-    state["Global State<br/>(GlobalState, initialGlobalState)"]
-
-    components -->|"uses"| globalStateHook
-    components -->|"uses"| globalBreakdownHook
-    globalStateHook -->|"accesses"| globalStore
-    globalBreakdownHook -->|"reads dailyPayMaps from"| globalStore
-    globalBreakdownHook -->|"uses"| breakdownCalculator
-    globalStore -->|"manages"| state
-    breakdownCalculator -->|"processes dailyPayMaps from"| state
+%% Source: v0.2.0 (v0.2.0). Module dependencies include type imports. Commit: de46c35d48079dab348156c5a15a152aa0129244.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+flowchart TD
+  subgraph group_ui["Presentation"]
+    node_3["App<br/>[src/App.tsx]"]
+    node_4["WorkTable<br/>[src/components/WorkTable.tsx]"]
+  end
+  subgraph group_app["Application and state"]
+    node_0["useSegments<br/>[src/hooks/useSegments.ts]"]
+    node_1["useWorkDays<br/>[src/hooks/useWorkDays.ts]"]
+    node_2["useBreakdownDay<br/>[src/hooks/useBreakdownDay.ts]"]
+  end
+  node_3 -->|"depends on"| node_4
+  node_4 -->|"depends on"| node_1
+  click node_0 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/hooks/useSegments.ts"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/hooks/useWorkDays.ts"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/hooks/useBreakdownDay.ts"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/App.tsx"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/components/WorkTable.tsx"
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  class node_3,node_4 toneBlue
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class node_0,node_1,node_2 toneMint

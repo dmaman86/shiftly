@@ -1,0 +1,66 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+%% Source: v0.19.4 (release candidate; source HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+flowchart TD
+  subgraph group_app["Application and state"]
+    node_0["AppProviders<br/>[apps/web/src/app/providers/AppProviders.tsx]"]
+    node_1["AuthProvider<br/>[apps/web/src/app/providers/auth/AuthProvider.tsx]"]
+    node_2["DomainProvider<br/>[apps/web/src/app/providers/domain/DomainProvider.tsx]"]
+    node_3["domain.instance<br/>[apps/web/src/app/domain/domain.instance.ts]"]
+    node_4["MonthlyDataProvider<br/>[apps/web/src/features/monthly-data/MonthlyDataProvider.tsx]"]
+    node_5["GuestDraftImportProvider<br/>[apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx]"]
+    node_6["useGuestDraftCapture<br/>[apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts]"]
+    node_7["useWorkTableMonthSession<br/>[apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts]"]
+    node_8["WorkTableDayStateProvider<br/>[apps/web/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx]"]
+    node_9["globalStore<br/>[apps/web/src/store/globalStore.ts]"]
+    node_10["useAuth<br/>[apps/web/src/hooks/useAuth.ts]"]
+    node_11["useDomain<br/>[apps/web/src/hooks/useDomain.ts]"]
+    node_12["useGlobalState<br/>[apps/web/src/hooks/useGlobalState.ts]"]
+    node_13["month.resolver<br/>[apps/web/src/app/months/month.resolver.ts]"]
+    node_14["workdayinfo.presenter<br/>[apps/web/src/app/domain/workdayinfo.presenter.ts]"]
+  end
+  node_0 -->|"depends on"| node_1
+  node_0 -->|"depends on"| node_2
+  node_2 -->|"depends on"| node_3
+  node_3 -->|"depends on"| node_13
+  node_3 -->|"depends on"| node_14
+  node_4 -->|"depends on"| node_10
+  node_4 -->|"depends on"| node_12
+  node_4 -->|"depends on"| node_9
+  node_5 -->|"depends on"| node_10
+  node_5 -->|"depends on"| node_11
+  node_5 -->|"depends on"| node_12
+  node_7 -->|"depends on"| node_10
+  node_7 -->|"depends on"| node_12
+  node_7 -->|"depends on"| node_9
+  node_7 -->|"depends on"| node_6
+  node_12 -->|"depends on"| node_9
+  node_1 -->|"imports"| external_supabase
+  external_supabase{{"Supabase SDK"}}
+  click node_0 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/app/providers/AppProviders.tsx"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/app/providers/auth/AuthProvider.tsx"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/app/providers/domain/DomainProvider.tsx"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/app/domain/domain.instance.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/features/monthly-data/MonthlyDataProvider.tsx"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/store/globalStore.ts"
+  click node_10 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/hooks/useAuth.ts"
+  click node_11 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/hooks/useDomain.ts"
+  click node_12 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/hooks/useGlobalState.ts"
+  click node_13 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/app/months/month.resolver.ts"
+  click node_14 "https://github.com/dmaman86/shiftly/blob/v0.19.4/apps/web/src/app/domain/workdayinfo.presenter.ts"
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14 toneMint

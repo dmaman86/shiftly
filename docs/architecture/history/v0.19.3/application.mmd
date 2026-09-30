@@ -9,47 +9,52 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
+%% Source: v0.19.3 (v0.19.3). Module dependencies include type imports. Commit: 9bd7aa0321a0569b161a923d50639bf782762cad.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
 flowchart TD
-  subgraph group_composition["Application composition"]
-    node_domaininstance["Domain instance<br/>[domain.instance.ts]"]
-    node_providers["Application providers<br/>[AppProviders.tsx]"]
-    node_auth["Authentication provider<br/>[AuthProvider.tsx]"]
-    node_domainprovider["Domain provider<br/>[DomainProvider.tsx]"]
+  subgraph group_app["Application and state"]
+    node_0["AppProviders<br/>[src/app/providers/AppProviders.tsx]"]
+    node_1["AuthProvider<br/>[src/app/providers/auth/AuthProvider.tsx]"]
+    node_2["DomainProvider<br/>[src/app/providers/domain/DomainProvider.tsx]"]
+    node_3["domain.instance<br/>[src/app/domain/domain.instance.ts]"]
+    node_4["MonthlyDataProvider<br/>[src/features/monthly-data/MonthlyDataProvider.tsx]"]
+    node_5["GuestDraftImportProvider<br/>[src/features/guest-draft/GuestDraftImportProvider.tsx]"]
+    node_6["useGuestDraftCapture<br/>[src/features/work-table/hooks/month/useGuestDraftCapture.ts]"]
+    node_7["useWorkTableMonthSession<br/>[src/features/work-table/hooks/month/useWorkTableMonthSession.ts]"]
+    node_8["WorkTableDayStateProvider<br/>[src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx]"]
+    node_9["globalStore<br/>[src/store/globalStore.ts]"]
+    node_10["useAuth<br/>[src/hooks/useAuth.ts]"]
+    node_11["useDomain<br/>[src/hooks/useDomain.ts]"]
+    node_12["useGlobalState<br/>[src/hooks/useGlobalState.ts]"]
   end
-
-  subgraph group_state["Application state"]
-    node_guestimport["Guest draft import<br/>[GuestDraftImportProvider.tsx]"]
-    node_monthlydata["Monthly data provider<br/>[MonthlyDataProvider.tsx]"]
-    node_session["Month session<br/>[useWorkTableMonthSession.ts]"]
-    node_guestcapture["Guest draft capture<br/>[useGuestDraftCapture.ts]"]
-    node_daystate["Day-state context<br/>[WorkTableDayStateProvider.tsx]"]
-    node_globalstate["Global state<br/>[globalStore.ts]"]
-  end
-
-  node_providers -->|"installs"| node_auth
-  node_providers -->|"installs"| node_domainprovider
-  node_domainprovider -->|"exposes"| node_domaininstance
-  node_guestimport -->|"reads user"| node_auth
-  node_guestimport -->|"gates hydration until import settles"| node_monthlydata
-  node_monthlydata -->|"coordinates"| node_session
-  node_session -->|"reads user"| node_auth
-  node_session -->|"saves guest month"| node_guestcapture
-  node_session -->|"hydrates and observes"| node_daystate
-  node_session -->|"replaces pay maps"| node_globalstate
-  node_daystate -->|"updates"| node_globalstate
-  node_domaininstance -->|"serves domain operations"| node_session
-
-  click node_domaininstance "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/app/domain/domain.instance.ts"
-  click node_providers "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/app/providers/AppProviders.tsx"
-  click node_auth "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/app/providers/auth/AuthProvider.tsx"
-  click node_domainprovider "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/app/providers/domain/DomainProvider.tsx"
-  click node_guestimport "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/features/guest-draft/GuestDraftImportProvider.tsx"
-  click node_monthlydata "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/features/monthly-data/MonthlyDataProvider.tsx"
-  click node_session "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
-  click node_guestcapture "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/features/work-table/hooks/month/useGuestDraftCapture.ts"
-  click node_daystate "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
-  click node_globalstate "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/store/globalStore.ts"
-
+  node_0 -->|"depends on"| node_1
+  node_0 -->|"depends on"| node_2
+  node_2 -->|"depends on"| node_3
+  node_4 -->|"depends on"| node_10
+  node_4 -->|"depends on"| node_12
+  node_4 -->|"depends on"| node_9
+  node_5 -->|"depends on"| node_10
+  node_5 -->|"depends on"| node_11
+  node_5 -->|"depends on"| node_12
+  node_7 -->|"depends on"| node_10
+  node_7 -->|"depends on"| node_12
+  node_7 -->|"depends on"| node_9
+  node_7 -->|"depends on"| node_6
+  node_12 -->|"depends on"| node_9
+  node_1 -->|"imports"| external_supabase
+  external_supabase{{"Supabase SDK"}}
+  click node_0 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/app/providers/AppProviders.tsx"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/app/providers/auth/AuthProvider.tsx"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/app/providers/domain/DomainProvider.tsx"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/app/domain/domain.instance.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/features/monthly-data/MonthlyDataProvider.tsx"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/features/guest-draft/GuestDraftImportProvider.tsx"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/features/work-table/hooks/month/useGuestDraftCapture.ts"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/store/globalStore.ts"
+  click node_10 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/hooks/useAuth.ts"
+  click node_11 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/hooks/useDomain.ts"
+  click node_12 "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/hooks/useGlobalState.ts"
   classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
-  class node_domaininstance,node_providers,node_auth,node_domainprovider,node_guestimport,node_monthlydata,node_session,node_guestcapture,node_daystate,node_globalstate toneMint
-
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12 toneMint

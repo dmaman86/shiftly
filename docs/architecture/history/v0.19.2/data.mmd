@@ -9,46 +9,46 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
+%% Source: v0.19.2 (v0.19.2). Module dependencies include type imports. Commit: 92cbe0f714061b5654f8d7587ab2bfe56d32f108.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
 flowchart TD
-  subgraph group_services["Services and integrations"]
-    node_shiftservice["Shift service<br/>[shift.service.ts]"]
-    node_workdayservice["Workday service<br/>[workDay.service.ts]"]
-    node_monthlyconfig["Monthly config service<br/>[monthlyConfig.service.ts]"]
-    node_account["Account service<br/>[account.service.ts]"]
-    node_hebcal["Hebcal service<br/>[hebcal.service.ts]"]
-    node_analytics["Analytics service<br/>[analytics.service.ts]"]
-    node_supabase["Supabase client and CRUD<br/>[supabase.client.ts]"]
+  subgraph group_data["Infrastructure and adapters"]
+    node_0["supabase.crud<br/>[src/services/supabase/supabase.crud.ts]"]
+    node_1["supabase.client<br/>[src/services/supabase/supabase.client.ts]"]
+    node_2["shift.service<br/>[src/services/shift/shift.service.ts]"]
+    node_3["hebcal.service<br/>[src/services/hebcal/hebcal.service.ts]"]
+    node_4["account.service<br/>[src/services/account/account.service.ts]"]
+    node_5["workDay.service<br/>[src/services/workDay/workDay.service.ts]"]
+    node_6["analytics.service<br/>[src/services/analytics/analytics.service.ts]"]
+    node_7["monthlyConfig.service<br/>[src/services/monthlyConfig/monthlyConfig.service.ts]"]
+    node_8["gtag<br/>[src/services/analytics/gtag.ts]"]
+    node_9["event.adapter<br/>[src/adapters/event.adapter.ts]"]
+    node_10["dayToPayBreadownVM<br/>[src/adapters/dayToPayBreadownVM.ts]"]
+    node_11["monthToPayBreakdownVM<br/>[src/adapters/monthToPayBreakdownVM.ts]"]
   end
-
-  subgraph group_adapters["Adapters"]
-    node_dayadapter["Day pay breakdown adapter<br/>[dayToPayBreadownVM.ts]"]
-    node_monthadapter["Month pay breakdown adapter<br/>[monthToPayBreakdownVM.ts]"]
-  end
-
-  node_persistence[("Persisted application data")]
-  node_hebcalapi{{"Hebcal API"}}
-
-  node_shiftservice -->|"uses"| node_supabase
-  node_workdayservice -->|"uses"| node_supabase
-  node_monthlyconfig -->|"uses"| node_supabase
-  node_account -->|"uses"| node_supabase
-  node_supabase -->|"reads and writes"| node_persistence
-  node_hebcal -->|"fetches holidays"| node_hebcalapi
-  node_dayadapter -->|"maps domain output"| node_monthadapter
-  node_analytics -->|"tracks application events"| node_supabase
-
-  click node_shiftservice "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/shift/shift.service.ts"
-  click node_workdayservice "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/workDay/workDay.service.ts"
-  click node_monthlyconfig "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/monthlyConfig/monthlyConfig.service.ts"
-  click node_account "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/account/account.service.ts"
-  click node_hebcal "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/hebcal/hebcal.service.ts"
-  click node_analytics "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/analytics/analytics.service.ts"
-  click node_supabase "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/supabase/supabase.client.ts"
-  click node_dayadapter "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/adapters/dayToPayBreadownVM.ts"
-  click node_monthadapter "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/adapters/monthToPayBreakdownVM.ts"
-
+  node_0 -->|"depends on"| node_1
+  node_2 -->|"depends on"| node_0
+  node_4 -->|"depends on"| node_1
+  node_5 -->|"depends on"| node_0
+  node_7 -->|"depends on"| node_0
+  node_1 -->|"imports"| external_supabase
+  node_3 -->|"imports"| external_http
+  node_6 -->|"calls"| external_analytics
+  node_8 -->|"calls"| external_analytics
+  external_supabase{{"Supabase SDK"}}
+  external_http{{"HTTP client (axios)"}}
+  external_analytics{{"Google Analytics (gtag)"}}
+  click node_0 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/supabase/supabase.crud.ts"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/supabase/supabase.client.ts"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/shift/shift.service.ts"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/hebcal/hebcal.service.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/account/account.service.ts"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/workDay/workDay.service.ts"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/analytics/analytics.service.ts"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/monthlyConfig/monthlyConfig.service.ts"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/services/analytics/gtag.ts"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/adapters/event.adapter.ts"
+  click node_10 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/adapters/dayToPayBreadownVM.ts"
+  click node_11 "https://github.com/dmaman86/shiftly/blob/v0.19.2/src/adapters/monthToPayBreakdownVM.ts"
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
-  classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
-  class node_shiftservice,node_workdayservice,node_monthlyconfig,node_account,node_hebcal,node_analytics,node_supabase toneRose
-  class node_dayadapter,node_monthadapter,node_persistence,node_hebcalapi toneNeutral
-
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11 toneRose

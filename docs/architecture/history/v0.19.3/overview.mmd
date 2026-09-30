@@ -9,33 +9,44 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
+%% Source: v0.19.3 (v0.19.3). Layers are derived from modules present at this commit. Commit: 9bd7aa0321a0569b161a923d50639bf782762cad.
+%% Arrows aggregate source dependencies, including type imports.
 flowchart TD
-  subgraph group_presentation["Presentation"]
-    layer_presentation["User experience"]
-  end
-
-  subgraph group_application["Application"]
-    layer_application["Composition, routing and state"]
-  end
-
-  subgraph group_domain["Domain"]
-    layer_domain["Payroll calculation"]
-  end
-
   subgraph group_data["Infrastructure and data"]
-    layer_data["Services, adapters and persistence"]
+    layer_data["Application services and adapters"]
   end
-
-  layer_presentation --> layer_application
-  layer_application --> layer_domain
-  layer_application --> layer_data
-
-  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
-  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
-  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  subgraph group_ui["Presentation"]
+    layer_ui["React presentation"]
+  end
+  subgraph group_app["Application"]
+    layer_app["Application composition and hooks<br/>Zustand state"]
+  end
+  subgraph group_domain["Payroll logic"]
+    layer_domain["Payroll domain (src/domain)"]
+  end
+  layer_data -->|"depends on"| layer_domain
+  layer_data -->|"depends on"| layer_app
+  layer_ui -->|"depends on"| layer_app
+  layer_ui -->|"depends on"| layer_data
+  layer_app -->|"depends on"| layer_domain
+  layer_app -->|"depends on"| layer_ui
+  layer_app -->|"depends on"| layer_data
+  layer_ui -->|"depends on"| layer_domain
+  layer_data -->|"depends on"| layer_ui
+  external_supabase{{"Supabase SDK"}}
+  layer_app -->|"uses"| external_supabase
+  e2e["Playwright E2E"]
+  e2e -.->|"exercises UI"| layer_ui
+  click e2e "https://github.com/dmaman86/shiftly/blob/v0.19.3/playwright.config.ts"
+  click layer_data "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/services/supabase/supabase.client.ts"
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
-  class layer_presentation toneBlue
-  class layer_application toneMint
-  class layer_domain toneAmber
   class layer_data toneRose
-
+  click layer_ui "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/app/App.tsx"
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  class layer_ui toneBlue
+  click layer_app "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/store/globalStore.ts"
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class layer_app toneMint
+  click layer_domain "https://github.com/dmaman86/shiftly/blob/v0.19.3/src/domain/composition.ts"
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  class layer_domain toneAmber
