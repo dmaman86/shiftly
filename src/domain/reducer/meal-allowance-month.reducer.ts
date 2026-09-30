@@ -21,17 +21,4 @@ export class MealAllowanceMonthReducer implements Reducer<MealAllowance> {
       },
     };
   }
-
-  subtract(base: MealAllowance, sub: MealAllowance): MealAllowance {
-    return {
-      large: {
-        points: Math.max(0, base.large.points - sub.large.points),
-        amount: Math.max(0, base.large.amount - sub.large.amount),
-      },
-      small: {
-        points: Math.max(0, base.small.points - sub.small.points),
-        amount: Math.max(0, base.small.amount - sub.small.amount),
-      },
-    };
-  }
 }

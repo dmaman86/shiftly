@@ -217,175 +217,6 @@ describe("MealAllowanceMonthReducer", () => {
     });
   });
 
-  describe("subtract", () => {
-    it("should subtract large meal allowance points", () => {
-      const base: MealAllowance = {
-        large: { points: 8, amount: 160 },
-        small: { points: 0, amount: 0 },
-      };
-      const sub: MealAllowance = {
-        large: { points: 3, amount: 60 },
-        small: { points: 0, amount: 0 },
-      };
-
-      const result = reducer.subtract(base, sub);
-
-      expect(result.large.points).toBe(5);
-      expect(result.large.amount).toBe(100);
-    });
-
-    it("should subtract small meal allowance points", () => {
-      const base: MealAllowance = {
-        large: { points: 0, amount: 0 },
-        small: { points: 6, amount: 75 },
-      };
-      const sub: MealAllowance = {
-        large: { points: 0, amount: 0 },
-        small: { points: 2, amount: 25 },
-      };
-
-      const result = reducer.subtract(base, sub);
-
-      expect(result.small.points).toBe(4);
-      expect(result.small.amount).toBe(50);
-    });
-
-    it("should subtract both large and small allowances", () => {
-      const base: MealAllowance = {
-        large: { points: 8, amount: 160 },
-        small: { points: 6, amount: 75 },
-      };
-      const sub: MealAllowance = {
-        large: { points: 3, amount: 60 },
-        small: { points: 2, amount: 25 },
-      };
-
-      const result = reducer.subtract(base, sub);
-
-      expect(result.large.points).toBe(5);
-      expect(result.large.amount).toBe(100);
-      expect(result.small.points).toBe(4);
-      expect(result.small.amount).toBe(50);
-    });
-
-    it("should not go below zero for points", () => {
-      const base: MealAllowance = {
-        large: { points: 3, amount: 60 },
-        small: { points: 2, amount: 25 },
-      };
-      const sub: MealAllowance = {
-        large: { points: 5, amount: 100 },
-        small: { points: 4, amount: 50 },
-      };
-
-      const result = reducer.subtract(base, sub);
-
-      expect(result.large.points).toBe(0);
-      expect(result.small.points).toBe(0);
-    });
-
-    it("should not go below zero for amounts", () => {
-      const base: MealAllowance = {
-        large: { points: 5, amount: 60 },
-        small: { points: 4, amount: 25 },
-      };
-      const sub: MealAllowance = {
-        large: { points: 3, amount: 100 },
-        small: { points: 2, amount: 50 },
-      };
-
-      const result = reducer.subtract(base, sub);
-
-      expect(result.large.amount).toBe(0);
-      expect(result.small.amount).toBe(0);
-    });
-
-    it("should handle subtracting empty allowance", () => {
-      const base: MealAllowance = {
-        large: { points: 5, amount: 100 },
-        small: { points: 4, amount: 50 },
-      };
-      const sub = reducer.createEmpty();
-
-      const result = reducer.subtract(base, sub);
-
-      expect(result).toEqual(base);
-    });
-
-    it("should handle subtracting from empty allowance", () => {
-      const base = reducer.createEmpty();
-      const sub: MealAllowance = {
-        large: { points: 5, amount: 100 },
-        small: { points: 4, amount: 50 },
-      };
-
-      const result = reducer.subtract(base, sub);
-
-      expect(result).toEqual(reducer.createEmpty());
-    });
-
-    it("should handle decimal values", () => {
-      const base: MealAllowance = {
-        large: { points: 4.0, amount: 84.25 },
-        small: { points: 2.0, amount: 35.4 },
-      };
-      const sub: MealAllowance = {
-        large: { points: 1.5, amount: 31.5 },
-        small: { points: 0.7, amount: 14.3 },
-      };
-
-      const result = reducer.subtract(base, sub);
-
-      expect(result.large.points).toBeCloseTo(2.5, 1);
-      expect(result.large.amount).toBeCloseTo(52.75, 2);
-      expect(result.small.points).toBeCloseTo(1.3, 1);
-      expect(result.small.amount).toBeCloseTo(21.1, 2);
-    });
-
-    it("should not mutate the base object", () => {
-      const base: MealAllowance = {
-        large: { points: 8, amount: 160 },
-        small: { points: 6, amount: 75 },
-      };
-      const baseCopy = { ...base, large: { ...base.large }, small: { ...base.small } };
-      const sub: MealAllowance = {
-        large: { points: 3, amount: 60 },
-        small: { points: 2, amount: 25 },
-      };
-
-      reducer.subtract(base, sub);
-
-      expect(base).toEqual(baseCopy);
-    });
-
-    it("should be inverse of accumulate", () => {
-      const base: MealAllowance = {
-        large: { points: 5, amount: 100 },
-        small: { points: 4, amount: 50 },
-      };
-      const delta: MealAllowance = {
-        large: { points: 3, amount: 60 },
-        small: { points: 2, amount: 25 },
-      };
-
-      const accumulated = reducer.accumulate(base, delta);
-      const result = reducer.subtract(accumulated, delta);
-
-      expect(result).toEqual(base);
-    });
-
-    it("should handle exact subtraction to zero", () => {
-      const base: MealAllowance = {
-        large: { points: 5, amount: 100 },
-        small: { points: 4, amount: 50 },
-      };
-
-      const result = reducer.subtract(base, base);
-
-      expect(result).toEqual(reducer.createEmpty());
-    });
-  });
-
   describe("Integration Scenarios", () => {
     it("should handle multiple accumulations", () => {
       let result = reducer.createEmpty();
@@ -432,25 +263,6 @@ describe("MealAllowanceMonthReducer", () => {
       expect(monthTotal.large.amount).toBeCloseTo(105.5, 1);
       expect(monthTotal.small.points).toBe(5);
       expect(monthTotal.small.amount).toBeCloseTo(72.5, 1);
-    });
-
-    it("should handle shift removal from monthly total", () => {
-      const monthTotal: MealAllowance = {
-        large: { points: 20, amount: 422 },
-        small: { points: 10, amount: 145 },
-      };
-
-      const removedDay: MealAllowance = {
-        large: { points: 2, amount: 42.2 },
-        small: { points: 0, amount: 0 },
-      };
-
-      const result = reducer.subtract(monthTotal, removedDay);
-
-      expect(result.large.points).toBe(18);
-      expect(result.large.amount).toBeCloseTo(379.8, 1);
-      expect(result.small.points).toBe(10);
-      expect(result.small.amount).toBe(145);
     });
 
     it("should handle mixed large and small meals in one day", () => {
@@ -501,24 +313,6 @@ describe("MealAllowanceMonthReducer", () => {
       expect(result.large.amount).toBeCloseTo(0.63, 2);
     });
 
-    it("should handle negative amounts clamped to zero", () => {
-      const base: MealAllowance = {
-        large: { points: 0, amount: 0 },
-        small: { points: 0, amount: 0 },
-      };
-      const sub: MealAllowance = {
-        large: { points: 5, amount: 100 },
-        small: { points: 5, amount: 100 },
-      };
-
-      const result = reducer.subtract(base, sub);
-
-      expect(result.large.points).toBe(0);
-      expect(result.large.amount).toBe(0);
-      expect(result.small.points).toBe(0);
-      expect(result.small.amount).toBe(0);
-    });
-
     it("should maintain precision with floating point arithmetic", () => {
       let result = reducer.createEmpty();
 
@@ -543,24 +337,6 @@ describe("MealAllowanceMonthReducer", () => {
       expect(result).toMatchObject({
         large: { points: expect.any(Number), amount: expect.any(Number) },
         small: { points: expect.any(Number), amount: expect.any(Number) },
-      });
-    });
-
-    it("should return consistent structure across all methods", () => {
-      const empty = reducer.createEmpty();
-      const accumulated = reducer.accumulate(empty, {
-        large: { points: 1, amount: 21 },
-        small: { points: 1, amount: 14 },
-      });
-      const subtracted = reducer.subtract(accumulated, {
-        large: { points: 0.5, amount: 10 },
-        small: { points: 0.5, amount: 7 },
-      });
-
-      [empty, accumulated, subtracted].forEach((result) => {
-        expect(Object.keys(result).sort()).toEqual(["large", "small"]);
-        expect(Object.keys(result.large).sort()).toEqual(["amount", "points"]);
-        expect(Object.keys(result.small).sort()).toEqual(["amount", "points"]);
       });
     });
   });

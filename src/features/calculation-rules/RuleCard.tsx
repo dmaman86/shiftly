@@ -49,7 +49,7 @@ export const RuleCard = ({
         }}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6" fontWeight="bold">
+          <Typography variant="h6" component="h2" fontWeight="bold">
             {title}
           </Typography>
         </AccordionSummary>
@@ -64,7 +64,7 @@ export const RuleCard = ({
   return (
     <CardSurface id={id} sx={cardSx}>
       <CardContent>
-        <Typography variant="h6" fontWeight="bold" gutterBottom>
+        <Typography variant="h6" component="h2" fontWeight="bold" gutterBottom>
           {title}
         </Typography>
 

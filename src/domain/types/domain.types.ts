@@ -20,6 +20,7 @@ import type {
   ComposedDayCalculationParams,
   DayFromShiftsCalculation,
 } from "../calculator/day-from-shifts.calculator";
+import type { AdditionPolicy } from "../calculator/additions/addition.classifier";
 
 export interface CoreServices {
   dateService: DateService;
@@ -57,6 +58,7 @@ export interface Calculators {
 export interface BuildShiftLayerParams {
   dateService: DateService;
   shiftService: ShiftService;
+  additionPolicy?: AdditionPolicy;
 }
 
 export interface ShiftLayer {

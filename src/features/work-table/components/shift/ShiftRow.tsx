@@ -17,6 +17,7 @@ type ShiftRowProps = {
   standardHours: number;
   isEditable: boolean;
   otherShifts: Shift[];
+  shiftNumber?: number;
 
   onShiftUpdate: (shift: Shift, payMap: ShiftPayMap) => void;
   onRemove: (id: string) => void;
@@ -29,6 +30,7 @@ export const ShiftRow = ({
   standardHours,
   isEditable,
   otherShifts,
+  shiftNumber = 1,
   onShiftUpdate,
   onRemove,
 }: ShiftRowProps) => {
@@ -59,6 +61,7 @@ export const ShiftRow = ({
       >
         <ShiftTimeInput
           label=""
+          accessibleLabel={t("a11y.shift_time", { field: t("headers.entry"), number: shiftNumber, date: meta.date })}
           value={localShift.start.date}
           onChange={(newVal) => handleChange("start", newVal)}
           disabled={!isEditable}
@@ -81,6 +84,10 @@ export const ShiftRow = ({
           <span>
             <ShiftTimeInput
               label=""
+              accessibleLabel={t("a11y.shift_time", { field: t("headers.exit"), number: shiftNumber, date: meta.date })}
+              errorMessage={hasOverlap ? t("a11y.overlap")
+                : localShift.start.date.getTime() === localShift.end.date.getTime()
+                  ? t("a11y.equal_times") : t("a11y.invalid_range")}
               value={localShift.end.date}
             onChange={(newVal) => handleChange("end", newVal)}
             disabled={!isEditable}
@@ -114,6 +121,7 @@ export const ShiftRow = ({
               }
             >
               <Checkbox
+                slotProps={{ input: { "aria-label": t("shift_row.tooltip_cross_day") } }}
                 checked={crossDay}
                 onChange={(e) => handleToggleNextDay(e.target.checked)}
                 size="small"
@@ -139,6 +147,8 @@ export const ShiftRow = ({
                 <IconButton
                   size="small"
                   onClick={toggleDuty}
+                  aria-label={t("shift_row.tooltip_duty")}
+                  aria-pressed={localShift.isDuty}
                   sx={{ p: 0.5 }}
                 >
                   {localShift.isDuty ? (
@@ -153,6 +163,7 @@ export const ShiftRow = ({
             <Tooltip title={t("shift_row.tooltip_delete")}>
               <IconButton
                 size="small"
+                aria-label={t("shift_row.tooltip_delete")}
                 onClick={() => {
                   onRemove(shift.id);
                   analyticsService.track({ name: "shift_deleted", params: { month, year } });

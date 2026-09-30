@@ -1,7 +1,6 @@
 export interface Reducer<State, Input = State> {
   createEmpty(): State;
   accumulate(base: State, add: Input): State;
-  subtract(base: State, sub: Input): State;
 }
 
 /** A pure, dependency-free domain computation: input in, value out. */

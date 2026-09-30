@@ -1,4 +1,13 @@
 {
+  "a11y": {
+    "add_shift": "Add shift",
+    "shift_time": "{{field}}, shift {{number}}, {{date}}",
+    "equal_times": "Start and end times must be different.",
+    "invalid_range": "End time must be after start time. Select next day for an overnight shift.",
+    "overlap": "This shift overlaps another shift.",
+    "calculation_updated": "Calculation updated for {{monthName}} {{year}}. Hours: {{hours}}. Calculated salary: {{salary}} shekels.",
+    "calculation_updated_no_rate": "Calculation updated for {{monthName}} {{year}}. Hours: {{hours}}. Enter an hourly rate to calculate salary."
+  },
   "storage": {
     "loading": "Loading saved shifts...",
     "load_error": "Saved shifts could not be loaded. Retry to continue editing.",
@@ -143,6 +152,8 @@
     "sick": "Sick",
     "vacation": "Vacation",
     "night_50": "Night bonus (50%)",
+    "night": "Night bonus ({{percent}}%)",
+    "evening": "Evening bonus ({{percent}}%)",
     "shabbat_150": "150%",
     "extra_125": "125%",
     "shabbat_rate_150": "Shabbat 150%",

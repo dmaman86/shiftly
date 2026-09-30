@@ -50,21 +50,4 @@ export abstract class BaseRegularCalculator implements Reducer<RegularBreakdown>
       },
     };
   }
-
-  subtract(base: RegularBreakdown, sub: RegularBreakdown): RegularBreakdown {
-    return {
-      hours100: {
-        percent: base.hours100.percent,
-        hours: Math.max(base.hours100.hours - sub.hours100.hours, 0),
-      },
-      hours125: {
-        percent: base.hours125.percent,
-        hours: Math.max(base.hours125.hours - sub.hours125.hours, 0),
-      },
-      hours150: {
-        percent: base.hours150.percent,
-        hours: Math.max(base.hours150.hours - sub.hours150.hours, 0),
-      },
-    };
-  }
 }

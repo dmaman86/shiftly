@@ -56,7 +56,7 @@ export const CalculationRulesPage = () => {
                 mb: 1,
               }}
             >
-              <Typography variant="h5" fontWeight="bold">
+              <Typography variant="h5" component="h1" fontWeight="bold">
                 {t(`${cr}.title`)}
               </Typography>
             </Box>

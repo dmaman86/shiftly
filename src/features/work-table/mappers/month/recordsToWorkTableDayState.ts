@@ -1,5 +1,5 @@
 import { WorkDayStatus } from "@/domain/constants";
-import type { Shift, ShiftMapBuilder } from "@/domain";
+import { DateService, type Shift, type ShiftMapBuilder } from "@/domain";
 import type { WorkDayInfo } from "@/app/types";
 import type { ShiftRecord } from "@/services/shift/shift.service";
 import type { WorkDayRecord } from "@/services/workDay/workDay.service";
@@ -11,6 +11,7 @@ type RecordsToWorkTableDayStateParams = {
   workDays: WorkDayInfo[];
   shiftMapBuilder: ShiftMapBuilder;
   standardHours: number;
+  dateService?: DateService;
 };
 
 export const recordsToWorkTableDayState = ({
@@ -19,6 +20,7 @@ export const recordsToWorkTableDayState = ({
   workDays,
   shiftMapBuilder,
   standardHours,
+  dateService = new DateService(),
 }: RecordsToWorkTableDayStateParams): WorkTableDayState => {
   const state: WorkTableDayState = {};
 
@@ -38,8 +40,8 @@ export const recordsToWorkTableDayState = ({
 
     const shift: Shift = {
       id: row.id,
-      start: { date: new Date(row.start_time) },
-      end: { date: new Date(row.end_time) },
+      start: { date: dateService.createDateFromPersisted(row.start_time) },
+      end: { date: dateService.createDateFromPersisted(row.end_time) },
       isDuty: row.is_duty,
     };
     const payMap = shiftMapBuilder.build({

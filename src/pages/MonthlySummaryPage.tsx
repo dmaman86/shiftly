@@ -50,7 +50,7 @@ export const MonthlySummaryPage = ({
         <Card sx={{ mb: 3 }}>
           <CardHeader
             title={
-              <Typography variant="h5" fontWeight="bold">
+              <Typography variant="h5" component="h1" fontWeight="bold">
                 {t("monthly_summary_page.title")}
               </Typography>
             }

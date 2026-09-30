@@ -109,12 +109,13 @@ export const MonthlySalarySummary = ({
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <Typography variant="h6" fontWeight="bold">
+                <Typography variant="h6" component="h3" fontWeight="bold">
                   {t("salary_summary.total_label")}
                 </Typography>
               </Box>
               <Typography
                 variant="h6"
+                component="p"
                 fontWeight="bold"
                 data-testid="monthly-salary-total"
               >

@@ -119,6 +119,8 @@ export const DayRow = ({
                       size="small"
                       color={specialFullDay ? "warning" : "info"}
                       sx={{
+                        bgcolor: specialFullDay ? "#a64400" : "#005b96",
+                        color: "#fff",
                         height: 16,
                         fontSize: "0.6rem",
                         "& .MuiChip-label": { px: 0.5 },
@@ -140,6 +142,7 @@ export const DayRow = ({
                 }}
               >
                 <Checkbox
+                  slotProps={{ input: { "aria-label": `${t("headers.sick")} — ${dayLabel}` } }}
                   size="small"
                   checked={status === WorkDayStatus.sick}
                   onChange={(e) =>
@@ -170,6 +173,7 @@ export const DayRow = ({
                 }}
               >
                 <Checkbox
+                  slotProps={{ input: { "aria-label": `${t("headers.vacation")} — ${dayLabel}` } }}
                   size="small"
                   checked={status === WorkDayStatus.vacation}
                   onChange={(e) =>
@@ -201,6 +205,7 @@ export const DayRow = ({
                   <IconButton
                     size="small"
                     data-testid={`work-day-add-shift-${workDay.meta.date}`}
+                    aria-label={`${t("a11y.add_shift")} — ${dayLabel}`}
                     onClick={handleAddShift}
                     sx={{ p: 0.5 }}
                   >
@@ -214,6 +219,7 @@ export const DayRow = ({
             <ShiftRow
               domain={domain}
               shift={item.shift}
+              shiftNumber={index + 1}
               meta={workDay.meta}
               standardHours={standardHours}
               isEditable={isEditable}

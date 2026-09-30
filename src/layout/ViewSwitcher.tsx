@@ -13,7 +13,6 @@ import TranslateIcon from "@mui/icons-material/Translate";
 import { useState } from "react";
 import {
   NavLink,
-  NavLinkRenderProps,
   useNavigate,
   useLocation,
 } from "react-router-dom";
@@ -25,7 +24,7 @@ import { AuthControls } from "@/features/auth";
 const navButtonBaseStyle = {
   color: "text.secondary",
   borderRadius: 0,
-  "&.nav-active": {
+  "&[aria-current='page']": {
     color: "primary.main",
     fontWeight: 600,
     borderBottom: "2px solid",
@@ -42,17 +41,15 @@ const NavItem = ({
   children: React.ReactNode;
   onClick?: () => void;
 }) => (
-  <NavLink
+  <Button
+    component={NavLink}
+    fullWidth
+    sx={navButtonBaseStyle}
     to={to}
     onClick={onClick}
-    className={({ isActive }: NavLinkRenderProps) =>
-      isActive ? "nav-active" : ""
-    }
   >
-    <Button fullWidth sx={navButtonBaseStyle}>
-      {children}
-    </Button>
-  </NavLink>
+    {children}
+  </Button>
 );
 
 export const ViewSwitcher = () => {

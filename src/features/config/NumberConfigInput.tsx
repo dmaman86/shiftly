@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import { useDebounce } from "@/hooks";
 import { ConfigInput } from "./ConfigInput";
@@ -33,6 +34,7 @@ export const NumberConfigInput = ({
   isValid = defaultIsValid,
   onChange,
 }: NumberConfigInputProps) => {
+  const { t } = useTranslation();
   const [draft, setDraft] = useState<string>();
 
   // Reset the local draft whenever the committed value changes for any
@@ -78,7 +80,7 @@ export const NumberConfigInput = ({
       inputDirection="ltr"
       inputMode="decimal"
       step="any"
-      helperText={helperText}
+      helperText={error ? t("config.invalid_number") : helperText}
       error={error}
       onChange={setDraft}
     />

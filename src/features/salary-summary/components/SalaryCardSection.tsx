@@ -66,7 +66,7 @@ export const SalaryCardSection = ({
       <CardHeader
         avatar={section.icon}
         title={
-          <Typography variant="subtitle1" fontWeight="bold">
+          <Typography variant="subtitle1" component="h3" fontWeight="bold">
             {section.title}
           </Typography>
         }

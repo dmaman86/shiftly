@@ -9,6 +9,7 @@ export default defineConfig({
   reporter: "html",
   use: {
     baseURL: "http://127.0.0.1:4173/shiftly/",
+    timezoneId: "Asia/Jerusalem",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: process.env.PLAYWRIGHT_VIDEO === "on" ? "on" : "off",

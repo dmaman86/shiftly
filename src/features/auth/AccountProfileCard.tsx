@@ -120,7 +120,7 @@ export const AccountProfileCard = ({
           id="account-profile-header"
         >
           <Box>
-            <Typography variant="h6" fontWeight="bold">
+            <Typography variant="h6" component="h2" fontWeight="bold">
               {t("auth.profile_title")}
             </Typography>
             <Typography variant="body2" color="text.secondary">

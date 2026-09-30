@@ -1,5 +1,6 @@
 {
   "nav": {
+    "skip_to_content": "Skip to main content",
     "app_title": "Shiftly – Shift & Salary Management",
     "daily": "Daily",
     "monthly": "Monthly",
@@ -11,6 +12,7 @@
     "contact": "Contact"
   },
   "config": {
+    "invalid_number": "Enter a valid non-negative number.",
     "title": "Calculation Settings",
     "date_section": "Date",
     "work_params_section": "Work Parameters",

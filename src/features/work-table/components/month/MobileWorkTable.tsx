@@ -141,7 +141,7 @@ export const MobileWorkTable = ({
   return (
     <Stack spacing={2}>
       <Box aria-label={t("table.mobile_calendar_label")}>
-        <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+        <Typography variant="subtitle1" component="h3" fontWeight="bold" sx={{ mb: 1 }}>
           {t("table.mobile_calendar_label")}
         </Typography>
         <StaticDatePicker

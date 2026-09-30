@@ -1,6 +1,7 @@
 import type { useTranslation } from "react-i18next";
 import type { PayBreakdownViewModel } from "@/app/types";
-import { MealAllowanceRates, Segment } from "@/domain";
+import { getAdditionGroups, MealAllowanceRates, Segment } from "@/domain";
+import { mapSegmentToPayRow } from "./payRow.mapper";
 import {
   mapSegmentsToPayRows,
   mapAllowanceRows,
@@ -33,7 +34,6 @@ export const buildExtraPayRows = (
   t: TranslateFn,
 ): PayRowVM[] => {
   const extraMap: Record<string, { label: string; segment: Segment }> = {
-    night50: { label: t("pay_labels.night_50"), segment: payVM.extra.hours50 },
     shabbat150: { label: t("pay_labels.shabbat_150"), segment: payVM.regular.hours150 },
     extra125: { label: t("pay_labels.extra_125"), segment: payVM.regular.hours125 },
     shabbatRate150: {
@@ -44,10 +44,23 @@ export const buildExtraPayRows = (
       label: t("pay_labels.shabbat_rate_200"),
       segment: payVM.special.shabbat200,
     },
-    evening20: { label: t("pay_labels.evening_20"), segment: payVM.extra.hours20 },
   };
 
-  return mapSegmentsToPayRows(baseRate, extraMap);
+  const additionRows = (kind: "evening" | "night") =>
+    getAdditionGroups(payVM.extra)
+      .filter((group) => group.kind === kind)
+      .map(({ key, segment }) => mapSegmentToPayRow(
+        key === "hours20" ? "evening20" : key === "hours50" ? "night50" : key,
+        t(`pay_labels.${kind}`, { percent: segment.percent * 100 }),
+        segment,
+        baseRate,
+      ));
+
+  return [
+    ...additionRows("night"),
+    ...mapSegmentsToPayRows(baseRate, extraMap),
+    ...additionRows("evening"),
+  ];
 };
 
 export const buildAllowanceRows = (

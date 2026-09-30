@@ -1,5 +1,6 @@
 import type { ExtraBreakdown } from "../../types/data-shapes";
 import type { Reducer } from "../../types/core-behaviors";
+import { additionGroupKey, getAdditionGroups } from "../additions/addition-groups";
 
 export class ExtraCalculator implements Reducer<ExtraBreakdown> {
   private readonly fieldShiftPercent: Record<string, number> = {
@@ -14,28 +15,18 @@ export class ExtraCalculator implements Reducer<ExtraBreakdown> {
   }
 
   accumulate(base: ExtraBreakdown, add: ExtraBreakdown): ExtraBreakdown {
-    return {
-      hours20: {
-        percent: base.hours20.percent,
-        hours: base.hours20.hours + add.hours20.hours,
-      },
-      hours50: {
-        percent: base.hours50.percent,
-        hours: base.hours50.hours + add.hours50.hours,
-      },
-    };
-  }
-
-  subtract(base: ExtraBreakdown, sub: ExtraBreakdown): ExtraBreakdown {
-    return {
-      hours20: {
-        percent: base.hours20.percent,
-        hours: Math.max(base.hours20.hours - sub.hours20.hours, 0),
-      },
-      hours50: {
-        percent: base.hours50.percent,
-        hours: Math.max(base.hours50.hours - sub.hours50.hours, 0),
-      },
-    };
+    const result = this.createEmpty();
+    for (const { kind, segment } of [
+      ...getAdditionGroups(base),
+      ...getAdditionGroups(add),
+    ]) {
+      if (segment.hours === 0) continue;
+      const key = additionGroupKey(kind, segment.percent);
+      result[key] = {
+        percent: segment.percent,
+        hours: (result[key]?.hours ?? 0) + segment.hours,
+      };
+    }
+    return result;
   }
 }

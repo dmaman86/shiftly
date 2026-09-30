@@ -2,6 +2,10 @@ import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
+// Keep Node-side date behavior deterministic for Vitest. Browser contexts set
+// the same zone explicitly in playwright.config.ts.
+process.env.TZ = "Asia/Jerusalem";
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [

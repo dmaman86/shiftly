@@ -35,17 +35,4 @@ export class MonthPayMapReducer implements Reducer<MonthPayMap, WorkDayMap> {
       ),
     };
   }
-
-  subtract(base: MonthPayMap, sub: WorkDayMap): MonthPayMap {
-    return {
-      ...this.workPay.subtract(base, sub),
-      ...this.fixed.subtract(base, sub),
-      perDiem: this.perDiem.subtract(base.perDiem, sub.perDiem.diemInfo),
-      totalHours: Math.max(base.totalHours - sub.totalHours, 0),
-      mealAllowance: this.allowances.subtract(
-        base.mealAllowance,
-        sub.mealAllowance,
-      ),
-    };
-  }
 }

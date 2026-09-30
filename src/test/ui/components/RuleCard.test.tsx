@@ -24,7 +24,7 @@ describe("RuleCard", () => {
       expect(screen.getByText("Overtime is paid at 125%")).toBeInTheDocument();
     });
 
-    it("should render title as h6 heading", () => {
+    it("should render title as h2 heading", () => {
       renderWithTheme(
         <RuleCard title="Night Shift">
           <div>Content</div>
@@ -32,7 +32,7 @@ describe("RuleCard", () => {
       );
 
       const heading = screen.getByText("Night Shift");
-      expect(heading.tagName).toBe("H6");
+      expect(heading.tagName).toBe("H2");
     });
 
     it("should render divider between title and content", () => {
@@ -218,7 +218,7 @@ describe("RuleCard", () => {
       );
 
       // Should have proper heading and content structure
-      expect(container.querySelector("h6")).toBeInTheDocument();
+      expect(container.querySelector("h2")).toBeInTheDocument();
       expect(container.querySelector(".MuiCardContent-root")).toBeInTheDocument();
     });
   });

@@ -49,6 +49,7 @@ import type {
 } from "@/app/types";
 import { ShabbatCreditAllocation } from "@/domain";
 import { FeatureBoundary } from "@/layout";
+import { CalculationStatus } from "./CalculationStatus";
 
 type WorkTableProps = {
   domain: DomainContextType;
@@ -84,6 +85,12 @@ export const WorkTable = ({
   return (
     <Card sx={{ mb: 3 }}>
       <CardContent>
+        <CalculationStatus message={t(monthBreakdown.dailySalary === undefined
+          ? "a11y.calculation_updated_no_rate" : "a11y.calculation_updated", {
+          monthName: monthNames[month - 1], year,
+          hours: monthBreakdown.totalHours.toFixed(2),
+          salary: (monthBreakdown.dailySalary ?? 0).toFixed(2),
+        })} />
         {/* Header */}
         <Box
           sx={{
@@ -96,7 +103,7 @@ export const WorkTable = ({
         >
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <CalendarMonthIcon color="primary" />
-            <Typography variant="h6" fontWeight="bold">
+            <Typography variant="h6" component="h2" fontWeight="bold">
               {t("table.month_hours_title", {
                 monthName: monthNames[month - 1],
                 year,

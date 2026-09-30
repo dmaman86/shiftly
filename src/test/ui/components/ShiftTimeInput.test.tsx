@@ -88,21 +88,21 @@ describe("ShiftTimeInput", () => {
       renderWithTheme(<ShiftTimeInput {...defaultProps} error={true} />);
 
       // MUI applies aria-invalid to the group
-      const group = screen.getByRole("group");
+      const group = screen.getByRole("group", { name: "Start Time" });
       expect(group).toHaveAttribute("aria-invalid", "true");
     });
 
     it("should not display error state by default", () => {
       renderWithTheme(<ShiftTimeInput {...defaultProps} />);
 
-      const group = screen.getByRole("group");
+      const group = screen.getByRole("group", { name: "Start Time" });
       expect(group).toHaveAttribute("aria-invalid", "false");
     });
 
     it("should not display error state when error is false", () => {
       renderWithTheme(<ShiftTimeInput {...defaultProps} error={false} />);
 
-      const group = screen.getByRole("group");
+      const group = screen.getByRole("group", { name: "Start Time" });
       expect(group).toHaveAttribute("aria-invalid", "false");
     });
   });
@@ -184,6 +184,13 @@ describe("ShiftTimeInput", () => {
   });
 
   describe("Accessibility", () => {
+    it("names the time group and associates its error description", () => {
+      renderWithTheme(<ShiftTimeInput {...defaultProps} accessibleLabel="End, shift 2, September 15"
+        error errorMessage="Start and end times must be different." />);
+      const group = screen.getByRole("group", { name: "End, shift 2, September 15" });
+      expect(group).toHaveAccessibleDescription("Start and end times must be different.");
+      expect(screen.getAllByRole("group")).toHaveLength(1);
+    });
     it("should have accessible label", () => {
       renderWithTheme(<ShiftTimeInput {...defaultProps} />);
 

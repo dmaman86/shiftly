@@ -54,7 +54,7 @@ This makes it possible to **recalculate past months accurately** using the same 
 - Meal allowance calculation (small / large)
 - Optional hourly-rate calculation: when `baseRate > 0`, the daily pay column and salary summary are shown; clearing it or setting it to `0` hides them
 - Monthly aggregated breakdown
-- Incremental recalculation (add / update / remove shifts)
+- Monthly totals recomputed from the current daily pay maps after adding, updating, or removing shifts
 - Fully reactive UI
 - Landscape, right-to-left PDF export with weekly separators, independent meal-allowance columns, per-page metadata, and the application copyright footer
 - Optional Google sign-in with cross-device data persistence
@@ -241,7 +241,7 @@ The domain layer contains **pure business logic** and is framework-agnostic.
   per-diem, meal allowances, credits, and other domain rules.
 
 - **Reducers**
-  Handle accumulation and rollback of calculated values, enabling incremental recalculation.
+  Accumulate calculated daily values into a fresh monthly breakdown whenever the daily pay maps change.
 
 - **Resolvers**
   Multi-method decision services (day-type classification, available months) whose shape doesn't reduce to a single input/output calculation.
@@ -525,7 +525,7 @@ Unused credit is displayed to the user but is excluded from total hours and sala
 
 ### Reducers
 
-Accumulate and subtract breakdowns:
+Accumulate breakdowns from an empty state. Monthly totals are derived from the current daily pay maps, not maintained through inverse updates:
 
 - Monthly pay map reducer
 - Regular hours accumulator
@@ -771,7 +771,7 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   │   ├── builder/            # Shift, day and month structure builders
 │   │   ├── calculator/         # Timeline pipelines, rates, allowances and credits
 │   │   ├── pipelines/          # Domain dependency composition
-│   │   ├── reducer/            # Monthly accumulation and rollback
+│   │   ├── reducer/            # Monthly accumulation from daily pay maps
 │   │   ├── resolve/            # Multi-method decision services (day-type, month)
 │   │   ├── services/           # Date and shift services
 │   │   └── types/              # Domain contracts and data shapes
@@ -820,7 +820,7 @@ This architecture was chosen to handle:
 - Complex salary rules
 - Time-based edge cases (cross-day shifts, partial days)
 - Multiple aggregation levels (shift → day → month)
-- Incremental recalculation without full recompute
+- Deterministic monthly aggregation from the current daily pay maps
 - Historical accuracy without modifying core logic
 
 It allows the system to scale **without turning into tightly coupled conditional logic** inside UI components or reducers.
@@ -847,7 +847,7 @@ Shiftly provides two main calculation views:
 - Focused on day-by-day shift input
 - Allows adding, editing, and validating shifts
 - Displays per-day breakdown
-- Monthly totals are updated incrementally
+- Monthly totals are recomputed from an empty breakdown when daily pay maps change
 - Downloads the work table directly as a landscape, right-to-left PDF
 - On mobile, selecting a day shows its card collapsed by default. Sick/vacation controls, shift editing, and the compact summary remain visible; the detailed breakdown expands on demand.
 

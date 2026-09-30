@@ -9,8 +9,11 @@ import {
 } from "./pipelines";
 import { calculateDayFromShifts } from "./calculator/day-from-shifts.calculator";
 import { PayMapPipeline } from "./types/domain.types";
+import type { AdditionPolicy } from "./calculator/additions/addition.classifier";
 
-export const buildPayMapPipeline = (): PayMapPipeline => {
+export const buildPayMapPipeline = (
+  options: { additionPolicy?: AdditionPolicy } = {},
+): PayMapPipeline => {
   const services = buildCoreServices();
 
   const resolvers = buildResolvers(services.dateService);
@@ -21,6 +24,7 @@ export const buildPayMapPipeline = (): PayMapPipeline => {
   const shiftLayer = buildShiftLayer({
     dateService: services.dateService,
     shiftService: services.shiftService,
+    additionPolicy: options.additionPolicy,
   });
 
   const dayLayer = buildDayLayer({
