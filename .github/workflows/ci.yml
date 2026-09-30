@@ -63,7 +63,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: checks
 
     steps:
       - name: Checkout code
@@ -100,16 +99,15 @@ jobs:
   e2e:
     name: End-to-End Tests
     runs-on: ubuntu-latest
-    needs: build
+    needs: [checks, build]
+    container:
+      # Keep this version aligned with the Playwright version resolved in bun.lock.
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --ipc=host
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
-
-      - name: Setup Node
-        uses: actions/setup-node@v5
-        with:
-          node-version-file: .nvmrc
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -124,10 +122,6 @@ jobs:
         with:
           name: dist
           path: dist
-
-      # Chromium runs the desktop and Android projects; WebKit runs the iPhone project.
-      - name: Install Playwright browsers
-        run: bunx playwright install --with-deps chromium webkit
 
       # In CI, playwright.config.ts serves ./dist via `vite preview`,
       # so the exact artifact that gets deployed is the one under test.
