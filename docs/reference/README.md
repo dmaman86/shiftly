@@ -143,11 +143,11 @@ flowchart TD
   end
 
   subgraph group_application["Application"]
-    layer_application["Composition, routing and state"]
+    layer_application["Web app: composition, routing and state"]
   end
 
   subgraph group_domain["Domain"]
-    layer_domain["Payroll calculation"]
+    layer_domain["@shiftly/domain package<br/>Payroll calculation engine"]
   end
 
   subgraph group_data["Infrastructure and data"]
@@ -189,14 +189,14 @@ config:
     edgeLabelBackground: "#ffffff"
 ---
 flowchart TD
-  subgraph group_domain["Payroll domain"]
+  subgraph group_domain["@shiftly/domain — payroll engine"]
     node_composition["Domain composition<br/>[composition.ts]"]
     node_shiftbuilder["Shift map builder<br/>[shiftmap.builder.ts]"]
     node_daybuilder["Day pay builder<br/>[daypaymap.builder.ts]"]
     node_timeline["Timeline classification<br/>[classify-shift-timeline.ts]"]
     node_calculators["Pay calculators<br/>[buildCalculators.pipeline.ts]"]
     node_monthreducer["Month pay reducers<br/>[month-pay-map.reducer.ts]"]
-    node_resolvers["Resolvers<br/>[month.resolver.ts]"]
+    node_resolvers["Workday info resolver<br/>[workdayinfo.resolver.ts]"]
     node_services["Domain services<br/>[shift.service.ts]"]
   end
 
@@ -211,14 +211,14 @@ flowchart TD
   node_resolvers -->|"uses"| node_services
   node_monthreducer -->|"aggregates"| node_resolvers
 
-  click node_composition "https://github.com/dmaman86/shiftly/blob/main/src/domain/composition.ts"
-  click node_shiftbuilder "https://github.com/dmaman86/shiftly/blob/main/src/domain/builder/shiftmap.builder.ts"
-  click node_daybuilder "https://github.com/dmaman86/shiftly/blob/main/src/domain/builder/daypaymap.builder.ts"
-  click node_timeline "https://github.com/dmaman86/shiftly/blob/main/src/domain/timeline/classify-shift-timeline.ts"
-  click node_calculators "https://github.com/dmaman86/shiftly/blob/main/src/domain/pipelines/buildCalculators.pipeline.ts"
-  click node_monthreducer "https://github.com/dmaman86/shiftly/blob/main/src/domain/reducer/month-pay-map.reducer.ts"
-  click node_resolvers "https://github.com/dmaman86/shiftly/blob/main/src/domain/resolve/month.resolver.ts"
-  click node_services "https://github.com/dmaman86/shiftly/blob/main/src/domain/services/shift.service.ts"
+  click node_composition "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/composition.ts"
+  click node_shiftbuilder "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/shiftmap.builder.ts"
+  click node_daybuilder "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/daypaymap.builder.ts"
+  click node_timeline "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/timeline/classify-shift-timeline.ts"
+  click node_calculators "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildCalculators.pipeline.ts"
+  click node_monthreducer "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reducer/month-pay-map.reducer.ts"
+  click node_resolvers "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/resolve/workdayinfo.resolver.ts"
+  click node_services "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/services/shift.service.ts"
 
   classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
   class node_composition,node_shiftbuilder,node_daybuilder,node_timeline,node_calculators,node_monthreducer,node_resolvers,node_services toneAmber
@@ -247,7 +247,7 @@ The domain layer contains **pure business logic** and is framework-agnostic.
   Multi-method decision services (day-type classification, available months) whose shape doesn't reduce to a single input/output calculation.
 
 - **Composition**
-  Centralized wiring of domain components via `pipelines/`. The public domain API is assembled by `src/domain/composition.ts` and exposed to the application through `src/app/domain/domain.instance.ts`.
+  Centralized wiring of domain components via `pipelines/`. The public API is assembled in `packages/domain/src/composition.ts` and exported by `packages/domain/src/index.ts`; the web app imports `@shiftly/domain` and adapts it in `apps/web/src/app/domain/domain.instance.ts`.
 
 ### Presentation
 <details>
@@ -289,16 +289,16 @@ flowchart TD
   node_monthly -->|"shows totals"| node_salary
   node_monthly -->|"maps monthly pay"| node_monthbreakdown
 
-  click node_app "https://github.com/dmaman86/shiftly/blob/main/src/app/App.tsx"
-  click node_routes "https://github.com/dmaman86/shiftly/blob/main/src/app/routes/AppRoutes.tsx"
-  click node_daily "https://github.com/dmaman86/shiftly/blob/main/src/pages/DailyPage.tsx"
-  click node_monthly "https://github.com/dmaman86/shiftly/blob/main/src/pages/MonthlySummaryPage.tsx"
-  click node_rules "https://github.com/dmaman86/shiftly/blob/main/src/pages/CalculationRulesPage.tsx"
-  click node_worktable "https://github.com/dmaman86/shiftly/blob/main/src/features/work-table/components/month/WorkTable.tsx"
-  click node_daycontroller "https://github.com/dmaman86/shiftly/blob/main/src/features/work-table/hooks/day/useDayController.ts"
-  click node_salary "https://github.com/dmaman86/shiftly/blob/main/src/features/salary-summary/components/MonthlySalarySummary.tsx"
-  click node_dayviews "https://github.com/dmaman86/shiftly/blob/main/src/adapters/dayToPayBreadownVM.ts"
-  click node_monthbreakdown "https://github.com/dmaman86/shiftly/blob/main/src/adapters/monthToPayBreakdownVM.ts"
+  click node_app "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/App.tsx"
+  click node_routes "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AppRoutes.tsx"
+  click node_daily "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/DailyPage.tsx"
+  click node_monthly "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/MonthlySummaryPage.tsx"
+  click node_rules "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/CalculationRulesPage.tsx"
+  click node_worktable "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/components/month/WorkTable.tsx"
+  click node_daycontroller "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/day/useDayController.ts"
+  click node_salary "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx"
+  click node_dayviews "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreadownVM.ts"
+  click node_monthbreakdown "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
 
   classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
   class node_app,node_routes,node_daily,node_monthly,node_rules,node_worktable,node_daycontroller,node_salary,node_dayviews,node_monthbreakdown toneBlue
@@ -307,9 +307,9 @@ flowchart TD
 </details>
 
 #### Application and UI Types
-`src/app/` is the application composition root. It creates the composed domain instance and makes domain operations available to React without importing orchestration functions directly. For example, application code calls `domain.payMap.calculateDayFromShifts(...)`.
+`apps/web/src/app/` is the application composition root. The web app imports the framework-independent `@shiftly/domain` package and adapts its public API for React. For example, application code calls `domain.payMap.calculateDayFromShifts(...)`.
 
-Domain contracts remain under `src/domain/types`. UI-facing models such as `PayBreakdownViewModel`, `CompactPayBreakdownVM`, and `WorkDayInfo` live under `src/app/types`, because they describe presentation and application state rather than domain rules. Adapters and feature mappers convert domain results into those application models.
+Domain contracts remain under `packages/domain/src/types`. UI-facing models such as `PayBreakdownViewModel`, `CompactPayBreakdownVM`, and `WorkDayInfo` live under `apps/web/src/app/types`, because they describe presentation and application state rather than domain rules. Adapters and feature mappers convert domain results into those application models.
 
 #### Hooks
 Thin orchestration layer between UI, domain, and state.
@@ -339,7 +339,7 @@ config:
     edgeLabelBackground: "#ffffff"
 ---
 flowchart TD
-  subgraph group_composition["Application composition"]
+  subgraph group_composition["apps/web — application composition"]
     node_domaininstance["Domain instance<br/>[domain.instance.ts]"]
     node_providers["Application providers<br/>[AppProviders.tsx]"]
     node_auth["Authentication provider<br/>[AuthProvider.tsx]"]
@@ -363,14 +363,14 @@ flowchart TD
   node_daystate -->|"updates"| node_globalstate
   node_domaininstance -->|"serves domain operations"| node_session
 
-  click node_domaininstance "https://github.com/dmaman86/shiftly/blob/main/src/app/domain/domain.instance.ts"
-  click node_providers "https://github.com/dmaman86/shiftly/blob/main/src/app/providers/AppProviders.tsx"
-  click node_auth "https://github.com/dmaman86/shiftly/blob/main/src/app/providers/auth/AuthProvider.tsx"
-  click node_domainprovider "https://github.com/dmaman86/shiftly/blob/main/src/app/providers/domain/DomainProvider.tsx"
-  click node_monthlydata "https://github.com/dmaman86/shiftly/blob/main/src/features/monthly-data/MonthlyDataProvider.tsx"
-  click node_session "https://github.com/dmaman86/shiftly/blob/main/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
-  click node_daystate "https://github.com/dmaman86/shiftly/blob/main/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
-  click node_globalstate "https://github.com/dmaman86/shiftly/blob/main/src/store/globalStore.ts"
+  click node_domaininstance "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/domain.instance.ts"
+  click node_providers "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/AppProviders.tsx"
+  click node_auth "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/auth/AuthProvider.tsx"
+  click node_domainprovider "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/DomainProvider.tsx"
+  click node_monthlydata "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyDataProvider.tsx"
+  click node_session "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
+  click node_daystate "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
+  click node_globalstate "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/store/globalStore.ts"
 
   classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
   class node_domaininstance,node_providers,node_auth,node_domainprovider,node_monthlydata,node_session,node_daystate,node_globalstate toneMint
@@ -386,8 +386,8 @@ flowchart TD
 
 Global Zustand state:
 
-- `src/store/globalStore.ts`
-- `src/store/globalBreakdown.ts`
+- `apps/web/src/store/globalStore.ts`
+- `apps/web/src/store/globalBreakdown.ts`
 
 ### Data
 <details>
@@ -433,15 +433,15 @@ flowchart TD
   node_dayadapter -->|"maps domain output"| node_monthadapter
   node_analytics -->|"tracks application events"| node_supabase
 
-  click node_shiftservice "https://github.com/dmaman86/shiftly/blob/main/src/services/shift/shift.service.ts"
-  click node_workdayservice "https://github.com/dmaman86/shiftly/blob/main/src/services/workDay/workDay.service.ts"
-  click node_monthlyconfig "https://github.com/dmaman86/shiftly/blob/main/src/services/monthlyConfig/monthlyConfig.service.ts"
-  click node_account "https://github.com/dmaman86/shiftly/blob/main/src/services/account/account.service.ts"
-  click node_hebcal "https://github.com/dmaman86/shiftly/blob/main/src/services/hebcal/hebcal.service.ts"
-  click node_analytics "https://github.com/dmaman86/shiftly/blob/main/src/services/analytics/analytics.service.ts"
-  click node_supabase "https://github.com/dmaman86/shiftly/blob/main/src/services/supabase/supabase.client.ts"
-  click node_dayadapter "https://github.com/dmaman86/shiftly/blob/main/src/adapters/dayToPayBreadownVM.ts"
-  click node_monthadapter "https://github.com/dmaman86/shiftly/blob/main/src/adapters/monthToPayBreakdownVM.ts"
+  click node_shiftservice "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/shift/shift.service.ts"
+  click node_workdayservice "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/workDay/workDay.service.ts"
+  click node_monthlyconfig "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
+  click node_account "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/account/account.service.ts"
+  click node_hebcal "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/hebcal/hebcal.service.ts"
+  click node_analytics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/analytics.service.ts"
+  click node_supabase "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
+  click node_dayadapter "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreadownVM.ts"
+  click node_monthadapter "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
 
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
   classDef toneNeutral fill:#f8fafc,stroke:#334155,stroke-width:1.5px,color:#0f172a
@@ -603,16 +603,16 @@ Shiftly uses **Vitest** for unit and integration testing, with a focus on domain
 
 ```bash
 # Run tests in watch mode
-npm run test
+bun run test
 
 # Run tests with UI
-npm run test:ui
+bun run test:ui
 
 # Run tests with coverage
-npm run test:coverage
+bun run test:coverage
 
 # Run tests in CI mode (single run)
-npm run test:ci
+bun run test:ci
 ```
 
 ### End-to-End Tests
@@ -638,13 +638,13 @@ Run the end-to-end test suite:
 
 ```bash
 # Run E2E tests
-npm run test:e2e
+bun run test:e2e
 
 # Open Playwright UI mode
-npm run test:e2e:ui
+bun run test:e2e:ui
 
 # Run with a visible browser
-npm run test:e2e:headed
+bun run test:e2e:headed
 ```
 
 The golden month scenarios (inputs and expected outputs) are stored in:
@@ -667,7 +667,7 @@ e2e/
     └── navigation.spec.ts
 ```
 
-Every fixture is verified by the Vitest integration test `src/test/integration/work-table-month-fixtures.test.ts`, which runs the same calculation path as the app without a browser. Playwright drives only the August 2026 scenario through the UI.
+Every fixture is verified by the Vitest integration test `apps/web/src/test/integration/work-table-month-fixtures.test.ts`, which runs the same calculation path as the app without a browser. Playwright drives only the August 2026 scenario through the UI.
 
 Locally, the Playwright web server starts the Vite dev server on `127.0.0.1` with the `/shiftly` base path. In CI it serves the prebuilt `dist/` with `vite preview`. Hebcal is mocked by the tests so scenarios stay deterministic.
 The CI workflow installs Chromium and WebKit and runs the E2E suite automatically.
@@ -676,13 +676,13 @@ The CI workflow installs Chromium and WebKit and runs the E2E suite automaticall
 
 ```bash
 # Type-check the application and Vite configuration
-npm run typecheck
+bun run typecheck
 
 # Run static analysis
-npm run lint
+bun run lint
 
 # Create the production bundle in dist/
-npm run build
+bun run build
 ```
 
 ### Test Coverage
@@ -712,8 +712,8 @@ git clone https://github.com/dmaman86/shiftly.git
 cd shiftly
 nvm install
 nvm use
-npm install
-npm run dev
+bun install
+bun run dev
 
 # Alternative package manager:
 # bun install --frozen-lockfile
@@ -758,7 +758,7 @@ The function validates the signed-in user's JWT and deletes that same user from 
 ├── playwright.config.ts         # Playwright configuration
 ├── scripts/
 │   └── architecture/           # Mermaid architecture generators
-├── src/
+├── apps/web/src/
 │   ├── adapters/               # External data and domain-to-view adapters
 │   ├── app/                    # Application composition root
 │   │   ├── domain/             # Domain instance and application-facing types
@@ -767,14 +767,6 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   │   └── routes/             # Application and language-aware routing
 │   ├── constants/              # Shared domain and UI constants
 │   ├── components/             # Shared presentational UI components
-│   ├── domain/                 # Framework-independent payroll rules
-│   │   ├── builder/            # Shift, day and month structure builders
-│   │   ├── calculator/         # Timeline pipelines, rates, allowances and credits
-│   │   ├── pipelines/          # Domain dependency composition
-│   │   ├── reducer/            # Monthly accumulation from daily pay maps
-│   │   ├── resolve/            # Multi-method decision services (day-type, month)
-│   │   ├── services/           # Date and shift services
-│   │   └── types/              # Domain contracts and data shapes
 │   ├── features/               # Feature-owned UI and orchestration
 │   │   ├── auth/               # Google sign-in controls
 │   │   ├── calculation-rules/  # Rules and interactive calculation example
@@ -804,8 +796,12 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   ├── pages/                  # Daily, monthly and calculation-rules pages
 │   ├── store/                  # Zustand global state and breakdown calculations
 │   ├── services/               # Analytics, Hebcal and Supabase persistence clients
-│   ├── test/                   # Domain, store, service and UI test suites
+│   ├── test/                   # Web app, store, service and UI test suites
 │   └── utils/                  # API result handling and shared helpers
+├── packages/
+│   └── domain/
+│       ├── src/                 # Framework-independent payroll engine and public index.ts
+│       └── tests/               # Domain tests, independent from React
 └── supabase/
     ├── functions/               # Authenticated Edge Functions
     └── migrations/              # Postgres schema and Row Level Security policies

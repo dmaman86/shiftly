@@ -15,11 +15,11 @@ flowchart TD
   end
 
   subgraph group_application["Application"]
-    layer_application["Composition, routing and state"]
+    layer_application["Web app: composition, routing and state"]
   end
 
   subgraph group_domain["Domain"]
-    layer_domain["Payroll calculation"]
+    layer_domain["@shiftly/domain package<br/>Payroll calculation engine"]
   end
 
   subgraph group_data["Infrastructure and data"]

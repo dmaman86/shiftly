@@ -1,0 +1,21 @@
+{
+  "name": "@shiftly/domain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -b --stopBuildOnErrors --pretty false",
+    "typecheck": "tsc -b tsconfig.json tsconfig.test.json --stopBuildOnErrors --pretty false",
+    "test": "bun run build && vitest run --config ../../vitest.config.ts --project domain"
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0"
+  }
+}

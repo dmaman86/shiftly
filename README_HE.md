@@ -19,16 +19,16 @@ Shiftly מנהלת משמרות ומסבירה את חישובי השכר ביש
 
 ## התחלה מהירה
 
-דרישה: Node.js 24. Bun 1.3.14 הוא מנהל החבילות המועדף, אך ניתן להריץ את
-הסקריפטים באמצעות npm או Bun.
+דרישות: Node.js 24 ו־Bun 1.3.14. התקינו באמצעות Bun כדי לקשר את חבילות
+ה־workspace; המאגר משתמש בפרוטוקול התלויות `workspace:*` של Bun.
 
 ```bash
 git clone https://github.com/dmaman86/shiftly.git
 cd shiftly
 nvm install
 nvm use
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 פתחו את `http://localhost:5173/shiftly`.
@@ -44,14 +44,15 @@ npm run dev
 ## פקודות נפוצות
 
 ```bash
-npm run typecheck
-npm run lint
-npm run test:ci
-npm run test:e2e
+bun run typecheck
+bun run lint
+bun run test:ci
+bun run build
+bun run test:e2e
 ```
 
-ניתן להריץ את אותם סקריפטים באמצעות Bun כאשר משתמשים במנהל החבילות המועדף
-של המאגר.
+אפליקציית הווב נמצאת ב־`apps/web` וצורכת את `@shiftly/domain` מתוך
+`packages/domain`. בעת עריכת המנוע, הריצו `bun run dev:domain` בחלון נוסף.
 
 ## רישיון
 
