@@ -1,26 +1,45 @@
-# Shiftly – מערכת לניהול שעות וחישוב שכר
+<div dir="rtl">
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://dmaman86.github.io/shiftly/?utm_source=github&utm_medium=readme)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dmaman86/shiftly)
-![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
-![Zustand](https://img.shields.io/badge/Zustand-5.0.15-433E38?logo=react&logoColor=white)
-![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?logo=reactquery&logoColor=white)
-![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
-![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-2.112.4-3ECF8E?logo=supabase&logoColor=white)
+# Shiftly
+
+קשה לבדוק את שכר המשמרות במשרדי ממשלה בישראל. Shiftly הופכת את המשמרות לפירוט שכר יומי ולאומדן שכר ברוטו חודשי.
+
+<div dir="ltr">
+
 [![CI](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml/badge.svg)](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
 [![codecov](https://codecov.io/gh/dmaman86/shiftly/branch/main/graph/badge.svg)](https://codecov.io/gh/dmaman86/shiftly)
-![License](https://img.shields.io/badge/license-MIT-blue)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://dmaman86.github.io/shiftly/)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Shiftly מנהלת משמרות ומסבירה את חישובי השכר בישראל באמצעות מודל דומיין
-שקוף, ניתן לבדיקה וניתן לאימות.
+Stack: TypeScript · React · Vite · Zustand · TanStack Query · MUI · Supabase · Vitest · Playwright
+
+</div>
+
+**[הדגמה חיה](https://dmaman86.github.io/shiftly/) · [English](README.md) · [תיעוד טכני מלא](docs/reference/README_HE.md)**
+
+![הקלטת תהליך E2E במחשב בעברית: הזנת משמרות ופתיחת פירוט החישוב היומי](.github/assets/demos/august-2026-he-desktop.gif)
+
+## למה הפרויקט נוצר
+
+Shiftly נולדה מתוך בעיה חוזרת של חישוב שכר משמרות במשרד ממשלתי: המשמרות שנרשמו אינן מתורגמות ישירות לשעות הנוספות, לתעריפי שבת וחג ולתוספות בתלוש השכר. האפליקציה פרוסה ב־GitHub Pages כדי לאפשר לבדוק את פירוט החישובים.
+
+<!-- TODO: add validation line once VALIDATION.md exists -->
+
+> החישובים הם אומדני שכר ברוטו לצורכי המחשה ואינם תחליף לחישוב שכר רשמי.
+
+## נקודות הנדסיות
+
+- **מנוע חישוב עצמאי:** React צורכת את [חבילת TypeScript בשם `@shiftly/domain`](packages/domain/) דרך API ציבורי מפורש; למנוע אין תלות ב־React או ב־DOM.
+- **בדיקת תוצר הפריסה:** תהליך ה־[CI](.github/workflows/ci.yml) מריץ E2E מול תוצר הייצור `dist` שהורד, ופורס את אותו תוצר רק לאחר שהבדיקות ו־E2E עברו.
+- **כיסוי דפדפנים:** [פרויקטי Playwright](playwright.config.ts) בודקים Chromium במחשב, אמולציית Android ב־Chromium ואמולציית iPhone ב־WebKit.
+- **שמירת נתונים לפי משתמש:** [מיגרציית בסיס הנתונים](supabase/migrations/20260830000000_persistence_schema.sql) מפעילה Row Level Security ב־Supabase על הגדרות חודשיות, ימי עבודה ומשמרות, עם מדיניות בעלות המבוססת על `auth.uid()`.
 
 ## התחלה מהירה
 
 דרישות: Node.js 24 ו־Bun 1.3.14. התקינו באמצעות Bun כדי לקשר את חבילות
 ה־workspace; המאגר משתמש בפרוטוקול התלויות `workspace:*` של Bun.
+
+<div dir="ltr">
 
 ```bash
 git clone https://github.com/dmaman86/shiftly.git
@@ -31,17 +50,22 @@ bun install
 bun run dev
 ```
 
+</div>
+
 פתחו את `http://localhost:5173/shiftly`.
 
 ## תיעוד
 
-- [תיעוד פרויקט מפורט באנגלית](docs/reference/README.md)
-- [תיעוד פרויקט מפורט בעברית](docs/reference/README_HE.md)
+- [תיעוד טכני מלא באנגלית](docs/reference/README.md)
+- [תיעוד טכני מלא בעברית](docs/reference/README_HE.md)
+- [מנוע השכר העצמאי](packages/domain/README.md)
 - [תיעוד הארכיטקטורה](docs/architecture/)
-- [תרשימי הארכיטקטורה](docs/architecture/generated/)
-- [היסטוריית הארכיטקטורה](docs/architecture/history/)
+- [תרשימי הארכיטקטורה הנוכחית](docs/architecture/generated/)
+- [היסטוריית הארכיטקטורה לפי tag](docs/architecture/history/)
 
 ## פקודות נפוצות
+
+<div dir="ltr">
 
 ```bash
 bun run typecheck
@@ -51,10 +75,14 @@ bun run build
 bun run test:e2e
 ```
 
+</div>
+
 אפליקציית הווב נמצאת ב־`apps/web` וצורכת את `@shiftly/domain` מתוך
-`packages/domain`. בעת עריכת המנוע, הריצו `bun run dev:domain` בחלון נוסף.
+`packages/domain`. בעת עריכת המנוע, הריצו `bun run dev:domain` בחלון נוסף כדי
+לעדכן את החבילה המהודרת בזמן ש־Vite פועל.
 
 ## רישיון
 
 הפרויקט מופץ תחת רישיון [MIT](LICENSE).
-\n\n
+
+</div>
