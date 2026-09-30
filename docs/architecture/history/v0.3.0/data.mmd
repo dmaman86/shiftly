@@ -6,27 +6,23 @@ config:
     primaryColor: "#313244"
     primaryTextColor: "#cdd6f4"
     primaryBorderColor: "#89b4fa"
-    lineColor: "#a6adc8"
-    secondaryColor: "#45475a"
-    secondaryTextColor: "#cdd6f4"
-    secondaryBorderColor: "#cba6f7"
-    tertiaryColor: "#585b70"
-    tertiaryTextColor: "#cdd6f4"
-    tertiaryBorderColor: "#f9e2af"
-    clusterBkg: "#181825"
-    clusterBorder: "#cba6f7"
-    edgeLabelBackground: "#1e1e2e"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
 ---
-flowchart LR
-    features["Application Features"]
-    monthlyData["Monthly Data Provider<br/>(Hydration & Persistence)"]
-    services["Feature Services<br/>(Monthly Config, Work Days, Shifts, Account)"]
-    adapters["Data Adapters<br/>(Domain-to-View Models)"]
-    supabase["Supabase Client & CRUD"]
-    database["PostgreSQL Database<br/>(RLS-Protected Tables)"]
-
-    features -->|"reads and updates"| monthlyData
-    monthlyData -->|"uses"| services
-    features -->|"maps results through"| adapters
-    services -->|"persists and queries"| supabase
-    supabase -->|"reads and writes"| database
+%% Source: v0.3.0 (v0.3.0). Module dependencies include type imports. Commit: 0a34874c8856a1e036fc9b3042cefb4d04a104df.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+flowchart TD
+  subgraph group_data["Infrastructure and adapters"]
+    node_0["hebcal.service<br/>[src/services/hebcal/hebcal.service.ts]"]
+    node_1["event.adapter<br/>[src/adapters/event.adapter.ts]"]
+    node_2["dayToPayBreadownVM<br/>[src/adapters/dayToPayBreadownVM.ts]"]
+    node_3["monthToPayBreakdownVM<br/>[src/adapters/monthToPayBreakdownVM.ts]"]
+  end
+  node_0 -->|"imports"| external_http
+  external_http{{"HTTP client (axios)"}}
+  click node_0 "https://github.com/dmaman86/shiftly/blob/v0.3.0/src/services/hebcal/hebcal.service.ts"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/v0.3.0/src/adapters/event.adapter.ts"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/v0.3.0/src/adapters/dayToPayBreadownVM.ts"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/v0.3.0/src/adapters/monthToPayBreakdownVM.ts"
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class node_0,node_1,node_2,node_3 toneRose

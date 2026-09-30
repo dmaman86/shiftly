@@ -1,0 +1,46 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+%% Source: v0.7.0 (v0.7.0). Layers are derived from modules present at this commit. Commit: 8d3bb69b9a92e6c844c9bceb8e42a2751c146d01.
+%% Arrows aggregate source dependencies, including type imports.
+flowchart TD
+  subgraph group_data["Infrastructure and data"]
+    layer_data["Application services and adapters"]
+  end
+  subgraph group_ui["Presentation"]
+    layer_ui["React presentation"]
+  end
+  subgraph group_app["Application"]
+    layer_app["Application composition and hooks<br/>Redux state"]
+  end
+  subgraph group_domain["Payroll logic"]
+    layer_domain["Payroll domain (src/domain)"]
+  end
+  layer_data -->|"depends on"| layer_domain
+  layer_ui -->|"depends on"| layer_app
+  layer_app -->|"depends on"| layer_domain
+  layer_ui -->|"depends on"| layer_domain
+  layer_domain -->|"depends on"| layer_ui
+  layer_ui -->|"depends on"| layer_data
+  layer_app -->|"depends on"| layer_data
+  layer_app -->|"depends on"| layer_ui
+  click layer_data "https://github.com/dmaman86/shiftly/blob/v0.7.0/src/services/hebcal/hebcal.service.ts"
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class layer_data toneRose
+  click layer_ui "https://github.com/dmaman86/shiftly/blob/v0.7.0/src/app/App.tsx"
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  class layer_ui toneBlue
+  click layer_app "https://github.com/dmaman86/shiftly/blob/v0.7.0/src/redux/store.ts"
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class layer_app toneMint
+  click layer_domain "https://github.com/dmaman86/shiftly/blob/v0.7.0/src/domain/composition.ts"
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  class layer_domain toneAmber

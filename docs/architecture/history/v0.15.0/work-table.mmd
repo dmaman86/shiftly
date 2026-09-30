@@ -6,37 +6,48 @@ config:
     primaryColor: "#313244"
     primaryTextColor: "#cdd6f4"
     primaryBorderColor: "#89b4fa"
-    lineColor: "#a6adc8"
-    secondaryColor: "#45475a"
-    secondaryTextColor: "#cdd6f4"
-    secondaryBorderColor: "#cba6f7"
-    tertiaryColor: "#585b70"
-    tertiaryTextColor: "#cdd6f4"
-    tertiaryBorderColor: "#f9e2af"
-    clusterBkg: "#181825"
-    clusterBorder: "#cba6f7"
-    edgeLabelBackground: "#1e1e2e"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
 ---
-flowchart LR
-    subgraph workTable["Work Table Feature"]
-      workTableUi["WorkTable & DayRow<br/>(UI Components)"]
-      workTableState["WorkTableDayStateProvider<br/>useWorkTableMonthSession<br/>(State Management)"]
-      workTableMappers["Work Table Mappers"]
-
-      workTableUi -->|"uses/updates"| workTableState
-      workTableState -->|"transforms data"| workTableMappers
-    end
-
-    subgraph salarySummary["Salary Summary Feature"]
-      salaryUi["MonthlySalarySummary<br/>& SalaryCardSection<br/>(UI Components)"]
-      salaryMappers["Salary Summary Mappers"]
-
-      salaryUi -->|"processes data"| salaryMappers
-    end
-
-    globalStore["Global State Store"]
-
-    workTableState -->|"persists/hydrates"| globalStore
-    workTableMappers -->|"updates breakdowns"| globalStore
-    globalStore -->|"provides aggregated data"| salaryUi
-    salaryUi -->|"reads breakdowns"| globalStore
+%% Source: v0.15.0 (v0.15.0). Module dependencies include type imports. Commit: 54d4a78eb0d5233313529b5a0047751a924ad139.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+flowchart TD
+  subgraph group_ui["Presentation"]
+    node_0["WorkTable<br/>[src/features/work-table/components/WorkTable.tsx]"]
+    node_1["DayRow<br/>[src/features/work-table/components/DayRow.tsx]"]
+    node_4["MonthlySalarySummary<br/>[src/features/salary-summary/components/MonthlySalarySummary.tsx]"]
+    node_5["SalaryCardSection<br/>[src/features/salary-summary/components/SalaryCardSection.tsx]"]
+  end
+  subgraph group_app["Application and state"]
+    node_2["WorkTableDayStateProvider<br/>[src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx]"]
+    node_3["useDay<br/>[src/features/work-table/hooks/useDay.ts]"]
+    node_6["useGlobalState<br/>[src/hooks/useGlobalState.ts]"]
+    node_7["useGlobalBreakdown<br/>[src/hooks/useGlobalBreakdown.ts]"]
+    node_8["globalStore<br/>[src/store/globalStore.ts]"]
+    node_9["useWorkDays<br/>[src/hooks/useWorkDays.ts]"]
+  end
+  node_0 -->|"depends on"| node_7
+  node_0 -->|"depends on"| node_6
+  node_0 -->|"depends on"| node_1
+  node_0 -->|"depends on"| node_2
+  node_4 -->|"depends on"| node_5
+  node_4 -->|"depends on"| node_7
+  node_4 -->|"depends on"| node_6
+  node_5 -->|"depends on"| node_6
+  node_6 -->|"depends on"| node_8
+  node_7 -->|"depends on"| node_8
+  node_9 -->|"depends on"| node_6
+  click node_0 "https://github.com/dmaman86/shiftly/blob/v0.15.0/src/features/work-table/components/WorkTable.tsx"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/v0.15.0/src/features/work-table/components/DayRow.tsx"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/v0.15.0/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/v0.15.0/src/features/work-table/hooks/useDay.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/v0.15.0/src/features/salary-summary/components/MonthlySalarySummary.tsx"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/v0.15.0/src/features/salary-summary/components/SalaryCardSection.tsx"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/v0.15.0/src/hooks/useGlobalState.ts"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/v0.15.0/src/hooks/useGlobalBreakdown.ts"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/v0.15.0/src/store/globalStore.ts"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/v0.15.0/src/hooks/useWorkDays.ts"
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  class node_0,node_1,node_4,node_5 toneBlue
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class node_2,node_3,node_6,node_7,node_8,node_9 toneMint

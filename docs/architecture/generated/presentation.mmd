@@ -9,49 +9,54 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
+%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
 flowchart TD
-  subgraph group_ui["User experience"]
-    node_app["Application shell<br/>[App.tsx]"]
-    node_routes["Application routes<br/>[AppRoutes.tsx]"]
-    node_daily["Daily page<br/>[DailyPage.tsx]"]
-    node_monthly["Monthly summary<br/>[MonthlySummaryPage.tsx]"]
-    node_rules["Calculation rules<br/>[CalculationRulesPage.tsx]"]
-    node_worktable["Work table<br/>[WorkTable.tsx]"]
-    node_guestnotice["Guest mode notice<br/>[GuestModeNotice.tsx]"]
-    node_signin["Google sign-in<br/>[GoogleSignInButton.tsx]"]
-    node_conflict["Guest draft conflict dialog<br/>[GuestDraftConflictDialog.tsx]"]
-    node_daycontroller["Day controller<br/>[useDayController.ts]"]
-    node_salary["Salary summary<br/>[MonthlySalarySummary.tsx]"]
-    node_dayviews["Day pay breakdown<br/>[dayToPayBreadownVM.ts]"]
-    node_monthbreakdown["Month pay breakdown<br/>[monthToPayBreakdownVM.ts]"]
+  subgraph group_ui["Presentation"]
+    node_0["App<br/>[apps/web/src/app/App.tsx]"]
+    node_1["AppRoutes<br/>[apps/web/src/app/routes/AppRoutes.tsx]"]
+    node_2["DailyPage<br/>[apps/web/src/pages/DailyPage.tsx]"]
+    node_3["MonthlySummaryPage<br/>[apps/web/src/pages/MonthlySummaryPage.tsx]"]
+    node_4["CalculationRulesPage<br/>[apps/web/src/pages/CalculationRulesPage.tsx]"]
+    node_5["WorkTable<br/>[apps/web/src/features/work-table/components/month/WorkTable.tsx]"]
+    node_6["GuestModeNotice<br/>[apps/web/src/features/auth/GuestModeNotice.tsx]"]
+    node_7["GoogleSignInButton<br/>[apps/web/src/features/auth/GoogleSignInButton.tsx]"]
+    node_8["GuestDraftConflictDialog<br/>[apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx]"]
+    node_9["MonthlySalarySummary<br/>[apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx]"]
   end
-
-  node_app -->|"renders"| node_routes
-  node_routes -->|"routes to"| node_daily
-  node_routes -->|"routes to"| node_monthly
-  node_routes -->|"routes to"| node_rules
-  node_daily -->|"presents"| node_worktable
-  node_worktable -->|"warns guests"| node_guestnotice
-  node_guestnotice -->|"offers"| node_signin
-  node_app -->|"asks before overwriting saved month"| node_conflict
-  node_worktable -->|"delegates day interactions"| node_daycontroller
-  node_daycontroller -->|"maps"| node_dayviews
-  node_monthly -->|"shows totals"| node_salary
-  node_monthly -->|"maps monthly pay"| node_monthbreakdown
-
-  click node_app "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/App.tsx"
-  click node_routes "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AppRoutes.tsx"
-  click node_daily "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/DailyPage.tsx"
-  click node_monthly "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/MonthlySummaryPage.tsx"
-  click node_rules "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/CalculationRulesPage.tsx"
-  click node_worktable "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/components/month/WorkTable.tsx"
-  click node_guestnotice "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GuestModeNotice.tsx"
-  click node_signin "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GoogleSignInButton.tsx"
-  click node_conflict "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx"
-  click node_daycontroller "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/day/useDayController.ts"
-  click node_salary "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx"
-  click node_dayviews "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreadownVM.ts"
-  click node_monthbreakdown "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
-
+  subgraph group_app["Application and state"]
+    node_10["useDayController<br/>[apps/web/src/features/work-table/hooks/day/useDayController.ts]"]
+  end
+  subgraph group_data["Infrastructure and adapters"]
+    node_11["dayToPayBreadownVM<br/>[apps/web/src/adapters/dayToPayBreadownVM.ts]"]
+    node_12["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
+  end
+  node_0 -->|"depends on"| node_1
+  node_1 -->|"depends on"| node_2
+  node_1 -->|"depends on"| node_3
+  node_1 -->|"depends on"| node_4
+  node_2 -->|"depends on"| node_5
+  node_2 -->|"depends on"| node_9
+  node_3 -->|"depends on"| node_9
+  node_5 -->|"depends on"| node_6
+  node_6 -->|"depends on"| node_7
+  node_10 -->|"depends on"| node_11
+  click node_0 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/App.tsx"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AppRoutes.tsx"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/DailyPage.tsx"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/MonthlySummaryPage.tsx"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/CalculationRulesPage.tsx"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/components/month/WorkTable.tsx"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GuestModeNotice.tsx"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GoogleSignInButton.tsx"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx"
+  click node_9 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx"
+  click node_10 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/day/useDayController.ts"
+  click node_11 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreadownVM.ts"
+  click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
   classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
-  class node_app,node_routes,node_daily,node_monthly,node_rules,node_worktable,node_guestnotice,node_signin,node_conflict,node_daycontroller,node_salary,node_dayviews,node_monthbreakdown toneBlue
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9 toneBlue
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class node_10 toneMint
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class node_11,node_12 toneRose

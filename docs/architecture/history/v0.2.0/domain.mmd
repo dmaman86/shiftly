@@ -6,24 +6,30 @@ config:
     primaryColor: "#313244"
     primaryTextColor: "#cdd6f4"
     primaryBorderColor: "#89b4fa"
-    lineColor: "#a6adc8"
-    secondaryColor: "#45475a"
-    secondaryTextColor: "#cdd6f4"
-    secondaryBorderColor: "#cba6f7"
-    tertiaryColor: "#585b70"
-    tertiaryTextColor: "#cdd6f4"
-    tertiaryBorderColor: "#f9e2af"
-    clusterBkg: "#181825"
-    clusterBorder: "#cba6f7"
-    edgeLabelBackground: "#1e1e2e"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
 ---
-flowchart TB
-    components["{Builder | Calculator | Factory}"]
-    breakdowns["{Pay Breakdowns | Time-based Aggregations}"]
-    reducers["{Reducers | Resolvers}"]
-    pipeline["PayMapPipeline"]
-
-    components -->|"operate on"| breakdowns
-    breakdowns -->|"aggregated by"| reducers
-    components -->|"composed by"| pipeline
-    reducers -->|"integrated into"| pipeline
+%% Source: v0.2.0 (v0.2.0). Module dependencies include type imports. Commit: de46c35d48079dab348156c5a15a152aa0129244.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+flowchart TD
+  subgraph group_domain["Payroll logic"]
+    node_0["holiday.service<br/>[src/domain/services/holiday.service.ts]"]
+    node_1["segments.service<br/>[src/domain/services/segments.service.ts]"]
+    node_2["breakdown.service<br/>[src/domain/services/breakdown.service.ts]"]
+    node_3["segmentResolver.service<br/>[src/domain/services/segmentResolver.service.ts]"]
+    node_4["breakdownResolve.service<br/>[src/domain/services/breakdownResolve.service.ts]"]
+    node_5["paySegmentFactory.service<br/>[src/domain/services/paySegmentFactory.service.ts]"]
+  end
+  node_1 -->|"depends on"| node_5
+  node_2 -->|"depends on"| node_5
+  node_2 -->|"depends on"| node_1
+  node_4 -->|"depends on"| node_2
+  node_4 -->|"depends on"| node_3
+  click node_0 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/domain/services/holiday.service.ts"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/domain/services/segments.service.ts"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/domain/services/breakdown.service.ts"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/domain/services/segmentResolver.service.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/domain/services/breakdownResolve.service.ts"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/v0.2.0/src/domain/services/paySegmentFactory.service.ts"
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  class node_0,node_1,node_2,node_3,node_4,node_5 toneAmber

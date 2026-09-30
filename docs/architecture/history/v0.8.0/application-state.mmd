@@ -6,29 +6,42 @@ config:
     primaryColor: "#313244"
     primaryTextColor: "#cdd6f4"
     primaryBorderColor: "#89b4fa"
-    lineColor: "#a6adc8"
-    secondaryColor: "#45475a"
-    secondaryTextColor: "#cdd6f4"
-    secondaryBorderColor: "#cba6f7"
-    tertiaryColor: "#585b70"
-    tertiaryTextColor: "#cdd6f4"
-    tertiaryBorderColor: "#f9e2af"
-    clusterBkg: "#181825"
-    clusterBorder: "#cba6f7"
-    edgeLabelBackground: "#1e1e2e"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
 ---
-flowchart TB
-    components["React Components"]
-    globalStateHook["useGlobalState Hook"]
-    globalBreakdownHook["useGlobalBreakdown Hook"]
-    globalStore["Zustand Global Store<br/>(useGlobalStore)"]
-    breakdownCalculator["Global Breakdown Calculator<br/>(calculateGlobalBreakdown)"]
-    state["Global State<br/>(GlobalState, initialGlobalState)"]
-
-    components -->|"uses"| globalStateHook
-    components -->|"uses"| globalBreakdownHook
-    globalStateHook -->|"accesses"| globalStore
-    globalBreakdownHook -->|"reads dailyPayMaps from"| globalStore
-    globalBreakdownHook -->|"uses"| breakdownCalculator
-    globalStore -->|"manages"| state
-    breakdownCalculator -->|"processes dailyPayMaps from"| state
+%% Source: v0.8.0 (v0.8.0). Module dependencies include type imports. Commit: 5d271f39d491fe3b50a20051eb313e245a5d6cdf.
+%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+flowchart TD
+  subgraph group_ui["Presentation"]
+    node_7["App<br/>[src/app/App.tsx]"]
+    node_8["WorkTable<br/>[src/features/work-table/components/WorkTable.tsx]"]
+  end
+  subgraph group_app["Application and state"]
+    node_0["store<br/>[src/redux/store.ts]"]
+    node_1["globalSlice<br/>[src/redux/states/globalSlice.ts]"]
+    node_2["workDaysSlice<br/>[src/redux/states/workDaysSlice.ts]"]
+    node_3["useGlobalState<br/>[src/hooks/useGlobalState.ts]"]
+    node_4["useDomain<br/>[src/hooks/useDomain.ts]"]
+    node_5["useWorkDays<br/>[src/hooks/useWorkDays.ts]"]
+    node_6["domain.instance<br/>[src/app/domain/domain.instance.ts]"]
+  end
+  node_0 -->|"depends on"| node_2
+  node_0 -->|"depends on"| node_1
+  node_1 -->|"depends on"| node_6
+  node_2 -->|"depends on"| node_6
+  node_3 -->|"depends on"| node_0
+  node_5 -->|"depends on"| node_0
+  node_8 -->|"depends on"| node_3
+  click node_0 "https://github.com/dmaman86/shiftly/blob/v0.8.0/src/redux/store.ts"
+  click node_1 "https://github.com/dmaman86/shiftly/blob/v0.8.0/src/redux/states/globalSlice.ts"
+  click node_2 "https://github.com/dmaman86/shiftly/blob/v0.8.0/src/redux/states/workDaysSlice.ts"
+  click node_3 "https://github.com/dmaman86/shiftly/blob/v0.8.0/src/hooks/useGlobalState.ts"
+  click node_4 "https://github.com/dmaman86/shiftly/blob/v0.8.0/src/hooks/useDomain.ts"
+  click node_5 "https://github.com/dmaman86/shiftly/blob/v0.8.0/src/hooks/useWorkDays.ts"
+  click node_6 "https://github.com/dmaman86/shiftly/blob/v0.8.0/src/app/domain/domain.instance.ts"
+  click node_7 "https://github.com/dmaman86/shiftly/blob/v0.8.0/src/app/App.tsx"
+  click node_8 "https://github.com/dmaman86/shiftly/blob/v0.8.0/src/features/work-table/components/WorkTable.tsx"
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  class node_7,node_8 toneBlue
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class node_0,node_1,node_2,node_3,node_4,node_5,node_6 toneMint
