@@ -1,21 +1,32 @@
-# Shiftly – Work Hours Tracking & Calculation System
+# Shiftly
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://dmaman86.github.io/shiftly/?utm_source=github&utm_medium=readme)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/dmaman86/shiftly)
-![React](https://img.shields.io/badge/React-19.2.3-61DAFB?logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
-![Zustand](https://img.shields.io/badge/Zustand-5.0.15-433E38?logo=react&logoColor=white)
-![TanStack Query](https://img.shields.io/badge/TanStack_Query-5-FF4154?logo=reactquery&logoColor=white)
-![MUI](https://img.shields.io/badge/Material_UI-7.0.2-007FFF?logo=mui&logoColor=white)
-![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-2.112.4-3ECF8E?logo=supabase&logoColor=white)
+Israeli government-office shift pay is hard to verify. Shiftly turns your shifts into daily pay breakdowns and a monthly gross-pay estimate.
+
 [![CI](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml/badge.svg)](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7.2-blue?logo=typescript)
 [![codecov](https://codecov.io/gh/dmaman86/shiftly/branch/main/graph/badge.svg)](https://codecov.io/gh/dmaman86/shiftly)
-![License](https://img.shields.io/badge/license-MIT-blue)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://dmaman86.github.io/shiftly/)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Shiftly tracks work shifts and explains Israeli payroll calculations through a
-transparent, testable domain model.
+Stack: TypeScript · React · Vite · Zustand · TanStack Query · MUI · Supabase · Vitest · Playwright
+
+**[Live demo](https://dmaman86.github.io/shiftly/) · [עברית](README_HE.md) · [Full technical reference](docs/reference/README.md)**
+
+![Recorded desktop E2E flow in Hebrew: entering shifts and expanding daily calculation details](.github/assets/demos/august-2026-he-desktop.gif)
+
+## Why it exists
+
+Shiftly grew out of a recurring shift-work payroll problem in a government office: recorded shifts do not map directly to the overtime, Shabbat/holiday rates and premiums on a payslip. It is deployed on GitHub Pages to make those calculations inspectable.
+
+<!-- TODO: add validation line once VALIDATION.md exists -->
+
+> Calculations are indicative gross-pay estimates, not a replacement for official payroll.
+
+## Engineering highlights
+
+- **Independent calculation engine:** React consumes the TypeScript [`@shiftly/domain` package](packages/domain/) through an explicit public API; the engine has no React or DOM dependency.
+- **Tested deployment artifact:** [CI](.github/workflows/ci.yml) runs E2E against the downloaded production `dist` artifact and deploys that same artifact only after checks and E2E pass.
+- **Browser coverage:** [Playwright projects](playwright.config.ts) exercise desktop Chromium, Android emulation (Chromium) and iPhone emulation (WebKit).
+- **User-scoped persistence:** the [database migration](supabase/migrations/20260830000000_persistence_schema.sql) enables Supabase Row Level Security on monthly settings, work days and shifts, with ownership policies based on `auth.uid()`.
 
 ## Quick start
 
@@ -35,13 +46,12 @@ Open `http://localhost:5173/shiftly`.
 
 ## Documentation
 
-- [Detailed project reference](docs/reference/README.md)
-- [Detailed Hebrew reference](docs/reference/README_HE.md)
-- [Architecture documentation](docs/architecture/)
-- [Generated architecture diagrams](docs/architecture/generated/)
-- [Architecture history](docs/architecture/history/)
+- [Full technical reference](docs/reference/README.md)
+- [Hebrew technical reference](docs/reference/README_HE.md)
 - [Independent payroll engine](packages/domain/README.md)
-- [Workspace migration and validation](docs/domain-workspace-migration.md)
+- [Architecture documentation](docs/architecture/)
+- [Current architecture diagrams](docs/architecture/generated/)
+- [Architecture history by tag](docs/architecture/history/)
 
 ## Common commands
 
@@ -55,10 +65,8 @@ bun run test:e2e
 
 The web lives in `apps/web` and consumes `@shiftly/domain` from `packages/domain`.
 Run `bun run dev:domain` in a second terminal when editing engine sources so the
-compiled package updates while Vite is running. CI gates deployment on engine
-and web checks, then tests the production build with Playwright.
+compiled package updates while Vite is running.
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-\n\n
