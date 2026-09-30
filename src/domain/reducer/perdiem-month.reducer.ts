@@ -13,12 +13,4 @@ export class DefaultPerDiemMonthReducer implements PerDiemMonthReducer {
       amount: base.amount + add.amount,
     };
   }
-
-  subtract(base: PerDiemInfo, sub: PerDiemInfo): PerDiemInfo {
-    return {
-      tier: null,
-      points: Math.max(base.points - sub.points, 0),
-      amount: Math.max(base.amount - sub.amount, 0),
-    };
-  }
 }

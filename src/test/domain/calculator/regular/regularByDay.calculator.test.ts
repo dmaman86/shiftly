@@ -600,38 +600,6 @@ describe("RegularByDayCalculator", () => {
       });
     });
 
-    it("should produce results compatible with subtract", () => {
-      const input1: RegularInput = {
-        totalHours: 13,
-        standardHours: 9,
-        meta: {
-          date: "2024-01-01",
-          typeDay: WorkDayType.Regular,
-          crossDayContinuation: false,
-        },
-      };
-
-      const input2: RegularInput = {
-        totalHours: 10,
-        standardHours: 9,
-        meta: {
-          date: "2024-01-02",
-          typeDay: WorkDayType.Regular,
-          crossDayContinuation: false,
-        },
-      };
-
-      const result1 = calculator.calculate(input1);
-      const result2 = calculator.calculate(input2);
-      const subtracted = calculator.subtract(result1, result2);
-
-      expect(subtracted).toEqual({
-        hours100: { percent: 1, hours: 0 },
-        hours125: { percent: 1.25, hours: 1 },
-        hours150: { percent: 1.5, hours: 2 },
-      });
-    });
-
     it("should work with createEmpty for accumulation", () => {
       const input: RegularInput = {
         totalHours: 12,

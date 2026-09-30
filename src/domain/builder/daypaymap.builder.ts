@@ -13,6 +13,7 @@ import {
   WorkDayMap,
 } from "../types/data-shapes";
 import { PerDiemShiftInfo, TimelineInterval, WorkDayMeta } from "../types/types";
+import { getAdditionGroups } from "../calculator/additions/addition-groups";
 
 export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
   constructor(
@@ -105,7 +106,10 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
     isFieldDutyDay: boolean;
   }) {
     const nightHours =
-      params.extra.hours50.hours + params.special.shabbat200.hours;
+      getAdditionGroups(params.extra)
+        .filter(({ kind }) => kind === "night")
+        .reduce((total, { segment }) => total + segment.hours, 0)
+      + params.special.shabbat200.hours;
 
     return {
       totalHours: params.totalHours,

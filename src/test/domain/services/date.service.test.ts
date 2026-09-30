@@ -371,6 +371,33 @@ describe("DateService", () => {
     });
   });
 
+  describe("persisted work timezone conversion", () => {
+    it("persists summer wall-clock time as an Asia/Jerusalem instant", () => {
+      const localWallClock = service.createDateWithTime("2026-08-01", 9, 0);
+
+      expect(service.toPersistedDateTime(localWallClock)).toBe(
+        "2026-08-01T06:00:00.000Z",
+      );
+
+      const restored = service.createDateFromPersisted(
+        "2026-08-01T06:00:00.000Z",
+      );
+      expect(restored.getFullYear()).toBe(2026);
+      expect(restored.getMonth()).toBe(7);
+      expect(restored.getDate()).toBe(1);
+      expect(restored.getHours()).toBe(9);
+      expect(restored.getMinutes()).toBe(0);
+    });
+
+    it("uses the winter Asia/Jerusalem offset", () => {
+      const localWallClock = service.createDateWithTime("2026-01-15", 9, 0);
+
+      expect(service.toPersistedDateTime(localWallClock)).toBe(
+        "2026-01-15T07:00:00.000Z",
+      );
+    });
+  });
+
   describe("getNextMonthDay", () => {
     it("should return first day of next month (January -> February)", () => {
       const result = service.getNextMonthDay(2025, 1);

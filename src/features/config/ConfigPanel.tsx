@@ -95,7 +95,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
         {/* Header */}
         <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
           <SettingsIcon color="primary" fontSize="small" />
-          <Typography variant="h6" fontWeight="bold">
+          <Typography variant="h6" component="h2" fontWeight="bold">
             {t("config.title")}
           </Typography>
         </Box>
@@ -118,7 +118,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                   sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
                 >
                   <CalendarTodayIcon fontSize="small" color="primary" />
-                  <Typography variant="subtitle1" fontWeight="bold">
+                  <Typography variant="subtitle1" component="h3" fontWeight="bold">
                     {t("config.date_section")}
                   </Typography>
                 </Box>
@@ -198,7 +198,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                   sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
                 >
                   <PaymentsIcon fontSize="small" color="primary" />
-                  <Typography variant="subtitle1" fontWeight="bold">
+                  <Typography variant="subtitle1" component="h3" fontWeight="bold">
                     {t("config.work_params_section")}
                   </Typography>
                 </Box>

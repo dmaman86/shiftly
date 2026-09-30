@@ -1,6 +1,7 @@
 import { TFunction } from "i18next";
 
 import type { PayBreakdownViewModel } from "@/app/types";
+import { getAdditionGroups } from "@/domain";
 
 export type DetailItem = { label: string; value: number };
 export type DetailSection = { label: string; items: DetailItem[] };
@@ -46,10 +47,12 @@ export const breakdownToDetailGroups = (
   {
     key: "extras",
     title: t("headers.extras"),
-    items: [
-      { label: "20%", value: breakdown.extra.hours20.hours },
-      { label: "50%", value: breakdown.extra.hours50.hours },
-    ],
+    items: getAdditionGroups(breakdown.extra).map(({ key, kind, segment }) => ({
+      label: key === "hours20" || key === "hours50"
+        ? `${segment.percent * 100}%`
+        : t(`pay_labels.${kind}`, { percent: segment.percent * 100 }),
+      value: segment.hours,
+    })),
   },
   ...(showShabbatCreditUsed
     ? [

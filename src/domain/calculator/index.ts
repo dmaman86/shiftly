@@ -1,6 +1,7 @@
 export { DefaultHolidayCalculator } from "./holiday.calculator.ts";
 export { FixedSegmentCalculator } from "./fixed-segment.calculator.ts";
 export { ExtraCalculator } from "./extra/extra.calculator.ts";
+export { additionGroupKey, getAdditionGroups } from "./additions/addition-groups";
 export { TimelineMealAllowanceCalculator } from "./mealallowance/timeline-meal-allowance.calculator.ts";
 export { TimelinePerDiemCalculator } from "./perdiem/timeline-per-diem.calculator.ts";
 export { BaseRegularCalculator } from "./regular/baseRegular.calculator.ts";

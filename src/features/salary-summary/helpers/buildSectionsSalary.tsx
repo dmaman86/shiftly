@@ -46,9 +46,9 @@ export const buildSectionsSalary = ({
 
     createExtraSectionFactory("extra", {
       title: t("salary_summary.extras_title"),
-      icon: <AddCircleOutlineIcon sx={{ color: "#ed6c02" }} />,
+      icon: <AddCircleOutlineIcon sx={{ color: "#a64400" }} />,
       summaryLabel: t("salary_summary.extras_summary"),
-      color: "#ed6c02",
+      color: "#a64400",
       payVM,
       baseRate,
       buildRows: (vm, rate) => buildExtraPayRows(vm, rate, t),

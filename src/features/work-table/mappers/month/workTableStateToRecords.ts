@@ -1,4 +1,5 @@
 import { WorkDayStatus } from "@/domain/constants";
+import { DateService } from "@/domain/services/date.service";
 import type { ShiftRecord } from "@/services/shift/shift.service";
 import type { WorkDayRecord } from "@/services/workDay/workDay.service";
 import type { WorkTableDayState } from "../../context/workTableDayState/workTableDayStateContext";
@@ -14,6 +15,7 @@ export type WorkTableRecords = {
  */
 export const workTableStateToRecords = (
   state: WorkTableDayState,
+  dateService = new DateService(),
 ): WorkTableRecords => {
   const days: WorkDayRecord[] = [];
   const shifts: ShiftRecord[] = [];
@@ -28,8 +30,8 @@ export const workTableStateToRecords = (
       shifts.push({
         id: shift.id,
         date,
-        start_time: shift.start.date.toISOString(),
-        end_time: shift.end.date.toISOString(),
+        start_time: dateService.toPersistedDateTime(shift.start.date),
+        end_time: dateService.toPersistedDateTime(shift.end.date),
         is_duty: shift.isDuty,
       });
     }

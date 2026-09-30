@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 
 import { dayToPayBreakdownVM } from "@/adapters";
 import { WorkDayStatus, WorkDayType } from "@/domain/constants";
+import { getAdditionGroups, type AdditionGroupKey } from "@/domain";
 import { DomainContextType } from "@/app";
 import type {
   PayBreakdownViewModel,
@@ -43,6 +44,7 @@ type PrintDayRowProps = {
   standardHours: number;
   shabbatCreditHours: number;
   isLastInWeek: boolean;
+  additionKeys: AdditionGroupKey[];
 };
 
 const PrintDayRow = ({
@@ -54,6 +56,7 @@ const PrintDayRow = ({
   standardHours,
   shabbatCreditHours,
   isLastInWeek,
+  additionKeys,
 }: PrintDayRowProps) => {
   const { t } = useTranslation("work-table");
   const { status, shiftEntries } = useWorkTableDayState(workDay.meta.date);
@@ -134,8 +137,11 @@ const PrintDayRow = ({
       <TableCell>{formatValue(calculation.breakdown.regular.hours100.hours)}</TableCell>
       <TableCell>{formatValue(calculation.breakdown.regular.hours125.hours)}</TableCell>
       <TableCell>{formatValue(calculation.breakdown.regular.hours150.hours)}</TableCell>
-      <TableCell>{formatValue(calculation.breakdown.extra.hours20.hours)}</TableCell>
-      <TableCell>{formatValue(calculation.breakdown.extra.hours50.hours)}</TableCell>
+      {additionKeys.map((key) => (
+        <TableCell key={key}>
+          {formatValue(calculation.breakdown.extra[key]?.hours)}
+        </TableCell>
+      ))}
       <TableCell>{formatValue(calculation.breakdown.special.shabbat150.hours)}</TableCell>
       <TableCell>{formatValue(calculation.breakdown.special.shabbat200.hours)}</TableCell>
       <TableCell>{specialFullDay ? "" : formatValue(calculation.breakdown.hours100Sick.hours)}</TableCell>
@@ -169,6 +175,8 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
   const { t } = useTranslation("work-table");
   const { month, year, baseRate, standardHours } = useGlobalState();
   const groupedWorkDays = useMemo(() => groupByShabbat(workDays), [workDays]);
+  const additionGroups = getAdditionGroups(monthBreakdown.extra);
+  const additionKeys = additionGroups.map(({ key }) => key);
 
   return (
     <>
@@ -242,7 +250,7 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
                 <TableCell rowSpan={2}>{t("headers.description")}</TableCell>
                 <TableCell colSpan={2}>{t("headers.total_hours")}</TableCell>
                 <TableCell colSpan={3}>{t("headers.regular")}</TableCell>
-                <TableCell colSpan={2}>{t("headers.extras")}</TableCell>
+                <TableCell colSpan={additionGroups.length}>{t("headers.extras")}</TableCell>
                 <TableCell colSpan={2}>{t("headers.shabbat")}</TableCell>
                 <TableCell colSpan={2}>{t("headers.absence")}</TableCell>
                 <TableCell rowSpan={2}>{t("headers.shabbat_credit")}</TableCell>
@@ -259,8 +267,13 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
                 <TableCell>100%</TableCell>
                 <TableCell>125%</TableCell>
                 <TableCell>150%</TableCell>
-                <TableCell>20%</TableCell>
-                <TableCell>50%</TableCell>
+                {additionGroups.map(({ key, kind, segment }) => (
+                  <TableCell key={key}>
+                    {key === "hours20" || key === "hours50"
+                      ? `${segment.percent * 100}%`
+                      : t(`pay_labels.${kind}`, { percent: segment.percent * 100 })}
+                  </TableCell>
+                ))}
                 <TableCell>150%</TableCell>
                 <TableCell>200%</TableCell>
                 <TableCell>{t("headers.sick")}</TableCell>
@@ -280,6 +293,7 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
                     standardHours={standardHours}
                     shabbatCreditHours={shabbatCreditHoursByDate[workDay.meta.date] ?? 0}
                     isLastInWeek={dayIndex === group.length - 1}
+                    additionKeys={additionKeys}
                   />
                 ))}
               </TableBody>
@@ -292,8 +306,9 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
                 <TableCell>{formatValue(monthBreakdown.regular.hours100.hours)}</TableCell>
                 <TableCell>{formatValue(monthBreakdown.regular.hours125.hours)}</TableCell>
                 <TableCell>{formatValue(monthBreakdown.regular.hours150.hours)}</TableCell>
-                <TableCell>{formatValue(monthBreakdown.extra.hours20.hours)}</TableCell>
-                <TableCell>{formatValue(monthBreakdown.extra.hours50.hours)}</TableCell>
+                {additionGroups.map(({ key, segment }) => (
+                  <TableCell key={key}>{formatValue(segment.hours)}</TableCell>
+                ))}
                 <TableCell>{formatValue(monthBreakdown.special.shabbat150.hours)}</TableCell>
                 <TableCell>{formatValue(monthBreakdown.special.shabbat200.hours)}</TableCell>
                 <TableCell>{formatValue(monthBreakdown.hours100Sick.hours)}</TableCell>

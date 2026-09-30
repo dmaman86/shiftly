@@ -110,10 +110,17 @@ describe("guestDraftStorage", () => {
   });
 
   it("ignores tampered or corrupted storage", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     sessionStorage.setItem(DRAFT_KEY, "{not json");
     guestDraftStorage.markPendingImport();
 
     expect(guestDraftStorage.consumePending(savedAtMs)).toBeNull();
+    expect(warn).toHaveBeenCalledExactlyOnceWith(
+      "Guest draft storage is unavailable",
+      expect.any(SyntaxError),
+    );
+    expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
+    expect(sessionStorage.getItem(PENDING_IMPORT_KEY)).toBeNull();
   });
 
   it("does not keep an empty draft", () => {

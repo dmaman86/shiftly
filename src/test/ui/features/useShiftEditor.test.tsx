@@ -42,6 +42,19 @@ const createDomain = (payMap: ShiftPayMap) =>
   }) as unknown as DomainContextType;
 
 describe("useShiftEditor", () => {
+  it("does not flag an untouched midnight placeholder but validates edited equal times", () => {
+    const midnight = new Date("2026-08-10T00:00:00");
+    const shift = { ...createShift(16), start: { date: midnight }, end: { date: midnight } };
+    const onShiftUpdate = vi.fn();
+    const { result } = renderHook(() => useShiftEditor({
+      domain: createDomain({ totalHours: 0 } as ShiftPayMap), shift, meta,
+      standardHours: 6.67, otherShifts: [], onShiftUpdate,
+    }));
+    expect(result.current.hasError).toBe(false);
+    act(() => result.current.handleChange("end", midnight));
+    expect(result.current.hasError).toBe(true);
+    expect(onShiftUpdate).not.toHaveBeenCalled();
+  });
   it("accepts external updates without emitting a write", () => {
     const domain = createDomain({ totalHours: 8 } as ShiftPayMap);
     const onShiftUpdate = vi.fn();

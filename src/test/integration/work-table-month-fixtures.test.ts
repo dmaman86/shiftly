@@ -59,29 +59,6 @@ const PRECISION = 6;
 const loadFixture = <T>(file: string): T =>
   JSON.parse(readFileSync(resolve("e2e/fixtures", file), "utf8")) as T;
 
-/**
- * The app treats shift times as wall-clock times in the browser's zone.
- * Rewriting the fixture instants as offset-less local ISO strings keeps the
- * result independent of the machine's TZ (UTC in CI, Asia/Jerusalem locally).
- */
-const toLocalWallClock = (instant: string, timeZone: string): string => {
-  const parts = Object.fromEntries(
-    new Intl.DateTimeFormat("en-CA", {
-      timeZone,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hourCycle: "h23",
-    })
-      .formatToParts(new Date(instant))
-      .map(({ type, value }) => [type, value]),
-  );
-  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}`;
-};
-
 const expectCloseTo = (actual: unknown, expected: unknown, path: string) => {
   if (typeof expected === "number") {
     expect(actual, path).toBeTypeOf("number");
@@ -113,11 +90,7 @@ const calculateMonth =(input: MonthFixture) => {
 
   const state = recordsToWorkTableDayState({
     days: input.statuses,
-    shifts: input.shifts.map((shift) => ({
-      ...shift,
-      start_time: toLocalWallClock(shift.start_time, input.timeZone),
-      end_time: toLocalWallClock(shift.end_time, input.timeZone),
-    })),
+    shifts: input.shifts,
     workDays,
     shiftMapBuilder: domain.payMap.shiftMapBuilder,
     standardHours,

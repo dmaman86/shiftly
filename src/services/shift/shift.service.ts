@@ -1,4 +1,5 @@
 import { Shift } from "@/domain";
+import { DateService } from "@/domain/services/date.service";
 import { supabaseCrud } from "@/services/supabase/supabase.crud";
 
 export interface ShiftRecord {
@@ -10,6 +11,7 @@ export interface ShiftRecord {
 }
 
 export const shiftService = () => {
+  const dateService = new DateService();
   const fetchForMonth = (userId: string, startDate: string, endDate: string) =>
     supabaseCrud.select<ShiftRecord>("shifts", {
       select: "id, date, start_time, end_time, is_duty",
@@ -25,8 +27,8 @@ export const shiftService = () => {
       id: shift.id,
       user_id: userId,
       date,
-      start_time: shift.start.date.toISOString(),
-      end_time: shift.end.date.toISOString(),
+      start_time: dateService.toPersistedDateTime(shift.start.date),
+      end_time: dateService.toPersistedDateTime(shift.end.date),
       is_duty: shift.isDuty,
       updated_at: new Date().toISOString(),
     });

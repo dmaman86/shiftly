@@ -15,10 +15,6 @@ export const formatValue = (value: number | null | undefined): string => {
   return rounded.toFixed(2);
 };
 
-export const subtractValues = (a: number, b: number): number => {
-  return Math.max(a - b, 0);
-};
-
 export const calculateActualHours = (
   totalHours: number,
   sickHours: number,

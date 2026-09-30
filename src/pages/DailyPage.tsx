@@ -47,7 +47,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
         <Card sx={{ mb: 3 }}>
           <CardHeader
             title={
-              <Typography variant="h5" fontWeight="bold">
+              <Typography variant="h5" component="h1" fontWeight="bold">
                 {t("page_title")}
               </Typography>
             }

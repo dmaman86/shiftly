@@ -12,6 +12,7 @@ import { ShiftEditorFields, useShiftEditor } from "@/features/work-table";
 type ShiftCardProps = {
   domain: DomainContextType;
   shift: Shift;
+  shiftNumber?: number;
   meta: WorkDayMeta;
   standardHours: number;
   isEditable: boolean;
@@ -23,6 +24,7 @@ type ShiftCardProps = {
 export const ShiftCard = ({
   domain,
   shift,
+  shiftNumber = 1,
   meta,
   standardHours,
   isEditable,
@@ -61,6 +63,7 @@ export const ShiftCard = ({
         additionalActions={
           <Tooltip title={t("shift_row.tooltip_delete")}>
             <IconButton
+              aria-label={t("shift_row.tooltip_delete")}
               size="small"
               onClick={() => {
                 onRemove(shift.id);
@@ -83,6 +86,7 @@ export const ShiftCard = ({
         onToggleDuty={toggleDuty}
         onToggleNextDay={handleToggleNextDay}
         shift={localShift}
+        shiftNumber={shiftNumber}
         testIdPrefix="mobile-shift"
       />
     </Box>

@@ -16,9 +16,14 @@ const workDays: WorkDayInfo[] = [
   },
 ];
 
-const shiftRecord = (id: string, startTime: string, endTime: string): ShiftRecord => ({
+const shiftRecord = (
+  id: string,
+  startTime: string,
+  endTime: string,
+  date = "2026-09-05",
+): ShiftRecord => ({
   id,
-  date: "2026-09-05",
+  date,
   start_time: startTime,
   end_time: endTime,
   is_duty: false,
@@ -45,5 +50,32 @@ describe("recordsToWorkTableDayState", () => {
       "afternoon",
       "evening",
     ]);
+  });
+
+  it("rehydrates persisted instants as Israeli wall-clock fields", () => {
+    const state = recordsToWorkTableDayState({
+      days: [],
+      shifts: [
+        shiftRecord(
+          "morning",
+          "2026-08-01T06:00:00.000Z",
+          "2026-08-01T14:00:00.000Z",
+          "2026-08-01",
+        ),
+      ],
+      workDays: [{
+        meta: {
+          date: "2026-08-01",
+          typeDay: WorkDayType.Regular,
+          crossDayContinuation: false,
+        },
+      }],
+      shiftMapBuilder,
+      standardHours: 6.67,
+    });
+
+    const restored = state["2026-08-01"]?.shiftEntries.morning?.shift;
+    expect(restored?.start.date.getHours()).toBe(9);
+    expect(restored?.end.date.getHours()).toBe(17);
   });
 });

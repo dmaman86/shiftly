@@ -14,7 +14,7 @@ export const SummaryHeader = ({ title, subtitle }: SummaryHeaderProps) => {
       sx={{ mb: 3 }}
     >
       <Box>
-        <Typography variant="h5" fontWeight="bold">
+        <Typography variant="h5" component="h2" fontWeight="bold">
           {title}
         </Typography>
         {subtitle && (

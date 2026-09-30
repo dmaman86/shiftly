@@ -25,18 +25,4 @@ export class FixedSegmentMonthReducer {
       ),
     };
   }
-
-  subtract(base: MonthPayMap, sub: WorkDayMap) {
-    return {
-      hours100Sick: this.fixed.sick.calculate(
-        Math.max(0, base.hours100Sick.hours - sub.hours100Sick.hours),
-      ),
-      hours100Vacation: this.fixed.vacation.calculate(
-        Math.max(0, base.hours100Vacation.hours - sub.hours100Vacation.hours),
-      ),
-      earnedShabbatCredit: this.fixed.earnedShabbatCredit.calculate(
-        Math.max(0, base.earnedShabbatCredit.hours - sub.earnedShabbatCredit.hours),
-      ),
-    };
-  }
 }

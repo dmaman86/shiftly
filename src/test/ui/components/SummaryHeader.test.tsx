@@ -10,11 +10,11 @@ describe("SummaryHeader", () => {
       expect(screen.getByText("Monthly Summary")).toBeInTheDocument();
     });
 
-    it("should render title as h5 heading", () => {
+    it("should render title as h2 heading", () => {
       renderWithTheme(<SummaryHeader title="Salary Breakdown" />);
 
       const heading = screen.getByText("Salary Breakdown");
-      expect(heading.tagName).toBe("H5");
+      expect(heading.tagName).toBe("H2");
     });
 
     it("should render without subtitle", () => {
@@ -181,7 +181,7 @@ describe("SummaryHeader", () => {
       );
 
       // Should have proper heading element
-      const heading = container.querySelector("h5");
+      const heading = container.querySelector("h2");
       expect(heading).toBeInTheDocument();
       expect(heading?.textContent).toBe("Test Title");
     });

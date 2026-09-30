@@ -368,7 +368,7 @@ export const CalculationExampleCard = ({
           spacing={1}
           sx={{ p: 1.5, pb: 0 }}
         >
-          <Typography variant="h6" fontWeight={700}>
+          <Typography variant="h6" component="h3" fontWeight={700}>
             {t("calculation_rules_page.example.day_total", {
               hours: formatValue(calculation.dayBreakdown.actualHours),
             })}
@@ -381,7 +381,7 @@ export const CalculationExampleCard = ({
             >
               {t("calculation_rules_page.example.daily_pay")}
             </Typography>
-            <Typography variant="h5" color="primary.main" fontWeight={700}>
+            <Typography variant="h5" component="p" color="primary.main" fontWeight={700}>
               {calculation.dayCompactBreakdown.dailySalary === undefined
                 ? "—"
                 : `₪${calculation.dayCompactBreakdown.dailySalary.toFixed(2)}`}

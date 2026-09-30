@@ -19,17 +19,25 @@ const workDays: WorkDayInfo[] = ["2026-09-05", "2026-09-06", "2026-09-07"].map(
   }),
 );
 
-const shiftEntry = (id: string, start: string, end: string, isDuty = false) => ({
-  shift: { id, start: { date: new Date(start) }, end: { date: new Date(end) }, isDuty },
+const shiftEntry = (id: string, start: string | Date, end: string | Date, isDuty = false) => ({
+  shift: {
+    id,
+    start: { date: typeof start === "string" ? new Date(start) : start },
+    end: { date: typeof end === "string" ? new Date(end) : end },
+    isDuty,
+  },
   payMap,
 });
+
+const localWallClock = (year: number, month: number, day: number, hour: number) =>
+  new Date(year, month - 1, day, hour, 0, 0, 0);
 
 const state: WorkTableDayState = {
   "2026-09-05": {
     status: WorkDayStatus.normal,
     shiftEntries: {
-      morning: shiftEntry("morning", "2026-09-05T05:00:00.000Z", "2026-09-05T13:00:00.000Z"),
-      night: shiftEntry("night", "2026-09-05T20:00:00.000Z", "2026-09-06T04:00:00.000Z", true),
+      morning: shiftEntry("morning", localWallClock(2026, 9, 5, 8), localWallClock(2026, 9, 5, 16)),
+      night: shiftEntry("night", localWallClock(2026, 9, 5, 20), localWallClock(2026, 9, 6, 4), true),
     },
   },
   "2026-09-06": { status: WorkDayStatus.vacation, shiftEntries: {} },
@@ -57,8 +65,8 @@ describe("workTableStateToRecords", () => {
       {
         id: "night",
         date: "2026-09-05",
-        start_time: "2026-09-05T20:00:00.000Z",
-        end_time: "2026-09-06T04:00:00.000Z",
+        start_time: "2026-09-05T17:00:00.000Z",
+        end_time: "2026-09-06T01:00:00.000Z",
         is_duty: true,
       },
     ]);

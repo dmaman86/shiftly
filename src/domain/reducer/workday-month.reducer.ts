@@ -26,12 +26,4 @@ export class WorkDayMonthReducer implements Reducer<WorkPayPart, WorkDayMap> {
       ),
     };
   }
-
-  subtract(base: WorkPayPart, sub: WorkDayMap): WorkPayPart {
-    return {
-      regular: this.workDay.regular.subtract(base.regular, sub.workMap.regular),
-      extra: this.workDay.extra.subtract(base.extra, sub.workMap.extra),
-      special: this.workDay.special.subtract(base.special, sub.workMap.special),
-    };
-  }
 }

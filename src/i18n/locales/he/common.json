@@ -1,5 +1,6 @@
 {
   "nav": {
+    "skip_to_content": "דלג לתוכן הראשי",
     "app_title": "Shiftly – ניהול שעות עבודה ושכר",
     "daily": "חישוב יומי",
     "monthly": "חישוב חודשי",
@@ -11,6 +12,7 @@
     "contact": "יצירת קשר"
   },
   "config": {
+    "invalid_number": "יש להזין מספר תקין שאינו שלילי.",
     "title": "הגדרות חישוב",
     "date_section": "תאריך",
     "work_params_section": "פרמטרי עבודה",

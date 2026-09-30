@@ -26,17 +26,4 @@ export class SpecialCalculator implements Reducer<SpecialBreakdown> {
       },
     };
   }
-
-  subtract(base: SpecialBreakdown, sub: SpecialBreakdown): SpecialBreakdown {
-    return {
-      shabbat150: {
-        percent: base.shabbat150.percent,
-        hours: Math.max(base.shabbat150.hours - sub.shabbat150.hours, 0),
-      },
-      shabbat200: {
-        percent: base.shabbat200.percent,
-        hours: Math.max(base.shabbat200.hours - sub.shabbat200.hours, 0),
-      },
-    };
-  }
 }

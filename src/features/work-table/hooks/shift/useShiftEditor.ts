@@ -71,5 +71,10 @@ export const useShiftEditor = ({
     localShift,
     hasOverlap,
     ...controls,
+    // A newly added placeholder has no entered range yet. Domain validation
+    // still rejects it, but the UI waits for an edit before showing an error.
+    hasError: controls.hasError && !(draft?.id !== shift.id
+      && localShift.start.date.getTime() === localShift.end.date.getTime()
+      && controls.startMinutes === 0),
   };
 };

@@ -46,21 +46,6 @@ describe("MonthPayMapReducer", () => {
           shabbat200: { percent: 2, hours: base.special.shabbat200.hours + add.workMap.special.shabbat200.hours },
         },
       })),
-      subtract: vi.fn((base, sub) => ({
-        regular: {
-          hours100: { percent: 1, hours: Math.max(0, base.regular.hours100.hours - sub.workMap.regular.hours100.hours) },
-          hours125: { percent: 1.25, hours: Math.max(0, base.regular.hours125.hours - sub.workMap.regular.hours125.hours) },
-          hours150: { percent: 1.5, hours: Math.max(0, base.regular.hours150.hours - sub.workMap.regular.hours150.hours) },
-        },
-        extra: {
-          hours20: { percent: 0.2, hours: Math.max(0, base.extra.hours20.hours - sub.workMap.extra.hours20.hours) },
-          hours50: { percent: 0.5, hours: Math.max(0, base.extra.hours50.hours - sub.workMap.extra.hours50.hours) },
-        },
-        special: {
-          shabbat150: { percent: 1.5, hours: Math.max(0, base.special.shabbat150.hours - sub.workMap.special.shabbat150.hours) },
-          shabbat200: { percent: 2, hours: Math.max(0, base.special.shabbat200.hours - sub.workMap.special.shabbat200.hours) },
-        },
-      })),
     } as unknown as WorkDayMonthReducer;
 
     // Mock FixedSegmentMonthReducer
@@ -75,11 +60,6 @@ describe("MonthPayMapReducer", () => {
         hours100Vacation: { percent: 1, hours: base.hours100Vacation.hours + add.hours100Vacation.hours },
         earnedShabbatCredit: { percent: 1.5, hours: base.earnedShabbatCredit.hours + add.earnedShabbatCredit.hours },
       })),
-      subtract: vi.fn((base, sub) => ({
-        hours100Sick: { percent: 1, hours: Math.max(0, base.hours100Sick.hours - sub.hours100Sick.hours) },
-        hours100Vacation: { percent: 1, hours: Math.max(0, base.hours100Vacation.hours - sub.hours100Vacation.hours) },
-        earnedShabbatCredit: { percent: 1.5, hours: Math.max(0, base.earnedShabbatCredit.hours - sub.earnedShabbatCredit.hours) },
-      })),
     } as unknown as FixedSegmentMonthReducer;
 
     // Mock MealAllowanceMonthReducer
@@ -91,10 +71,6 @@ describe("MonthPayMapReducer", () => {
       accumulate: vi.fn((base, add) => ({
         small: { points: base.small.points + add.small.points, amount: base.small.amount + add.small.amount },
         large: { points: base.large.points + add.large.points, amount: base.large.amount + add.large.amount },
-      })),
-      subtract: vi.fn((base, sub) => ({
-        small: { points: Math.max(0, base.small.points - sub.small.points), amount: Math.max(0, base.small.amount - sub.small.amount) },
-        large: { points: Math.max(0, base.large.points - sub.large.points), amount: Math.max(0, base.large.amount - sub.large.amount) },
       })),
     } as unknown as MealAllowanceMonthReducer;
 
@@ -109,11 +85,6 @@ describe("MonthPayMapReducer", () => {
         tier: null,
         points: base.points + add.points,
         amount: base.amount + add.amount,
-      })),
-      subtract: vi.fn((base, sub) => ({
-        tier: null,
-        points: Math.max(0, base.points - sub.points),
-        amount: Math.max(0, base.amount - sub.amount),
       })),
     } as unknown as PerDiemMonthReducer;
 
@@ -449,301 +420,6 @@ describe("MonthPayMapReducer", () => {
     });
   });
 
-  describe("subtract", () => {
-    it("should subtract totalHours with Math.max", () => {
-      const base = reducer.createEmpty();
-      base.totalHours = 48;
-
-      const sub: Partial<WorkDayMap> = {
-        totalHours: 8,
-        workMap: {
-          regular: {
-            hours100: { percent: 1, hours: 0 },
-            hours125: { percent: 1.25, hours: 0 },
-            hours150: { percent: 1.5, hours: 0 },
-          },
-          extra: {
-            hours20: { percent: 0.2, hours: 0 },
-            hours50: { percent: 0.5, hours: 0 },
-          },
-          special: {
-            shabbat150: { percent: 1.5, hours: 0 },
-            shabbat200: { percent: 2, hours: 0 },
-          },
-          totalHours: 0,
-        },
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        earnedShabbatCredit: { percent: 1.5, hours: 0 },
-        perDiem: {
-          isFieldDutyDay: false,
-          diemInfo: { tier: null, points: 0, amount: 0 },
-        },
-        mealAllowance: {
-          small: { points: 0, amount: 0 },
-          large: { points: 0, amount: 0 },
-        },
-      };
-
-      const result = reducer.subtract(base, sub as WorkDayMap);
-
-      expect(result.totalHours).toBe(40);
-    });
-
-    it("should not allow negative totalHours", () => {
-      const base = reducer.createEmpty();
-      base.totalHours = 5;
-
-      const sub: Partial<WorkDayMap> = {
-        totalHours: 10,
-        workMap: {
-          regular: {
-            hours100: { percent: 1, hours: 0 },
-            hours125: { percent: 1.25, hours: 0 },
-            hours150: { percent: 1.5, hours: 0 },
-          },
-          extra: {
-            hours20: { percent: 0.2, hours: 0 },
-            hours50: { percent: 0.5, hours: 0 },
-          },
-          special: {
-            shabbat150: { percent: 1.5, hours: 0 },
-            shabbat200: { percent: 2, hours: 0 },
-          },
-          totalHours: 0,
-        },
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        earnedShabbatCredit: { percent: 1.5, hours: 0 },
-        perDiem: {
-          isFieldDutyDay: false,
-          diemInfo: { tier: null, points: 0, amount: 0 },
-        },
-        mealAllowance: {
-          small: { points: 0, amount: 0 },
-          large: { points: 0, amount: 0 },
-        },
-      };
-
-      const result = reducer.subtract(base, sub as WorkDayMap);
-
-      expect(result.totalHours).toBe(0);
-    });
-
-    it("should call workPay subtract", () => {
-      const base = reducer.createEmpty();
-      const sub: Partial<WorkDayMap> = {
-        totalHours: 8,
-        workMap: {
-          regular: {
-            hours100: { percent: 1, hours: 8 },
-            hours125: { percent: 1.25, hours: 0 },
-            hours150: { percent: 1.5, hours: 0 },
-          },
-          extra: {
-            hours20: { percent: 0.2, hours: 0 },
-            hours50: { percent: 0.5, hours: 0 },
-          },
-          special: {
-            shabbat150: { percent: 1.5, hours: 0 },
-            shabbat200: { percent: 2, hours: 0 },
-          },
-          totalHours: 8,
-        },
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        earnedShabbatCredit: { percent: 1.5, hours: 0 },
-        perDiem: {
-          isFieldDutyDay: false,
-          diemInfo: { tier: null, points: 0, amount: 0 },
-        },
-        mealAllowance: {
-          small: { points: 0, amount: 0 },
-          large: { points: 0, amount: 0 },
-        },
-      };
-
-      vi.clearAllMocks();
-
-      reducer.subtract(base, sub as WorkDayMap);
-
-      expect(mockWorkPay.subtract).toHaveBeenCalledWith(base, sub);
-    });
-
-    it("should call fixed subtract", () => {
-      const base = reducer.createEmpty();
-      const sub: Partial<WorkDayMap> = {
-        totalHours: 0,
-        workMap: {
-          regular: {
-            hours100: { percent: 1, hours: 0 },
-            hours125: { percent: 1.25, hours: 0 },
-            hours150: { percent: 1.5, hours: 0 },
-          },
-          extra: {
-            hours20: { percent: 0.2, hours: 0 },
-            hours50: { percent: 0.5, hours: 0 },
-          },
-          special: {
-            shabbat150: { percent: 1.5, hours: 0 },
-            shabbat200: { percent: 2, hours: 0 },
-          },
-          totalHours: 0,
-        },
-        hours100Sick: { percent: 1, hours: 8 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        earnedShabbatCredit: { percent: 1.5, hours: 0 },
-        perDiem: {
-          isFieldDutyDay: false,
-          diemInfo: { tier: null, points: 0, amount: 0 },
-        },
-        mealAllowance: {
-          small: { points: 0, amount: 0 },
-          large: { points: 0, amount: 0 },
-        },
-      };
-
-      vi.clearAllMocks();
-
-      reducer.subtract(base, sub as WorkDayMap);
-
-      expect(mockFixed.subtract).toHaveBeenCalledWith(base, sub);
-    });
-
-    it("should call perDiem subtract with diemInfo", () => {
-      const base = reducer.createEmpty();
-      base.perDiem = { tier: "A" as const, points: 5, amount: 181.5 };
-
-      const sub: Partial<WorkDayMap> = {
-        totalHours: 0,
-        workMap: {
-          regular: {
-            hours100: { percent: 1, hours: 0 },
-            hours125: { percent: 1.25, hours: 0 },
-            hours150: { percent: 1.5, hours: 0 },
-          },
-          extra: {
-            hours20: { percent: 0.2, hours: 0 },
-            hours50: { percent: 0.5, hours: 0 },
-          },
-          special: {
-            shabbat150: { percent: 1.5, hours: 0 },
-            shabbat200: { percent: 2, hours: 0 },
-          },
-          totalHours: 0,
-        },
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        earnedShabbatCredit: { percent: 1.5, hours: 0 },
-        perDiem: {
-          isFieldDutyDay: true,
-          diemInfo: { tier: "A" as const, points: 1, amount: 36.3 },
-        },
-        mealAllowance: {
-          small: { points: 0, amount: 0 },
-          large: { points: 0, amount: 0 },
-        },
-      };
-
-      vi.clearAllMocks();
-
-      reducer.subtract(base, sub as WorkDayMap);
-
-      expect(mockPerDiem.subtract).toHaveBeenCalledWith(
-        base.perDiem,
-        sub.perDiem!.diemInfo
-      );
-    });
-
-    it("should call allowances subtract with mealAllowance", () => {
-      const base = reducer.createEmpty();
-      base.mealAllowance = { small: { points: 5, amount: 72.5 }, large: { points: 3, amount: 63.3 } };
-
-      const sub: Partial<WorkDayMap> = {
-        totalHours: 0,
-        workMap: {
-          regular: {
-            hours100: { percent: 1, hours: 0 },
-            hours125: { percent: 1.25, hours: 0 },
-            hours150: { percent: 1.5, hours: 0 },
-          },
-          extra: {
-            hours20: { percent: 0.2, hours: 0 },
-            hours50: { percent: 0.5, hours: 0 },
-          },
-          special: {
-            shabbat150: { percent: 1.5, hours: 0 },
-            shabbat200: { percent: 2, hours: 0 },
-          },
-          totalHours: 0,
-        },
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        earnedShabbatCredit: { percent: 1.5, hours: 0 },
-        perDiem: {
-          isFieldDutyDay: false,
-          diemInfo: { tier: null, points: 0, amount: 0 },
-        },
-        mealAllowance: {
-          small: { points: 1, amount: 14.5 },
-          large: { points: 0, amount: 0 },
-        },
-      };
-
-      vi.clearAllMocks();
-
-      reducer.subtract(base, sub as WorkDayMap);
-
-      expect(mockAllowances.subtract).toHaveBeenCalledWith(
-        base.mealAllowance,
-        sub.mealAllowance
-      );
-    });
-
-    it("should call all sub-reducers in subtract", () => {
-      const base = reducer.createEmpty();
-      const sub: Partial<WorkDayMap> = {
-        totalHours: 8,
-        workMap: {
-          regular: {
-            hours100: { percent: 1, hours: 8 },
-            hours125: { percent: 1.25, hours: 0 },
-            hours150: { percent: 1.5, hours: 0 },
-          },
-          extra: {
-            hours20: { percent: 0.2, hours: 0 },
-            hours50: { percent: 0.5, hours: 0 },
-          },
-          special: {
-            shabbat150: { percent: 1.5, hours: 0 },
-            shabbat200: { percent: 2, hours: 0 },
-          },
-          totalHours: 8,
-        },
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        earnedShabbatCredit: { percent: 1.5, hours: 0 },
-        perDiem: {
-          isFieldDutyDay: false,
-          diemInfo: { tier: null, points: 0, amount: 0 },
-        },
-        mealAllowance: {
-          small: { points: 0, amount: 0 },
-          large: { points: 0, amount: 0 },
-        },
-      };
-
-      vi.clearAllMocks();
-
-      reducer.subtract(base, sub as WorkDayMap);
-
-      expect(mockWorkPay.subtract).toHaveBeenCalledTimes(1);
-      expect(mockFixed.subtract).toHaveBeenCalledTimes(1);
-      expect(mockPerDiem.subtract).toHaveBeenCalledTimes(1);
-      expect(mockAllowances.subtract).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe("Integration: Orchestration", () => {
     it("should orchestrate all reducers in createEmpty", () => {
       vi.clearAllMocks();
@@ -798,49 +474,6 @@ describe("MonthPayMapReducer", () => {
       expect(mockFixed.accumulate).toHaveBeenCalledTimes(1);
       expect(mockPerDiem.accumulate).toHaveBeenCalledTimes(1);
       expect(mockAllowances.accumulate).toHaveBeenCalledTimes(1);
-    });
-
-    it("should orchestrate all reducers in subtract", () => {
-      const base = reducer.createEmpty();
-      const sub: Partial<WorkDayMap> = {
-        totalHours: 10,
-        workMap: {
-          regular: {
-            hours100: { percent: 1, hours: 8 },
-            hours125: { percent: 1.25, hours: 2 },
-            hours150: { percent: 1.5, hours: 0 },
-          },
-          extra: {
-            hours20: { percent: 0.2, hours: 1 },
-            hours50: { percent: 0.5, hours: 1 },
-          },
-          special: {
-            shabbat150: { percent: 1.5, hours: 0 },
-            shabbat200: { percent: 2, hours: 0 },
-          },
-          totalHours: 12,
-        },
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        earnedShabbatCredit: { percent: 1.5, hours: 0 },
-        perDiem: {
-          isFieldDutyDay: true,
-          diemInfo: { tier: "A" as const, points: 1, amount: 36.3 },
-        },
-        mealAllowance: {
-          small: { points: 0, amount: 0 },
-          large: { points: 1, amount: 21.1 },
-        },
-      };
-
-      vi.clearAllMocks();
-
-      reducer.subtract(base, sub as WorkDayMap);
-
-      expect(mockWorkPay.subtract).toHaveBeenCalledTimes(1);
-      expect(mockFixed.subtract).toHaveBeenCalledTimes(1);
-      expect(mockPerDiem.subtract).toHaveBeenCalledTimes(1);
-      expect(mockAllowances.subtract).toHaveBeenCalledTimes(1);
     });
   });
 

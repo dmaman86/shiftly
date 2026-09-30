@@ -100,6 +100,7 @@ export const DayCard = ({
               label={tHoliday(workDay.meta.holidayKey)}
               size="small"
               color={specialFullDay ? "warning" : "info"}
+              sx={{ bgcolor: specialFullDay ? "#a64400" : "#005b96", color: "#fff" }}
             />
           )}
         </Stack>
@@ -207,6 +208,7 @@ export const DayCard = ({
             <Box sx={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
               <Tooltip title={t("table.add_shift_label")}>
               <IconButton
+                aria-label={`${t("a11y.add_shift")} — ${workDay.meta.date}`}
                 size="small"
                 data-testid={`work-day-add-shift-${workDay.meta.date}`}
                 onClick={handleAddShift}
@@ -218,11 +220,12 @@ export const DayCard = ({
           )}
 
           <Stack spacing={1} sx={{ flex: 1, minWidth: 0 }}>
-            {shifts.map((entry) => (
+            {shifts.map((entry, index) => (
               <ShiftCard
                 key={entry.shift.id}
                 domain={domain}
                 shift={entry.shift}
+                shiftNumber={index + 1}
                 meta={workDay.meta}
                 standardHours={standardHours}
                 isEditable={isEditable}

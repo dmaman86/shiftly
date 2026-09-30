@@ -1,4 +1,5 @@
 import { AdditionClassifier } from "./additions/addition.classifier";
+import { additionGroupKey } from "./additions/addition-groups";
 import { BaseHoursClassifier } from "./regular/base-hours.classifier";
 import { SpecialHoursClassifier } from "./special/special-hours.classifier";
 import type {
@@ -49,9 +50,12 @@ export class TimelineShiftPayCalculator {
       for (const addition of this.additions.calculate({
         intervals: dayIntervals,
       })) {
-        const key = addition.kind === "evening" ? "hours20" : "hours50";
-        result.extra[key].hours +=
-          (addition.point.end - addition.point.start) / 60;
+        const key = additionGroupKey(addition.kind, addition.percent);
+        const segment = result.extra[key] ?? { percent: addition.percent, hours: 0 };
+        result.extra[key] = {
+          percent: addition.percent,
+          hours: segment.hours + (addition.point.end - addition.point.start) / 60,
+        };
       }
 
       for (const special of this.specialHours.calculate({

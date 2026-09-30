@@ -23,7 +23,12 @@ export interface RegularBreakdown {
   hours150: Segment;
 }
 
+export type AdditionGroupKey = "hours20" | "hours50" | `evening:${number}` | `night:${number}`;
+
 export interface ExtraBreakdown {
+  // Default policy keys stay stable; other rates use `${kind}:${percent}`.
+  // Every entry is a distinct pay segment, never a duplicate summary.
+  [key: `evening:${number}` | `night:${number}`]: Segment;
   hours20: Segment;
   hours50: Segment;
 }
