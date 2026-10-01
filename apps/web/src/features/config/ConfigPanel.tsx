@@ -27,8 +27,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
   const { t } = useTranslation();
   const { t: tWT } = useTranslation("work-table");
   const monthNames = tWT("months", { returnObjects: true }) as string[];
-  const { year, month, selectMonth } =
-    useGlobalState();
+  const { year, month, selectMonth } = useGlobalState();
 
   const { monthResolver } = domain.resolvers;
 
@@ -41,6 +40,20 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
     availableCurrentYearMonths[availableCurrentYearMonths.length - 1];
   const minDate = new Date(SYSTEM_START_YEAR, firstAvailableMonth, 1);
   const maxDate = new Date(currentYear, (lastAvailableMonth ?? 11) + 1, 0);
+
+  const commitMonth = (value: Date | null) => {
+    if (!value || Number.isNaN(value.getTime())) return;
+
+    const nextYear = value.getFullYear();
+    const nextMonth = value.getMonth() + 1;
+    if (!monthResolver.getAvailableMonths(nextYear).includes(nextMonth - 1)) {
+      return;
+    }
+
+    if (nextYear !== year || nextMonth !== month) {
+      selectMonth(nextYear, nextMonth);
+    }
+  };
 
   return (
     <Card sx={{ mb: 3 }}>
@@ -79,27 +92,22 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                   <Box sx={{ flex: 1 }}>
                     <DatePicker
+                      key={`${year}:${month}`}
                       label={t("config.date_section")}
-                      value={new Date(year, month - 1, 1)}
+                      defaultValue={new Date(year, month - 1, 1)}
                       minDate={minDate}
                       maxDate={maxDate}
                       views={["year", "month"]}
                       openTo="month"
-                      onChange={(value) => {
-                        if (!value || Number.isNaN(value.getTime())) return;
-
-                        const nextYear = value.getFullYear();
-                        const nextMonth = value.getMonth() + 1;
-                        if (
-                          !monthResolver
-                            .getAvailableMonths(nextYear)
-                            .includes(nextMonth - 1)
-                        ) {
-                          return;
-                        }
-
-                        if (nextYear !== year || nextMonth !== month) {
-                          selectMonth(nextYear, nextMonth);
+                      // MUI owns view drafts until acceptance; changing the
+                      // monthly context earlier would unmount the mobile dialog.
+                      onAccept={(value, context) => {
+                        if (context.validationError === null) commitMonth(value);
+                      }}
+                      onChange={(value, context) => {
+                        // Keep direct keyboard edits working without a dialog.
+                        if (context.source === "field" && context.validationError === null) {
+                          commitMonth(value);
                         }
                       }}
                       slotProps={{

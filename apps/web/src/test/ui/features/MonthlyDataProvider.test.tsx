@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -64,6 +64,18 @@ const renderSession = (ready = true) => {
 };
 const waitForReady = () => screen.findByTestId("config");
 const editRate = (rate: string) => fireEvent.change(screen.getByLabelText("שכר שעתי"), { target: { value: rate } });
+const useMobileViewport = () => {
+  vi.stubGlobal("matchMedia", vi.fn((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })));
+};
 
 describe("MonthlyDataProvider with the real store and ConfigPanel", () => {
   beforeEach(async () => {
@@ -80,6 +92,7 @@ describe("MonthlyDataProvider with the real store and ConfigPanel", () => {
 
   afterEach(() => {
     cleanup();
+    vi.unstubAllGlobals();
     clients.splice(0).forEach((client) => client.clear());
   });
 
@@ -207,6 +220,43 @@ describe("MonthlyDataProvider with the real store and ConfigPanel", () => {
     await act(async () => { old.resolve({ data: record(10) }); });
     expect(useGlobalStore.getState().config.baseRate).toBe(90);
     expect(useGlobalStore.getState().config.month).toBe(9);
+    expect(serviceMock.upsert).not.toHaveBeenCalled();
+  });
+
+  it("keeps the mobile picker mounted until its draft month is accepted", async () => {
+    useMobileViewport();
+    serviceMock.fetch.mockImplementation((_user: string, _year: number, month: number) => ({
+      call: async () => ({ data: record(month === 7 ? 70 : 60, month) }),
+    }));
+    renderSession();
+    await waitForReady();
+    fireEvent.click(screen.getByRole("button", { name: /Choose date/ }));
+    const dialog = screen.getByRole("dialog");
+    fireEvent.click(within(dialog).getByText("Jul", { exact: true }));
+    expect(within(dialog).getByRole("button", { name: "OK" })).toBeVisible();
+    expect(useGlobalStore.getState().config.month).toBe(8);
+    expect(serviceMock.fetch).toHaveBeenCalledOnce();
+    fireEvent.click(within(dialog).getByRole("button", { name: "OK" }));
+    await waitFor(() => expect(useGlobalStore.getState().config.month).toBe(7));
+    await waitForReady();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(useGlobalStore.getState().config.baseRate).toBe(70);
+    expect(serviceMock.fetch).toHaveBeenLastCalledWith("user-1", 2026, 7);
+    expect(serviceMock.upsert).not.toHaveBeenCalled();
+  });
+
+  it("does not initialize another month when a mobile picker draft is cancelled", async () => {
+    useMobileViewport();
+    renderSession();
+    await waitForReady();
+    fireEvent.click(screen.getByRole("button", { name: /Choose date/ }));
+    const dialog = screen.getByRole("dialog");
+    fireEvent.click(within(dialog).getByText("Jul", { exact: true }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(useGlobalStore.getState().config.month).toBe(8);
+    expect(useGlobalStore.getState().config.baseRate).toBe(60);
+    expect(serviceMock.fetch).toHaveBeenCalledOnce();
     expect(serviceMock.upsert).not.toHaveBeenCalled();
   });
 
