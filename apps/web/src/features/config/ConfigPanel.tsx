@@ -6,22 +6,14 @@ import {
   CardContent,
   Stack,
 } from "@mui/material";
-import { useEffect } from "react";
 import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-import {
-  useAppSnackbar,
-  useAuth,
-  useFetch,
-  useGlobalState,
-} from "@/hooks";
+import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
-import { monthlyConfigService } from "@/services";
-import { useMonthlyConfigHydration } from "@/features/monthly-data/monthlyConfigHydrationContext";
 import { WorkParametersInputs } from "./WorkParametersInputs";
 import { SYSTEM_START_YEAR } from "@/app/constants";
 import { useTranslation } from "react-i18next";
@@ -35,47 +27,7 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
   const { t } = useTranslation();
   const { t: tWT } = useTranslation("work-table");
   const monthNames = tWT("months", { returnObjects: true }) as string[];
-  const { year, month, standardHours, baseRate, updateYear, updateMonth } =
-    useGlobalState();
-  const { user } = useAuth();
-  const { callEndPoint } = useFetch();
-  const snackbar = useAppSnackbar();
-  const { configReady, contextKey, hydratedValues } = useMonthlyConfigHydration();
-
-  useEffect(() => {
-    if (!user || !configReady || contextKey !== `${user.id}:${year}:${month}`) {
-      return;
-    }
-
-    if (
-      hydratedValues?.standardHours === standardHours &&
-      hydratedValues.baseRate === baseRate
-    ) {
-      return;
-    }
-
-    void callEndPoint(
-      monthlyConfigService().upsert(user.id, {
-        year,
-        month,
-        standard_hours: standardHours,
-        base_rate: baseRate,
-      }),
-    ).then((result) => {
-      if (result.error) snackbar.error(result.error);
-    });
-  }, [
-    baseRate,
-    callEndPoint,
-    configReady,
-    contextKey,
-    hydratedValues,
-    month,
-    snackbar,
-    standardHours,
-    user,
-    year,
-  ]);
+  const { year, month, selectMonth } = useGlobalState();
 
   const { monthResolver } = domain.resolvers;
 
@@ -88,6 +40,20 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
     availableCurrentYearMonths[availableCurrentYearMonths.length - 1];
   const minDate = new Date(SYSTEM_START_YEAR, firstAvailableMonth, 1);
   const maxDate = new Date(currentYear, (lastAvailableMonth ?? 11) + 1, 0);
+
+  const commitMonth = (value: Date | null) => {
+    if (!value || Number.isNaN(value.getTime())) return;
+
+    const nextYear = value.getFullYear();
+    const nextMonth = value.getMonth() + 1;
+    if (!monthResolver.getAvailableMonths(nextYear).includes(nextMonth - 1)) {
+      return;
+    }
+
+    if (nextYear !== year || nextMonth !== month) {
+      selectMonth(nextYear, nextMonth);
+    }
+  };
 
   return (
     <Card sx={{ mb: 3 }}>
@@ -126,27 +92,23 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                   <Box sx={{ flex: 1 }}>
                     <DatePicker
+                      key={`${year}:${month}`}
                       label={t("config.date_section")}
-                      value={new Date(year, month - 1, 1)}
+                      defaultValue={new Date(year, month - 1, 1)}
                       minDate={minDate}
                       maxDate={maxDate}
                       views={["year", "month"]}
                       openTo="month"
-                      onChange={(value) => {
-                        if (!value || Number.isNaN(value.getTime())) return;
-
-                        const nextYear = value.getFullYear();
-                        const nextMonth = value.getMonth() + 1;
-                        if (
-                          !monthResolver
-                            .getAvailableMonths(nextYear)
-                            .includes(nextMonth - 1)
-                        ) {
-                          return;
+                      // MUI owns view drafts until acceptance; changing the
+                      // monthly context earlier would unmount the mobile dialog.
+                      onAccept={(value, context) => {
+                        if (context.validationError === null) commitMonth(value);
+                      }}
+                      onChange={(value, context) => {
+                        // Keep direct keyboard edits working without a dialog.
+                        if (context.source === "field" && context.validationError === null) {
+                          commitMonth(value);
                         }
-
-                        if (nextYear !== year) updateYear(nextYear);
-                        if (nextMonth !== month) updateMonth(nextMonth);
                       }}
                       slotProps={{
                         textField: { size: "small", fullWidth: true },

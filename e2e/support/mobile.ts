@@ -8,10 +8,19 @@ export const selectMonthInDialog = async (page: Page, year: number, month: numbe
   const date = new Date(year, month - 1, 1);
   const longLabel = new Intl.DateTimeFormat("he-IL", { month: "long" }).format(date);
   const shortLabel = new Intl.DateTimeFormat("he-IL", { month: "short" }).format(date);
+  // The modal makes the background aria-hidden without changing its month.
+  const monthHeading = page.getByRole("heading", {
+    name: /^שעות חודש/,
+    level: 2,
+    includeHidden: true,
+  });
+  const previousHeading = await monthHeading.innerText();
 
   await page.getByRole("button", { name: /בחירת תאריך|בחר תאריך/i }).click();
   const datePickerDialog = page.getByRole("dialog");
   await datePickerDialog.getByText(shortLabel, { exact: true }).click();
+  await expect(datePickerDialog.getByRole("button", { name: "אישור" })).toBeVisible();
+  await expect(monthHeading).toHaveText(previousHeading);
   await datePickerDialog.getByRole("button", { name: "אישור" }).click();
 
   await expect(datePickerDialog).toBeHidden();

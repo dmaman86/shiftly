@@ -32,7 +32,7 @@ const theme = createTheme({
  */
 export function createMockStore(preloadedState?: { global?: GlobalState }) {
   const globalState = preloadedState?.global ?? initialGlobalState;
-  useGlobalStore.setState(globalState);
+  useGlobalStore.setState({ ...globalState, monthlyConfigContextKey: null });
 
   return {
     getState: () => ({ global: useGlobalStore.getState() }),

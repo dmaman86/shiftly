@@ -59,7 +59,7 @@ export const GuestDraftImportProvider = ({
   const { t } = useTranslation();
   const { user, isLoading: isAuthLoading } = useAuth();
   const { services } = useDomain();
-  const { initializeMonth } = useGlobalState();
+  const { selectMonth } = useGlobalState();
   const { callEndPoint } = useFetch();
   const snackbar = useAppSnackbar();
   const [state, setState] = useState<GuestDraftImportState>(() =>
@@ -145,9 +145,9 @@ export const GuestDraftImportProvider = ({
 
     // The month is not in the URL, so without this the user would land on the
     // current month instead of the one they filled in.
-    initializeMonth(pendingDraft.year, pendingDraft.month);
+    selectMonth(pendingDraft.year, pendingDraft.month);
     void runCheck(pendingDraft, userId);
-  }, [initializeMonth, isAuthLoading, pendingDraft, runCheck, userId]);
+  }, [selectMonth, isAuthLoading, pendingDraft, runCheck, userId]);
 
   // A pending draft without a user means the sign-in was cancelled or failed:
   // it is simply ignored (storage was already cleared when it was consumed).

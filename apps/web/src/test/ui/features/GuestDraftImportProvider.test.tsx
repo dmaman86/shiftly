@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
     user: null as { id: string } | null,
     isLoading: false,
   },
-  initializeMonth: vi.fn(),
+  selectMonth: vi.fn(),
   snackbar: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
   track: vi.fn(),
   importMonth: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock("@/services/supabase/supabase.client", () => ({ supabase: {} }));
 vi.mock("@/hooks", () => ({
   useAuth: () => mocks.authState,
   useAppSnackbar: () => mocks.snackbar,
-  useGlobalState: () => ({ initializeMonth: mocks.initializeMonth }),
+  useGlobalState: () => ({ selectMonth: mocks.selectMonth }),
   useDomain: () => ({
     services: {
       dateService: {
@@ -126,7 +126,7 @@ describe("GuestDraftImportProvider", () => {
     renderProvider();
 
     expect(screen.getByTestId("gate")).toHaveTextContent("ready");
-    expect(mocks.initializeMonth).not.toHaveBeenCalled();
+    expect(mocks.selectMonth).not.toHaveBeenCalled();
     expect(mocks.importMonth).not.toHaveBeenCalled();
   });
 
@@ -136,7 +136,7 @@ describe("GuestDraftImportProvider", () => {
     renderProvider();
 
     await waitFor(() => expect(screen.getByTestId("gate")).toHaveTextContent("ready"));
-    expect(mocks.initializeMonth).toHaveBeenCalledWith(2026, 8);
+    expect(mocks.selectMonth).toHaveBeenCalledWith(2026, 8);
     expect(mocks.importMonth).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     expect(mocks.snackbar.success).toHaveBeenCalled();

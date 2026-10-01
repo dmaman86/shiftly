@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { useGlobalState } from "@/hooks";
 import { NumberConfigInput } from "./NumberConfigInput";
+import { useMonthlyConfigActions } from "@/features/monthly-data/monthlyConfigActionsContext";
 
 type WorkParametersInputsProps = {
   idPrefix?: string;
@@ -18,8 +19,8 @@ export const WorkParametersInputs = ({
   showHelperText = true,
 }: WorkParametersInputsProps) => {
   const { t } = useTranslation();
-  const { baseRate, standardHours, updateBaseRate, updateStandardHours } =
-    useGlobalState();
+  const { baseRate, standardHours } = useGlobalState();
+  const { updateBaseRate, updateStandardHours } = useMonthlyConfigActions();
 
   const baseRateHelper =
     baseRate === 0
