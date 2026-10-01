@@ -11,6 +11,33 @@ const createShift = (startHour: number, endHour: number, isDuty = false): Shift 
 });
 
 describe("calculateDayFromShifts", () => {
+  it("pays wall-clock hours on the autumn daylight-saving transition night", () => {
+    const startTime = "2025-10-25T22:47:00+03:00";
+    const endTime = "2025-10-26T07:01:00+02:00";
+    const result = pipeline.payMap.calculateDayFromShifts({
+      meta: {
+        crossDayContinuation: false,
+        date: "2025-10-25",
+        typeDay: WorkDayType.SpecialFull,
+      },
+      month: 10,
+      year: 2025,
+      standardHours: 6.67,
+      shifts: [{
+        id: "autumn-clock-change",
+        start: { date: pipeline.services.dateService.createDateFromPersisted(startTime) },
+        end: { date: pipeline.services.dateService.createDateFromPersisted(endTime) },
+        isDuty: false,
+      }],
+    });
+
+    expect(result.dayPayMap.totalHours).toBeCloseTo(8.233333333333333, 10);
+    expect(result.dayPayMap.workMap.regular.hours150.hours).toBeCloseTo(1.0166666666666666, 10);
+    expect(result.dayPayMap.workMap.special.shabbat200.hours).toBeCloseTo(7.216666666666667, 10);
+    const elapsedHours = (new Date(endTime).getTime() - new Date(startTime).getTime()) / 3_600_000;
+    expect(elapsedHours).toBeCloseTo(9.233333333333333, 10);
+  });
+
   it("builds the shift maps and their consolidated day map", () => {
     const shifts = [createShift(8, 12), createShift(13, 17, true)];
 

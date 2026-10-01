@@ -1301,11 +1301,11 @@
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 8
+            "hours": 7.25
           },
           "hours50": {
             "percent": 0.5,
-            "hours": 0.11666666666666667
+            "hours": 1.1166666666666667
           }
         },
         "special": {
@@ -1361,11 +1361,11 @@
       "extra": {
         "hours20": {
           "percent": 0.2,
-          "hours": 47.7
+          "hours": 46.95
         },
         "hours50": {
           "percent": 0.5,
-          "hours": 20.733333333333334
+          "hours": 21.733333333333334
         }
       },
       "special": {

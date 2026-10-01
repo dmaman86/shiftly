@@ -990,8 +990,8 @@
     "2025-10-25": {
       "status": "normal",
       "breakdown": {
-        "totalHours": 7.233333333333333,
-        "actualHours": 7.233333333333333,
+        "totalHours": 8.233333333333333,
+        "actualHours": 8.233333333333333,
         "regular": {
           "hours100": {
             "percent": 1,
@@ -1003,7 +1003,7 @@
           },
           "hours150": {
             "percent": 1.5,
-            "hours": 0.016666666666666607
+            "hours": 1.0166666666666666
           }
         },
         "extra": {
@@ -1045,7 +1045,7 @@
         "smallPoints": 1,
         "smallAmount": 14.5
       },
-      "salary": 697.2225
+      "salary": 768.05
     },
     "2025-10-29": {
       "status": "normal",
@@ -1133,17 +1133,17 @@
           },
           "hours50": {
             "percent": 0.5,
-            "hours": 0.5166666666666667
+            "hours": 0
           }
         },
         "special": {
           "shabbat150": {
             "percent": 1.5,
-            "hours": 0.48333333333333334
+            "hours": 1
           },
           "shabbat200": {
             "percent": 2,
-            "hours": 8
+            "hours": 7.483333333333333
           }
         },
         "hours100Sick": {
@@ -1165,13 +1165,13 @@
         "smallPoints": 0,
         "smallAmount": 0
       },
-      "salary": 1247.0098999999998
+      "salary": 1222.61
     }
   },
   "monthly": {
     "breakdown": {
-      "totalHours": 287.24,
-      "actualHours": 209.04999999999995,
+      "totalHours": 288.24,
+      "actualHours": 210.04999999999995,
       "regular": {
         "hours100": {
           "percent": 1,
@@ -1183,7 +1183,7 @@
         },
         "hours150": {
           "percent": 1.5,
-          "hours": 14.76666666666667
+          "hours": 15.766666666666666
         }
       },
       "extra": {
@@ -1193,17 +1193,17 @@
         },
         "hours50": {
           "percent": 0.5,
-          "hours": 2.533333333333333
+          "hours": 2.0166666666666666
         }
       },
       "special": {
         "shabbat150": {
           "percent": 1.5,
-          "hours": 39.199999999999996
+          "hours": 39.71666666666666
         },
         "shabbat200": {
           "percent": 2,
-          "hours": 64
+          "hours": 63.483333333333334
         }
       },
       "hours100Sick": {
@@ -1225,6 +1225,6 @@
       "smallPoints": 4,
       "smallAmount": 58
     },
-    "salary": 18731.74
+    "salary": 18778.17
   }
 }
