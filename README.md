@@ -1,6 +1,6 @@
 # Shiftly
 
-Israeli government-office shift pay is hard to verify. Shiftly turns your shifts into daily pay breakdowns and a monthly gross-pay estimate.
+Workers think in shifts. Payslips are computed in weighted segments. Shiftly bridges the two: it turns your shifts into daily pay breakdowns and a monthly gross-pay estimate.
 
 [![CI](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml/badge.svg)](https://github.com/dmaman86/shiftly/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/dmaman86/shiftly/branch/main/graph/badge.svg)](https://codecov.io/gh/dmaman86/shiftly)
@@ -15,7 +15,11 @@ Stack: TypeScript · React · Vite · Zustand · TanStack Query · MUI · Supaba
 
 ## Why it exists
 
-Shiftly grew out of a recurring shift-work payroll problem in a government office: recorded shifts do not map directly to the overtime, Shabbat/holiday rates and premiums on a payslip. It is deployed on GitHub Pages to make those calculations inspectable.
+Shiftly was born from a real problem observed in a government office.
+
+Workers track time in shifts: a continuous block of hours with a clear start and end. Israeli payslips don't work that way. They are computed in weighted segments: overtime brackets that restart with each working day, Shabbat and holiday additions that begin at specific hours, and night additions that cut through the middle of a shift.
+
+The result is a predictable frustration: employees get a payslip they have no practical way to verify. Shiftly bridges that gap. You enter shifts the way you think about them, and it calculates pay by the rules applied in government offices, so every amount can be inspected and explained.
 
 <!-- TODO: add validation line once VALIDATION.md exists -->
 
