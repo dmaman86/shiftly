@@ -52,7 +52,8 @@ export const NumberConfigInput = ({
   const debouncedDraft = useDebounce({ value: draft });
 
   useEffect(() => {
-    if (debouncedDraft === undefined) return;
+    // An external update clears the draft before its old debounce settles.
+    if (draft === undefined || debouncedDraft !== draft) return;
     if (debouncedDraft === "") {
       if (emptyValue !== undefined && emptyValue !== value) {
         onChange(emptyValue);
@@ -62,7 +63,7 @@ export const NumberConfigInput = ({
     const parsed = Number(debouncedDraft);
     if (!Number.isFinite(parsed) || !isValid(parsed)) return;
     if (parsed !== value) onChange(parsed);
-  }, [debouncedDraft, emptyValue, value, onChange, isValid]);
+  }, [draft, debouncedDraft, emptyValue, value, onChange, isValid]);
 
   const displayValue = draft ?? value.toString();
   const parsed = Number(displayValue);

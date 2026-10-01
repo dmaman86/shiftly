@@ -1,102 +1,203 @@
-import { useEffect, useState } from "react";
-
+import { useCallback, useEffect, useMemo } from "react";
 import {
-  useAppSnackbar,
-  useAuth,
-  useFetch,
-  useGlobalState,
-} from "@/hooks";
+  useIsMutating,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { Alert, Box, Button, CircularProgress } from "@mui/material";
+import { useTranslation } from "react-i18next";
+
+import { useAppSnackbar, useAuth, useGlobalState } from "@/hooks";
 import { monthlyConfigService } from "@/services";
-import { defaultMonthlyConfig } from "@/store/globalStore";
-import { useGuestDraftImportGate } from "@/features/guest-draft/guestDraftImportContext";
 import {
-  MonthlyConfigHydrationContext,
-  getMonthlyContextKey,
+  defaultMonthlyConfig,
+  useGlobalStore,
   type MonthlyConfigValues,
-} from "./monthlyConfigHydrationContext";
+} from "@/store/globalStore";
+import { resolveErrorMessage } from "@/utils";
+import { useGuestDraftImportGate } from "@/features/guest-draft/guestDraftImportContext";
+import { MonthlyConfigActionsContext } from "./monthlyConfigActionsContext";
 
-
-type MonthlyDataProviderProps = {
-  children: React.ReactNode;
+type MonthlyDataProviderProps = { children: React.ReactNode };
+type ConfigChange = MonthlyConfigValues & {
+  userId: string;
+  year: number;
+  month: number;
 };
 
-/** Owns initialization of the selected monthly context above the pages. */
-export const MonthlyDataProvider = ({ children }: MonthlyDataProviderProps) => {
-  const { user } = useAuth();
-  const {
-    year,
-    month,
-    initializeMonth,
-    updateStandardHours,
-    updateBaseRate,
-  } = useGlobalState();
-  const { callEndPoint } = useFetch();
-  const snackbar = useAppSnackbar();
-  const [hydratedValues, setHydratedValues] =
-    useState<MonthlyConfigValues | null>(null);
-  const [hydratedContextKey, setHydratedContextKey] = useState<string | null>(null);
-  const contextKey = getMonthlyContextKey(user?.id, year, month);
-  const configReady =
-    hydratedContextKey === contextKey && hydratedValues !== null;
+const configKey = (userId: string | undefined, year: number, month: number) =>
+  ["monthlyConfig", userId, year, month] as const;
+
+const LoadingConfig = () => {
+  const { t } = useTranslation();
+  return (
+    <Box sx={{ display: "flex", justifyContent: "center", p: 4 }} aria-busy="true">
+      <CircularProgress aria-label={t("config.loading")} />
+    </Box>
+  );
+};
+
+type MonthlyConfigSessionProps = MonthlyDataProviderProps & {
+  userId: string | undefined;
+  year: number;
+  month: number;
+  save: (change: ConfigChange) => void;
+};
+
+/** The keyed boundary mounts consumers only after one coherent store commit. */
+const MonthlyConfigSession = ({
+  userId,
+  year,
+  month,
+  save,
+  children,
+}: MonthlyConfigSessionProps) => {
+  const { t } = useTranslation();
   const { ready: guestDraftReady } = useGuestDraftImportGate();
-  // Only gates signed-in hydration; a guest never loads anything, so their
-  // config is not reset when the gate opens.
-  const canHydrate = !!user && guestDraftReady;
+  const contextKey = JSON.stringify(configKey(userId, year, month));
+  const initialized = useGlobalStore(
+    (state) => state.monthlyConfigContextKey === contextKey,
+  );
+  const initializeMonth = useGlobalStore((state) => state.initializeMonth);
+  const pendingSaves = useIsMutating({ mutationKey: configKey(userId, year, month) });
+  const query = useQuery({
+    queryKey: configKey(userId, year, month),
+    enabled: !!userId && guestDraftReady && !initialized && pendingSaves === 0,
+    staleTime: 0,
+    gcTime: 0,
+    retry: false,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    queryFn: async () => {
+      if (!userId) throw new Error("An authenticated user is required");
+      const result = await monthlyConfigService().fetch(userId, year, month).call();
+      if (result.error !== undefined) throw new Error(result.error);
+      return result.data;
+    },
+  });
 
   useEffect(() => {
-    initializeMonth(year, month);
-
-    if (!user || !canHydrate) return;
-
-    let cancelled = false;
-    const key = getMonthlyContextKey(user.id, year, month);
-
-    void callEndPoint(monthlyConfigService().fetch(user.id, year, month)).then(
-      (result) => {
-        if (cancelled) return;
-
-        if (result.error) {
-          snackbar.error(result.error);
-          return;
-        }
-
-        const values = result.data
-          ? {
-              standardHours: result.data.standard_hours,
-              baseRate: result.data.base_rate,
-            }
-          : defaultMonthlyConfig;
-
-        if (result.data) {
-          updateStandardHours(values.standardHours);
-          updateBaseRate(values.baseRate);
-        }
-
-        setHydratedValues(values);
-        setHydratedContextKey(key);
-      },
-    );
-
-    return () => {
-      cancelled = true;
-    };
+    if (
+      initialized ||
+      useGlobalStore.getState().monthlyConfigContextKey === contextKey ||
+      (userId &&
+        (!guestDraftReady || pendingSaves > 0 || !query.isSuccess || query.isFetching))
+    ) return;
+    const values = userId && query.data
+      ? { standardHours: query.data.standard_hours, baseRate: query.data.base_rate }
+      : defaultMonthlyConfig;
+    initializeMonth(year, month, values, contextKey);
   }, [
-    callEndPoint,
-    canHydrate,
-    initializeMonth,
-    month,
-    snackbar,
-    updateBaseRate,
-    updateStandardHours,
-    user,
-    year,
+    contextKey, guestDraftReady, initialized, initializeMonth, month,
+    pendingSaves, query.data, query.isFetching, query.isSuccess, userId, year,
   ]);
 
+  const edit = useCallback((field: keyof MonthlyConfigValues, value: number) => {
+    if (!initialized || !Number.isFinite(value) || value < 0) return;
+    const store = useGlobalStore.getState();
+    if (
+      store.monthlyConfigContextKey !== contextKey ||
+      store.config.year !== year || store.config.month !== month ||
+      store.config[field] === value
+    ) return;
+    if (field === "baseRate") store.updateBaseRate(value);
+    else store.updateStandardHours(value);
+    const { baseRate, standardHours } = useGlobalStore.getState().config;
+    if (userId) save({ userId, year, month, baseRate, standardHours });
+  }, [contextKey, initialized, month, save, userId, year]);
+  const actions = useMemo(() => ({
+    updateBaseRate: (value: number) => edit("baseRate", value),
+    updateStandardHours: (value: number) => edit("standardHours", value),
+  }), [edit]);
+
+  if (!initialized) {
+    if (query.isError) {
+      return (
+        <Alert
+          severity="error"
+          action={
+            <Button onClick={() => void query.refetch()}>
+              {t("actions.try_again")}
+            </Button>
+          }
+        >
+          {t("config.load_error")}
+        </Alert>
+      );
+    }
+    return <LoadingConfig />;
+  }
+
   return (
-    <MonthlyConfigHydrationContext.Provider
-      value={{ configReady, contextKey, hydratedValues }}
-    >
+    <MonthlyConfigActionsContext.Provider value={actions}>
       {children}
-    </MonthlyConfigHydrationContext.Provider>
+    </MonthlyConfigActionsContext.Provider>
+  );
+};
+
+/** Loading initializes state; only explicit editor commits schedule saves. */
+export const MonthlyDataProvider = ({ children }: MonthlyDataProviderProps) => {
+  const { user, isLoading: isAuthLoading, initializationError } = useAuth();
+  const { year, month } = useGlobalState();
+  const userId = user?.id;
+  const snackbar = useAppSnackbar();
+  const queryClient = useQueryClient();
+  const { t } = useTranslation();
+  // This owner survives month/route changes, so accepted writes retain their identity.
+  const mutation = useMutation({
+    mutationKey: configKey(userId, year, month),
+    scope: { id: JSON.stringify(["monthlyConfig", userId]) },
+    retry: false,
+    mutationFn: async (change: ConfigChange) => {
+      const result = await monthlyConfigService()
+        .upsert(change.userId, {
+          year: change.year,
+          month: change.month,
+          standard_hours: change.standardHours,
+          base_rate: change.baseRate,
+        })
+        .call();
+      if (result.error !== undefined) throw new Error(result.error);
+    },
+    onSuccess: (_data, change) => {
+      void queryClient.invalidateQueries({
+        queryKey: configKey(change.userId, change.year, change.month),
+        refetchType: "none",
+      });
+    },
+    onError: (error) => snackbar.error(resolveErrorMessage(error)),
+  });
+
+  if (isAuthLoading) return <LoadingConfig />;
+  if (initializationError) {
+    return <Alert severity="error">{t("auth.initialization_error")}</Alert>;
+  }
+
+  return (
+    <>
+      {mutation.isError && mutation.variables.userId === userId && (
+        <Alert
+          severity="error"
+          action={
+            <Button onClick={() => mutation.mutate(mutation.variables)}>
+              {t("actions.try_again")}
+            </Button>
+          }
+        >
+          {t("config.save_error", { year: mutation.variables.year, month: mutation.variables.month })}
+        </Alert>
+      )}
+      <MonthlyConfigSession
+        key={JSON.stringify(configKey(userId, year, month))}
+        userId={userId}
+        year={year}
+        month={month}
+        save={mutation.mutate}
+      >
+        {children}
+      </MonthlyConfigSession>
+    </>
   );
 };

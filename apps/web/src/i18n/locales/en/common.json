@@ -12,6 +12,9 @@
     "contact": "Contact"
   },
   "config": {
+    "loading": "Loading monthly settings...",
+    "load_error": "Monthly settings could not be loaded. Try again before editing.",
+    "save_error": "Settings for {{month}}/{{year}} were not saved. Try again.",
     "invalid_number": "Enter a valid non-negative number.",
     "title": "Calculation Settings",
     "date_section": "Date",

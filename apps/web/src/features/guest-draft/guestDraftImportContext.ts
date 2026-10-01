@@ -8,7 +8,7 @@ export type GuestDraftImportGate = {
 };
 
 // Defaults to ready so consumers work without the provider (tests, isolated
-// renders), matching MonthlyConfigHydrationContext.
+// renders).
 export const GuestDraftImportContext = createContext<GuestDraftImportGate>({
   ready: true,
 });

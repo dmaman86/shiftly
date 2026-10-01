@@ -6,7 +6,7 @@ const createDayPayMap = (totalHours: number) =>
   ({ totalHours }) as WorkDayMap;
 
 describe("globalStore", () => {
-  beforeEach(() => useGlobalStore.setState(initialGlobalState));
+  beforeEach(() => useGlobalStore.setState({ ...initialGlobalState, monthlyConfigContextKey: null }));
 
   it("stores and replaces a daily pay map without a derived summary", () => {
     const firstDayPayMap = createDayPayMap(4);
@@ -56,5 +56,27 @@ describe("globalStore", () => {
       month: 1,
     });
     expect(result.dailyPayMaps).toEqual({});
+  });
+
+  it("initializes resolved values and their context in one notification", () => {
+    useGlobalStore.getState().updateBaseRate(75);
+    const observed: Array<{ baseRate: number; standardHours: number; key: string | null }> = [];
+    const unsubscribe = useGlobalStore.subscribe((state) => {
+      observed.push({ baseRate: state.config.baseRate, standardHours: state.config.standardHours, key: state.monthlyConfigContextKey });
+    });
+    try {
+      useGlobalStore.getState().initializeMonth(2026, 8, { baseRate: 60, standardHours: 7.5 }, "user-1:2026:8");
+      expect(observed).toEqual([{ baseRate: 60, standardHours: 7.5, key: "user-1:2026:8" }]);
+    } finally { unsubscribe(); }
+  });
+
+  it("selects a month atomically without replacing editable values with defaults", () => {
+    const store = useGlobalStore.getState();
+    store.initializeMonth(2026, 8, { baseRate: 60, standardHours: 7.5 }, "user-1:2026:8");
+    store.updateDayPayMap("2026-08-01", createDayPayMap(4));
+    store.selectMonth(2027, 1);
+    expect(useGlobalStore.getState().config).toEqual({ year: 2027, month: 1, baseRate: 60, standardHours: 7.5 });
+    expect(useGlobalStore.getState().monthlyConfigContextKey).toBeNull();
+    expect(useGlobalStore.getState().dailyPayMaps).toEqual({});
   });
 });

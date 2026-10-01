@@ -13,7 +13,15 @@ export interface GlobalState {
 }
 
 export interface GlobalStore extends GlobalState {
-  initializeMonth: (year: number, month: number) => void;
+  // Set together with resolved values; month selection invalidates it.
+  monthlyConfigContextKey: string | null;
+  initializeMonth: (
+    year: number,
+    month: number,
+    config?: MonthlyConfigValues,
+    contextKey?: string,
+  ) => void;
+  selectMonth: (year: number, month: number) => void;
   updateYear: (year: number) => void;
   updateMonth: (month: number) => void;
   updateStandardHours: (standardHours: number) => void;
@@ -23,6 +31,11 @@ export interface GlobalStore extends GlobalState {
   removeDay: (dateKey: string) => void;
   reset: () => void;
 }
+
+export type MonthlyConfigValues = Pick<
+  GlobalState["config"],
+  "standardHours" | "baseRate"
+>;
 
 const now = new Date();
 
@@ -44,19 +57,29 @@ const resetMonthData = () => ({ dailyPayMaps: {} });
 
 export const useGlobalStore = create<GlobalStore>((set) => ({
   ...initialGlobalState,
-  initializeMonth: (year, month) =>
+  monthlyConfigContextKey: null,
+  initializeMonth: (year, month, config = defaultMonthlyConfig, contextKey) =>
     set({
-      config: { ...defaultMonthlyConfig, year, month },
+      config: { ...config, year, month },
+      monthlyConfigContextKey: contextKey ?? null,
       ...resetMonthData(),
     }),
+  selectMonth: (year, month) =>
+    set((state) => ({
+      config: { ...state.config, year, month },
+      monthlyConfigContextKey: null,
+      ...resetMonthData(),
+    })),
   updateYear: (year) =>
     set((state) => ({
       config: { ...state.config, year },
+      monthlyConfigContextKey: null,
       ...resetMonthData(),
     })),
   updateMonth: (month) =>
     set((state) => ({
       config: { ...state.config, month },
+      monthlyConfigContextKey: null,
       ...resetMonthData(),
     })),
   updateStandardHours: (standardHours) =>
