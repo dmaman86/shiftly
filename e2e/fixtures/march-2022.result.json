@@ -7,21 +7,21 @@
   "carryOverHours": 0,
   "shabbatCreditAllocation": {
     "carriedOverHours": 0,
-    "earnedHours": 19.533333333333335,
-    "totalAvailableHours": 19.533333333333335,
-    "usedHours": 19.533333333333335,
+    "earnedHours": 20.533333333333335,
+    "totalAvailableHours": 20.533333333333335,
+    "usedHours": 20.533333333333335,
     "unusedHours": 0,
     "appliedHoursByDate": {
       "2022-03-01": 7,
       "2022-03-04": 7,
-      "2022-03-07": 5.533333333333335
+      "2022-03-07": 6.533333333333335
     }
   },
   "daily": {
     "2022-03-02": {
       "status": "normal",
       "breakdown": {
-      "totalHours": 8.483333333333333,
+        "totalHours": 8.483333333333333,
         "actualHours": 8.483333333333333,
         "regular": {
           "hours100": {
@@ -100,11 +100,11 @@
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 8
+            "hours": 7.233333333333333
           },
           "hours50": {
             "percent": 0.5,
-            "hours": 0.1
+            "hours": 1.1
           }
         },
         "special": {
@@ -160,7 +160,7 @@
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 4
+            "hours": 3
           },
           "hours50": {
             "percent": 0.5,
@@ -261,12 +261,12 @@
     "2022-03-11": {
       "status": "normal",
       "breakdown": {
-      "totalHours": 8.533333333333333,
+        "totalHours": 8.533333333333333,
         "actualHours": 8.533333333333333,
         "regular": {
           "hours100": {
             "percent": 1,
-            "hours": 3.2666666666666666
+            "hours": 2.2666666666666666
           },
           "hours125": {
             "percent": 1.25,
@@ -280,7 +280,7 @@
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 3
+            "hours": 0
           },
           "hours50": {
             "percent": 0.5,
@@ -294,7 +294,7 @@
           },
           "shabbat200": {
             "percent": 2,
-            "hours": 0.26666666666666666
+            "hours": 1.2666666666666666
           }
         },
         "hours100Sick": {
@@ -520,7 +520,7 @@
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 3.533333333333333
+            "hours": 4.533333333333333
           },
           "hours50": {
             "percent": 0.5,
@@ -640,7 +640,7 @@
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 4.116666666666666
+            "hours": 3.1166666666666667
           },
           "hours50": {
             "percent": 0.5,
@@ -820,11 +820,11 @@
         "extra": {
           "hours20": {
             "percent": 0.2,
-            "hours": 3.0166666666666666
+            "hours": 4.016666666666667
           },
           "hours50": {
             "percent": 0.5,
-            "hours": 0.03333333333333333
+            "hours": 0
           }
         },
         "special": {
@@ -1161,12 +1161,12 @@
   },
   "monthly": {
     "breakdown": {
-      "totalHours": 180.56666666666666,
+      "totalHours": 181.56666666666666,
       "actualHours": 112.03333333333333,
       "regular": {
         "hours100": {
           "percent": 1,
-          "hours": 68.41666666666666
+          "hours": 67.41666666666666
         },
         "hours125": {
           "percent": 1.25,
@@ -1180,11 +1180,11 @@
       "extra": {
         "hours20": {
           "percent": 0.2,
-          "hours": 32.88333333333333
+          "hours": 29.116666666666667
         },
         "hours50": {
           "percent": 0.5,
-          "hours": 17.1
+          "hours": 18.066666666666666
         }
       },
       "special": {
@@ -1194,7 +1194,7 @@
         },
         "shabbat200": {
           "percent": 2,
-          "hours": 1.5
+          "hours": 2.5
         }
       },
       "hours100Sick": {
@@ -1207,7 +1207,7 @@
       },
       "appliedShabbatCredit": {
         "percent": 1,
-        "hours": 19.533333333333335
+        "hours": 20.533333333333335
       },
       "perDiemPoints": 18,
       "perDiemAmount": 568.8,

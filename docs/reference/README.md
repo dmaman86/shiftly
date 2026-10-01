@@ -3,7 +3,7 @@
 > 📘 Hebrew version available: [README_HE.md](./README_HE.md)
 
 **Shiftly** is a work-hours tracking and salary calculation application built with **React + TypeScript**.
-It is designed to accurately calculate monthly salary based on daily shifts, special days, per-diem rules, and real-world labor regulations.
+It is designed to accurately calculate monthly salary based on daily shifts, special days, per-diem rules, and the rules applied in government offices.
 
 The project focuses not only on correctness, but on **clear domain modeling, architectural stability, and long-term maintainability**.
 
@@ -15,13 +15,11 @@ The project focuses not only on correctness, but on **clear domain modeling, arc
 
 ## Motivation
 
-**Shiftly** was born from a recurring problem observed in a real government office environment.
+Shiftly was born from a real problem observed in a government office.
 
-Workers track their time in **shifts** - a continuous block of hours with a clear start and end. But Israeli payslips don't work that way. They operate in **weighted segments:** overtime brackets that reset daily, Shabbat and holiday bonuses that kick in at specific hours, night premiums that split mid-way through.
+Workers track time in shifts: a continuous block of hours with a clear start and end. Israeli payslips don't work that way. They are computed in weighted segments: overtime brackets that restart with each working day, Shabbat and holiday additions that begin at specific hours, and night additions that cut through the middle of a shift.
 
-The result is a predictable source of confusion: employees receive a payslip they can't verify, and have no practical way to cross-check whether the numbers are correct.
-
-**Shiftly** bridges that gap. It takes shift input the way workers actually think - and calculates compensation based on **Israeli labor law:** overtime brackets, Shabbat and holiday bonuses, and night premiums - making the calculation **transparent and verifiable** for the person receiving the paycheck.
+The result is a predictable frustration: employees get a payslip they have no practical way to verify. Shiftly bridges that gap. You enter shifts the way you think about them, and it calculates pay by the rules applied in government offices, so every amount can be inspected and explained.
 
 ---
 
@@ -1059,4 +1057,3 @@ Aggregated monthly salary calculation with all components.
 ## License
 
 This project is licensed under the [MIT License](../../LICENSE).
-\n
