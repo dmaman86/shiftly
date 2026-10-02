@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CircularProgress,
   Link as MuiLink,
   Stack,
   Typography,
@@ -20,6 +19,7 @@ import {
   Feedback,
   useMonthlyBreakdowns,
   useShabbatCreditAllocation,
+  MonthlyContentBoundary,
 } from "@/features";
 import { useGlobalState, useWorkDays } from "@/hooks";
 import { DomainContextType } from "@/app";
@@ -28,18 +28,8 @@ import { FeatureBoundary } from "@/layout";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const { t } = useTranslation("work-table");
-  const { year, month, baseRate } = useGlobalState();
-
   const { workDays, isLoading: loading, error: queryError } = useWorkDays(domain);
-  const shabbatCreditAllocation = useShabbatCreditAllocation();
-  const { monthBreakdown, monthFullBreakdown } = useMonthlyBreakdowns({
-    monthPayMapCalculator: domain.payMap.monthPayMapCalculator,
-    baseRate,
-    shabbatCreditHours: shabbatCreditAllocation.usedHours,
-  });
   const error = queryError?.message;
-
-  const hasData = workDays.length > 0;
 
   return (
     <Box component="section" sx={{ mt: 2 }}>
@@ -149,49 +139,61 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
             <Stack spacing={3}>
               <ConfigPanel domain={domain} mode={"daily"} />
 
-              {error && <Alert severity="error">{error}</Alert>}
-
-              {loading && (
-                <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-                  <CircularProgress />
-                </Box>
-              )}
-
-              {!loading && !error && hasData && (
-                <FeatureBoundary
-                  featureName={t("feature_name_work_table")}
-                  errorContext="WorkTable"
-                  resetKeys={[year, month]}
-                >
-                  <WorkTable
-                    domain={domain}
-                    workDays={workDays}
-                    shabbatCreditAllocation={shabbatCreditAllocation}
-                    monthBreakdown={monthBreakdown}
-                    monthFullBreakdown={monthFullBreakdown}
-                  />
-                </FeatureBoundary>
-              )}
-
-              {baseRate > 0 && (
-                <>
-                  <FeatureBoundary
-                    featureName={t("feature_name_salary_summary")}
-                    errorContext="MonthlySalarySummary"
-                    resetKeys={[year, month]}
-                  >
-                    <MonthlySalarySummary
-                      domain={domain}
-                      monthFullBreakdown={monthFullBreakdown}
-                    />
-                  </FeatureBoundary>
-                  <Feedback />
-                </>
-              )}
+              <MonthlyContentBoundary loading={loading} minHeight={600}>
+                {error ? <Alert severity="error">{error}</Alert> : (
+                  <DailyMonthlyContent domain={domain} workDays={workDays} />
+                )}
+              </MonthlyContentBoundary>
             </Stack>
           </CardContent>
         </Card>
       </Box>
     </Box>
+  );
+};
+
+const DailyMonthlyContent = ({ domain, workDays }: {
+  domain: DomainContextType;
+  workDays: ReturnType<typeof useWorkDays>["workDays"];
+}) => {
+  const { t } = useTranslation("work-table");
+  const { year, month, baseRate } = useGlobalState();
+  const shabbatCreditAllocation = useShabbatCreditAllocation();
+  const { monthBreakdown, monthFullBreakdown } = useMonthlyBreakdowns({
+    monthPayMapCalculator: domain.payMap.monthPayMapCalculator,
+    baseRate,
+    shabbatCreditHours: shabbatCreditAllocation.usedHours,
+  });
+  return (
+    <Stack spacing={3}>
+      {workDays.length > 0 && (
+        <FeatureBoundary
+          featureName={t("feature_name_work_table")}
+          errorContext="WorkTable"
+          resetKeys={[year, month]}
+        >
+          <WorkTable
+            domain={domain}
+            workDays={workDays}
+            shabbatCreditAllocation={shabbatCreditAllocation}
+            monthBreakdown={monthBreakdown}
+            monthFullBreakdown={monthFullBreakdown}
+          />
+        </FeatureBoundary>
+      )}
+
+      {baseRate > 0 && (
+        <>
+          <FeatureBoundary
+            featureName={t("feature_name_salary_summary")}
+            errorContext="MonthlySalarySummary"
+            resetKeys={[year, month]}
+          >
+            <MonthlySalarySummary domain={domain} monthFullBreakdown={monthFullBreakdown} />
+          </FeatureBoundary>
+          <Feedback />
+        </>
+      )}
+    </Stack>
   );
 };

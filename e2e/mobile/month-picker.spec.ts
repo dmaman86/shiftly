@@ -13,6 +13,7 @@ test("selects another month through the modal date picker", async ({ page }) => 
   await expect(page.getByTestId("mobile-calendar-day-2026-09-15")).toBeVisible();
 
   await selectMonthInDialog(page, 2026, 8);
+  await expect(page.getByRole("button", { name: /בחירת תאריך|בחר תאריך/i })).toBeFocused();
 
   await expect(page.getByTestId("mobile-calendar-day-2026-08-01")).toBeVisible();
   await expect(page.getByTestId("work-day-card-2026-08-01")).toBeVisible();
@@ -34,6 +35,7 @@ test("discards an unconfirmed month selection when the modal is cancelled", asyn
   await dialog.getByRole("button", { name: "ביטול" }).click();
 
   await expect(dialog).toBeHidden();
+  await expect(page.getByRole("button", { name: /בחירת תאריך|בחר תאריך/i })).toBeFocused();
   await expect(originalDay).toBeVisible();
   await selectMonthInDialog(page, 2026, 8);
   await expect(page.getByTestId("mobile-calendar-day-2026-08-01")).toBeVisible();
