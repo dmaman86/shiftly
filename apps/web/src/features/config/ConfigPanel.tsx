@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import {
   Card,
   Typography,
@@ -17,6 +18,7 @@ import { DomainContextType } from "@/app";
 import { WorkParametersInputs } from "./WorkParametersInputs";
 import { SYSTEM_START_YEAR } from "@/app/constants";
 import { useTranslation } from "react-i18next";
+import { MonthlyContentBoundary } from "@/features/monthly-data/MonthlyContentBoundary";
 
 type ConfigPanelProps = {
   domain: DomainContextType;
@@ -28,6 +30,14 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
   const { t: tWT } = useTranslation("work-table");
   const monthNames = tWT("months", { returnObjects: true }) as string[];
   const { year, month, selectMonth } = useGlobalState();
+  const pickerButtonRef = useRef<HTMLButtonElement>(null);
+  const period = `${year}:${month}`;
+  const [draft, setDraft] = useState<Date | null>(() => new Date(year, month - 1, 1));
+  const [draftPeriod, setDraftPeriod] = useState(period);
+  if (draftPeriod !== period) {
+    setDraftPeriod(period);
+    setDraft(new Date(year, month - 1, 1));
+  }
 
   const { monthResolver } = domain.resolvers;
 
@@ -92,26 +102,33 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
                   <Box sx={{ flex: 1 }}>
                     <DatePicker
-                      key={`${year}:${month}`}
                       label={t("config.date_section")}
-                      defaultValue={new Date(year, month - 1, 1)}
+                      value={draft}
                       minDate={minDate}
                       maxDate={maxDate}
                       views={["year", "month"]}
                       openTo="month"
-                      // MUI owns view drafts until acceptance; changing the
-                      // monthly context earlier would unmount the mobile dialog.
+                      // View drafts stay local until acceptance, including on mobile.
                       onAccept={(value, context) => {
                         if (context.validationError === null) commitMonth(value);
                       }}
                       onChange={(value, context) => {
+                        setDraft(value);
                         // Keep direct keyboard edits working without a dialog.
                         if (context.source === "field" && context.validationError === null) {
                           commitMonth(value);
                         }
                       }}
+                      onClose={() => {
+                        // Wait until the dialog's focus trap is closed.
+                        queueMicrotask(() => pickerButtonRef.current?.focus({ preventScroll: true }));
+                      }}
                       slotProps={{
                         textField: { size: "small", fullWidth: true },
+                        openPickerButton: { ref: pickerButtonRef },
+                        // Restore focus ourselves without moving the page.
+                        desktopTrapFocus: { disableRestoreFocus: true },
+                        dialog: { disableRestoreFocus: true },
                       }}
                     />
                   </Box>
@@ -165,9 +182,11 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                   </Typography>
                 </Box>
 
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                  <WorkParametersInputs mode={mode} />
-                </Stack>
+                <MonthlyContentBoundary>
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+                    <WorkParametersInputs mode={mode} />
+                  </Stack>
+                </MonthlyContentBoundary>
               </CardContent>
             </Card>
           </Box>

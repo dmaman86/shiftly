@@ -28,6 +28,7 @@ import type { MonthlyConfigRecord } from "@/services/monthlyConfig/monthlyConfig
 import { useGlobalState } from "@/hooks/useGlobalState";
 import { initialGlobalState, useGlobalStore } from "@/store/globalStore";
 import { MonthlyDataProvider } from "@/features/monthly-data/MonthlyDataProvider";
+import { useMonthlyConfigStatus } from "@/features/monthly-data/monthlyConfigStatusContext";
 import { GuestDraftImportContext } from "@/features/guest-draft/guestDraftImportContext";
 import { ConfigPanel } from "@/features/config/ConfigPanel";
 
@@ -41,11 +42,14 @@ const deferred = <T,>() => {
 };
 const Probe = () => {
   const { year, month, standardHours, baseRate } = useGlobalState();
+  const { ready } = useMonthlyConfigStatus();
+  if (!ready) return null;
   return <output data-testid="config">{JSON.stringify({ year, month, standardHours, baseRate })}</output>;
 };
 const session = (ready = true, showEditor = true) => (
   <GuestDraftImportContext.Provider value={{ ready }}>
     <MonthlyDataProvider>
+      <button type="button">Persistent navigation</button>
       <Probe />
       {showEditor && <ConfigPanel domain={domain} />}
     </MonthlyDataProvider>
@@ -112,6 +116,42 @@ describe("MonthlyDataProvider with the real store and ConfigPanel", () => {
       expect(useGlobalStore.getState().config).toEqual({ year: 2026, month: 8, standardHours: 7.5, baseRate: 60 });
       expect(serviceMock.upsert).not.toHaveBeenCalled();
     } finally { unsubscribe(); }
+  });
+
+  it("preserves the shell and focused date field while another month loads", async () => {
+    const next = deferred<ApiResponse<MonthlyConfigRecord | null>>();
+    renderSession();
+    await waitForReady();
+    const navigation = screen.getByRole("button", { name: "Persistent navigation" });
+    const dateField = screen.getByRole("spinbutton", { name: "Month" });
+    act(() => dateField.focus());
+    serviceMock.fetch.mockReturnValueOnce({ call: () => next.promise });
+    act(() => useGlobalStore.getState().selectMonth(2026, 9));
+    expect(screen.getByRole("button", { name: "Persistent navigation" })).toBe(navigation);
+    expect(screen.getByRole("spinbutton", { name: "Month" })).toBe(dateField);
+    expect(dateField).toHaveFocus();
+    expect(screen.queryByTestId("config")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("שכר שעתי")).not.toBeInTheDocument();
+    await act(async () => { next.resolve({ data: record(90, 9) }); });
+    await waitForReady();
+    expect(screen.getByRole("spinbutton", { name: "Month" })).toBe(dateField);
+    expect(dateField).toHaveFocus();
+    expect(serviceMock.upsert).not.toHaveBeenCalled();
+  });
+
+  it("resets guest values on month changes without rebuilding the selector", async () => {
+    authMock.user = null;
+    renderSession();
+    await waitForReady();
+    const dateField = screen.getByRole("spinbutton", { name: "Month" });
+    editRate("45");
+    await waitFor(() => expect(useGlobalStore.getState().config.baseRate).toBe(45));
+    act(() => useGlobalStore.getState().selectMonth(2026, 9));
+    await waitForReady();
+    expect(useGlobalStore.getState().config.baseRate).toBe(0);
+    expect(screen.getByRole("spinbutton", { name: "Month" })).toBe(dateField);
+    expect(serviceMock.fetch).not.toHaveBeenCalled();
+    expect(serviceMock.upsert).not.toHaveBeenCalled();
   });
 
   it("does not treat unresolved auth as guest initialization", async () => {
@@ -239,7 +279,7 @@ describe("MonthlyDataProvider with the real store and ConfigPanel", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "OK" }));
     await waitFor(() => expect(useGlobalStore.getState().config.month).toBe(7));
     await waitForReady();
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
     expect(useGlobalStore.getState().config.baseRate).toBe(70);
     expect(serviceMock.fetch).toHaveBeenLastCalledWith("user-1", 2026, 7);
     expect(serviceMock.upsert).not.toHaveBeenCalled();
@@ -254,6 +294,7 @@ describe("MonthlyDataProvider with the real store and ConfigPanel", () => {
     fireEvent.click(within(dialog).getByText("Jul", { exact: true }));
     fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.getByRole("spinbutton", { name: "Month" })).toHaveTextContent("August");
     expect(useGlobalStore.getState().config.month).toBe(8);
     expect(useGlobalStore.getState().config.baseRate).toBe(60);
     expect(serviceMock.fetch).toHaveBeenCalledOnce();

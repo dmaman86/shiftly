@@ -18,6 +18,7 @@ import {
 import { resolveErrorMessage } from "@/utils";
 import { useGuestDraftImportGate } from "@/features/guest-draft/guestDraftImportContext";
 import { MonthlyConfigActionsContext } from "./monthlyConfigActionsContext";
+import { MonthlyConfigStatusContext } from "./monthlyConfigStatusContext";
 
 type MonthlyDataProviderProps = { children: React.ReactNode };
 type ConfigChange = MonthlyConfigValues & {
@@ -45,7 +46,7 @@ type MonthlyConfigSessionProps = MonthlyDataProviderProps & {
   save: (change: ConfigChange) => void;
 };
 
-/** The keyed boundary mounts consumers only after one coherent store commit. */
+/** Publish readiness without replacing the application shell. */
 const MonthlyConfigSession = ({
   userId,
   year,
@@ -60,7 +61,11 @@ const MonthlyConfigSession = ({
     (state) => state.monthlyConfigContextKey === contextKey,
   );
   const initializeMonth = useGlobalStore((state) => state.initializeMonth);
-  const pendingSaves = useIsMutating({ mutationKey: configKey(userId, year, month) });
+  // Subscribe globally, but read the current identity synchronously: changing
+  // a filtered subscription can otherwise expose its previous period's count.
+  useIsMutating();
+  const queryClient = useQueryClient();
+  const pendingSaves = queryClient.isMutating({ mutationKey: configKey(userId, year, month) });
   const query = useQuery({
     queryKey: configKey(userId, year, month),
     enabled: !!userId && guestDraftReady && !initialized && pendingSaves === 0,
@@ -112,27 +117,24 @@ const MonthlyConfigSession = ({
     updateStandardHours: (value: number) => edit("standardHours", value),
   }), [edit]);
 
-  if (!initialized) {
-    if (query.isError) {
-      return (
-        <Alert
-          severity="error"
-          action={
-            <Button onClick={() => void query.refetch()}>
-              {t("actions.try_again")}
-            </Button>
-          }
-        >
-          {t("config.load_error")}
-        </Alert>
-      );
-    }
-    return <LoadingConfig />;
-  }
+  const fallback = query.isError ? (
+    <Alert
+      severity="error"
+      action={
+        <Button onClick={() => void query.refetch()}>
+          {t("actions.try_again")}
+        </Button>
+      }
+    >
+      {t("config.load_error")}
+    </Alert>
+  ) : <LoadingConfig />;
 
   return (
     <MonthlyConfigActionsContext.Provider value={actions}>
-      {children}
+      <MonthlyConfigStatusContext.Provider value={{ ready: initialized, contextKey, fallback }}>
+        {children}
+      </MonthlyConfigStatusContext.Provider>
     </MonthlyConfigActionsContext.Provider>
   );
 };
@@ -190,7 +192,6 @@ export const MonthlyDataProvider = ({ children }: MonthlyDataProviderProps) => {
         </Alert>
       )}
       <MonthlyConfigSession
-        key={JSON.stringify(configKey(userId, year, month))}
         userId={userId}
         year={year}
         month={month}

@@ -6,6 +6,7 @@ import {
   Link as MuiLink,
   Stack,
   Typography,
+  Alert,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -18,6 +19,7 @@ import {
   Feedback,
   useMonthlyBreakdowns,
   useShabbatCreditAllocation,
+  MonthlyContentBoundary,
 } from "@/features";
 import {
   WorkTableDayStateHydrator,
@@ -33,16 +35,7 @@ export const MonthlySummaryPage = ({
   domain: DomainContextType;
 }) => {
   const { t } = useTranslation("pages");
-  const { t: tWT } = useTranslation("work-table");
-  const { year, month, baseRate } = useGlobalState();
-  const { workDays } = useWorkDays(domain);
-  const { user } = useAuth();
-  const shabbatCreditAllocation = useShabbatCreditAllocation();
-  const { monthFullBreakdown } = useMonthlyBreakdowns({
-    monthPayMapCalculator: domain.payMap.monthPayMapCalculator,
-    baseRate,
-    shabbatCreditHours: shabbatCreditAllocation.usedHours,
-  });
+  const { workDays, isLoading, error } = useWorkDays(domain);
 
   return (
     <Box component="section" sx={{ mt: 2 }}>
@@ -125,27 +118,46 @@ export const MonthlySummaryPage = ({
             <Stack spacing={3}>
               <ConfigPanel domain={domain} mode={"monthly"} />
 
-              <WorkTableDayStateProvider
-                ownerKey={JSON.stringify([user?.id, year, month])}
-              >
-                <WorkTableDayStateHydrator domain={domain} workDays={workDays}>
-                  <FeatureBoundary
-                    featureName={tWT("feature_name_salary_summary")}
-                    errorContext="MonthlySalarySummary"
-                    resetKeys={[year, month]}
-                  >
-                    <MonthlySalarySummary
-                      domain={domain}
-                      monthFullBreakdown={monthFullBreakdown}
-                    />
-                  </FeatureBoundary>
-                </WorkTableDayStateHydrator>
-              </WorkTableDayStateProvider>
-              <Feedback />
+              <MonthlyContentBoundary loading={isLoading} minHeight={300}>
+                {error ? <Alert severity="error">{error.message}</Alert> : (
+                  <MonthlySummaryContent domain={domain} workDays={workDays} />
+                )}
+              </MonthlyContentBoundary>
             </Stack>
           </CardContent>
         </Card>
       </Box>
     </Box>
+  );
+};
+
+const MonthlySummaryContent = ({ domain, workDays }: {
+  domain: DomainContextType;
+  workDays: ReturnType<typeof useWorkDays>["workDays"];
+}) => {
+  const { t: tWT } = useTranslation("work-table");
+  const { year, month, baseRate } = useGlobalState();
+  const { user } = useAuth();
+  const shabbatCreditAllocation = useShabbatCreditAllocation();
+  const { monthFullBreakdown } = useMonthlyBreakdowns({
+    monthPayMapCalculator: domain.payMap.monthPayMapCalculator,
+    baseRate,
+    shabbatCreditHours: shabbatCreditAllocation.usedHours,
+  });
+  return (
+    <Stack spacing={3}>
+      <WorkTableDayStateProvider ownerKey={JSON.stringify([user?.id, year, month])}>
+        <WorkTableDayStateHydrator domain={domain} workDays={workDays}>
+          <FeatureBoundary
+            featureName={tWT("feature_name_salary_summary")}
+            errorContext="MonthlySalarySummary"
+            resetKeys={[year, month]}
+          >
+            <MonthlySalarySummary domain={domain} monthFullBreakdown={monthFullBreakdown} />
+          </FeatureBoundary>
+        </WorkTableDayStateHydrator>
+      </WorkTableDayStateProvider>
+      <Feedback />
+    </Stack>
   );
 };
