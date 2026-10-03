@@ -14,6 +14,7 @@ type RuleCardProps = {
   children: React.ReactNode;
   collapsible?: boolean;
   defaultExpanded?: boolean;
+  lazyMount?: boolean;
   id?: string;
   onExpand?: () => void;
 };
@@ -31,6 +32,7 @@ export const RuleCard = ({
   children,
   collapsible = false,
   defaultExpanded = false,
+  lazyMount = false,
   id,
   onExpand,
 }: RuleCardProps) => {
@@ -40,6 +42,12 @@ export const RuleCard = ({
         id={id}
         disableGutters
         defaultExpanded={defaultExpanded}
+        slotProps={{
+          transition: {
+            mountOnEnter: lazyMount,
+            unmountOnExit: lazyMount,
+          },
+        }}
         onChange={(_, expanded) => {
           if (expanded) onExpand?.();
         }}

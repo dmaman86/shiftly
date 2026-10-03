@@ -1,8 +1,58 @@
 import { describe, it, expect } from "vitest";
+import { fireEvent, waitFor } from "@testing-library/react";
 import { renderWithTheme, screen } from "@/test/ui/utils";
 import { RuleCard } from "@/features/calculation-rules/RuleCard";
 
 describe("RuleCard", () => {
+  describe("Lazy content", () => {
+    it("mounts video only when opened and unmounts it after closing", async () => {
+      const { container } = renderWithTheme(
+        <RuleCard title="Demo" collapsible lazyMount>
+          <video src="/demos/video-desktop.webm" />
+        </RuleCard>
+      );
+
+      expect(container.querySelector("video")).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: "Demo" }));
+      const firstVideo = container.querySelector("video");
+      expect(firstVideo).toHaveAttribute("src", "/demos/video-desktop.webm");
+
+      fireEvent.click(screen.getByRole("button", { name: "Demo" }));
+      await waitFor(() => {
+        expect(container.querySelector("video")).not.toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: "Demo" }));
+      expect(container.querySelector("video")).toBeInTheDocument();
+      expect(container.querySelector("video")).not.toBe(firstVideo);
+    });
+
+    it("mounts lazy content immediately when initially expanded", () => {
+      const { container } = renderWithTheme(
+        <RuleCard title="Demo" collapsible lazyMount defaultExpanded>
+          <video src="/demos/video-mobile.webm" />
+        </RuleCard>
+      );
+
+      expect(container.querySelector("video")).toHaveAttribute(
+        "src", "/demos/video-mobile.webm"
+      );
+      expect(screen.getByRole("button", { name: "Demo" })).toHaveAttribute(
+        "aria-expanded", "true"
+      );
+    });
+
+    it("preserves mounted content for other collapsed cards", () => {
+      renderWithTheme(
+        <RuleCard title="Other rules" collapsible>
+          <div>Persistent content</div>
+        </RuleCard>
+      );
+
+      expect(screen.getByText("Persistent content")).toBeInTheDocument();
+    });
+  });
+
   describe("Basic Rendering", () => {
     it("should render card title", () => {
       renderWithTheme(

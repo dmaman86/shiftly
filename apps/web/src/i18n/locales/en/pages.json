@@ -6,11 +6,7 @@
     "title": "Monthly Salary Calculator",
     "subtitle": "Calculate your monthly salary without entering shifts — enter your hourly rate and number of hours for a quick estimate.",
     "nav_hint_daily": "Want to calculate salary by shifts? Go to",
-    "nav_link_daily": "Daily Calculator",
-    "nav_hint_rules": "Want to understand how the calculation works? Go to",
-    "nav_link_rules": "Calculation Rules",
-    "nav_hint_example": "Want to try your own shifts? Go to",
-    "nav_link_example": "Interactive Calculation Example"
+    "nav_link_daily": "Daily Calculator"
   },
   "calculation_rules_page": {
     "title": "Calculation Rules",
@@ -126,5 +122,59 @@
         "text_2": "Differences may occur based on personal agreements or internal procedures."
       }
     }
+  },
+  "profile_page": {
+    "title": "My Profile",
+    "history_title": "Your history",
+    "history_description": "Based on saved shifts, day statuses, each month's settings and saved Shabbat carry-over. The current month, when included, is partial. Temporary salary-summary quantity edits are not saved and are not included here.",
+    "range_label": "Date range",
+    "range_presets": {
+      "last3": "Last 3 months",
+      "last6": "Last 6 months",
+      "last12": "Last 12 months",
+      "year": "This year",
+      "custom": "Custom range"
+    },
+    "range_from": "From month",
+    "range_to": "To month",
+    "range_apply": "Apply range",
+    "active_range": "All charts: {{from}} – {{to}}",
+    "range_errors": {
+      "invalid_month": "Select a valid start and end month.",
+      "reversed": "The start month must not be after the end month.",
+      "unsupported": "Choose months from November 2015 through the current month."
+    },
+    "loading": "Loading your history...",
+    "load_error": "Your history could not be loaded. No incomplete totals are shown. Try again.",
+    "retry": "Try again",
+    "empty_history": "No saved records were found for these months. Save shifts in the monthly calculator to see your history.",
+    "default_config": "Some months have records but no saved settings. Their hours use the default standard hours; payment is unavailable until an hourly rate is saved for those months.",
+    "partial_month": "partial",
+    "no_records": "No saved records",
+    "missing_rate": "Hourly rate not set",
+    "actual_payable_title": "Actual Hrs vs Payable Hrs",
+    "actual_payable_description": "Actual hours exclude sick leave and vacation. Payable hours include paid absences and applied Shabbat credit; they are not multiplied by overtime rates.",
+    "actual_hours": "Actual Hrs",
+    "payable_hours": "Payable Hrs",
+    "base_overtime_title": "Base Hours vs Overtime Hours",
+    "base_overtime_description": "Worked hours in the 100% segment compared with hours in the 125% and 150% segments. Evening, night and Shabbat additions are not added as extra worked hours.",
+    "base_hours": "Base Hours (100%)",
+    "overtime_hours": "Overtime (125% + 150%)",
+    "payment_title": "Total Payment Composition",
+    "payment_description": "The calculated gross Total Payment, split exactly like the unedited salary summary: base pay includes 100% hours, paid absences and applied Shabbat credit; extras include full overtime pay and evening, night and Shabbat additions; allowances include per diem and meals. This is not net pay or proof of payment received.",
+    "base_pay": "Base pay",
+    "extras_pay": "Extras & overtime",
+    "allowances_pay": "Allowances",
+    "hours_axis": "Hours",
+    "currency_axis": "Calculated payment (₪)",
+    "show_values": "Show exact values",
+    "month": "Month",
+    "total": "Total"
+  },
+  "calculation_help": {
+    "intro": "Understand the calculation:",
+    "rules": "Calculation rules",
+    "example": "Interactive example",
+    "demo": "Demo video"
   }
 }

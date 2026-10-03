@@ -57,11 +57,12 @@ export const ViewSwitcher = () => {
   const { direction } = useDirection();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, isLoading, initializationError } = useAuth();
   /* v8 ignore next */
   const lang = location.pathname.split("/")[1] || "he";
   const [open, setOpen] = useState(false);
-  const accountAndRulesPath = `/${lang}/account-and-rules${user ? "#account-profile" : ""}`;
+  const calculationRulesPath = `/${lang}/calculation-rules`;
+  const showProfile = !!user && !isLoading && !initializationError;
 
   const toggleLang = () => {
     const nextLang = lang === "he" ? "en" : "he";
@@ -95,9 +96,10 @@ export const ViewSwitcher = () => {
         <Box sx={{ display: { xs: "none", md: "flex" }, gap: 2 }}>
           <NavItem to={`/${lang}/daily`}>{t("nav.daily")}</NavItem>
           <NavItem to={`/${lang}/monthly`}>{t("nav.monthly")}</NavItem>
-          <NavItem to={accountAndRulesPath}>
+          <NavItem to={calculationRulesPath}>
             {t("nav.calculation_rules")}
           </NavItem>
+          {showProfile && <NavItem to={`/${lang}/profile`}>{t("nav.profile")}</NavItem>}
         </Box>
 
         <AuthControls display="account" />
@@ -147,11 +149,12 @@ export const ViewSwitcher = () => {
             {t("nav.monthly")}
           </NavItem>
           <NavItem
-            to={accountAndRulesPath}
+            to={calculationRulesPath}
             onClick={() => setOpen(false)}
           >
             {t("nav.calculation_rules")}
           </NavItem>
+          {showProfile && <NavItem to={`/${lang}/profile`} onClick={() => setOpen(false)}>{t("nav.profile")}</NavItem>}
         </Box>
       </Collapse>
     </AppBar>

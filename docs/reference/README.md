@@ -56,12 +56,13 @@ This makes it possible to **recalculate past months accurately** using the same 
 - Fully reactive UI
 - Landscape, right-to-left PDF export with weekly separators, independent meal-allowance columns, per-page metadata, and the application copyright footer
 - Optional Google sign-in with cross-device data persistence
+- Authenticated profile with an account card and three historical charts, sharing preset or custom monthly ranges
 
 ---
 
 ## Authentication & Data Persistence
 
-Shiftly works fully **without an account** — everything runs in memory, and nothing is stored anywhere.
+The salary calculators work **without an account** — calculation data stays in memory. The personal profile and persisted history require authentication.
 
 Signing in with a **Google account** (via Supabase Auth) additionally persists your data to Supabase, tied to your account, so it carries over across sessions and devices:
 
@@ -876,6 +877,7 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   │   ├── monthly-data/       # Monthly configuration hydration and persistence
 │   │   ├── monthly-pay/        # Derived monthly pay and Shabbat credit allocation
 │   │   │   └── hooks/          # Allocation calculation and carry-over persistence
+│   │   ├── profile/            # Read-only history, metrics, charts and range selection
 │   │   ├── salary-summary/     # Monthly salary components and view models
 │   │   │   ├── components/     # Salary summary presentation
 │   │   │   ├── helpers/        # Salary section construction
@@ -893,7 +895,7 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   ├── hooks/                  # Shared React integration hooks
 │   ├── i18n/                   # Hebrew/English resources and URL language resolution
 │   ├── layout/                 # Application layout and error boundaries
-│   ├── pages/                  # Daily, monthly and calculation-rules pages
+│   ├── pages/                  # Daily, monthly, calculation-rules and profile pages
 │   ├── store/                  # Zustand global state and breakdown calculations
 │   ├── services/               # Analytics, Hebcal and Supabase persistence clients
 │   ├── test/                   # Web app, store, service and UI test suites
@@ -936,7 +938,16 @@ It allows the system to scale **without turning into tightly coupled conditional
 
 ## Application Views
 
-Shiftly provides two main calculation views:
+Shiftly provides two main calculation views, a public rules page, and an authenticated profile:
+
+| Route | Access | Purpose |
+| --- | --- | --- |
+| `/:lang/daily` | Public | Shift entry and daily breakdowns |
+| `/:lang/monthly` | Public | Monthly salary calculation |
+| `/:lang/calculation-rules` | Public | Calculation rules, interactive example and demo |
+| `/:lang/profile` | Authenticated | Account card and saved monthly history |
+
+`:lang` is `he` or `en`; routes run under the configured application base path.
 
 ### Daily View
 
@@ -965,6 +976,22 @@ Shiftly provides two main calculation views:
 
 Both views share the same domain calculation pipeline.
 Only the presentation and configuration context changes.
+
+### Profile and Historical Charts
+
+The profile account card is separate from the public calculation-rules page. Desktop and mobile navigation expose the profile only to signed-in users. Direct profile URLs wait for authentication initialization; guests are redirected to `/:lang/calculation-rules` in the same language, preserving query parameters. Supabase RLS remains the server-side ownership boundary.
+
+The three charts use saved monthly configurations, day statuses and shifts:
+
+- **Actual Hrs vs Payable Hrs:** actual hours exclude sick leave and vacation; payable hours include paid absences and applied Shabbat credit, without overtime multipliers.
+- **Base Hours vs Overtime Hours:** hours in the 100% segment versus the 125% and 150% segments. Evening, night and Shabbat additions are not extra worked time.
+- **Total Payment composition:** base pay, extras and allowances sum to the unedited salary summary's calculated gross total. Extras include full overtime pay, not just the premium; allowances include per diem and meals. This is not net pay or proof of payment received.
+
+One selector above all three charts offers the last **3, 6 or 12 months**, **this year** (January through the current month), and **custom start/end months**. Six months is the default. Custom endpoints are inclusive and take effect only after **Apply range**; invalid or reversed drafts leave the active range unchanged. Dates are limited to November 2015 through the current month, and only the actual current month is marked partial.
+
+History is read-only and recalculated with the current domain engine, not an immutable payroll snapshot. It uses saved previous-month Shabbat carry-over and excludes temporary salary-summary quantity overrides. Missing records are distinct from zero-hour months; payment is unavailable without a positive saved hourly rate. Loading failures show a retry action instead of incomplete chart totals.
+
+History queries are scoped to the user and both range endpoints, wait for pending writes/imports, discard obsolete reads, and load in three-month batches. Charts provide keyboard/touch tooltips and expandable exact-value tables using existing MUI/CSS components. English and Hebrew translations live under `profile_page` in their respective `pages.json`, not a separate namespace.
 
 ### Configuration Panel
 

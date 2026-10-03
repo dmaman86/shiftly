@@ -10,6 +10,7 @@ import { Box, CircularProgress } from "@mui/material";
 
 import { useDomain, usePageTracking } from "@/hooks";
 import { LanguageLayout } from "./LanguageLayout";
+import { AuthenticatedRoute } from "./AuthenticatedRoute";
 
 const DailyPage = lazy(() =>
   import("@/pages/DailyPage").then((m) => ({ default: m.DailyPage })),
@@ -23,6 +24,9 @@ const CalculationRulesPage = lazy(() =>
   import("@/pages/CalculationRulesPage").then((m) => ({
     default: m.CalculationRulesPage,
   })),
+);
+const ProfilePage = lazy(() =>
+  import("@/pages/ProfilePage").then((m) => ({ default: m.ProfilePage })),
 );
 
 const RedirectToDaily = () => {
@@ -82,7 +86,15 @@ export const AppRoutes = () => {
             path="monthly"
             element={<MonthlySummaryPage domain={domain} />}
           />
-          <Route path="account-and-rules" element={<CalculationRulesPage />} />
+          <Route path="calculation-rules" element={<CalculationRulesPage />} />
+          <Route
+            path="profile"
+            element={
+              <AuthenticatedRoute>
+                <ProfilePage />
+              </AuthenticatedRoute>
+            }
+          />
           <Route path="*" element={<RedirectToDaily />} />
         </Route>
         <Route index element={<RootRedirect />} />

@@ -6,7 +6,7 @@ test.use({ viewport: { width: 1363, height: 936 } });
 for (const language of ["en", "he"]) {
   test(`uses visible page headings and named controls (${language})`, async ({ page }) => {
     await prepareApp(page);
-    for (const route of ["daily", "monthly", "account-and-rules"]) {
+    for (const route of ["daily", "monthly", "calculation-rules"]) {
       await page.goto(`${language}/${route}`);
       await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
       await expect(page.locator("main h5, main h6")).toHaveCount(0);

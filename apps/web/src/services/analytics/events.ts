@@ -8,7 +8,6 @@ export type AnalyticsEvent =
         month?: number;
         year?: number;
         calculationType?: "monthly" | "daily";
-        hasAllowances?: boolean;
       };
     }
   | {
@@ -69,7 +68,7 @@ export type AnalyticsEvent =
     }
   | {
       name: "calculation_demo_link_clicked";
-      params: { source: "daily" };
+      params: { source: "daily" | "monthly" };
     }
   | {
       name: "guest_draft_import_resolved";

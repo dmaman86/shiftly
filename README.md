@@ -32,6 +32,14 @@ The result is a predictable frustration: employees get a payslip they have no pr
 - **Browser coverage:** [Playwright projects](playwright.config.ts) exercise desktop Chromium, Android emulation (Chromium) and iPhone emulation (WebKit).
 - **User-scoped persistence:** the [database migration](supabase/migrations/20260830000000_persistence_schema.sql) enables Supabase Row Level Security on monthly settings, work days and shifts, with ownership policies based on `auth.uid()`.
 
+## Personal profile
+
+Signed-in users can open `/:lang/profile` for their account card and three monthly charts: **Actual Hrs vs Payable Hrs**, **Base Hours vs Overtime Hours**, and **Total Payment composition** (base pay, extras/overtime, and allowances).
+
+A shared selector applies the last **3, 6 or 12 months**, **this year**, or an inclusive **custom month range** to all charts. The default is six months; supported dates run from November 2015 through the current month.
+
+History uses saved account data, not unsaved salary-summary quantity edits. Payment is a calculated gross estimate, not net pay or confirmation of payment received. Calculation rules remain public at `/:lang/calculation-rules`; guests opening the profile are redirected there.
+
 ## Quick start
 
 Requirements: Node.js 24 and Bun 1.3.14. Install with Bun to link the workspace
