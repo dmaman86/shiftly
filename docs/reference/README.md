@@ -993,8 +993,6 @@ History is read-only and recalculated with the current domain engine, not an imm
 
 History queries are scoped to the user and both range endpoints, wait for pending writes/imports, discard obsolete reads, and load in three-month batches. Charts provide keyboard/touch tooltips and expandable exact-value tables using existing MUI/CSS components. English and Hebrew translations live under `profile_page` in their respective `pages.json`, not a separate namespace.
 
-See [Profile analytics](../profile-analytics.md) for data ownership and detailed metric definitions.
-
 ### Configuration Panel
 
 The `ConfigPanel` adapts its behavior based on the active view:

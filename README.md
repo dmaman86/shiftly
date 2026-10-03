@@ -61,7 +61,6 @@ Open `http://localhost:5173/shiftly`.
 - [Full technical reference](docs/reference/README.md)
 - [Hebrew technical reference](docs/reference/README_HE.md)
 - [Independent payroll engine](packages/domain/README.md)
-- [Profile analytics: metrics, ranges and data ownership](docs/profile-analytics.md)
 - [Architecture documentation](docs/architecture/)
 - [Current architecture diagrams](docs/architecture/generated/)
 - [Architecture history by tag](docs/architecture/history/)

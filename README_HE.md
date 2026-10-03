@@ -71,7 +71,6 @@ bun run dev
 - [תיעוד טכני מלא באנגלית](docs/reference/README.md)
 - [תיעוד טכני מלא בעברית](docs/reference/README_HE.md)
 - [מנוע השכר העצמאי](packages/domain/README.md)
-- [ניתוח נתוני הפרופיל: מדדים, טווחים ובעלות על נתונים (באנגלית)](docs/profile-analytics.md)
 - [תיעוד הארכיטקטורה](docs/architecture/)
 - [תרשימי הארכיטקטורה הנוכחית](docs/architecture/generated/)
 - [היסטוריית הארכיטקטורה לפי tag](docs/architecture/history/)
