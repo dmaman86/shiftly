@@ -9,7 +9,7 @@ import { SalaryFeedback, analyticsService } from "@/services";
 export const Feedback = () => {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const { month, year, baseRate } = useGlobalState();
+  const { month, year } = useGlobalState();
   const snackbar = useAppSnackbar();
 
   const handleClick = useCallback(
@@ -21,12 +21,11 @@ export const Feedback = () => {
           month,
           year,
           calculationType: pathname.includes("/daily") ? "daily" : "monthly",
-          hasAllowances: baseRate > 0,
         },
       });
       snackbar.success(t("feedback.success"));
     },
-    [snackbar, month, year, pathname, baseRate, t],
+    [snackbar, month, year, pathname, t],
   );
 
   return (

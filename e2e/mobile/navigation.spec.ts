@@ -9,7 +9,7 @@ import { getHorizontalOverflow, prepareApp } from "../support/app";
 
 const PAGES = [
   { label: "חישוב חודשי", path: /\/he\/monthly$/ },
-  { label: "חשבון וכללי חישוב", path: /\/he\/account-and-rules$/ },
+  { label: "כללי חישוב", path: /\/he\/calculation-rules$/ },
   { label: "חישוב יומי", path: /\/he\/daily$/ },
 ];
 

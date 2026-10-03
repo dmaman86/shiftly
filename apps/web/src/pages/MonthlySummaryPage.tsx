@@ -27,7 +27,7 @@ import {
 } from "@/features/work-table";
 import { useAuth, useGlobalState, useWorkDays } from "@/hooks";
 import { FeatureBoundary } from "@/layout";
-import { analyticsService } from "@/services";
+import { CalculationHelpLinks } from "@/features/calculation-rules/CalculationHelpLinks";
 
 export const MonthlySummaryPage = ({
   domain,
@@ -65,46 +65,7 @@ export const MonthlySummaryPage = ({
                     {t("monthly_summary_page.nav_link_daily")}
                   </MuiLink>
                 </Stack>
-                <Stack
-                  direction="row"
-                  spacing={0.5}
-                  flexWrap="wrap"
-                  justifyContent="center"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {t("monthly_summary_page.nav_hint_rules")}
-                  </Typography>
-                  <MuiLink
-                    component={RouterLink}
-                    to="../account-and-rules"
-                    variant="body2"
-                  >
-                    {t("monthly_summary_page.nav_link_rules")}
-                  </MuiLink>
-                </Stack>
-                <Stack
-                  direction="row"
-                  spacing={0.5}
-                  flexWrap="wrap"
-                  justifyContent="center"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {t("monthly_summary_page.nav_hint_example")}
-                  </Typography>
-                  <MuiLink
-                    component={RouterLink}
-                    to="../account-and-rules#interactive-example"
-                    variant="body2"
-                    onClick={() =>
-                      analyticsService.track({
-                        name: "calculation_example_link_clicked",
-                        params: { source: "monthly" },
-                      })
-                    }
-                  >
-                    {t("monthly_summary_page.nav_link_example")}
-                  </MuiLink>
-                </Stack>
+                <CalculationHelpLinks source="monthly" />
                 <Box sx={{ pt: 1 }}>
                   <AuthControls />
                 </Box>

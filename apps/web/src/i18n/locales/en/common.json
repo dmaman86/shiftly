@@ -4,8 +4,9 @@
     "app_title": "Shiftly – Shift & Salary Management",
     "daily": "Daily",
     "monthly": "Monthly",
-    "account_and_rules": "Account & Rules",
-    "calculation_rules": "Account & Rules"
+    "account_and_rules": "Rules",
+    "calculation_rules": "Rules",
+    "profile": "My Profile"
   },
   "footer": {
     "copyright": "© {{year}} Shiftly – Salary & Shift Simulation & Calculator",

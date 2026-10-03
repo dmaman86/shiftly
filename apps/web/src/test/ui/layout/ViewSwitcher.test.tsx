@@ -56,6 +56,7 @@ describe("ViewSwitcher", () => {
   beforeEach(() => {
     mockDirection.direction = "rtl";
     mockAuthState.user = null;
+    mockAuthState.isLoading = false;
     vi.clearAllMocks();
   });
 
@@ -75,9 +76,9 @@ describe("ViewSwitcher", () => {
       expect(screen.getAllByText("חישוב חודשי").length).toBeGreaterThan(0);
     });
 
-    it("renders account and rules nav item", () => {
+    it("renders the rules nav item", () => {
       renderAtPath("/he/daily");
-      expect(screen.getAllByText("חשבון וכללי חישוב").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("כללי חישוב").length).toBeGreaterThan(0);
     });
 
     it("renders language toggle button", () => {
@@ -95,10 +96,11 @@ describe("ViewSwitcher", () => {
 
       renderAtPath("/he/daily");
 
-      expect(screen.getByRole("link", { name: "חשבון וכללי חישוב" })).toHaveAttribute(
+      expect(screen.getByRole("link", { name: "כללי חישוב" })).toHaveAttribute(
         "href",
-        "/he/account-and-rules#account-profile",
+        "/he/calculation-rules",
       );
+      expect(screen.getByRole("link", { name: "הפרופיל שלי" })).toHaveAttribute("href", "/he/profile");
       expect(screen.getByRole("button", { name: "התנתקות" })).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "התחברות" })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "הרשמה" })).not.toBeInTheDocument();
@@ -108,8 +110,16 @@ describe("ViewSwitcher", () => {
       renderAtPath("/he/daily");
 
       expect(
-        screen.getByRole("link", { name: "חשבון וכללי חישוב" }),
-      ).toHaveAttribute("href", "/he/account-and-rules");
+        screen.getByRole("link", { name: "כללי חישוב" }),
+      ).toHaveAttribute("href", "/he/calculation-rules");
+      expect(screen.queryByRole("link", { name: "הפרופיל שלי" })).not.toBeInTheDocument();
+    });
+
+    it("does not expose profile navigation while authentication is initializing", () => {
+      mockAuthState.user = { email: "worker@example.com" };
+      mockAuthState.isLoading = true;
+      renderAtPath("/he/daily");
+      expect(screen.queryByRole("link", { name: "הפרופיל שלי" })).not.toBeInTheDocument();
     });
   });
 
@@ -164,6 +174,17 @@ describe("ViewSwitcher", () => {
   });
 
   describe("Mobile menu", () => {
+    it("includes the profile link for authenticated users and closes after navigation", async () => {
+      mockAuthState.user = { email: "worker@example.com" };
+      const user = userEvent.setup();
+      renderAtPath("/he/daily");
+      await user.click(screen.getByRole("button", { name: "Open navigation menu" }));
+      const links = await screen.findAllByRole("link", { name: "הפרופיל שלי" });
+      expect(links).toHaveLength(2);
+      await user.click(links[1]);
+      await waitFor(() => expect(screen.getByTestId("location")).toHaveTextContent("/he/profile"));
+      await waitFor(() => expect(screen.getAllByRole("link", { name: "הפרופיל שלי" })).toHaveLength(1));
+    });
     it("mobile nav items are hidden initially", () => {
       renderAtPath("/he/daily");
       const menuButtons = screen.getAllByText("חישוב יומי");

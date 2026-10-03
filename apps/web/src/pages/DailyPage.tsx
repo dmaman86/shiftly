@@ -23,7 +23,7 @@ import {
 } from "@/features";
 import { useGlobalState, useWorkDays } from "@/hooks";
 import { DomainContextType } from "@/app";
-import { analyticsService } from "@/services";
+import { CalculationHelpLinks } from "@/features/calculation-rules/CalculationHelpLinks";
 import { FeatureBoundary } from "@/layout";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
@@ -63,69 +63,7 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
                     {t("nav_link_monthly")}
                   </MuiLink>
                 </Stack>
-                <Stack
-                  direction="row"
-                  spacing={0.5}
-                  flexWrap="wrap"
-                  justifyContent="center"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {t("nav_hint_rules")}
-                  </Typography>
-                  <MuiLink
-                    component={RouterLink}
-                    to="../account-and-rules"
-                    variant="body2"
-                  >
-                    {t("nav_link_rules")}
-                  </MuiLink>
-                </Stack>
-                <Stack
-                  direction="row"
-                  spacing={0.5}
-                  flexWrap="wrap"
-                  justifyContent="center"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {t("nav_hint_example")}
-                  </Typography>
-                  <MuiLink
-                    component={RouterLink}
-                    to="../account-and-rules#interactive-example"
-                    variant="body2"
-                    onClick={() =>
-                      analyticsService.track({
-                        name: "calculation_example_link_clicked",
-                        params: { source: "daily" },
-                      })
-                    }
-                  >
-                    {t("nav_link_example")}
-                  </MuiLink>
-                </Stack>
-                <Stack
-                  direction="row"
-                  spacing={0.5}
-                  flexWrap="wrap"
-                  justifyContent="center"
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {t("nav_hint_demo")}
-                  </Typography>
-                  <MuiLink
-                    component={RouterLink}
-                    to="../account-and-rules#demo"
-                    variant="body2"
-                    onClick={() =>
-                      analyticsService.track({
-                        name: "calculation_demo_link_clicked",
-                        params: { source: "daily" },
-                      })
-                    }
-                  >
-                    {t("nav_link_demo")}
-                  </MuiLink>
-                </Stack>
+                <CalculationHelpLinks source="daily" />
                 <Box sx={{ pt: 1 }}>
                   <AuthControls />
                 </Box>

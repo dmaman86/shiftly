@@ -21,7 +21,6 @@ import {
   WorkDayTimeline,
   TimelineNote,
   AuthControls,
-  AccountProfileCard,
   CalculationExampleCard,
 } from "@/features";
 import { useDeviceType, useDomain, useGlobalState } from "@/hooks";
@@ -73,8 +72,6 @@ export const CalculationRulesPage = () => {
           </Box>
           <Divider sx={{ mt: 3 }} />
 
-          <AccountProfileCard defaultExpanded={hash === "#account-profile"} />
-
           <CalculationExampleCard
             defaultExpanded={hash === "#interactive-example"}
             domain={domain}
@@ -82,6 +79,7 @@ export const CalculationRulesPage = () => {
 
           <RuleCard
             id="demo"
+            lazyMount
             title={t(`${cr}.card_demo.title`)}
             collapsible
             defaultExpanded={hash === "#demo"}
