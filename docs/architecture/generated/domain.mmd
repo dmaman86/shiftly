@@ -9,8 +9,8 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
-%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
 flowchart TD
   subgraph group_domain["Payroll logic"]
     node_0["composition<br/>[packages/domain/src/composition.ts]"]
@@ -33,7 +33,16 @@ flowchart TD
     node_17["fixed-segment-month.reducer<br/>[packages/domain/src/reducer/fixed-segment-month.reducer.ts]"]
     node_18["meal-allowance-month.reducer<br/>[packages/domain/src/reducer/meal-allowance-month.reducer.ts]"]
     node_19["buildShiftLayer.pipeline<br/>[packages/domain/src/pipelines/buildShiftLayer.pipeline.ts]"]
+    rate_pipeline["buildRateCalculators.pipeline<br/>[packages/domain/src/pipelines/buildRateCalculators.pipeline.ts]"]
+    day_from_shifts["calculateDayFromShifts<br/>[packages/domain/src/calculator/day-from-shifts.calculator.ts]"]
+    addition_classifier["AdditionClassifier<br/>[packages/domain/src/calculator/additions/addition.classifier.ts]"]
+    shabbat_credit["allocateShabbatCredit — exported credit allocation API<br/>[packages/domain/src/calculator/shabbat-credit.calculator.ts]"]
   end
+  node_0 --> rate_pipeline
+  node_0 --> day_from_shifts
+  node_0 -->|"policy type"| addition_classifier
+  node_19 --> addition_classifier
+  node_9 --> addition_classifier
   node_0 -->|"depends on"| node_4
   node_0 -->|"depends on"| node_5
   node_0 -->|"depends on"| node_1
@@ -85,3 +94,8 @@ flowchart TD
   click node_19 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildShiftLayer.pipeline.ts"
   classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
   class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15,node_16,node_17,node_18,node_19 toneAmber
+  class rate_pipeline,day_from_shifts,addition_classifier,shabbat_credit toneAmber
+  click rate_pipeline "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildRateCalculators.pipeline.ts"
+  click day_from_shifts "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/day-from-shifts.calculator.ts"
+  click addition_classifier "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/additions/addition.classifier.ts"
+  click shabbat_credit "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/shabbat-credit.calculator.ts"

@@ -21,7 +21,7 @@ Workers track time in shifts: a continuous block of hours with a clear start and
 
 The result is a predictable frustration: employees get a payslip they have no practical way to verify. Shiftly bridges that gap. You enter shifts the way you think about them, and it calculates pay by the rules applied in government offices, so every amount can be inspected and explained.
 
-<!-- TODO: add validation line once VALIDATION.md exists -->
+See [payroll validation](VALIDATION.md) ([עברית](VALIDATION_HE.md)) for the evidence matrix, comparisons against results corrected using actual payslips, known limitations and validation plan.
 
 > Calculations are indicative gross-pay estimates, not a replacement for official payroll.
 
@@ -60,6 +60,8 @@ Open `http://localhost:5173/shiftly`.
 
 - [Full technical reference](docs/reference/README.md)
 - [Hebrew technical reference](docs/reference/README_HE.md)
+- [Payroll validation](VALIDATION.md)
+- [Payroll validation in Hebrew](VALIDATION_HE.md)
 - [Independent payroll engine](packages/domain/README.md)
 - [Architecture documentation](docs/architecture/)
 - [Current architecture diagrams](docs/architecture/generated/)

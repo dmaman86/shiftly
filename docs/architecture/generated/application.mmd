@@ -9,8 +9,9 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
-%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Selected module dependencies, including type imports; not an exhaustive import graph.
+%% Arrows point from consumers to dependencies. Profile reads do not hydrate editor state.
 flowchart TD
   subgraph group_app["Application and state"]
     node_0["AppProviders<br/>[apps/web/src/app/providers/AppProviders.tsx]"]
@@ -28,7 +29,38 @@ flowchart TD
     node_12["useGlobalState<br/>[apps/web/src/hooks/useGlobalState.ts]"]
     node_13["month.resolver<br/>[apps/web/src/app/months/month.resolver.ts]"]
     node_14["workdayinfo.presenter<br/>[apps/web/src/app/domain/workdayinfo.presenter.ts]"]
+    profile_query["useProfileHistory<br/>[apps/web/src/features/profile/hooks/useProfileHistory.ts]"]
+    profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
+    profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
+    profile_metrics["profileMetrics<br/>[apps/web/src/features/profile/helpers/profileMetrics.ts]"]
+    profile_range["profileRange<br/>[apps/web/src/features/profile/helpers/profileRange.ts]"]
+    config_status["monthlyConfigStatusContext<br/>[apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts]"]
+    config_actions["monthlyConfigActionsContext<br/>[apps/web/src/features/monthly-data/monthlyConfigActionsContext.ts]"]
+    import_gate["guestDraftImportContext<br/>[apps/web/src/features/guest-draft/guestDraftImportContext.ts]"]
+    work_days["useWorkDays / loadCalendarEventMap<br/>[apps/web/src/hooks/useWorkDays.ts]"]
   end
+  profile_query --> profile_loader
+  profile_query --> profile_range
+  profile_loader --> profile_history
+  profile_loader --> profile_range
+  profile_query --> node_10
+  profile_query --> node_11
+  profile_query --> work_days
+  profile_query --> import_gate
+  profile_history -->|"month type"| profile_range
+  profile_history --> node_9
+  profile_loader --> work_days
+  profile_metrics -->|"snapshot type"| profile_history
+  node_4 --> config_status
+  node_4 --> config_actions
+  node_4 --> import_gate
+  node_5 --> import_gate
+  node_7 --> import_gate
+  external_query{{"TanStack Query — queries and mutations"}}
+  node_0 --> external_query
+  node_4 --> external_query
+  node_7 --> external_query
+  profile_query -->|"wait for writes; cancel stale reads"| external_query
   node_0 -->|"depends on"| node_1
   node_0 -->|"depends on"| node_2
   node_2 -->|"depends on"| node_3
@@ -64,3 +96,13 @@ flowchart TD
   click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/workdayinfo.presenter.ts"
   classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
   class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14 toneMint
+  class profile_query,profile_loader,profile_history,profile_metrics,profile_range,config_status,config_actions,import_gate,work_days toneMint
+  click profile_loader "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/services/profileHistory.service.ts"
+  click profile_query "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/hooks/useProfileHistory.ts"
+  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileHistory.ts"
+  click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
+  click profile_range "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileRange.ts"
+  click config_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts"
+  click config_actions "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigActionsContext.ts"
+  click import_gate "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/guestDraftImportContext.ts"
+  click work_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useWorkDays.ts"
