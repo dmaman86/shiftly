@@ -9,10 +9,26 @@ export const AuthenticatedRoute = ({ children }: { children: ReactNode }) => {
   const { lang } = useParams<{ lang: string }>();
   const { search } = useLocation();
   const { t } = useTranslation();
+
   if (isLoading) {
-    return <Box sx={{ display: "flex", justifyContent: "center", p: 4 }} aria-busy="true"><CircularProgress aria-label={t("auth.loading")} /></Box>;
+    return (
+      <Box
+        sx={{ display: "flex", justifyContent: "center", p: 4 }}
+        aria-busy="true"
+      >
+        <CircularProgress aria-label={t("auth.loading")} />
+      </Box>
+    );
+  } else {
+    if (initializationError)
+      return <Alert severity="error">{t("auth.initialization_error")}</Alert>;
+    if (!user)
+      return (
+        <Navigate
+          to={{ pathname: `/${lang}/calculation-rules`, search }}
+          replace
+        />
+      );
+    return <>{children}</>;
   }
-  if (initializationError) return <Alert severity="error">{t("auth.initialization_error")}</Alert>;
-  if (!user) return <Navigate to={{ pathname: `/${lang}/calculation-rules`, search }} replace />;
-  return <>{children}</>;
 };
