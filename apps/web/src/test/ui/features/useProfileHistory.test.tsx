@@ -3,9 +3,9 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { domain } from "@/app/domain";
-import { useProfileHistory } from "@/features/profile/useProfileHistory";
+import { useProfileHistory } from "@/features/profile/hooks/useProfileHistory";
 import { GuestDraftImportContext } from "@/features/guest-draft/guestDraftImportContext";
-import type { ProfileMonthSnapshot } from "@/features/profile/profileHistory";
+import type { ProfileMonthSnapshot } from "@/features/profile/helpers/profileHistory";
 
 const mocks = vi.hoisted(() => ({
   load: vi.fn(),
@@ -13,7 +13,7 @@ const mocks = vi.hoisted(() => ({
 }));
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => mocks.auth }));
 vi.mock("@/hooks/useDomain", () => ({ useDomain: () => domain }));
-vi.mock("@/features/profile/profileHistory", () => ({ loadProfileHistory: mocks.load }));
+vi.mock("@/features/profile/services/profileHistory.service", () => ({ loadProfileHistory: mocks.load }));
 
 const month = { year: 2026, month: 8 };
 const period = { from: { year: 2026, month: 3 }, to: month };
