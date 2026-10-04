@@ -31,7 +31,7 @@
     },
     "apps/web": {
       "name": "@shiftly/web",
-      "version": "0.19.4",
+      "version": "1.0.0",
       "dependencies": {
         "@babel/runtime": "^7.26.10",
         "@date-io/date-fns": "^3.2.1",

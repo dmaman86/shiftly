@@ -1,7 +1,7 @@
 {
   "name": "@shiftly/web",
   "private": true,
-  "version": "0.19.4",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "bun run --cwd ../../packages/domain build && vite",
