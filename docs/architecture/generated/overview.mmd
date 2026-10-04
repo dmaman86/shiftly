@@ -9,17 +9,18 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: main (HEAD). Layers are derived from modules present at this commit. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
-%% Arrows aggregate source dependencies, including type imports.
+%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Selected layer dependencies, including type imports; not a strict layered architecture.
+%% Solid arrows point from consumers to dependencies; dashed arrows show runtime behavior.
 flowchart TD
   subgraph group_data["Infrastructure and data"]
     layer_data["Application services and adapters"]
   end
   subgraph group_ui["Presentation"]
-    layer_ui["React presentation"]
+    layer_ui["React presentation<br/>Daily, monthly, rules and protected profile"]
   end
   subgraph group_app["Application"]
-    layer_app["Application composition and hooks<br/>Zustand state"]
+    layer_app["Application composition and hooks<br/>Zustand editor state; read-only profile history"]
   end
   subgraph group_domain["Payroll logic"]
     layer_domain["@shiftly/domain — standalone payroll engine"]
@@ -34,7 +35,15 @@ flowchart TD
   layer_ui -->|"depends on"| layer_domain
   layer_data -->|"depends on"| layer_ui
   external_supabase{{"Supabase SDK"}}
+  external_query{{"TanStack Query — server state and mutations"}}
+  layer_app --> external_query
+  layer_ui --> external_query
+  layer_data --> external_supabase
   layer_app -->|"uses"| external_supabase
+  profile["Profile analytics<br/>Actual vs payable; base vs overtime; payment composition"]
+  layer_ui -.->|"authenticated route"| profile
+  profile -.->|"saved months, bounded reads, current engine"| layer_app
+  click profile "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/ProfilePage.tsx"
   e2e["Playwright E2E"]
   e2e -.->|"exercises UI"| layer_ui
   click e2e "https://github.com/dmaman86/shiftly/blob/main/playwright.config.ts"

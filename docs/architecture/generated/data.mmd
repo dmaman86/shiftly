@@ -9,8 +9,9 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
-%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
+%% Profile history reads saved config, shifts and days without persisting recalculated results.
 flowchart TD
   subgraph group_data["Infrastructure and adapters"]
     node_0["supabase.crud<br/>[apps/web/src/services/supabase/supabase.crud.ts]"]
@@ -30,6 +31,24 @@ flowchart TD
     node_14["dayToPayBreadownVM<br/>[apps/web/src/adapters/dayToPayBreadownVM.ts]"]
     node_15["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
   end
+  profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
+  profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
+  profile_loader --> profile_history
+  profile_metrics["profileMetrics<br/>[apps/web/src/features/profile/helpers/profileMetrics.ts]"]
+  salary_rows["payRows.mapper<br/>[apps/web/src/features/salary-summary/mappers/payRows.mapper.ts]"]
+  salary_total["calculateTotal<br/>[apps/web/src/features/salary-summary/helpers/helper.ts]"]
+  profile_loader -->|"read saved months"| node_9
+  profile_loader -->|"read shifts"| node_2
+  profile_loader -->|"read days"| node_5
+  profile_history --> node_15
+  profile_metrics --> salary_rows
+  profile_metrics --> salary_total
+  external_domain{{"@shiftly/domain"}}
+  node_13 --> external_domain
+  node_14 --> external_domain
+  node_15 --> external_domain
+  node_10 -->|"status enum"| external_domain
+  profile_history -->|"allocate Shabbat credit"| external_domain
   node_0 -->|"depends on"| node_1
   node_2 -->|"depends on"| node_0
   node_3 -->|"depends on"| node_11
@@ -66,3 +85,11 @@ flowchart TD
   click node_15 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
   class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15 toneRose
+  class salary_rows,salary_total toneRose
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class profile_loader,profile_history,profile_metrics toneMint
+  click profile_loader "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/services/profileHistory.service.ts"
+  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileHistory.ts"
+  click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
+  click salary_rows "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/mappers/payRows.mapper.ts"
+  click salary_total "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/helpers/helper.ts"

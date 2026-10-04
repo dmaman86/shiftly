@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   formatProfileMonthInput, getPresetProfileRange, getProfileMonths,
   getProfileRangeError, parseProfileMonthInput,
-} from "@/features/profile/profileRange";
+} from "@/features/profile/helpers/profileRange";
 
 const now = { year: 2026, month: 2 };
 

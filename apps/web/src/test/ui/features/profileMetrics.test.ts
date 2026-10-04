@@ -4,8 +4,8 @@ import i18n from "@/i18n";
 import { monthToPayBreakdownVM } from "@/adapters";
 import { buildSectionsSalary } from "@/features/salary-summary/helpers/buildSectionsSalary";
 import { calculateTotal } from "@/features/salary-summary/helpers/helper";
-import { getProfileMetrics } from "@/features/profile/profileMetrics";
-import type { ProfileMonthSnapshot } from "@/features/profile/profileHistory";
+import { getProfileMetrics } from "@/features/profile/helpers/profileMetrics";
+import type { ProfileMonthSnapshot } from "@/features/profile/helpers/profileHistory";
 
 const createSnapshot = (): ProfileMonthSnapshot => {
   const map = domain.payMap.monthPayMapCalculator.createEmpty();

@@ -136,17 +136,18 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: main (HEAD). Layers are derived from modules present at this commit. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
-%% Arrows aggregate source dependencies, including type imports.
+%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Selected layer dependencies, including type imports; not a strict layered architecture.
+%% Solid arrows point from consumers to dependencies; dashed arrows show runtime behavior.
 flowchart TD
   subgraph group_data["Infrastructure and data"]
     layer_data["Application services and adapters"]
   end
   subgraph group_ui["Presentation"]
-    layer_ui["React presentation"]
+    layer_ui["React presentation<br/>Daily, monthly, rules and protected profile"]
   end
   subgraph group_app["Application"]
-    layer_app["Application composition and hooks<br/>Zustand state"]
+    layer_app["Application composition and hooks<br/>Zustand editor state; read-only profile history"]
   end
   subgraph group_domain["Payroll logic"]
     layer_domain["@shiftly/domain — standalone payroll engine"]
@@ -161,7 +162,15 @@ flowchart TD
   layer_ui -->|"depends on"| layer_domain
   layer_data -->|"depends on"| layer_ui
   external_supabase{{"Supabase SDK"}}
+  external_query{{"TanStack Query — server state and mutations"}}
+  layer_app --> external_query
+  layer_ui --> external_query
+  layer_data --> external_supabase
   layer_app -->|"uses"| external_supabase
+  profile["Profile analytics<br/>Actual vs payable; base vs overtime; payment composition"]
+  layer_ui -.->|"authenticated route"| profile
+  profile -.->|"saved months, bounded reads, current engine"| layer_app
+  click profile "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/ProfilePage.tsx"
   e2e["Playwright E2E"]
   e2e -.->|"exercises UI"| layer_ui
   click e2e "https://github.com/dmaman86/shiftly/blob/main/playwright.config.ts"
@@ -199,8 +208,8 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
-%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
 flowchart TD
   subgraph group_domain["Payroll logic"]
     node_0["composition<br/>[packages/domain/src/composition.ts]"]
@@ -223,7 +232,16 @@ flowchart TD
     node_17["fixed-segment-month.reducer<br/>[packages/domain/src/reducer/fixed-segment-month.reducer.ts]"]
     node_18["meal-allowance-month.reducer<br/>[packages/domain/src/reducer/meal-allowance-month.reducer.ts]"]
     node_19["buildShiftLayer.pipeline<br/>[packages/domain/src/pipelines/buildShiftLayer.pipeline.ts]"]
+    rate_pipeline["buildRateCalculators.pipeline<br/>[packages/domain/src/pipelines/buildRateCalculators.pipeline.ts]"]
+    day_from_shifts["calculateDayFromShifts<br/>[packages/domain/src/calculator/day-from-shifts.calculator.ts]"]
+    addition_classifier["AdditionClassifier<br/>[packages/domain/src/calculator/additions/addition.classifier.ts]"]
+    shabbat_credit["allocateShabbatCredit — exported credit allocation API<br/>[packages/domain/src/calculator/shabbat-credit.calculator.ts]"]
   end
+  node_0 --> rate_pipeline
+  node_0 --> day_from_shifts
+  node_0 -->|"policy type"| addition_classifier
+  node_19 --> addition_classifier
+  node_9 --> addition_classifier
   node_0 -->|"depends on"| node_4
   node_0 -->|"depends on"| node_5
   node_0 -->|"depends on"| node_1
@@ -275,6 +293,11 @@ flowchart TD
   click node_19 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildShiftLayer.pipeline.ts"
   classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
   class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15,node_16,node_17,node_18,node_19 toneAmber
+  class rate_pipeline,day_from_shifts,addition_classifier,shabbat_credit toneAmber
+  click rate_pipeline "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildRateCalculators.pipeline.ts"
+  click day_from_shifts "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/day-from-shifts.calculator.ts"
+  click addition_classifier "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/additions/addition.classifier.ts"
+  click shabbat_credit "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/shabbat-credit.calculator.ts"
 ```
 
 </details>
@@ -318,8 +341,9 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
-%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Selected module dependencies, including lazy page imports; arrows point from consumers to dependencies.
+%% AuthenticatedRoute prioritizes loading, initialization error, guest redirect, then children.
 flowchart TD
   subgraph group_ui["Presentation"]
     node_0["App<br/>[apps/web/src/app/App.tsx]"]
@@ -332,15 +356,35 @@ flowchart TD
     node_7["GoogleSignInButton<br/>[apps/web/src/features/auth/GoogleSignInButton.tsx]"]
     node_8["GuestDraftConflictDialog<br/>[apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx]"]
     node_9["MonthlySalarySummary<br/>[apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx]"]
+    profile_page["ProfilePage — authenticated charts<br/>[apps/web/src/pages/ProfilePage.tsx]"]
+    auth_route["AuthenticatedRoute<br/>[apps/web/src/app/routes/AuthenticatedRoute.tsx]"]
+    account_card["AccountProfileCard<br/>[apps/web/src/features/auth/AccountProfileCard.tsx]"]
+    profile_chart["ProfileBarChart<br/>[apps/web/src/features/profile/components/ProfileBarChart.tsx]"]
+    range_selector["ProfileRangeSelector<br/>[apps/web/src/features/profile/components/ProfileRangeSelector.tsx]"]
+    monthly_boundary["MonthlyContentBoundary — scoped period replacement<br/>[apps/web/src/features/monthly-data/MonthlyContentBoundary.tsx]"]
   end
   subgraph group_app["Application and state"]
     node_10["useDayController<br/>[apps/web/src/features/work-table/hooks/day/useDayController.ts]"]
+    profile_query["useProfileHistory<br/>[apps/web/src/features/profile/hooks/useProfileHistory.ts]"]
+    profile_metrics["profileMetrics<br/>[apps/web/src/features/profile/helpers/profileMetrics.ts]"]
+    config_status["monthlyConfigStatusContext<br/>[apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts]"]
   end
   subgraph group_data["Infrastructure and adapters"]
     node_11["dayToPayBreadownVM<br/>[apps/web/src/adapters/dayToPayBreadownVM.ts]"]
     node_12["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
   end
   node_0 -->|"depends on"| node_1
+  node_1 --> auth_route
+  node_1 --> profile_page
+  profile_page --> account_card
+  profile_page --> profile_chart
+  profile_page --> range_selector
+  profile_page --> profile_query
+  profile_page --> profile_metrics
+  node_2 --> monthly_boundary
+  node_3 --> monthly_boundary
+  monthly_boundary --> config_status
+  auth_route -.->|"guest redirect"| node_4
   node_1 -->|"depends on"| node_2
   node_1 -->|"depends on"| node_3
   node_1 -->|"depends on"| node_4
@@ -369,6 +413,17 @@ flowchart TD
   class node_10 toneMint
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
   class node_11,node_12 toneRose
+  class profile_page,auth_route,account_card,profile_chart,range_selector,monthly_boundary toneBlue
+  class profile_query,profile_metrics,config_status toneMint
+  click profile_page "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/ProfilePage.tsx"
+  click auth_route "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AuthenticatedRoute.tsx"
+  click account_card "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/AccountProfileCard.tsx"
+  click profile_chart "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/components/ProfileBarChart.tsx"
+  click range_selector "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/components/ProfileRangeSelector.tsx"
+  click monthly_boundary "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyContentBoundary.tsx"
+  click profile_query "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/hooks/useProfileHistory.ts"
+  click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
+  click config_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts"
 ```
 
 </details>
@@ -405,8 +460,9 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
-%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Selected module dependencies, including type imports; not an exhaustive import graph.
+%% Arrows point from consumers to dependencies. Profile reads do not hydrate editor state.
 flowchart TD
   subgraph group_app["Application and state"]
     node_0["AppProviders<br/>[apps/web/src/app/providers/AppProviders.tsx]"]
@@ -424,7 +480,38 @@ flowchart TD
     node_12["useGlobalState<br/>[apps/web/src/hooks/useGlobalState.ts]"]
     node_13["month.resolver<br/>[apps/web/src/app/months/month.resolver.ts]"]
     node_14["workdayinfo.presenter<br/>[apps/web/src/app/domain/workdayinfo.presenter.ts]"]
+    profile_query["useProfileHistory<br/>[apps/web/src/features/profile/hooks/useProfileHistory.ts]"]
+    profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
+    profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
+    profile_metrics["profileMetrics<br/>[apps/web/src/features/profile/helpers/profileMetrics.ts]"]
+    profile_range["profileRange<br/>[apps/web/src/features/profile/helpers/profileRange.ts]"]
+    config_status["monthlyConfigStatusContext<br/>[apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts]"]
+    config_actions["monthlyConfigActionsContext<br/>[apps/web/src/features/monthly-data/monthlyConfigActionsContext.ts]"]
+    import_gate["guestDraftImportContext<br/>[apps/web/src/features/guest-draft/guestDraftImportContext.ts]"]
+    work_days["useWorkDays / loadCalendarEventMap<br/>[apps/web/src/hooks/useWorkDays.ts]"]
   end
+  profile_query --> profile_loader
+  profile_query --> profile_range
+  profile_loader --> profile_history
+  profile_loader --> profile_range
+  profile_query --> node_10
+  profile_query --> node_11
+  profile_query --> work_days
+  profile_query --> import_gate
+  profile_history -->|"month type"| profile_range
+  profile_history --> node_9
+  profile_loader --> work_days
+  profile_metrics -->|"snapshot type"| profile_history
+  node_4 --> config_status
+  node_4 --> config_actions
+  node_4 --> import_gate
+  node_5 --> import_gate
+  node_7 --> import_gate
+  external_query{{"TanStack Query — queries and mutations"}}
+  node_0 --> external_query
+  node_4 --> external_query
+  node_7 --> external_query
+  profile_query -->|"wait for writes; cancel stale reads"| external_query
   node_0 -->|"depends on"| node_1
   node_0 -->|"depends on"| node_2
   node_2 -->|"depends on"| node_3
@@ -460,6 +547,16 @@ flowchart TD
   click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/workdayinfo.presenter.ts"
   classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
   class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14 toneMint
+  class profile_query,profile_loader,profile_history,profile_metrics,profile_range,config_status,config_actions,import_gate,work_days toneMint
+  click profile_loader "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/services/profileHistory.service.ts"
+  click profile_query "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/hooks/useProfileHistory.ts"
+  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileHistory.ts"
+  click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
+  click profile_range "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileRange.ts"
+  click config_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts"
+  click config_actions "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigActionsContext.ts"
+  click import_gate "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/guestDraftImportContext.ts"
+  click work_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useWorkDays.ts"
 ```
 
 </details>
@@ -491,8 +588,9 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: main (HEAD). Module dependencies include type imports. Commit: 2f6d26699aa360b6758154d1ebc0bb23d53807fe.
-%% Barrel re-exports are resolved; arrows point from consumers to dependencies.
+%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
+%% Profile history reads saved config, shifts and days without persisting recalculated results.
 flowchart TD
   subgraph group_data["Infrastructure and adapters"]
     node_0["supabase.crud<br/>[apps/web/src/services/supabase/supabase.crud.ts]"]
@@ -512,6 +610,24 @@ flowchart TD
     node_14["dayToPayBreadownVM<br/>[apps/web/src/adapters/dayToPayBreadownVM.ts]"]
     node_15["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
   end
+  profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
+  profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
+  profile_loader --> profile_history
+  profile_metrics["profileMetrics<br/>[apps/web/src/features/profile/helpers/profileMetrics.ts]"]
+  salary_rows["payRows.mapper<br/>[apps/web/src/features/salary-summary/mappers/payRows.mapper.ts]"]
+  salary_total["calculateTotal<br/>[apps/web/src/features/salary-summary/helpers/helper.ts]"]
+  profile_loader -->|"read saved months"| node_9
+  profile_loader -->|"read shifts"| node_2
+  profile_loader -->|"read days"| node_5
+  profile_history --> node_15
+  profile_metrics --> salary_rows
+  profile_metrics --> salary_total
+  external_domain{{"@shiftly/domain"}}
+  node_13 --> external_domain
+  node_14 --> external_domain
+  node_15 --> external_domain
+  node_10 -->|"status enum"| external_domain
+  profile_history -->|"allocate Shabbat credit"| external_domain
   node_0 -->|"depends on"| node_1
   node_2 -->|"depends on"| node_0
   node_3 -->|"depends on"| node_11
@@ -548,6 +664,14 @@ flowchart TD
   click node_15 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
   class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15 toneRose
+  class salary_rows,salary_total toneRose
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class profile_loader,profile_history,profile_metrics toneMint
+  click profile_loader "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/services/profileHistory.service.ts"
+  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileHistory.ts"
+  click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
+  click salary_rows "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/mappers/payRows.mapper.ts"
+  click salary_total "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/helpers/helper.ts"
 ```
 
 </details>

@@ -4,7 +4,7 @@ import { domain } from "@/app/domain";
 import { monthToPayBreakdownVM } from "@/adapters";
 import i18n from "@/i18n";
 import { ProfilePage } from "@/pages/ProfilePage";
-import type { ProfileMonthSnapshot } from "@/features/profile/profileHistory";
+import type { ProfileMonthSnapshot } from "@/features/profile/helpers/profileHistory";
 
 const history = vi.hoisted(() => ({
   data: undefined as ProfileMonthSnapshot[] | undefined,
@@ -12,13 +12,25 @@ const history = vi.hoisted(() => ({
   waitingForWrites: false, refetch: vi.fn(),
   rangeSpy: vi.fn(),
 }));
-vi.mock("@/features/profile/useProfileHistory", () => ({ useProfileHistory: (range: unknown) => {
+vi.mock("@/features/profile/hooks/useProfileHistory", () => ({ useProfileHistory: (range: unknown) => {
   history.rangeSpy(range);
   return history;
 } }));
 vi.mock("@/hooks/useDomain", () => ({ useDomain: () => domain }));
 vi.mock("@/features/auth", () => ({
   AccountProfileCard: ({ defaultExpanded }: { defaultExpanded: boolean }) => <div>{defaultExpanded ? "Expanded profile card" : "Collapsed profile card"}</div>,
+}));
+// Page tests isolate range application; real picker localization is covered separately.
+vi.mock("@mui/x-date-pickers/DatePicker", () => ({
+  DatePicker: ({ label, value, onChange }: {
+    label: string; value: Date | null; onChange: (value: Date | null) => void;
+  }) => <input
+    aria-label={label}
+    type="month"
+    value={value && !Number.isNaN(value.getTime())
+      ? `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}` : ""}
+    onChange={(event) => onChange(event.target.value ? new Date(`${event.target.value}-01T12:00:00`) : null)}
+  />,
 }));
 
 const snapshot = (month: number, baseRate = 40): ProfileMonthSnapshot => {

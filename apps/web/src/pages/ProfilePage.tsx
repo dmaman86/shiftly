@@ -3,11 +3,14 @@ import { Alert, Box, Button, CircularProgress, Container, Stack, Typography } fr
 import { useTranslation } from "react-i18next";
 import { AccountProfileCard } from "@/features/auth";
 import { useDomain } from "@/hooks";
-import { ProfileBarChart, type ProfileChartRow } from "@/features/profile/ProfileBarChart";
-import { getProfileMetrics } from "@/features/profile/profileMetrics";
-import { useProfileHistory } from "@/features/profile/useProfileHistory";
-import { ProfileRangeSelector } from "@/features/profile/ProfileRangeSelector";
-import { getPresetProfileRange } from "@/features/profile/profileRange";
+import {
+  ProfileBarChart,
+  ProfileRangeSelector,
+  getProfileMetrics,
+  getPresetProfileRange,
+  useProfileHistory,
+  type ProfileChartRow,
+} from "@/features/profile";
 
 export const ProfilePage = () => {
   const { t, i18n } = useTranslation("pages", { keyPrefix: "profile_page" });
