@@ -1,0 +1,15 @@
+# Prettier also reads .gitignore; these are tracked files it must leave alone.
+
+# Lockfiles are owned by their package managers.
+bun.lock
+**/deno.lock
+
+# Generated data: scripts/generate-calendar.ts writes the calendar, and the
+# E2E fixtures are reference datasets compared against payroll results.
+apps/web/public/calendar/
+e2e/fixtures/
+
+# Prose and generated diagrams: the bilingual docs embed the .mmd files
+# verbatim, so reformatting either side would break that sync.
+*.md
+docs/
