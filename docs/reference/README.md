@@ -124,6 +124,8 @@ distinction between timeline boundaries and business-rule resets.
 <details>
 <summary>Overview</summary>
 
+<!-- diagram:overview -->
+
 ```mermaid
 ---
 config:
@@ -188,6 +190,8 @@ flowchart TD
   class layer_domain toneAmber
 ```
 
+<!-- /diagram:overview -->
+
 </details>
 
 ## Architectural Layers
@@ -195,6 +199,8 @@ flowchart TD
 ### Domain
 <details>
 <summary>Domain</summary>
+
+<!-- diagram:domain -->
 
 ```mermaid
 ---
@@ -300,6 +306,8 @@ flowchart TD
   click shabbat_credit "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/shabbat-credit.calculator.ts"
 ```
 
+<!-- /diagram:domain -->
+
 </details>
 
 The domain layer contains **pure business logic** and is framework-agnostic.
@@ -328,6 +336,8 @@ The domain layer contains **pure business logic** and is framework-agnostic.
 ### Presentation
 <details>
 <summary>Presentation</summary>
+
+<!-- diagram:presentation -->
 
 ```mermaid
 ---
@@ -434,6 +444,8 @@ flowchart TD
   click config_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts"
 ```
 
+<!-- /diagram:presentation -->
+
 </details>
 
 #### Application and UI Types
@@ -455,6 +467,8 @@ Duty/Meal Allowance shifts are rendered as `Duty` in the English print view and 
 ### Application
 <details>
 <summary>Application</summary>
+
+<!-- diagram:application -->
 
 ```mermaid
 ---
@@ -567,6 +581,8 @@ flowchart TD
   click work_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useWorkDays.ts"
 ```
 
+<!-- /diagram:application -->
+
 </details>
 
 #### State Management
@@ -583,6 +599,8 @@ Global Zustand state:
 ### Data
 <details>
 <summary>Data</summary>
+
+<!-- diagram:data -->
 
 ```mermaid
 ---
@@ -681,6 +699,8 @@ flowchart TD
   click salary_rows "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/mappers/payRows.mapper.ts"
   click salary_total "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/helpers/helper.ts"
 ```
+
+<!-- /diagram:data -->
 
 </details>
 

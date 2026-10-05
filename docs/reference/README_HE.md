@@ -125,6 +125,8 @@ Shiftly אינה ממדלת עבודה כסוגי משמרות קבועים. ה�
 <details>
 <summary>Overview</summary>
 
+<!-- diagram:overview -->
+
 ```mermaid
 ---
 config:
@@ -189,6 +191,8 @@ flowchart TD
   class layer_domain toneAmber
 ```
 
+<!-- /diagram:overview -->
+
 </details>
 
 ## שכבות מערכת
@@ -196,6 +200,8 @@ flowchart TD
 ### דומיין
 <details>
 <summary>Domain</summary>
+
+<!-- diagram:domain -->
 
 ```mermaid
 ---
@@ -301,6 +307,8 @@ flowchart TD
   click shabbat_credit "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/shabbat-credit.calculator.ts"
 ```
 
+<!-- /diagram:domain -->
+
 </details>
 
 שכבת הדומיין מכילה לוגיקה עסקית טהורה ואינה תלויה ב-React, בניהול המצב או בספריות חיצוניות.
@@ -328,6 +336,8 @@ flowchart TD
 ### תצוגה
 <details>
 <summary>Presentation</summary>
+
+<!-- diagram:presentation -->
 
 ```mermaid
 ---
@@ -434,6 +444,8 @@ flowchart TD
   click config_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts"
 ```
 
+<!-- /diagram:presentation -->
+
 </details>
 
 #### טיפוסי האפליקציה וה־UI
@@ -454,6 +466,8 @@ flowchart TD
 ### אפליקציה
 <details>
 <summary>Application</summary>
+
+<!-- diagram:application -->
 
 ```mermaid
 ---
@@ -566,6 +580,8 @@ flowchart TD
   click work_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useWorkDays.ts"
 ```
 
+<!-- /diagram:application -->
+
 </details>
 
 #### ניהול מצב
@@ -582,6 +598,8 @@ flowchart TD
 ### נתונים
 <details>
 <summary>Data</summary>
+
+<!-- diagram:data -->
 
 ```mermaid
 ---
@@ -680,6 +698,8 @@ flowchart TD
   click salary_rows "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/mappers/payRows.mapper.ts"
   click salary_total "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/helpers/helper.ts"
 ```
+
+<!-- /diagram:data -->
 
 </details>
 
