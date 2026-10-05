@@ -1,3 +1,5 @@
+import { toAnalyticsPageLocation } from "./pageLocation";
+
 const GA_ID = "G-G19J1209M6";
 const LOCAL_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1"]);
 
@@ -19,7 +21,7 @@ export const gtagService = {
 
     window.gtag("js", new Date());
     window.gtag("config", GA_ID, {
-      page_location: window.location.href,
+      page_location: toAnalyticsPageLocation(window.location.href),
     });
   },
 };

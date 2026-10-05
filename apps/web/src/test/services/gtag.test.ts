@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { gtagService } from "@/services/analytics/gtag";
 
+const PAGE_URL = "https://dmaman86.github.io/shiftly/he/daily";
+
 describe("gtagService", () => {
   beforeEach(() => {
     vi.stubGlobal("gtag", undefined);
@@ -37,14 +39,14 @@ describe("gtagService", () => {
     );
 
     it("initializes dataLayer and gtag on non-localhost", () => {
-      vi.stubGlobal("location", { hostname: "dmaman86.github.io" });
+      vi.stubGlobal("location", new URL(PAGE_URL));
       gtagService.load();
       expect(Array.isArray(window.dataLayer)).toBe(true);
       expect(typeof window.gtag).toBe("function");
     });
 
     it("injects async GA script when not on localhost", () => {
-      vi.stubGlobal("location", { hostname: "dmaman86.github.io" });
+      vi.stubGlobal("location", new URL(PAGE_URL));
       const spy = vi.spyOn(document.head, "appendChild");
       gtagService.load();
       expect(spy).toHaveBeenCalledOnce();
@@ -55,20 +57,30 @@ describe("gtagService", () => {
     });
 
     it("pushes js and config commands to dataLayer", () => {
-      vi.stubGlobal("location", { hostname: "dmaman86.github.io" });
+      vi.stubGlobal("location", new URL(PAGE_URL));
       gtagService.load();
       const [jsCall, configCall] = window.dataLayer as unknown[][];
       expect(jsCall[0]).toBe("js");
       expect(jsCall[1]).toBeInstanceOf(Date);
       expect(configCall[0]).toBe("config");
       expect(configCall[1]).toBe("G-G19J1209M6");
-      expect(configCall[2]).toEqual({
-        page_location: window.location.href,
-      });
+      expect(configCall[2]).toEqual({ page_location: PAGE_URL });
+    });
+
+    it("never sends OAuth callback tokens as the page location", () => {
+      vi.stubGlobal(
+        "location",
+        new URL(
+          `${PAGE_URL}?error=access_denied#access_token=secret&refresh_token=secret`,
+        ),
+      );
+      gtagService.load();
+      const [, configCall] = window.dataLayer as unknown[][];
+      expect(configCall[2]).toEqual({ page_location: PAGE_URL });
     });
 
     it("is idempotent: second call does nothing if script already loaded", () => {
-      vi.stubGlobal("location", { hostname: "dmaman86.github.io" });
+      vi.stubGlobal("location", new URL(PAGE_URL));
       const spy = vi.spyOn(document.head, "appendChild");
       gtagService.load();
       gtagService.load();

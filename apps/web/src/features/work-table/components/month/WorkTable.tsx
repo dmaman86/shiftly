@@ -82,6 +82,39 @@ export const WorkTable = ({
 
   const groupByWeeks = useMemo(() => groupByShabbat(workDays), [workDays]);
 
+  const pdfMetadataHeader = [
+    user?.email ? `${t("table.pdf_email")}: ${user.email}` : null,
+    `${t("table.pdf_base_rate")}: ${baseRate}`,
+    `${t("table.pdf_standard_hours")}: ${standardHours}`,
+  ]
+    .filter(Boolean)
+    .join("  |  ");
+
+  const handleExportPdf = async () => {
+    if (!printViewRef.current) return;
+    setIsExporting(true);
+    try {
+      await exportWorkTablePdf({
+        element: printViewRef.current,
+        fileName: `work-table-${year}-${String(month).padStart(2, "0")}.pdf`,
+        metadata: {
+          header: pdfMetadataHeader,
+          footer: tCommon("footer.copyright", { year: copyrightYear }),
+          direction: "rtl",
+        },
+      });
+      analyticsService.track({
+        name: "work_table_pdf_exported",
+        params: { month, year },
+      });
+    } catch (error) {
+      console.error("Failed to export work table PDF", error);
+      snackbar.error(t("table.export_pdf_error"));
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <Card sx={{ mb: 3 }}>
       <CardContent>
@@ -124,40 +157,7 @@ export const WorkTable = ({
             startIcon={
               isExporting ? <CircularProgress size={16} /> : <DownloadIcon />
             }
-            onClick={async () => {
-              if (!printViewRef.current) return;
-              setIsExporting(true);
-              try {
-                await exportWorkTablePdf({
-                  element: printViewRef.current,
-                  fileName: `work-table-${year}-${String(month).padStart(2, "0")}.pdf`,
-                  metadata: {
-                    header: [
-                      user?.email
-                        ? `${t("table.pdf_email")}: ${user.email}`
-                        : null,
-                      `${t("table.pdf_base_rate")}: ${baseRate}`,
-                      `${t("table.pdf_standard_hours")}: ${standardHours}`,
-                    ]
-                      .filter(Boolean)
-                      .join("  |  "),
-                    footer: tCommon("footer.copyright", {
-                      year: copyrightYear,
-                    }),
-                    direction: "rtl",
-                  },
-                });
-                analyticsService.track({
-                  name: "work_table_pdf_exported",
-                  params: { month, year },
-                });
-              } catch (error) {
-                console.error("Failed to export work table PDF", error);
-                snackbar.error(t("table.export_pdf_error"));
-              } finally {
-                setIsExporting(false);
-              }
-            }}
+            onClick={handleExportPdf}
           >
             {t("table.export_pdf")}
           </Button>
@@ -292,13 +292,7 @@ export const WorkTable = ({
               domain={domain}
               workDays={workDays}
               monthName={monthNames[month - 1]}
-              pdfMetadataHeader={[
-                user?.email ? `${t("table.pdf_email")}: ${user.email}` : null,
-                `${t("table.pdf_base_rate")}: ${baseRate}`,
-                `${t("table.pdf_standard_hours")}: ${standardHours}`,
-              ]
-                .filter(Boolean)
-                .join("  |  ")}
+              pdfMetadataHeader={pdfMetadataHeader}
               monthBreakdown={monthFullBreakdown}
               dailySalary={monthBreakdown.dailySalary}
               shabbatCreditHoursByDate={

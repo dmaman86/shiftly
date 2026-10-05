@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import {
@@ -55,7 +55,9 @@ type GuestDraftImportProviderProps = {
 
 /**
  * Moves the month a guest filled in into their account right after the OAuth
- * redirect, asking before it replaces anything already saved.
+ * redirect, asking before it replaces anything already saved. When the
+ * redirect comes back without a user (failed or cancelled sign-in), the month
+ * is handed back to the guest work table instead of being lost.
  */
 export const GuestDraftImportProvider = ({
   initialDraft,
@@ -161,14 +163,32 @@ export const GuestDraftImportProvider = ({
     void runCheck(pendingDraft, userId);
   }, [selectMonth, isAuthLoading, pendingDraft, runCheck, userId]);
 
-  // A pending draft without a user means the sign-in was cancelled or failed:
-  // it is simply ignored (storage was already cleared when it was consumed).
-  const ready =
-    state.status === "idle" ||
-    (state.status === "pending" && !isAuthLoading && !userId);
+  // A pending draft without a user means the sign-in failed or was cancelled:
+  // the month goes back to the guest work table, which acknowledges it with
+  // markRestored() once applied.
+  const restoreDraft = !isAuthLoading && !userId ? pendingDraft : null;
+
+  useEffect(() => {
+    if (!restoreDraft) return;
+
+    // Only the pending flag is cleared: one restore per sign-in attempt, so a
+    // later plain reload still starts empty. The draft itself stays in storage
+    // and guest capture keeps it current for the next attempt.
+    guestDraftStorage.clearPendingImport();
+    selectMonth(restoreDraft.year, restoreDraft.month);
+  }, [restoreDraft, selectMonth]);
+
+  const markRestored = useCallback(() => {
+    setState((current) =>
+      current.status === "pending" ? { status: "idle" } : current,
+    );
+  }, []);
+
+  const ready = state.status === "idle" || restoreDraft !== null;
 
   const handleKeep = () => {
     if (state.status !== "confirming") return;
+    guestDraftStorage.discard();
     analyticsService.track({
       name: "guest_draft_import_resolved",
       params: { outcome: "kept", shift_count: state.draft.shifts.length },
@@ -219,10 +239,14 @@ export const GuestDraftImportProvider = ({
     }
   };
   const dialogMode = resolveDialogMode();
+  const gate = useMemo(
+    () => ({ ready, restoreDraft, markRestored }),
+    [markRestored, ready, restoreDraft],
+  );
   const draft = "draft" in state ? state.draft : null;
 
   return (
-    <GuestDraftImportContext.Provider value={{ ready }}>
+    <GuestDraftImportContext.Provider value={gate}>
       {children}
       {draft && (
         <GuestDraftConflictDialog

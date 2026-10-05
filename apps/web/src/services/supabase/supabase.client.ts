@@ -1,5 +1,13 @@
 import { createClient } from "@supabase/supabase-js";
 
+import { hasOAuthCallbackParams } from "./oauthCallback";
+
+// Read before the client is created: auth-js clears the fragment only after a
+// successful callback, and getSession() reports a failed one as a plain
+// signed-out visit, so this is the only way to tell them apart later.
+export const startedFromOAuthCallback =
+  typeof window !== "undefined" && hasOAuthCallbackParams(window.location.href);
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 

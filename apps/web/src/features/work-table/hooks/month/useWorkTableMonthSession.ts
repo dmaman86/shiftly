@@ -62,12 +62,16 @@ export const useWorkTableMonthSession = ({
   const replaceDailyPayMaps = useGlobalStore(
     (store) => store.replaceDailyPayMaps,
   );
-  const { ready: guestDraftReady } = useGuestDraftImportGate();
+  const {
+    ready: guestDraftReady,
+    restoreDraft,
+    markRestored,
+  } = useGuestDraftImportGate();
   const userId = user?.id;
   const previousStateRef = useRef<typeof state | null>(null);
 
   useGuestDraftCapture({
-    enabled: !isAuthLoading && !userId,
+    enabled: !isAuthLoading && !userId && guestDraftReady && !restoreDraft,
     state,
     year,
     month,
@@ -151,6 +155,44 @@ export const useWorkTableMonthSession = ({
     setHydrated,
     standardHours,
     userId,
+    workDays,
+  ]);
+
+  // The draft's shifts are mapped against this month's calendar, so it waits
+  // until the work days of the draft month are loaded.
+  const restoreMonthPrefix = restoreDraft
+    ? `${restoreDraft.year}-${String(restoreDraft.month).padStart(2, "0")}-`
+    : null;
+  const canRestoreGuestDraft =
+    !!restoreDraft &&
+    !userId &&
+    !hydrated &&
+    restoreDraft.year === year &&
+    restoreDraft.month === month &&
+    !!restoreMonthPrefix &&
+    !!workDays[0]?.meta.date.startsWith(restoreMonthPrefix);
+
+  useEffect(() => {
+    if (!canRestoreGuestDraft || !restoreDraft) return;
+    dispatch({
+      type: "hydrate",
+      state: recordsToWorkTableDayState({
+        days: restoreDraft.days,
+        shifts: restoreDraft.shifts,
+        workDays,
+        shiftMapBuilder: domain.payMap.shiftMapBuilder,
+        standardHours: restoreDraft.config.standardHours,
+      }),
+    });
+    setHydrated(true);
+    markRestored();
+  }, [
+    canRestoreGuestDraft,
+    dispatch,
+    domain,
+    markRestored,
+    restoreDraft,
+    setHydrated,
     workDays,
   ]);
 

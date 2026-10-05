@@ -96,6 +96,7 @@ export function renderWithProviders(
           user: null,
           isLoading: false,
           initializationError: null,
+          signInError: null,
         }}
       >
         {component}

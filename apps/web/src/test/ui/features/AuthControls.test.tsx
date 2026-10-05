@@ -18,6 +18,7 @@ const hookMocks = vi.hoisted(() => ({
     user: null as { email?: string } | null,
     isLoading: false,
     initializationError: null as string | null,
+    signInError: null as string | null,
   },
   snackbar: {
     success: vi.fn(),
@@ -53,6 +54,8 @@ describe("AuthControls", () => {
     hookMocks.authState.user = null;
     hookMocks.authState.isLoading = false;
     hookMocks.authState.initializationError = null;
+    hookMocks.authState.signInError = null;
+    sessionStorage.clear();
     vi.clearAllMocks();
   });
 
@@ -76,11 +79,37 @@ describe("AuthControls", () => {
       screen.getByRole("button", { name: "Continue with Google" }),
     );
 
+    // A fixed app-root target, never the current URL: that could still carry
+    // the fragment of an earlier failed callback.
     expect(authMocks.signInWithOAuth).toHaveBeenCalledWith({
       provider: "google",
-      options: { redirectTo: window.location.href },
+      options: {
+        redirectTo: new URL(
+          import.meta.env.BASE_URL,
+          window.location.origin,
+        ).toString(),
+      },
     });
+    expect(sessionStorage.getItem("shiftly:auth:return-path")).not.toBeNull();
+    expect(sessionStorage.getItem("shiftly:guest-draft:pending-import")).toBe(
+      "1",
+    );
     expect(hookMocks.snackbar.error).not.toHaveBeenCalled();
+  });
+
+  it("explains a failed sign-in and keeps the retry button available", () => {
+    hookMocks.authState.signInError = "Invalid JWT";
+
+    render(<AuthControls />);
+
+    expect(
+      screen.getByText(
+        "Sign-in with Google did not complete. You can keep working as a guest and try again.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Continue with Google" }),
+    ).toBeEnabled();
   });
 
   it("shows an error when the OAuth flow fails to start", async () => {

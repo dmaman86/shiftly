@@ -1219,6 +1219,13 @@ VITE_SUPABASE_URL=
 VITE_SUPABASE_PUBLISHABLE_KEY=
 ```
 
+התחברות עם Google תמיד חוזרת לשורש האפליקציה (`<origin>/shiftly/`) ולאחר מכן משחזרת את הדף שממנו המשתמש התחיל. תחת **Authentication → URL Configuration → Redirect URLs**, אפשרו את השורש הזה עבור כל origin שבו אתם משתמשים, לדוגמה:
+
+```text
+https://dmaman86.github.io/shiftly/**
+http://localhost:5173/shiftly/**
+```
+
 לאחר מכן הריצו את קבצי ה-SQL תחת `supabase/migrations/`, לפי הסדר, ב-SQL Editor של פרויקט ה-Supabase שלכם, כדי ליצור את הטבלאות `monthly_configs`, `work_days` ו-`shifts` עם מדיניות ה-Row Level Security שלהן.
 
 מחיקת חשבון דורשת את Supabase Edge Function בשם `delete-account`, כי מחיקה מ-`auth.users` דורשת מפתח סודי בצד שרת. לאחר קישור הפרויקט, פרסו אותה כך:

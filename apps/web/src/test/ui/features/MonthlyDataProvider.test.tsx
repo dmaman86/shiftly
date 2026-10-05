@@ -67,7 +67,9 @@ const Probe = () => {
   );
 };
 const session = (ready = true, showEditor = true) => (
-  <GuestDraftImportContext.Provider value={{ ready }}>
+  <GuestDraftImportContext.Provider
+    value={{ ready, restoreDraft: null, markRestored: () => {} }}
+  >
     <MonthlyDataProvider>
       <button type="button">Persistent navigation</button>
       <Probe />
