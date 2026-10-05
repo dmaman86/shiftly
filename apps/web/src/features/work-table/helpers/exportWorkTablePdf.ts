@@ -1,4 +1,5 @@
-import { jsPDF } from "jspdf";
+// Type-only: the library itself is loaded on demand inside exportWorkTablePdf.
+import type { jsPDF } from "jspdf";
 
 import notoSansHebrewFontUrl from "../assets/NotoSansHebrew.ttf?url";
 import { PRINT_COLORS } from "./printColors";
@@ -350,6 +351,9 @@ export const exportWorkTablePdf = async ({
     throw new Error("Could not find the work table for PDF export");
   }
 
+  // jsPDF and its codecs are ~45% of the main bundle; download them only when
+  // a user actually exports instead of on every page load.
+  const { jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
   await setupFont(pdf);
 
