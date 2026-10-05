@@ -143,7 +143,7 @@ describe("RegularByMonthAccumulator", () => {
 
     it("should work with custom percentages", () => {
       const customAcc = new RegularByMonthAccumulator({
-        percentages: { 
+        percentages: {
           hours100: 1,
           hours125: 1.25,
           hours150: 2.0,
@@ -477,7 +477,7 @@ describe("RegularByMonthAccumulator", () => {
 
     it("should maintain custom percentages through accumulation", () => {
       const customAcc = new RegularByMonthAccumulator({
-        percentages: { 
+        percentages: {
           hours100: 1,
           hours125: 1.3,
           hours150: 1.5,

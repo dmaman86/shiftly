@@ -171,7 +171,10 @@ const getRowHeights = (
 
   for (const cell of cells) {
     const cellWidth = getCellWidth(cell, columnWidths);
-    const lineCount = Math.max(1, getCellLines(pdf, cell.text, cellWidth).length);
+    const lineCount = Math.max(
+      1,
+      getCellLines(pdf, cell.text, cellWidth).length,
+    );
     const requiredHeight = lineCount * PDF_LINE_HEIGHT + PDF_CELL_PADDING * 2;
     const heightPerRow = requiredHeight / cell.rowSpan;
 
@@ -340,7 +343,8 @@ export const exportWorkTablePdf = async ({
 }) => {
   const table = element.querySelector("table");
   const title = element.querySelector("h1")?.textContent?.trim() ?? "";
-  const metadataHeader = element.querySelector("h1 + div")?.textContent?.trim() ?? "";
+  const metadataHeader =
+    element.querySelector("h1 + div")?.textContent?.trim() ?? "";
 
   if (!(table instanceof HTMLTableElement)) {
     throw new Error("Could not find the work table for PDF export");
@@ -364,7 +368,9 @@ export const exportWorkTablePdf = async ({
   const headerRowCount = table.tHead?.rows.length ?? 0;
   const bodyStart = headerRowCount;
   const bodyEnd = rowCount - (table.tFoot?.rows.length ?? 0);
-  const bodyCells = cells.filter(({ row }) => row >= bodyStart && row < bodyEnd);
+  const bodyCells = cells.filter(
+    ({ row }) => row >= bodyStart && row < bodyEnd,
+  );
   const headerCells = cells.filter(({ row }) => row < headerRowCount);
   const footerCells = cells.filter(({ row }) => row >= bodyEnd);
   const bodyRows: PdfRow[] = Array.from(
@@ -389,14 +395,15 @@ export const exportWorkTablePdf = async ({
   const footerHeight = rowHeights
     .slice(bodyEnd)
     .reduce((sum, height) => sum + height, 0);
-  const bodyPageHeight = contentBottom - contentTop - headerHeight - footerHeight;
+  const bodyPageHeight =
+    contentBottom - contentTop - headerHeight - footerHeight;
   let bodyIndex = 0;
   let page = 0;
 
   while (bodyIndex < bodyRows.length || page === 0) {
     if (page > 0) pdf.addPage();
 
-    const pageTitle = page === 0 ? title : metadata?.header ?? metadataHeader;
+    const pageTitle = page === 0 ? title : (metadata?.header ?? metadataHeader);
     pdf.setTextColor(PDF_MUTED_TEXT_COLOR);
     drawDirectionalText(
       pdf,
@@ -440,7 +447,8 @@ export const exportWorkTablePdf = async ({
       bodyIndex += 1;
     }
 
-    if (bodyIndex === pageBodyStart && bodyIndex < bodyRows.length) bodyIndex += 1;
+    if (bodyIndex === pageBodyStart && bodyIndex < bodyRows.length)
+      bodyIndex += 1;
 
     const pageRows = bodyRows.slice(pageBodyStart, bodyIndex);
     drawRows({

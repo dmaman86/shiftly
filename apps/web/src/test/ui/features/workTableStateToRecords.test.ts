@@ -19,7 +19,12 @@ const workDays: WorkDayInfo[] = ["2026-09-05", "2026-09-06", "2026-09-07"].map(
   }),
 );
 
-const shiftEntry = (id: string, start: string | Date, end: string | Date, isDuty = false) => ({
+const shiftEntry = (
+  id: string,
+  start: string | Date,
+  end: string | Date,
+  isDuty = false,
+) => ({
   shift: {
     id,
     start: { date: typeof start === "string" ? new Date(start) : start },
@@ -29,15 +34,28 @@ const shiftEntry = (id: string, start: string | Date, end: string | Date, isDuty
   payMap,
 });
 
-const localWallClock = (year: number, month: number, day: number, hour: number) =>
-  new Date(year, month - 1, day, hour, 0, 0, 0);
+const localWallClock = (
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+) => new Date(year, month - 1, day, hour, 0, 0, 0);
 
 const state: WorkTableDayState = {
   "2026-09-05": {
     status: WorkDayStatus.normal,
     shiftEntries: {
-      morning: shiftEntry("morning", localWallClock(2026, 9, 5, 8), localWallClock(2026, 9, 5, 16)),
-      night: shiftEntry("night", localWallClock(2026, 9, 5, 20), localWallClock(2026, 9, 6, 4), true),
+      morning: shiftEntry(
+        "morning",
+        localWallClock(2026, 9, 5, 8),
+        localWallClock(2026, 9, 5, 16),
+      ),
+      night: shiftEntry(
+        "night",
+        localWallClock(2026, 9, 5, 20),
+        localWallClock(2026, 9, 6, 4),
+        true,
+      ),
     },
   },
   "2026-09-06": { status: WorkDayStatus.vacation, shiftEntries: {} },
@@ -48,7 +66,9 @@ describe("workTableStateToRecords", () => {
   it("stores only non-normal statuses, since row absence means normal", () => {
     const { days } = workTableStateToRecords(state);
 
-    expect(days).toEqual([{ date: "2026-09-06", status: WorkDayStatus.vacation }]);
+    expect(days).toEqual([
+      { date: "2026-09-06", status: WorkDayStatus.vacation },
+    ]);
   });
 
   it("serializes shifts under their day key with ISO times", () => {

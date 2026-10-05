@@ -15,7 +15,9 @@ export const useDebouncedShiftUpserts = ({
   mutate,
 }: UseDebouncedShiftUpsertsProps) => {
   const pendingUpsertsRef = useRef<Record<string, PendingShiftUpsert>>({});
-  const upsertTimeoutsRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const upsertTimeoutsRef = useRef<
+    Record<string, ReturnType<typeof setTimeout>>
+  >({});
 
   const clearPendingUpsert = useCallback((shiftId: string) => {
     clearTimeout(upsertTimeoutsRef.current[shiftId]);

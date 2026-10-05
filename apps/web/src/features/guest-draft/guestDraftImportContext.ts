@@ -13,4 +13,5 @@ export const GuestDraftImportContext = createContext<GuestDraftImportGate>({
   ready: true,
 });
 
-export const useGuestDraftImportGate = () => useContext(GuestDraftImportContext);
+export const useGuestDraftImportGate = () =>
+  useContext(GuestDraftImportContext);

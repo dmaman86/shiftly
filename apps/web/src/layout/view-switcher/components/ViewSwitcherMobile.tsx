@@ -54,7 +54,9 @@ export const ViewSwitcherMobile = () => {
           sx={{ display: "flex", flexDirection: "column", p: 1, gap: 1 }}
         >
           {items.map((item) => (
-            <NavItem key={item.to} to={item.to} onClick={close}>{item.label}</NavItem>
+            <NavItem key={item.to} to={item.to} onClick={close}>
+              {item.label}
+            </NavItem>
           ))}
         </Box>
       </Collapse>

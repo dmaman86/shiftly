@@ -26,7 +26,8 @@ const domain = {
       pipelineInstance.services.dateService,
     ),
     monthResolver: new DefaultMonthResolver(),
-    mealAllowanceRateResolver: pipelineInstance.rateCalculators.mealAllowanceRate,
+    mealAllowanceRateResolver:
+      pipelineInstance.rateCalculators.mealAllowanceRate,
   },
   services: {
     dateService: pipelineInstance.services.dateService,
@@ -90,7 +91,9 @@ describe("CalculationExampleCard", () => {
       },
     });
     expect(screen.getByText("משמרת 1")).toBeInTheDocument();
-    expect(screen.getByText(/סיכום יומי · 8\.00 שעות בפועל/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/סיכום יומי · 8\.00 שעות בפועל/),
+    ).toBeInTheDocument();
     expect(store.getState().global.dailyPayMaps).toEqual({});
   });
 
@@ -118,7 +121,9 @@ describe("CalculationExampleCard", () => {
     await user.click(screen.getByRole("option", { name: "שבת/חג" }));
 
     expect(screen.getByText(/נצברו 8\.00 שעות זכות שבת/)).toBeInTheDocument();
-    expect(screen.getByText(/יתרה שלא תנוצל תיצבר ותועבר לחודש הבא/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/יתרה שלא תנוצל תיצבר ותועבר לחודש הבא/),
+    ).toBeInTheDocument();
   });
 
   it("updates work parameters and displays the estimated daily pay", async () => {

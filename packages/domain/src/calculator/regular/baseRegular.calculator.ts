@@ -1,4 +1,7 @@
-import type { RegularBreakdown, RegularConfig } from "../../types/data-shapes.js";
+import type {
+  RegularBreakdown,
+  RegularConfig,
+} from "../../types/data-shapes.js";
 import type { Reducer } from "../../types/core-behaviors.js";
 
 export abstract class BaseRegularCalculator implements Reducer<RegularBreakdown> {

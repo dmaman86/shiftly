@@ -17,10 +17,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 
 import type { WorkDayInfo } from "@/app/types";
 import { WorkDayStatus, WorkDayType, HolidayKey } from "@shiftly/domain";
-import {
-  headersTable,
-  tableColumnWidths,
-} from "@/app/constants";
+import { headersTable, tableColumnWidths } from "@/app/constants";
 import {
   CompactDayRow,
   countTableColumns,
@@ -142,7 +139,11 @@ export const DayRow = ({
                 }}
               >
                 <Checkbox
-                  slotProps={{ input: { "aria-label": `${t("headers.sick")} — ${dayLabel}` } }}
+                  slotProps={{
+                    input: {
+                      "aria-label": `${t("headers.sick")} — ${dayLabel}`,
+                    },
+                  }}
                   size="small"
                   checked={status === WorkDayStatus.sick}
                   onChange={(e) =>
@@ -173,7 +174,11 @@ export const DayRow = ({
                 }}
               >
                 <Checkbox
-                  slotProps={{ input: { "aria-label": `${t("headers.vacation")} — ${dayLabel}` } }}
+                  slotProps={{
+                    input: {
+                      "aria-label": `${t("headers.vacation")} — ${dayLabel}`,
+                    },
+                  }}
                   size="small"
                   checked={status === WorkDayStatus.vacation}
                   onChange={(e) =>

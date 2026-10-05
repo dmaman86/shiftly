@@ -22,26 +22,32 @@ describe("CalculationHelpLinks", () => {
               />
             </Route>
           </Routes>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
 
       expect(screen.getByText(/להבנת החישוב:/)).toBeInTheDocument();
       expect(screen.getAllByRole("link")).toHaveLength(3);
       expect(screen.getByRole("link", { name: "כללי החישוב" })).toHaveAttribute(
-        "href", "/he/calculation-rules"
+        "href",
+        "/he/calculation-rules",
       );
       const example = screen.getByRole("link", { name: "דוגמה אינטראקטיבית" });
       const demo = screen.getByRole("link", { name: "סרטון הדגמה" });
-      expect(example).toHaveAttribute("href", "/he/calculation-rules#interactive-example");
+      expect(example).toHaveAttribute(
+        "href",
+        "/he/calculation-rules#interactive-example",
+      );
       expect(demo).toHaveAttribute("href", "/he/calculation-rules#demo");
       fireEvent.click(example);
       fireEvent.click(demo);
       expect(track).toHaveBeenCalledWith({
-        name: "calculation_example_link_clicked", params: { source },
+        name: "calculation_example_link_clicked",
+        params: { source },
       });
       expect(track).toHaveBeenCalledWith({
-        name: "calculation_demo_link_clicked", params: { source },
+        name: "calculation_demo_link_clicked",
+        params: { source },
       });
-    }
+    },
   );
 });

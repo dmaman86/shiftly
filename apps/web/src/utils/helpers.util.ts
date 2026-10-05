@@ -9,7 +9,8 @@ export const minutesToTimeStr = (minutes: number): string => {
 };
 
 export const formatValue = (value: number | null | undefined): string => {
-  if (value === null || value === undefined || Math.abs(value) < 0.005) return "";
+  if (value === null || value === undefined || Math.abs(value) < 0.005)
+    return "";
   const epsilon = Number.EPSILON * Math.max(1, Math.abs(value));
   const rounded = Math.round((value + Math.sign(value) * epsilon) * 100) / 100;
   return rounded.toFixed(2);

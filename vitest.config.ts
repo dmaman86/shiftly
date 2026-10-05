@@ -7,7 +7,10 @@ process.env.TZ = "Asia/Jerusalem";
 export default defineConfig({
   root: fileURLToPath(new URL(".", import.meta.url)),
   test: {
-    projects: ["./packages/domain/vitest.config.ts", "./apps/web/vite.config.ts"],
+    projects: [
+      "./packages/domain/vitest.config.ts",
+      "./apps/web/vite.config.ts",
+    ],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "json-summary", "html"],

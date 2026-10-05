@@ -5,7 +5,11 @@ import {
   RegularBreakdown,
   SpecialBreakdown,
 } from "./data-shapes.js";
-import type { MealAllowanceCalculator, PerDiemCalculator, RegularCalculator } from "./services.js";
+import type {
+  MealAllowanceCalculator,
+  PerDiemCalculator,
+  RegularCalculator,
+} from "./services.js";
 
 export type PayCalculationBundle = {
   regular: RegularCalculator;

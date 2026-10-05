@@ -7,7 +7,14 @@ import { FixedSegmentCalculator } from "../../src/calculator/fixed-segment.calcu
 import { TimelinePerDiemCalculator } from "../../src/calculator/perdiem/timeline-per-diem.calculator.js";
 import { TimelineMealAllowanceCalculator } from "../../src/calculator/mealallowance/timeline-meal-allowance.calculator.js";
 import { WorkDayStatus, WorkDayType } from "../../src/constants/index.js";
-import type { ShiftPayMap, WorkDayMeta, PayCalculationBundle, FixedSegmentBundle, PerDiemBundle, MealAllowanceBundle } from "../../src/index.js";
+import type {
+  ShiftPayMap,
+  WorkDayMeta,
+  PayCalculationBundle,
+  FixedSegmentBundle,
+  PerDiemBundle,
+  MealAllowanceBundle,
+} from "../../src/index.js";
 
 describe("DefaultDayPayMapBuilder", () => {
   let builder: DefaultDayPayMapBuilder;
@@ -57,7 +64,7 @@ describe("DefaultDayPayMapBuilder", () => {
       payCalculators,
       fixedSegments,
       perDiemBundle,
-      mealAllowanceBundle
+      mealAllowanceBundle,
     );
   });
 
@@ -65,7 +72,7 @@ describe("DefaultDayPayMapBuilder", () => {
   const createMeta = (
     date = "2024-01-15",
     typeDay = WorkDayType.Regular,
-    crossDayContinuation = false
+    crossDayContinuation = false,
   ): WorkDayMeta => ({
     date,
     typeDay,
@@ -79,43 +86,50 @@ describe("DefaultDayPayMapBuilder", () => {
     extraHours50: number = 0,
     shabbat150Hours: number = 0,
     shabbat200Hours: number = 0,
-    isFieldDuty: boolean = false
+    isFieldDuty: boolean = false,
   ): ShiftPayMap => {
-    const special150Start = Math.max(totalHours - shabbat150Hours - shabbat200Hours, 0) * 60;
+    const special150Start =
+      Math.max(totalHours - shabbat150Hours - shabbat200Hours, 0) * 60;
     const special200Start = special150Start + shabbat150Hours * 60;
     const timeline = [
       ...(totalHours > shabbat150Hours + shabbat200Hours
-        ? [{
-            point: {
-              start: 0,
-              end: special150Start,
+        ? [
+            {
+              point: {
+                start: 0,
+                end: special150Start,
+              },
+              category: "regular" as const,
+              calendarDate: "2024-01-15",
+              dayOffset: 0,
             },
-            category: "regular" as const,
-            calendarDate: "2024-01-15",
-            dayOffset: 0,
-          }]
+          ]
         : []),
       ...(shabbat150Hours > 0
-        ? [{
-            point: {
-              start: special150Start,
-              end: special200Start,
+        ? [
+            {
+              point: {
+                start: special150Start,
+                end: special200Start,
+              },
+              category: "special" as const,
+              calendarDate: "2024-01-15",
+              dayOffset: 0,
             },
-            category: "special" as const,
-            calendarDate: "2024-01-15",
-            dayOffset: 0,
-          }]
+          ]
         : []),
       ...(shabbat200Hours > 0
-        ? [{
-            point: {
-              start: special200Start,
-              end: special200Start + shabbat200Hours * 60,
+        ? [
+            {
+              point: {
+                start: special200Start,
+                end: special200Start + shabbat200Hours * 60,
+              },
+              category: "special" as const,
+              calendarDate: "2024-01-15",
+              dayOffset: 0,
             },
-            category: "special" as const,
-            calendarDate: "2024-01-15",
-            dayOffset: 0,
-          }]
+          ]
         : []),
     ];
 
@@ -311,10 +325,7 @@ describe("DefaultDayPayMapBuilder", () => {
     });
 
     it("should handle double shift (two 8-hour shifts)", () => {
-      const shifts = [
-        createShiftPayMap(8, 8),
-        createShiftPayMap(8, 8),
-      ];
+      const shifts = [createShiftPayMap(8, 8), createShiftPayMap(8, 8)];
 
       const result = builder.build({
         shifts,
@@ -329,10 +340,7 @@ describe("DefaultDayPayMapBuilder", () => {
     });
 
     it("should apply regular progression once across multiple shifts", () => {
-      const shifts = [
-        createShiftPayMap(4, 4),
-        createShiftPayMap(5, 5),
-      ];
+      const shifts = [createShiftPayMap(4, 4), createShiftPayMap(5, 5)];
 
       const result = builder.build({
         shifts,
@@ -351,25 +359,25 @@ describe("DefaultDayPayMapBuilder", () => {
     it("should aggregate timeline intervals from all shifts", () => {
       const firstShift = createShiftPayMap(2, 2);
       firstShift.timeline = [
-          {
-            point: { start: 600, end: 720 },
-            category: "regular",
-            calendarDate: "2024-01-15",
-            dayOffset: 0,
-            sourceShiftId: "first",
-          },
-        ];
+        {
+          point: { start: 600, end: 720 },
+          category: "regular",
+          calendarDate: "2024-01-15",
+          dayOffset: 0,
+          sourceShiftId: "first",
+        },
+      ];
 
       const secondShift = createShiftPayMap(2, 0, 0, 0, 2);
       secondShift.timeline = [
-          {
-            point: { start: 1320, end: 1440 },
-            category: "special",
-            calendarDate: "2024-01-15",
-            dayOffset: 0,
-            sourceShiftId: "second",
-          },
-        ];
+        {
+          point: { start: 1320, end: 1440 },
+          category: "special",
+          calendarDate: "2024-01-15",
+          dayOffset: 0,
+          sourceShiftId: "second",
+        },
+      ];
 
       const result = builder.build({
         shifts: [secondShift, firstShift],
@@ -413,10 +421,11 @@ describe("DefaultDayPayMapBuilder", () => {
         month: 1,
       });
 
-      const totalShabbat = result.workMap.special.shabbat150.hours + 
-                          result.workMap.special.shabbat200.hours;
+      const totalShabbat =
+        result.workMap.special.shabbat150.hours +
+        result.workMap.special.shabbat200.hours;
       expect(totalShabbat).toBe(8);
-      
+
       // Regular hours should be 0 since all hours are special
       expect(result.workMap.regular.hours100.hours).toBe(0);
     });
@@ -548,10 +557,7 @@ describe("DefaultDayPayMapBuilder", () => {
 
   describe("build - Meal Allowance calculation", () => {
     it("should use the total hours from all shifts in the day", () => {
-      const shifts = [
-        createShiftPayMap(9, 9),
-        createShiftPayMap(11, 11),
-      ];
+      const shifts = [createShiftPayMap(9, 9), createShiftPayMap(11, 11)];
 
       const result = builder.build({
         shifts,
@@ -682,7 +688,7 @@ describe("DefaultDayPayMapBuilder", () => {
   describe("build - Integration with dependencies", () => {
     it("should call extra calculator accumulate", () => {
       const accumulateSpy = vi.spyOn(payCalculators.extra, "accumulate");
-      
+
       const shifts = [
         createShiftPayMap(8, 8, 1, 0),
         createShiftPayMap(4, 4, 0, 1),
@@ -703,10 +709,8 @@ describe("DefaultDayPayMapBuilder", () => {
 
     it("should call special calculator accumulate", () => {
       const accumulateSpy = vi.spyOn(payCalculators.special, "accumulate");
-      
-      const shifts = [
-        createShiftPayMap(8, 0, 0, 0, 4, 4),
-      ];
+
+      const shifts = [createShiftPayMap(8, 0, 0, 0, 4, 4)];
 
       builder.build({
         shifts,
@@ -722,7 +726,7 @@ describe("DefaultDayPayMapBuilder", () => {
 
     it("should call regular calculator calculate", () => {
       const calculateSpy = vi.spyOn(payCalculators.regular, "calculate");
-      
+
       const shifts = [createShiftPayMap(8, 8)];
 
       builder.build({
@@ -741,7 +745,7 @@ describe("DefaultDayPayMapBuilder", () => {
 
     it("should call perDiem day calculator", () => {
       const calculateSpy = vi.spyOn(perDiemBundle.calculator, "calculateDay");
-      
+
       const shifts = [createShiftPayMap(8, 8, 0, 0, 0, 0, true)];
 
       builder.build({
@@ -758,7 +762,7 @@ describe("DefaultDayPayMapBuilder", () => {
 
     it("should call perDiem rate calculator", () => {
       const resolveSpy = vi.spyOn(perDiemBundle.calculator, "calculateRate");
-      
+
       const shifts = [createShiftPayMap(8, 8)];
 
       builder.build({
@@ -778,7 +782,7 @@ describe("DefaultDayPayMapBuilder", () => {
         mealAllowanceBundle.calculator,
         "calculateAllowance",
       );
-      
+
       const shifts = [createShiftPayMap(8, 8)];
 
       builder.build({
@@ -944,10 +948,7 @@ describe("DefaultDayPayMapBuilder", () => {
     });
 
     it("should handle very long day (multiple shifts totaling 24 hours)", () => {
-      const shifts = [
-        createShiftPayMap(12, 12),
-        createShiftPayMap(12, 12),
-      ];
+      const shifts = [createShiftPayMap(12, 12), createShiftPayMap(12, 12)];
 
       const result = builder.build({
         shifts,
@@ -1147,10 +1148,10 @@ describe("DefaultDayPayMapBuilder", () => {
         month: 1,
       });
 
-      const totalSpecial = 
-        result.workMap.special.shabbat150.hours + 
+      const totalSpecial =
+        result.workMap.special.shabbat150.hours +
         result.workMap.special.shabbat200.hours;
-      
+
       expect(result.earnedShabbatCredit.hours).toBe(totalSpecial);
     });
 
@@ -1167,10 +1168,10 @@ describe("DefaultDayPayMapBuilder", () => {
       });
 
       // Should have one or none, but not both
-      const hasBoth = 
-        result.mealAllowance.large.points > 0 && 
+      const hasBoth =
+        result.mealAllowance.large.points > 0 &&
         result.mealAllowance.small.points > 0;
-      
+
       expect(hasBoth).toBe(false);
     });
   });

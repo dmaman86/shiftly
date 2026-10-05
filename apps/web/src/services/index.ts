@@ -9,5 +9,9 @@ export type { WorkDayRecord } from "./workDay/workDay.service";
 export { shiftService } from "./shift/shift.service";
 export type { ShiftRecord } from "./shift/shift.service";
 export { accountService } from "./account/account.service";
-export { guestDraftService, guestDraftStorage, isGuestDraftEmpty } from "./guestDraft";
+export {
+  guestDraftService,
+  guestDraftStorage,
+  isGuestDraftEmpty,
+} from "./guestDraft";
 export type { GuestDraft } from "./guestDraft";

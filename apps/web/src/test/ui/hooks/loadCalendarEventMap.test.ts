@@ -32,11 +32,13 @@ describe("loadCalendarEventMap", () => {
   });
 
   it("merges both years when the range crosses into January", async () => {
-    const get = vi.spyOn(axios, "get").mockImplementation(async (url: string) =>
-      url.endsWith("2025.json")
-        ? holidayPayload("2025-12-15", "Some Yom Tov")
-        : holidayPayload("2026-01-01", "Another Yom Tov"),
-    );
+    const get = vi
+      .spyOn(axios, "get")
+      .mockImplementation(async (url: string) =>
+        url.endsWith("2025.json")
+          ? holidayPayload("2025-12-15", "Some Yom Tov")
+          : holidayPayload("2026-01-01", "Another Yom Tov"),
+      );
 
     const eventMap = await loadCalendarEventMap("2025-12-01", "2026-01-01");
 
@@ -48,10 +50,12 @@ describe("loadCalendarEventMap", () => {
   });
 
   it("falls back to Hebcal when the static calendar is unavailable", async () => {
-    const get = vi.spyOn(axios, "get").mockImplementation(async (url: string) => {
-      if (isStaticCalendarUrl(url)) throw new Error("Not Found");
-      return holidayPayload("2041-10-05", "Yom Kippur");
-    });
+    const get = vi
+      .spyOn(axios, "get")
+      .mockImplementation(async (url: string) => {
+        if (isStaticCalendarUrl(url)) throw new Error("Not Found");
+        return holidayPayload("2041-10-05", "Yom Kippur");
+      });
 
     const eventMap = await loadCalendarEventMap("2041-10-01", "2041-11-01");
 
@@ -60,17 +64,21 @@ describe("loadCalendarEventMap", () => {
     expect(eventMap["2041-10-05"]).toHaveLength(1);
     expect(analyticsService.track).toHaveBeenCalledWith(
       expect.objectContaining({
-        params: expect.objectContaining({ error_type: "static_calendar_error" }),
+        params: expect.objectContaining({
+          error_type: "static_calendar_error",
+        }),
       }),
     );
   });
 
   it("falls back to Hebcal when the host answers a missing year with HTML", async () => {
-    const get = vi.spyOn(axios, "get").mockImplementation(async (url: string) =>
-      isStaticCalendarUrl(url)
-        ? { data: "<!doctype html><html></html>" }
-        : holidayPayload("2041-10-05", "Yom Kippur"),
-    );
+    const get = vi
+      .spyOn(axios, "get")
+      .mockImplementation(async (url: string) =>
+        isStaticCalendarUrl(url)
+          ? { data: "<!doctype html><html></html>" }
+          : holidayPayload("2041-10-05", "Yom Kippur"),
+      );
 
     const eventMap = await loadCalendarEventMap("2041-10-01", "2041-11-01");
 
@@ -78,7 +86,9 @@ describe("loadCalendarEventMap", () => {
     expect(eventMap["2041-10-05"]).toHaveLength(1);
     expect(analyticsService.track).toHaveBeenCalledWith(
       expect.objectContaining({
-        params: expect.objectContaining({ error_type: "static_calendar_invalid" }),
+        params: expect.objectContaining({
+          error_type: "static_calendar_invalid",
+        }),
       }),
     );
   });
@@ -86,7 +96,9 @@ describe("loadCalendarEventMap", () => {
   it("throws when both the static calendar and Hebcal fail", async () => {
     vi.spyOn(axios, "get").mockRejectedValue(new Error("Network Error"));
 
-    await expect(loadCalendarEventMap("2026-09-01", "2026-10-01")).rejects.toThrow();
+    await expect(
+      loadCalendarEventMap("2026-09-01", "2026-10-01"),
+    ).rejects.toThrow();
     expect(analyticsService.track).toHaveBeenCalledWith(
       expect.objectContaining({
         params: expect.objectContaining({ error_type: "hebcal_api_error" }),

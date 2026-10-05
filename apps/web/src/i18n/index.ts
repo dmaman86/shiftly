@@ -23,8 +23,18 @@ i18n.use(initReactI18next).init({
   defaultNS: "common",
   ns: ["common", "errors", "pages", "work-table"],
   resources: {
-    he: { common: heCommon, errors: heErrors, pages: hePages, "work-table": heWorkTable },
-    en: { common: enCommon, errors: enErrors, pages: enPages, "work-table": enWorkTable },
+    he: {
+      common: heCommon,
+      errors: heErrors,
+      pages: hePages,
+      "work-table": heWorkTable,
+    },
+    en: {
+      common: enCommon,
+      errors: enErrors,
+      pages: enPages,
+      "work-table": enWorkTable,
+    },
   },
   interpolation: { escapeValue: false },
 });

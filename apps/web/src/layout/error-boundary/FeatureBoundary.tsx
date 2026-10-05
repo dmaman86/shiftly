@@ -19,10 +19,7 @@ export const FeatureBoundary = ({
     errorContext={errorContext}
     resetKeys={resetKeys}
     fallback={(_, resetError) => (
-      <FeatureErrorFallback
-        featureName={featureName}
-        resetError={resetError}
-      />
+      <FeatureErrorFallback featureName={featureName} resetError={resetError} />
     )}
   >
     {children}

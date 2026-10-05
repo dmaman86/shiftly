@@ -1,7 +1,4 @@
-import type {
-  CompactPayBreakdownVM,
-  PayBreakdownViewModel,
-} from "@/app/types";
+import type { CompactPayBreakdownVM, PayBreakdownViewModel } from "@/app/types";
 import { computeTotalPay } from "@/utils";
 
 export const monthToCompactPayBreakdownVM = (
@@ -14,9 +11,7 @@ export const monthToCompactPayBreakdownVM = (
     month.regular.hours125.hours + month.regular.hours150.hours;
 
   const dailySalary =
-    baseRate > 0
-      ? computeTotalPay(month, baseRate)
-      : undefined;
+    baseRate > 0 ? computeTotalPay(month, baseRate) : undefined;
 
   return {
     totalHours: month.totalHours,

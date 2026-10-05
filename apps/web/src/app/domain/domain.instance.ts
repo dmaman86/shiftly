@@ -21,7 +21,8 @@ export const domain: DomainContextType = {
       pipelineInstance.services.dateService,
     ),
     monthResolver: new DefaultMonthResolver(),
-    mealAllowanceRateResolver: pipelineInstance.rateCalculators.mealAllowanceRate,
+    mealAllowanceRateResolver:
+      pipelineInstance.rateCalculators.mealAllowanceRate,
   },
   services: {
     dateService: pipelineInstance.services.dateService,

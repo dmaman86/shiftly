@@ -2,9 +2,7 @@ import { useState } from "react";
 import { describe, expect, it } from "vitest";
 
 import { WorkDayStatus } from "@shiftly/domain";
-import {
-  useWorkTableDayState,
-} from "@/features/work-table/hooks/day/useWorkTableDayState";
+import { useWorkTableDayState } from "@/features/work-table/hooks/day/useWorkTableDayState";
 import { WorkTableDayStateProvider } from "@/features/work-table/context/workTableDayState/WorkTableDayStateProvider";
 import { renderPure, screen, userEvent } from "@/test/ui/utils";
 

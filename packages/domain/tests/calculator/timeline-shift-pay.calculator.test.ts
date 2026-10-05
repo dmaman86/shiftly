@@ -18,11 +18,14 @@ const interval = (
 
 describe("TimelineShiftPayCalculator", () => {
   it("preserves a custom evening percentage instead of using the default", () => {
-    const calculator = new TimelineShiftPayCalculator(undefined, new AdditionClassifier(() => ({
-      eveningPercent: 0.3,
-      nightPercent: 0.5,
-      eveningQualificationMinutes: 180,
-    })));
+    const calculator = new TimelineShiftPayCalculator(
+      undefined,
+      new AdditionClassifier(() => ({
+        eveningPercent: 0.3,
+        nightPercent: 0.5,
+        eveningQualificationMinutes: 180,
+      })),
+    );
     const { extra } = calculator.calculate({
       standardHours: 8,
       intervals: [interval(14 * 60, 18 * 60, "regular")],
@@ -30,16 +33,23 @@ describe("TimelineShiftPayCalculator", () => {
 
     expect(extra["evening:0.3"]).toEqual({ percent: 0.3, hours: 4 });
     expect(extra.hours20.hours).toBe(0);
-    expect(Object.values(extra).reduce((sum, segment) =>
-      sum + segment.hours * segment.percent * 50, 0)).toBe(60);
+    expect(
+      Object.values(extra).reduce(
+        (sum, segment) => sum + segment.hours * segment.percent * 50,
+        0,
+      ),
+    ).toBe(60);
   });
 
   it("keeps distinct rates across calendar days in the same shift", () => {
-    const calculator = new TimelineShiftPayCalculator(undefined, new AdditionClassifier((date) => ({
-      eveningPercent: date === "2026-08-03" ? 0.2 : 0.3,
-      nightPercent: date === "2026-08-03" ? 0.5 : 0.6,
-      eveningQualificationMinutes: 180,
-    })));
+    const calculator = new TimelineShiftPayCalculator(
+      undefined,
+      new AdditionClassifier((date) => ({
+        eveningPercent: date === "2026-08-03" ? 0.2 : 0.3,
+        nightPercent: date === "2026-08-03" ? 0.5 : 0.6,
+        eveningQualificationMinutes: 180,
+      })),
+    );
     const { extra } = calculator.calculate({
       standardHours: 8,
       intervals: [
@@ -55,22 +65,28 @@ describe("TimelineShiftPayCalculator", () => {
     expect(extra["night:0.6"]).toEqual({ percent: 0.6, hours: 6 });
   });
 
-  it.each([null, 0])("does not add hours when the policy disables additions with %s", (percent) => {
-    const calculator = new TimelineShiftPayCalculator(undefined, new AdditionClassifier(() => ({
-      eveningPercent: percent,
-      nightPercent: percent,
-      eveningQualificationMinutes: 180,
-    })));
-    const { extra } = calculator.calculate({
-      standardHours: 8,
-      intervals: [interval(14 * 60, 24 * 60, "regular")],
-    });
+  it.each([null, 0])(
+    "does not add hours when the policy disables additions with %s",
+    (percent) => {
+      const calculator = new TimelineShiftPayCalculator(
+        undefined,
+        new AdditionClassifier(() => ({
+          eveningPercent: percent,
+          nightPercent: percent,
+          eveningQualificationMinutes: 180,
+        })),
+      );
+      const { extra } = calculator.calculate({
+        standardHours: 8,
+        intervals: [interval(14 * 60, 24 * 60, "regular")],
+      });
 
-    expect(extra).toEqual({
-      hours20: { percent: 0.2, hours: 0 },
-      hours50: { percent: 0.5, hours: 0 },
-    });
-  });
+      expect(extra).toEqual({
+        hours20: { percent: 0.2, hours: 0 },
+        hours50: { percent: 0.5, hours: 0 },
+      });
+    },
+  );
 
   it("composes base, additions, and special pipelines by calendar day", () => {
     const result = new TimelineShiftPayCalculator().calculate({

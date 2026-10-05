@@ -20,7 +20,9 @@ const domainMock = vi.hoisted(() => ({
   services: {
     dateService: {
       getPreviousMonth: (year: number, month: number) =>
-        month === 1 ? { year: year - 1, month: 12 } : { year, month: month - 1 },
+        month === 1
+          ? { year: year - 1, month: 12 }
+          : { year, month: month - 1 },
     },
   },
 }));
@@ -40,14 +42,21 @@ const globalStoreStateMock = vi.hoisted(() => ({
 const workDaysMock = vi.hoisted(() => ({ workDays: [] as unknown[] }));
 
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => authMock }));
-vi.mock("@/hooks/useGlobalState", () => ({ useGlobalState: () => globalStateMock }));
-vi.mock("@/hooks/useAppSnackbar", () => ({ useAppSnackbar: () => snackbarMock }));
+vi.mock("@/hooks/useGlobalState", () => ({
+  useGlobalState: () => globalStateMock,
+}));
+vi.mock("@/hooks/useAppSnackbar", () => ({
+  useAppSnackbar: () => snackbarMock,
+}));
 vi.mock("@/hooks/useDomain", () => ({ useDomain: () => domainMock }));
 vi.mock("@/hooks/useWorkDays", () => ({ useWorkDays: () => workDaysMock }));
-vi.mock("@/services", () => ({ monthlyConfigService: () => monthlyConfigServiceMock }));
+vi.mock("@/services", () => ({
+  monthlyConfigService: () => monthlyConfigServiceMock,
+}));
 vi.mock("@/store/globalStore", () => ({
-  useGlobalStore: (selector: (state: typeof globalStoreStateMock.global) => unknown) =>
-    selector(globalStoreStateMock.global),
+  useGlobalStore: (
+    selector: (state: typeof globalStoreStateMock.global) => unknown,
+  ) => selector(globalStoreStateMock.global),
 }));
 
 import { useShabbatCreditAllocation } from "@/features/monthly-pay/hooks/useShabbatCreditAllocation";
@@ -97,7 +106,11 @@ describe("useShabbatCreditAllocation", () => {
       await Promise.resolve();
     });
 
-    expect(monthlyConfigServiceMock.fetch).toHaveBeenCalledWith("user-1", 2026, 8);
+    expect(monthlyConfigServiceMock.fetch).toHaveBeenCalledWith(
+      "user-1",
+      2026,
+      8,
+    );
     expect(result.current.carriedOverHours).toBe(3.5);
     expect(result.current.totalAvailableHours).toBe(3.5);
   });
@@ -115,7 +128,9 @@ describe("useShabbatCreditAllocation", () => {
       await Promise.resolve();
     });
 
-    expect(monthlyConfigServiceMock.setUnusedShabbatCreditHours).not.toHaveBeenCalled();
+    expect(
+      monthlyConfigServiceMock.setUnusedShabbatCreditHours,
+    ).not.toHaveBeenCalled();
 
     await act(async () => {
       resolveFetch({ data: null });
@@ -142,12 +157,9 @@ describe("useShabbatCreditAllocation", () => {
       await Promise.resolve();
     });
 
-    expect(monthlyConfigServiceMock.setUnusedShabbatCreditHours).toHaveBeenCalledWith(
-      "user-1",
-      2026,
-      9,
-      4,
-    );
+    expect(
+      monthlyConfigServiceMock.setUnusedShabbatCreditHours,
+    ).toHaveBeenCalledWith("user-1", 2026, 9, 4);
   });
 
   it("shows an error and treats the carry-over as zero when the fetch fails", async () => {

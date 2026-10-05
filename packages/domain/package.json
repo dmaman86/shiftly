@@ -9,7 +9,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc -b --stopBuildOnErrors --pretty false",
     "typecheck": "tsc -b tsconfig.json tsconfig.test.json --stopBuildOnErrors --pretty false",

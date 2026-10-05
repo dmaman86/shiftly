@@ -49,15 +49,15 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, "wrapper"> {
 
 /**
  * Custom render function that wraps components with necessary providers
- * 
+ *
  * @example
  * // Render with all providers
  * render(<MyComponent />, { preloadedState: { global: {...} } });
- * 
+ *
  * @example
  * // Render without router
  * render(<MyComponent />, { withRouter: false });
- * 
+ *
  * @example
  * // Render with custom store
  * const store = createMockStore({ global: {...} });
@@ -72,7 +72,7 @@ export function renderWithProviders(
     withTheme = true,
     withSnackbar = true,
     ...renderOptions
-  }: ExtendedRenderOptions = {}
+  }: ExtendedRenderOptions = {},
 ) {
   function Wrapper({ children }: { children: React.ReactNode }) {
     let component = <>{children}</>;
@@ -90,11 +90,7 @@ export function renderWithProviders(
     }
 
     if (withSnackbar) {
-      component = (
-        <AppSnackbarProvider>
-          {component}
-        </AppSnackbarProvider>
-      );
+      component = <AppSnackbarProvider>{component}</AppSnackbarProvider>;
     }
 
     component = (
@@ -111,11 +107,7 @@ export function renderWithProviders(
     );
 
     if (withRouter) {
-      component = (
-        <BrowserRouter>
-          {component}
-        </BrowserRouter>
-      );
+      component = <BrowserRouter>{component}</BrowserRouter>;
     }
 
     return component;
@@ -132,7 +124,7 @@ export function renderWithProviders(
  */
 export function renderPure(
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
+  options?: Omit<RenderOptions, "wrapper">,
 ) {
   return render(ui, options);
 }
@@ -143,7 +135,7 @@ export function renderPure(
  */
 export function renderWithTheme(
   ui: ReactElement,
-  options?: Omit<RenderOptions, "wrapper">
+  options?: Omit<RenderOptions, "wrapper">,
 ) {
   function Wrapper({ children }: { children: React.ReactNode }) {
     return (
@@ -162,7 +154,7 @@ export function renderWithTheme(
 
 /**
  * Re-export commonly used utilities from testing-library
- * 
+ *
  * Note: We explicitly list exports instead of using `export *` to:
  * 1. Satisfy ESLint rules about restricted imports
  * 2. Make it clear what's available from this module

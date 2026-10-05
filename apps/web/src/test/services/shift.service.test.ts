@@ -36,7 +36,9 @@ describe("shiftService", () => {
       .call();
 
     expect(fromMock).toHaveBeenCalledWith("shifts");
-    expect(select).toHaveBeenCalledWith("id, date, start_time, end_time, is_duty");
+    expect(select).toHaveBeenCalledWith(
+      "id, date, start_time, end_time, is_duty",
+    );
     expect(eq).toHaveBeenCalledWith("user_id", "user-1");
     expect(gte).toHaveBeenCalledWith("date", "2026-08-01");
     expect(lt).toHaveBeenCalledWith("date", "2026-09-01");
@@ -54,7 +56,9 @@ describe("shiftService", () => {
       isDuty: true,
     };
 
-    const result = await shiftService().upsert("user-1", "2026-08-10", shift).call();
+    const result = await shiftService()
+      .upsert("user-1", "2026-08-10", shift)
+      .call();
 
     expect(upsert).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -16,7 +16,12 @@ export const CalculationStatus = ({ message }: { message: string }) => {
   }, [message]);
 
   return (
-    <Box role="status" aria-live="polite" aria-atomic="true" sx={visuallyHidden}>
+    <Box
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      sx={visuallyHidden}
+    >
       {announcement}
     </Box>
   );

@@ -15,13 +15,18 @@ const onChange = vi.fn();
 const LocalizedSelector = () => {
   const { i18n: translation } = useTranslation();
   const isHebrew = translation.resolvedLanguage === "he";
-  return <LocalizationProvider
-    dateAdapter={AdapterDateFns}
-    adapterLocale={isHebrew ? he : enUS}
-    localeText={(isHebrew ? heIL : pickerEnUS).components.MuiLocalizationProvider.defaultProps.localeText}
-  >
-    <ProfileRangeSelector range={range} now={range.to} onChange={onChange} />
-  </LocalizationProvider>;
+  return (
+    <LocalizationProvider
+      dateAdapter={AdapterDateFns}
+      adapterLocale={isHebrew ? he : enUS}
+      localeText={
+        (isHebrew ? heIL : pickerEnUS).components.MuiLocalizationProvider
+          .defaultProps.localeText
+      }
+    >
+      <ProfileRangeSelector range={range} now={range.to} onChange={onChange} />
+    </LocalizationProvider>
+  );
 };
 
 describe("ProfileRangeSelector localization", () => {
@@ -31,22 +36,31 @@ describe("ProfileRangeSelector localization", () => {
   });
   afterEach(async () => {
     cleanup();
-    await act(async () => { await i18n.changeLanguage("en"); });
+    await act(async () => {
+      await i18n.changeLanguage("en");
+    });
   });
 
   it.each([
     ["en", "May", "January"],
     ["he", "מאי", "ינואר"],
-  ])("shows custom field and calendar months in %s", async (language, selectedMonth, calendarMonth) => {
-    const user = userEvent.setup();
-    await i18n.changeLanguage(language);
-    render(<LocalizedSelector />);
-    await user.selectOptions(screen.getByRole("combobox"), "custom");
-    expect(screen.getAllByRole("spinbutton")[0]).toHaveTextContent(selectedMonth);
-    await user.click(screen.getAllByRole("button")[0]);
-    expect(screen.getByRole("radio", { name: calendarMonth })).toBeInTheDocument();
-    expect(onChange).not.toHaveBeenCalled();
-  });
+  ])(
+    "shows custom field and calendar months in %s",
+    async (language, selectedMonth, calendarMonth) => {
+      const user = userEvent.setup();
+      await i18n.changeLanguage(language);
+      render(<LocalizedSelector />);
+      await user.selectOptions(screen.getByRole("combobox"), "custom");
+      expect(screen.getAllByRole("spinbutton")[0]).toHaveTextContent(
+        selectedMonth,
+      );
+      await user.click(screen.getAllByRole("button")[0]);
+      expect(
+        screen.getByRole("radio", { name: calendarMonth }),
+      ).toBeInTheDocument();
+      expect(onChange).not.toHaveBeenCalled();
+    },
+  );
 
   it("updates the locale without discarding custom drafts or applying them early", async () => {
     const user = userEvent.setup();
@@ -55,14 +69,23 @@ describe("ProfileRangeSelector localization", () => {
     await user.click(screen.getAllByRole("button")[0]);
     await user.click(screen.getByRole("radio", { name: "January" }));
     expect(onChange).not.toHaveBeenCalled();
-    await act(async () => { await i18n.changeLanguage("he"); });
+    await act(async () => {
+      await i18n.changeLanguage("he");
+    });
     expect(screen.getAllByRole("spinbutton")[0]).toHaveTextContent("ינואר");
     await user.click(screen.getAllByRole("button")[0]);
-    expect(within(screen.getByRole("dialog")).getByRole("radio", { name: "מאי" })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("dialog")).getByRole("radio", { name: "מאי" }),
+    ).toBeInTheDocument();
     await user.keyboard("{Escape}");
-    await user.click(screen.getByRole("button", { name: i18n.t("pages:profile_page.range_apply") }));
+    await user.click(
+      screen.getByRole("button", {
+        name: i18n.t("pages:profile_page.range_apply"),
+      }),
+    );
     expect(onChange).toHaveBeenCalledExactlyOnceWith({
-      from: { year: 2026, month: 1 }, to: range.to,
+      from: { year: 2026, month: 1 },
+      to: range.to,
     });
   });
 

@@ -6,7 +6,8 @@ const authMocks = vi.hoisted(() => ({
   getSession: vi.fn(),
   onAuthStateChange: vi.fn(),
   unsubscribe: vi.fn(),
-  callback: null as ((event: AuthChangeEvent, session: Session | null) => void) | null,
+  callback: null as
+    ((event: AuthChangeEvent, session: Session | null) => void) | null,
 }));
 
 vi.mock("@/services/supabase/supabase.client", () => ({
@@ -24,7 +25,7 @@ import { useAuth } from "@/hooks/useAuth";
 const AuthStateProbe = () => {
   const { user, isLoading } = useAuth();
 
-  return <div>{isLoading ? "loading" : user?.email ?? "signed-out"}</div>;
+  return <div>{isLoading ? "loading" : (user?.email ?? "signed-out")}</div>;
 };
 
 describe("AuthProvider", () => {

@@ -15,7 +15,7 @@ describe("WorkDayInfoResolver", () => {
     date: string,
     typeDay: WorkDayType,
     crossDayContinuation: boolean,
-    weekdayLabel: string
+    weekdayLabel: string,
   ): WorkDayTestCase => ({
     meta: {
       date,
@@ -31,7 +31,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-06",
         WorkDayType.SpecialFull,
         false,
-        "ש"
+        "ש",
       );
 
       const result = resolver.isSpecialFullDay(day);
@@ -44,7 +44,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-01",
         WorkDayType.Regular,
         false,
-        "א"
+        "א",
       );
 
       const result = resolver.isSpecialFullDay(day);
@@ -57,7 +57,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         false,
-        "ו"
+        "ו",
       );
 
       const result = resolver.isSpecialFullDay(day);
@@ -70,13 +70,13 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-06",
         WorkDayType.SpecialFull,
         true,
-        "ש"
+        "ש",
       );
       const day2 = createWorkDayInfo(
         "2024-01-06",
         WorkDayType.SpecialFull,
         false,
-        "ש"
+        "ש",
       );
 
       expect(resolver.isSpecialFullDay(day1)).toBe(true);
@@ -88,7 +88,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-06T00:00:00.000Z",
         WorkDayType.SpecialFull,
         false,
-        "ש"
+        "ש",
       );
 
       const result = resolver.isSpecialFullDay(day);
@@ -101,7 +101,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-04-23",
         WorkDayType.SpecialFull,
         false,
-        "ג"
+        "ג",
       );
 
       const result = resolver.isSpecialFullDay(day);
@@ -116,7 +116,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         false,
-        "ו"
+        "ו",
       );
 
       const result = resolver.isPartialHolidayStart(day);
@@ -129,7 +129,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-01",
         WorkDayType.Regular,
         false,
-        "א"
+        "א",
       );
 
       const result = resolver.isPartialHolidayStart(day);
@@ -142,7 +142,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-06",
         WorkDayType.SpecialFull,
         false,
-        "ש"
+        "ש",
       );
 
       const result = resolver.isPartialHolidayStart(day);
@@ -155,13 +155,13 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         true,
-        "ו"
+        "ו",
       );
       const day2 = createWorkDayInfo(
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         false,
-        "ו"
+        "ו",
       );
 
       expect(resolver.isPartialHolidayStart(day1)).toBe(true);
@@ -173,7 +173,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-05T00:00:00.000Z",
         WorkDayType.SpecialPartialStart,
         false,
-        "ו"
+        "ו",
       );
 
       const result = resolver.isPartialHolidayStart(day);
@@ -186,7 +186,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-04-22",
         WorkDayType.SpecialPartialStart,
         false,
-        "ב"
+        "ב",
       );
 
       const result = resolver.isPartialHolidayStart(day);
@@ -201,7 +201,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         true,
-        "ו"
+        "ו",
       );
 
       const result = resolver.hasCrossDayContinuation(day);
@@ -214,7 +214,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-01",
         WorkDayType.Regular,
         false,
-        "א"
+        "א",
       );
 
       const result = resolver.hasCrossDayContinuation(day);
@@ -227,13 +227,13 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-01",
         WorkDayType.Regular,
         true,
-        "א"
+        "א",
       );
       const day2 = createWorkDayInfo(
         "2024-01-02",
         WorkDayType.Regular,
         false,
-        "ב"
+        "ב",
       );
 
       expect(resolver.hasCrossDayContinuation(day1)).toBe(true);
@@ -245,13 +245,13 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-06",
         WorkDayType.SpecialFull,
         true,
-        "ש"
+        "ש",
       );
       const day2 = createWorkDayInfo(
         "2024-01-13",
         WorkDayType.SpecialFull,
         false,
-        "ש"
+        "ש",
       );
 
       expect(resolver.hasCrossDayContinuation(day1)).toBe(true);
@@ -263,13 +263,13 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         true,
-        "ו"
+        "ו",
       );
       const day2 = createWorkDayInfo(
         "2024-01-12",
         WorkDayType.SpecialPartialStart,
         false,
-        "ו"
+        "ו",
       );
 
       expect(resolver.hasCrossDayContinuation(day1)).toBe(true);
@@ -281,7 +281,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         true,
-        "ו"
+        "ו",
       );
 
       const result = resolver.hasCrossDayContinuation(friday);
@@ -294,7 +294,7 @@ describe("WorkDayInfoResolver", () => {
         "2024-01-04",
         WorkDayType.Regular,
         false,
-        "ה"
+        "ה",
       );
 
       const result = resolver.hasCrossDayContinuation(thursday);

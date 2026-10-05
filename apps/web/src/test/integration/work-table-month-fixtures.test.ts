@@ -3,7 +3,11 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { domain } from "@/app";
-import { buildEventMap, dayToPayBreakdownVM, monthToPayBreakdownVM } from "@/adapters";
+import {
+  buildEventMap,
+  dayToPayBreakdownVM,
+  monthToPayBreakdownVM,
+} from "@/adapters";
 import { allocateShabbatCredit } from "@shiftly/domain";
 import type { WorkDayStatus } from "@shiftly/domain";
 import {
@@ -42,7 +46,11 @@ type MonthFixtureResult = {
   };
   daily: Record<
     string,
-    { status: WorkDayStatus; breakdown: Record<string, unknown>; salary: number }
+    {
+      status: WorkDayStatus;
+      breakdown: Record<string, unknown>;
+      salary: number;
+    }
   >;
   monthly: { breakdown: Record<string, unknown>; salary: number };
 };
@@ -58,7 +66,10 @@ const PRECISION = 6;
 
 const loadFixture = <T>(file: string): T =>
   JSON.parse(
-    readFileSync(resolve(import.meta.dirname, "../../../../../e2e/fixtures", file), "utf8"),
+    readFileSync(
+      resolve(import.meta.dirname, "../../../../../e2e/fixtures", file),
+      "utf8",
+    ),
   ) as T;
 
 const expectCloseTo = (actual: unknown, expected: unknown, path: string) => {
@@ -70,7 +81,11 @@ const expectCloseTo = (actual: unknown, expected: unknown, path: string) => {
   if (expected !== null && typeof expected === "object") {
     expect(actual, path).toBeTypeOf("object");
     for (const [key, value] of Object.entries(expected)) {
-      expectCloseTo((actual as Record<string, unknown>)[key], value, `${path}.${key}`);
+      expectCloseTo(
+        (actual as Record<string, unknown>)[key],
+        value,
+        `${path}.${key}`,
+      );
     }
     return;
   }
@@ -82,7 +97,7 @@ const expectSalary = (actual: number | undefined, expected: number) => {
   expect(formatValue(actual)).toBe(formatValue(expected));
 };
 
-const calculateMonth =(input: MonthFixture) => {
+const calculateMonth = (input: MonthFixture) => {
   const { year, month, standardHours, baseRate } = input;
   const workDays = domain.payMap.workDaysMonthBuilder.build({
     year,
@@ -153,7 +168,11 @@ describe("work table month fixtures", () => {
     const actual = calculateMonth(input);
 
     it("allocates Shabbat credit", () => {
-      expectCloseTo(actual.allocation, expected.shabbatCreditAllocation, "allocation");
+      expectCloseTo(
+        actual.allocation,
+        expected.shabbatCreditAllocation,
+        "allocation",
+      );
       expect(Object.keys(actual.allocation.appliedHoursByDate).sort()).toEqual(
         Object.keys(expected.shabbatCreditAllocation.appliedHoursByDate).sort(),
       );
@@ -168,12 +187,20 @@ describe("work table month fixtures", () => {
     it.each(Object.keys(expected.daily))("calculates %s", (date) => {
       const { status, breakdown, salary } = expected.daily[date];
       expect(actual.daily[date]?.status).toBe(status);
-      expectCloseTo(actual.daily[date]?.breakdown, breakdown, `${date}.breakdown`);
+      expectCloseTo(
+        actual.daily[date]?.breakdown,
+        breakdown,
+        `${date}.breakdown`,
+      );
       expectSalary(actual.daily[date]?.salary, salary);
     });
 
     it("calculates the monthly totals", () => {
-      expectCloseTo(actual.monthly.breakdown, expected.monthly.breakdown, "monthly.breakdown");
+      expectCloseTo(
+        actual.monthly.breakdown,
+        expected.monthly.breakdown,
+        "monthly.breakdown",
+      );
       expectSalary(actual.monthly.salary, expected.monthly.salary);
     });
   });

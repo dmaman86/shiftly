@@ -1,7 +1,4 @@
-import {
-  applyShabbatCreditToSegment,
-  WorkDayMap,
-} from "@shiftly/domain";
+import { applyShabbatCreditToSegment, WorkDayMap } from "@shiftly/domain";
 import type { PayBreakdownViewModel } from "@/app/types";
 import { calculateActualHours } from "@/utils";
 

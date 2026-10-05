@@ -1,9 +1,11 @@
 import { WorkDayType } from "../../constants/index.js";
 import { BaseRegularCalculator } from "./baseRegular.calculator.js";
 import type { Calculator } from "../../types/core-behaviors.js";
-import type { RegularBreakdown, RegularInput } from "../../types/data-shapes.js";
+import type {
+  RegularBreakdown,
+  RegularInput,
+} from "../../types/data-shapes.js";
 import type { TimelineInterval, WorkDayMeta } from "../../types/types.js";
-
 
 export class RegularByDayCalculator
   extends BaseRegularCalculator
@@ -38,9 +40,9 @@ export class RegularByDayCalculator
     const regularHours = params.intervals
       .filter((interval) => interval.category === "regular")
       .reduce(
-      (total, interval) =>
-        total + (interval.point.end - interval.point.start) / 60,
-      0,
+        (total, interval) =>
+          total + (interval.point.end - interval.point.start) / 60,
+        0,
       );
 
     return this.calculate({

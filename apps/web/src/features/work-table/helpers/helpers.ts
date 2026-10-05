@@ -52,8 +52,9 @@ export const countTableColumns = (
   return headerColumns + salaryColumn + detailsColumn;
 };
 
-export const shabbatCreditHoursFromSpecial = (special: SpecialBreakdown): number =>
-  special.shabbat150.hours + special.shabbat200.hours;
+export const shabbatCreditHoursFromSpecial = (
+  special: SpecialBreakdown,
+): number => special.shabbat150.hours + special.shabbat200.hours;
 
 export const isSameDayPayMap = (a: WorkDayMap, b: WorkDayMap) => {
   return (

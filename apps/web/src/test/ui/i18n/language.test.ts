@@ -3,15 +3,15 @@ import { resolveLanguageFromPathname } from "@/i18n/language";
 
 describe("resolveLanguageFromPathname", () => {
   it("resolves English after the production base path", () => {
-    expect(
-      resolveLanguageFromPathname("/shiftly/en/daily", "/shiftly/"),
-    ).toBe("en");
+    expect(resolveLanguageFromPathname("/shiftly/en/daily", "/shiftly/")).toBe(
+      "en",
+    );
   });
 
   it("resolves Hebrew after the production base path", () => {
-    expect(
-      resolveLanguageFromPathname("/shiftly/he/daily", "/shiftly/"),
-    ).toBe("he");
+    expect(resolveLanguageFromPathname("/shiftly/he/daily", "/shiftly/")).toBe(
+      "he",
+    );
   });
 
   it("resolves a language from a router-relative path", () => {
@@ -19,8 +19,8 @@ describe("resolveLanguageFromPathname", () => {
   });
 
   it("uses Hebrew when the route language is unsupported", () => {
-    expect(
-      resolveLanguageFromPathname("/shiftly/fr/daily", "/shiftly/"),
-    ).toBe("he");
+    expect(resolveLanguageFromPathname("/shiftly/fr/daily", "/shiftly/")).toBe(
+      "he",
+    );
   });
 });

@@ -1,6 +1,9 @@
 import type { ExtraBreakdown } from "../../types/data-shapes.js";
 import type { Reducer } from "../../types/core-behaviors.js";
-import { additionGroupKey, getAdditionGroups } from "../additions/addition-groups.js";
+import {
+  additionGroupKey,
+  getAdditionGroups,
+} from "../additions/addition-groups.js";
 
 export class ExtraCalculator implements Reducer<ExtraBreakdown> {
   private readonly fieldShiftPercent: Record<string, number> = {

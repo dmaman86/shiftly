@@ -250,7 +250,9 @@ describe("FixedSegmentCalculator", () => {
     });
 
     it("should handle creating many segments", () => {
-      const segments = Array.from({ length: 30 }, () => calculator.calculate(8));
+      const segments = Array.from({ length: 30 }, () =>
+        calculator.calculate(8),
+      );
 
       expect(segments).toHaveLength(30);
       segments.forEach((segment) => {
@@ -304,7 +306,9 @@ describe("FixedSegmentCalculator", () => {
   describe("consistency", () => {
     it("should always produce the same output for the same input", () => {
       const hours = 8.5;
-      const results = Array.from({ length: 10 }, () => calculator.calculate(hours));
+      const results = Array.from({ length: 10 }, () =>
+        calculator.calculate(hours),
+      );
 
       results.forEach((result) => {
         expect(result).toEqual({
@@ -331,7 +335,7 @@ describe("FixedSegmentCalculator", () => {
   describe("integration - typical workflow", () => {
     it("should work in a sick day scenario", () => {
       const calculator = new FixedSegmentCalculator();
-      
+
       // Worker took sick leave for 8 hours
       const sickSegment = calculator.calculate(8);
 
@@ -341,7 +345,7 @@ describe("FixedSegmentCalculator", () => {
 
     it("should work in a vacation scenario", () => {
       const calculator = new FixedSegmentCalculator();
-      
+
       // Worker took vacation for 9 hours (standard hours)
       const vacationSegment = calculator.calculate(9);
 
@@ -351,7 +355,7 @@ describe("FixedSegmentCalculator", () => {
 
     it("should work for multiple fixed segments in a month", () => {
       const calculator = new FixedSegmentCalculator();
-      
+
       // Multiple days with fixed hours
       const day1Sick = calculator.calculate(8);
       const day2Vacation = calculator.calculate(9);
@@ -367,7 +371,7 @@ describe("FixedSegmentCalculator", () => {
 
     it("should integrate with breakdown calculations", () => {
       const calculator = new FixedSegmentCalculator();
-      
+
       // Simulate adding fixed hours to a breakdown
       const sickSegment = calculator.calculate(8);
 
@@ -391,7 +395,7 @@ describe("FixedSegmentCalculator", () => {
 
     it("should return Segment type", () => {
       const result = calculator.calculate(8);
-      
+
       expect(result).toHaveProperty("percent");
       expect(result).toHaveProperty("hours");
     });

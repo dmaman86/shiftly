@@ -45,7 +45,10 @@ vi.mock("@mui/x-date-pickers/StaticDatePicker", () => ({
   StaticDatePicker: ({ onChange }: { onChange: (date: Date) => void }) => (
     <div>
       {["2026-09-15", "2026-09-16"].map((dateKey) => (
-        <button key={dateKey} onClick={() => onChange(new Date(`${dateKey}T00:00:00`))}>
+        <button
+          key={dateKey}
+          onClick={() => onChange(new Date(`${dateKey}T00:00:00`))}
+        >
           select {dateKey}
         </button>
       ))}
@@ -92,8 +95,20 @@ const domainStub = {
 } as unknown as DomainContextType;
 
 const workDays: WorkDayInfo[] = [
-  { meta: { date: "2026-09-15", typeDay: WorkDayType.Regular, crossDayContinuation: false } },
-  { meta: { date: "2026-09-16", typeDay: WorkDayType.Regular, crossDayContinuation: false } },
+  {
+    meta: {
+      date: "2026-09-15",
+      typeDay: WorkDayType.Regular,
+      crossDayContinuation: false,
+    },
+  },
+  {
+    meta: {
+      date: "2026-09-16",
+      typeDay: WorkDayType.Regular,
+      crossDayContinuation: false,
+    },
+  },
 ];
 
 describe("MobileWorkTable", () => {

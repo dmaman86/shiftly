@@ -57,7 +57,9 @@ describe("DayCardDetails", () => {
   });
 
   it("hides the absence group for special full days", () => {
-    renderWithTheme(<DayCardDetails breakdown={breakdown} showAbsence={false} />);
+    renderWithTheme(
+      <DayCardDetails breakdown={breakdown} showAbsence={false} />,
+    );
 
     expect(
       screen.queryByRole("button", { name: "Absence" }),

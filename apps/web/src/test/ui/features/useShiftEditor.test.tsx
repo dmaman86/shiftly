@@ -44,12 +44,22 @@ const createDomain = (payMap: ShiftPayMap) =>
 describe("useShiftEditor", () => {
   it("does not flag an untouched midnight placeholder but validates edited equal times", () => {
     const midnight = new Date("2026-08-10T00:00:00");
-    const shift = { ...createShift(16), start: { date: midnight }, end: { date: midnight } };
+    const shift = {
+      ...createShift(16),
+      start: { date: midnight },
+      end: { date: midnight },
+    };
     const onShiftUpdate = vi.fn();
-    const { result } = renderHook(() => useShiftEditor({
-      domain: createDomain({ totalHours: 0 } as ShiftPayMap), shift, meta,
-      standardHours: 6.67, otherShifts: [], onShiftUpdate,
-    }));
+    const { result } = renderHook(() =>
+      useShiftEditor({
+        domain: createDomain({ totalHours: 0 } as ShiftPayMap),
+        shift,
+        meta,
+        standardHours: 6.67,
+        otherShifts: [],
+        onShiftUpdate,
+      }),
+    );
     expect(result.current.hasError).toBe(false);
     act(() => result.current.handleChange("end", midnight));
     expect(result.current.hasError).toBe(true);
@@ -58,9 +68,18 @@ describe("useShiftEditor", () => {
   it("accepts external updates without emitting a write", () => {
     const domain = createDomain({ totalHours: 8 } as ShiftPayMap);
     const onShiftUpdate = vi.fn();
-    const { result, rerender } = renderHook(({ shift }) => useShiftEditor({
-      domain, shift, meta, standardHours: 6.67, otherShifts: [], onShiftUpdate,
-    }), { initialProps: { shift: createShift(16) } });
+    const { result, rerender } = renderHook(
+      ({ shift }) =>
+        useShiftEditor({
+          domain,
+          shift,
+          meta,
+          standardHours: 6.67,
+          otherShifts: [],
+          onShiftUpdate,
+        }),
+      { initialProps: { shift: createShift(16) } },
+    );
     const updated = createShift(18);
     rerender({ shift: updated });
     expect(result.current.localShift).toBe(updated);
@@ -69,9 +88,18 @@ describe("useShiftEditor", () => {
 
   it("preserves an invalid draft on refresh but not across shift identities", () => {
     const domain = createDomain({ totalHours: 8 } as ShiftPayMap);
-    const { result, rerender } = renderHook(({ shift }) => useShiftEditor({
-      domain, shift, meta, standardHours: 6.67, otherShifts: [], onShiftUpdate: vi.fn(),
-    }), { initialProps: { shift: createShift(16) } });
+    const { result, rerender } = renderHook(
+      ({ shift }) =>
+        useShiftEditor({
+          domain,
+          shift,
+          meta,
+          standardHours: 6.67,
+          otherShifts: [],
+          onShiftUpdate: vi.fn(),
+        }),
+      { initialProps: { shift: createShift(16) } },
+    );
     const invalidEnd = new Date("2026-08-10T07:00:00");
     act(() => result.current.handleChange("end", invalidEnd));
     rerender({ shift: createShift(18) });
@@ -87,7 +115,11 @@ describe("useShiftEditor", () => {
     const { result } = renderHook(() => {
       const [shift, setShift] = useState(() => createShift(16));
       return useShiftEditor({
-        domain, shift, meta, standardHours: 6.67, otherShifts: [],
+        domain,
+        shift,
+        meta,
+        standardHours: 6.67,
+        otherShifts: [],
         onShiftUpdate: (nextShift, nextPayMap) => {
           setShift(nextShift);
           onShiftUpdate(nextShift, nextPayMap);

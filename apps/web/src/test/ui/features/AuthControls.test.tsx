@@ -39,7 +39,8 @@ vi.mock("@/hooks", () => ({
   useAppSnackbar: () => hookMocks.snackbar,
   useFetch: () => ({
     loading: false,
-    callEndPoint: (endpoint: { call: () => Promise<unknown> }) => endpoint.call(),
+    callEndPoint: (endpoint: { call: () => Promise<unknown> }) =>
+      endpoint.call(),
     cancelEndPoint: vi.fn(),
   }),
 }));
@@ -62,13 +63,18 @@ describe("AuthControls", () => {
   it("starts the Google OAuth flow", async () => {
     const user = userEvent.setup();
     authMocks.signInWithOAuth.mockResolvedValue({
-      data: { provider: "google", url: "https://accounts.google.com/o/oauth2/..." },
+      data: {
+        provider: "google",
+        url: "https://accounts.google.com/o/oauth2/...",
+      },
       error: null,
     });
 
     render(<AuthControls />);
 
-    await user.click(screen.getByRole("button", { name: "Continue with Google" }));
+    await user.click(
+      screen.getByRole("button", { name: "Continue with Google" }),
+    );
 
     expect(authMocks.signInWithOAuth).toHaveBeenCalledWith({
       provider: "google",
@@ -86,9 +92,13 @@ describe("AuthControls", () => {
 
     render(<AuthControls />);
 
-    await user.click(screen.getByRole("button", { name: "Continue with Google" }));
+    await user.click(
+      screen.getByRole("button", { name: "Continue with Google" }),
+    );
 
-    expect(hookMocks.snackbar.error).toHaveBeenCalledWith("Provider is not enabled");
+    expect(hookMocks.snackbar.error).toHaveBeenCalledWith(
+      "Provider is not enabled",
+    );
   });
 
   it("renders the account sign-out control", async () => {
@@ -101,7 +111,9 @@ describe("AuthControls", () => {
     await user.click(screen.getByRole("button", { name: "Sign out" }));
 
     expect(authMocks.signOut).toHaveBeenCalledOnce();
-    expect(hookMocks.snackbar.success).toHaveBeenCalledWith("You are signed out.");
+    expect(hookMocks.snackbar.success).toHaveBeenCalledWith(
+      "You are signed out.",
+    );
   });
 
   it("hides page authentication controls from signed-in users", () => {
@@ -112,7 +124,9 @@ describe("AuthControls", () => {
     expect(
       screen.queryByRole("button", { name: "Continue with Google" }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Sign out" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Sign out" }),
+    ).not.toBeInTheDocument();
   });
 
   it("does not expose account deletion in the compact account control", () => {

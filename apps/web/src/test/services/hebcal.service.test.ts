@@ -8,7 +8,9 @@ describe("hebcalService", () => {
   });
 
   it("requests the explicit Israel calendar contract", async () => {
-    const get = vi.spyOn(axios, "get").mockResolvedValue({ data: { items: [] } });
+    const get = vi
+      .spyOn(axios, "get")
+      .mockResolvedValue({ data: { items: [] } });
 
     const request = hebcalService().getData("2025-01-01", "2025-02-01");
     await request.call();

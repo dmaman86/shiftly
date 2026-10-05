@@ -1,9 +1,17 @@
 import { WorkDayStatus, WorkDayType } from "../../src/constants/index.js";
-import { buildPayMapPipeline, calculateDayFromShifts, Shift } from "../../src/index.js";
+import {
+  buildPayMapPipeline,
+  calculateDayFromShifts,
+  Shift,
+} from "../../src/index.js";
 
 const pipeline = buildPayMapPipeline();
 
-const createShift = (startHour: number, endHour: number, isDuty = false): Shift => ({
+const createShift = (
+  startHour: number,
+  endHour: number,
+  isDuty = false,
+): Shift => ({
   id: crypto.randomUUID(),
   start: { date: new Date(2026, 8, 6, startHour) },
   end: { date: new Date(2026, 8, 6, endHour) },
@@ -23,18 +31,35 @@ describe("calculateDayFromShifts", () => {
       month: 10,
       year: 2025,
       standardHours: 6.67,
-      shifts: [{
-        id: "autumn-clock-change",
-        start: { date: pipeline.services.dateService.createDateFromPersisted(startTime) },
-        end: { date: pipeline.services.dateService.createDateFromPersisted(endTime) },
-        isDuty: false,
-      }],
+      shifts: [
+        {
+          id: "autumn-clock-change",
+          start: {
+            date: pipeline.services.dateService.createDateFromPersisted(
+              startTime,
+            ),
+          },
+          end: {
+            date: pipeline.services.dateService.createDateFromPersisted(
+              endTime,
+            ),
+          },
+          isDuty: false,
+        },
+      ],
     });
 
     expect(result.dayPayMap.totalHours).toBeCloseTo(8.233333333333333, 10);
-    expect(result.dayPayMap.workMap.regular.hours150.hours).toBeCloseTo(1.0166666666666666, 10);
-    expect(result.dayPayMap.workMap.special.shabbat200.hours).toBeCloseTo(7.216666666666667, 10);
-    const elapsedHours = (new Date(endTime).getTime() - new Date(startTime).getTime()) / 3_600_000;
+    expect(result.dayPayMap.workMap.regular.hours150.hours).toBeCloseTo(
+      1.0166666666666666,
+      10,
+    );
+    expect(result.dayPayMap.workMap.special.shabbat200.hours).toBeCloseTo(
+      7.216666666666667,
+      10,
+    );
+    const elapsedHours =
+      (new Date(endTime).getTime() - new Date(startTime).getTime()) / 3_600_000;
     expect(elapsedHours).toBeCloseTo(9.233333333333333, 10);
   });
 

@@ -6,8 +6,7 @@ export const DEFAULT_LANGUAGE: Language = "he";
 
 export const isSupportedLanguage = (
   language: string | undefined,
-): language is Language =>
-  SUPPORTED_LANGUAGES.includes(language as Language);
+): language is Language => SUPPORTED_LANGUAGES.includes(language as Language);
 
 export const resolveLanguageFromPathname = (
   pathname: string,

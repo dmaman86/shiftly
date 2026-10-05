@@ -10,10 +10,7 @@ export const dayToCompactPayBreakdownVM = (
 ): CompactPayBreakdownVM => {
   const dailySalary =
     baseRate > 0
-      ? computeTotalPay(
-          dayToPayBreakdownVM(day, shabbatCreditHours),
-          baseRate,
-        )
+      ? computeTotalPay(dayToPayBreakdownVM(day, shabbatCreditHours), baseRate)
       : undefined;
 
   const regularHours = day.workMap.regular.hours100.hours;

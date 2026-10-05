@@ -8,7 +8,9 @@ afterEach(() => vi.useRealTimers());
 describe("CalculationStatus", () => {
   it("announces only the settled calculation, not initial rendering or intermediate updates", () => {
     vi.useFakeTimers();
-    const { rerender } = renderWithTheme(<CalculationStatus message="Total 0" />);
+    const { rerender } = renderWithTheme(
+      <CalculationStatus message="Total 0" />,
+    );
     expect(screen.getByRole("status")).toBeEmptyDOMElement();
     rerender(<CalculationStatus message="Total 50" />);
     act(() => vi.advanceTimersByTime(500));
@@ -22,7 +24,9 @@ describe("CalculationStatus", () => {
 
   it("cancels a pending announcement when the calculation returns to its previous value", () => {
     vi.useFakeTimers();
-    const { rerender } = renderWithTheme(<CalculationStatus message="Total 0" />);
+    const { rerender } = renderWithTheme(
+      <CalculationStatus message="Total 0" />,
+    );
     rerender(<CalculationStatus message="Total 50" />);
     rerender(<CalculationStatus message="Total 0" />);
     act(() => vi.advanceTimersByTime(2000));

@@ -13,5 +13,4 @@ export class WorkDayInfoResolver implements DayInfoResolver {
   hasCrossDayContinuation(day: DomainWorkDay): boolean {
     return day.meta.crossDayContinuation === true;
   }
-
 }

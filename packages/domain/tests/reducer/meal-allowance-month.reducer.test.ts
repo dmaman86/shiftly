@@ -151,7 +151,11 @@ describe("MealAllowanceMonthReducer", () => {
         large: { points: 5, amount: 100 },
         small: { points: 4, amount: 50 },
       };
-      const baseCopy = { ...base, large: { ...base.large }, small: { ...base.small } };
+      const baseCopy = {
+        ...base,
+        large: { ...base.large },
+        small: { ...base.small },
+      };
       const add: MealAllowance = {
         large: { points: 3, amount: 60 },
         small: { points: 2, amount: 25 },

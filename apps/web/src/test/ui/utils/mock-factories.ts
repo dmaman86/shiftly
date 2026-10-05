@@ -4,7 +4,7 @@ import type { GlobalState } from "@/store/globalStore";
  * Factory to create mock GlobalState for testing
  */
 export function createMockGlobalState(
-  overrides?: Partial<GlobalState>
+  overrides?: Partial<GlobalState>,
 ): GlobalState {
   return {
     config: {

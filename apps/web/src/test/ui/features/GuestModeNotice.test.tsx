@@ -30,7 +30,8 @@ vi.mock("@/hooks", () => ({
   useAppSnackbar: () => hookMocks.snackbar,
   useFetch: () => ({
     loading: false,
-    callEndPoint: (endpoint: { call: () => Promise<unknown> }) => endpoint.call(),
+    callEndPoint: (endpoint: { call: () => Promise<unknown> }) =>
+      endpoint.call(),
     cancelEndPoint: vi.fn(),
   }),
 }));
@@ -63,14 +64,18 @@ describe("GuestModeNotice", () => {
     const user = userEvent.setup();
 
     render(<GuestModeNotice />);
-    await user.click(screen.getByRole("button", { name: "Continue with Google" }));
+    await user.click(
+      screen.getByRole("button", { name: "Continue with Google" }),
+    );
 
     expect(authMocks.signInWithOAuth).toHaveBeenCalledWith({
       provider: "google",
       options: { redirectTo: window.location.href },
     });
     // Without this mark the guest's month would be discarded after the redirect.
-    expect(sessionStorage.getItem("shiftly:guest-draft:pending-import")).not.toBeNull();
+    expect(
+      sessionStorage.getItem("shiftly:guest-draft:pending-import"),
+    ).not.toBeNull();
   });
 
   it("renders nothing for signed-in users", () => {

@@ -5,11 +5,17 @@ import userEvent from "@testing-library/user-event";
 import { SalaryRow } from "@/features/salary-summary/components/SalaryRow";
 import { PayRowVM } from "@/features/salary-summary/vm";
 
-
 const renderSalaryRow = (ui: ReactElement) => {
-  const wrap = (row: ReactElement) => <table><tbody>{row}</tbody></table>;
+  const wrap = (row: ReactElement) => (
+    <table>
+      <tbody>{row}</tbody>
+    </table>
+  );
   const result = renderWithTheme(wrap(ui));
-  return { ...result, rerender: (row: ReactElement) => result.rerender(wrap(row)) };
+  return {
+    ...result,
+    rerender: (row: ReactElement) => result.rerender(wrap(row)),
+  };
 };
 
 describe("SalaryRow", () => {
@@ -71,21 +77,27 @@ describe("SalaryRow", () => {
 
     it("should display formatted quantity value", () => {
       const row = { ...defaultRow, quantity: 25.5 };
-      renderSalaryRow(<SalaryRow {...defaultProps} row={row} editMode={false} />);
+      renderSalaryRow(
+        <SalaryRow {...defaultProps} row={row} editMode={false} />,
+      );
 
       expect(screen.getByText("25.50")).toBeInTheDocument();
     });
 
     it("should display formatted rate value", () => {
       const row = { ...defaultRow, rate: 62.75 };
-      renderSalaryRow(<SalaryRow {...defaultProps} row={row} editMode={false} />);
+      renderSalaryRow(
+        <SalaryRow {...defaultProps} row={row} editMode={false} />,
+      );
 
       expect(screen.getByText("₪62.75")).toBeInTheDocument();
     });
 
     it("should display formatted total value", () => {
       const row = { ...defaultRow, total: 1234.56 };
-      renderSalaryRow(<SalaryRow {...defaultProps} row={row} editMode={false} />);
+      renderSalaryRow(
+        <SalaryRow {...defaultProps} row={row} editMode={false} />,
+      );
 
       expect(screen.getByText("₪1234.56")).toBeInTheDocument();
     });
@@ -94,11 +106,19 @@ describe("SalaryRow", () => {
   describe("Edit Mode", () => {
     it("should sync the input when the calculated quantity changes", () => {
       const { rerender } = renderSalaryRow(
-        <SalaryRow {...defaultProps} row={{ ...defaultRow, quantity: 0 }} editMode={false} />,
+        <SalaryRow
+          {...defaultProps}
+          row={{ ...defaultRow, quantity: 0 }}
+          editMode={false}
+        />,
       );
 
       rerender(
-        <SalaryRow {...defaultProps} row={{ ...defaultRow, quantity: 2.75 }} editMode={true} />,
+        <SalaryRow
+          {...defaultProps}
+          row={{ ...defaultRow, quantity: 2.75 }}
+          editMode={true}
+        />,
       );
 
       expect(screen.getByRole("textbox")).toHaveValue("2.75");
@@ -117,7 +137,11 @@ describe("SalaryRow", () => {
       const handleChange = vi.fn();
 
       renderSalaryRow(
-        <SalaryRow {...defaultProps} editMode={true} onQuantityChange={handleChange} />
+        <SalaryRow
+          {...defaultProps}
+          editMode={true}
+          onQuantityChange={handleChange}
+        />,
       );
 
       const input = screen.getByRole("textbox");
@@ -133,7 +157,11 @@ describe("SalaryRow", () => {
       const handleChange = vi.fn();
 
       renderSalaryRow(
-        <SalaryRow {...defaultProps} editMode={true} onQuantityChange={handleChange} />
+        <SalaryRow
+          {...defaultProps}
+          editMode={true}
+          onQuantityChange={handleChange}
+        />,
       );
 
       const input = screen.getByRole("textbox");
@@ -145,7 +173,7 @@ describe("SalaryRow", () => {
         () => {
           expect(handleChange).toHaveBeenCalledWith(180);
         },
-        { timeout: 1000 }
+        { timeout: 1000 },
       );
     });
 
@@ -190,7 +218,9 @@ describe("SalaryRow", () => {
 
     it("should hide zero quantity values in read mode", () => {
       const row = { ...defaultRow, quantity: 0 };
-      renderSalaryRow(<SalaryRow {...defaultProps} row={row} editMode={false} />);
+      renderSalaryRow(
+        <SalaryRow {...defaultProps} row={row} editMode={false} />,
+      );
 
       // formatValue returns "" for 0
       expect(screen.queryByText("0.00")).not.toBeInTheDocument();
@@ -206,7 +236,9 @@ describe("SalaryRow", () => {
 
     it("should format decimal quantities correctly", () => {
       const row = { ...defaultRow, quantity: 42.75 };
-      renderSalaryRow(<SalaryRow {...defaultProps} row={row} editMode={false} />);
+      renderSalaryRow(
+        <SalaryRow {...defaultProps} row={row} editMode={false} />,
+      );
 
       expect(screen.getByText("42.75")).toBeInTheDocument();
     });
@@ -290,7 +322,7 @@ describe("SalaryRow", () => {
 
       const row = container.querySelector("tr");
       expect(row).toBeInTheDocument();
-      
+
       const cells = row?.querySelectorAll("td");
       expect(cells?.length).toBe(4);
     });
@@ -316,7 +348,9 @@ describe("SalaryRow", () => {
   describe("Edge Cases", () => {
     it("should handle very small decimal values", () => {
       const row = { ...defaultRow, quantity: 0.01, rate: 0.05, total: 0.0005 };
-      renderSalaryRow(<SalaryRow {...defaultProps} row={row} editMode={false} />);
+      renderSalaryRow(
+        <SalaryRow {...defaultProps} row={row} editMode={false} />,
+      );
 
       expect(screen.getByText("0.01")).toBeInTheDocument();
       expect(screen.getByText("₪0.05")).toBeInTheDocument();
@@ -327,7 +361,11 @@ describe("SalaryRow", () => {
       const handleChange = vi.fn();
 
       renderSalaryRow(
-        <SalaryRow {...defaultProps} editMode={true} onQuantityChange={handleChange} />
+        <SalaryRow
+          {...defaultProps}
+          editMode={true}
+          onQuantityChange={handleChange}
+        />,
       );
 
       const input = screen.getByRole("textbox");
@@ -340,7 +378,7 @@ describe("SalaryRow", () => {
           // Should not call with negative value
           expect(handleChange).not.toHaveBeenCalledWith(-10);
         },
-        { timeout: 1000 }
+        { timeout: 1000 },
       );
     });
 
@@ -349,7 +387,11 @@ describe("SalaryRow", () => {
       const handleChange = vi.fn();
 
       renderSalaryRow(
-        <SalaryRow {...defaultProps} editMode={true} onQuantityChange={handleChange} />
+        <SalaryRow
+          {...defaultProps}
+          editMode={true}
+          onQuantityChange={handleChange}
+        />,
       );
 
       const input = screen.getByRole("textbox");
@@ -361,12 +403,14 @@ describe("SalaryRow", () => {
         () => {
           expect(handleChange).not.toHaveBeenCalled();
         },
-        { timeout: 1000 }
+        { timeout: 1000 },
       );
     });
 
     it("should switch between edit and read modes", () => {
-      const { rerender } = renderSalaryRow(<SalaryRow {...defaultProps} editMode={false} />);
+      const { rerender } = renderSalaryRow(
+        <SalaryRow {...defaultProps} editMode={false} />,
+      );
 
       // Read mode
       expect(screen.getByText("160.00")).toBeInTheDocument();
@@ -381,7 +425,9 @@ describe("SalaryRow", () => {
       const row = { ...defaultRow, label: "" };
       renderSalaryRow(<SalaryRow {...defaultProps} row={row} />);
 
-      const { container } = renderSalaryRow(<SalaryRow {...defaultProps} row={row} />);
+      const { container } = renderSalaryRow(
+        <SalaryRow {...defaultProps} row={row} />,
+      );
       const firstCell = container.querySelector("td");
       expect(firstCell?.textContent).toBe("");
     });

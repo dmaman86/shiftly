@@ -7,9 +7,15 @@ type UseSalaryRowParams = {
   delay?: number;
 };
 
-export const useSalaryRow = ({ initialRow, enabled, delay = 500 }: UseSalaryRowParams) => {
+export const useSalaryRow = ({
+  initialRow,
+  enabled,
+  delay = 500,
+}: UseSalaryRowParams) => {
   const [row, setRow] = useState<PayRowVM>(initialRow);
-  const [inputValue, setInputValue] = useState<string>(initialRow.quantity.toString());
+  const [inputValue, setInputValue] = useState<string>(
+    initialRow.quantity.toString(),
+  );
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const onInputChange = useCallback(
@@ -32,7 +38,11 @@ export const useSalaryRow = ({ initialRow, enabled, delay = 500 }: UseSalaryRowP
   );
 
   const updateRate = useCallback((newRate: number) => {
-    setRow((prev) => ({ ...prev, rate: newRate, total: prev.quantity * newRate }));
+    setRow((prev) => ({
+      ...prev,
+      rate: newRate,
+      total: prev.quantity * newRate,
+    }));
   }, []);
 
   return { row, inputValue, onInputChange, updateRate };

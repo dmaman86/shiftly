@@ -35,6 +35,8 @@ describe("static calendar files", () => {
     const eventMap = buildEventMap(payload);
 
     expect(Object.keys(eventMap).length).toBeGreaterThan(0);
-    expect(Object.keys(eventMap).every((date) => date.startsWith(`${year}-`))).toBe(true);
+    expect(
+      Object.keys(eventMap).every((date) => date.startsWith(`${year}-`)),
+    ).toBe(true);
   });
 });

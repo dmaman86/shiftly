@@ -20,8 +20,12 @@ const workDayServiceMock = vi.hoisted(() => ({ fetchForMonth: vi.fn() }));
 const shiftServiceMock = vi.hoisted(() => ({ fetchForMonth: vi.fn() }));
 
 vi.mock("@/hooks/useAuth", () => ({ useAuth: () => authMock }));
-vi.mock("@/hooks/useGlobalState", () => ({ useGlobalState: () => globalStateMock }));
-vi.mock("@/hooks/useAppSnackbar", () => ({ useAppSnackbar: () => snackbarMock }));
+vi.mock("@/hooks/useGlobalState", () => ({
+  useGlobalState: () => globalStateMock,
+}));
+vi.mock("@/hooks/useAppSnackbar", () => ({
+  useAppSnackbar: () => snackbarMock,
+}));
 vi.mock("@/services", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@/services")>();
   return {
@@ -43,11 +47,16 @@ import type { ReactElement, ReactNode } from "react";
 
 const renderPure = (ui: ReactElement) => {
   const client = new QueryClient();
-  return render(ui, { wrapper: ({ children }: { children: ReactNode }) =>
-    <QueryClientProvider client={client}>{children}</QueryClientProvider> });
+  return render(ui, {
+    wrapper: ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    ),
+  });
 };
 
-vi.mock("react-i18next", () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: (key: string) => key }),
+}));
 
 const domainStub = {
   services: {
@@ -71,16 +80,24 @@ const domainStub = {
 
 const workDays: WorkDayInfo[] = [
   {
-    meta: { date: "2026-08-10", typeDay: WorkDayType.Regular, crossDayContinuation: false },
+    meta: {
+      date: "2026-08-10",
+      typeDay: WorkDayType.Regular,
+      crossDayContinuation: false,
+    },
   },
 ];
 
 const DayProbe = ({ dateKey }: { dateKey: string }) => {
   const { status, shiftEntries, setStatus } = useWorkTableDayState(dateKey);
-  return <>
-    <span>{`${dateKey}:${status}:${Object.keys(shiftEntries).length}`}</span>
-    <button onClick={() => setStatus(WorkDayStatus.vacation)}>Edit day</button>
-  </>;
+  return (
+    <>
+      <span>{`${dateKey}:${status}:${Object.keys(shiftEntries).length}`}</span>
+      <button onClick={() => setStatus(WorkDayStatus.vacation)}>
+        Edit day
+      </button>
+    </>
+  );
 };
 
 const SessionHarness = () => (
@@ -119,7 +136,9 @@ describe("useWorkTableMonthSession", () => {
     authMock.user = { id: "user-1" };
     workDayServiceMock.fetchForMonth.mockReturnValue({
       call: () =>
-        Promise.resolve({ data: [{ date: "2026-08-10", status: WorkDayStatus.sick }] }),
+        Promise.resolve({
+          data: [{ date: "2026-08-10", status: WorkDayStatus.sick }],
+        }),
     });
     shiftServiceMock.fetchForMonth.mockReturnValue({
       call: () =>
@@ -182,7 +201,9 @@ describe("useWorkTableMonthSession", () => {
       await Promise.resolve();
     });
 
-    await waitFor(() => expect(screen.queryByRole("status")).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByRole("status")).not.toBeInTheDocument(),
+    );
     expect(workDayServiceMock.fetchForMonth).toHaveBeenCalledTimes(1);
 
     globalStateMock.standardHours = 7.5;
@@ -198,11 +219,22 @@ describe("useWorkTableMonthSession", () => {
   it("blocks editing while loading and ignores refreshes of the same user", async () => {
     authMock.user = { id: "user-1" };
     let resolveDays!: (value: { data: [] }) => void;
-    workDayServiceMock.fetchForMonth.mockReturnValue({ call: () => new Promise((resolve) => { resolveDays = resolve; }) });
-    shiftServiceMock.fetchForMonth.mockReturnValue({ call: async () => ({ data: [] }) });
+    workDayServiceMock.fetchForMonth.mockReturnValue({
+      call: () =>
+        new Promise((resolve) => {
+          resolveDays = resolve;
+        }),
+    });
+    shiftServiceMock.fetchForMonth.mockReturnValue({
+      call: async () => ({ data: [] }),
+    });
     const { rerender } = renderPure(<SessionHarness />);
-    expect(screen.queryByRole("button", { name: "Edit day" })).not.toBeInTheDocument();
-    await act(async () => { resolveDays({ data: [] }); });
+    expect(
+      screen.queryByRole("button", { name: "Edit day" }),
+    ).not.toBeInTheDocument();
+    await act(async () => {
+      resolveDays({ data: [] });
+    });
     fireEvent.click(await screen.findByRole("button", { name: "Edit day" }));
     authMock.user = { id: "user-1" };
     globalStateMock.standardHours = 7.5;
@@ -213,23 +245,39 @@ describe("useWorkTableMonthSession", () => {
 
   it("offers a retry after loading fails and enables editing after recovery", async () => {
     authMock.user = { id: "user-1" };
-    workDayServiceMock.fetchForMonth.mockReturnValueOnce({ call: async () => ({ error: "Request failed" }) })
+    workDayServiceMock.fetchForMonth
+      .mockReturnValueOnce({ call: async () => ({ error: "Request failed" }) })
       .mockReturnValue({ call: async () => ({ data: [] }) });
-    shiftServiceMock.fetchForMonth.mockReturnValue({ call: async () => ({ data: [] }) });
+    shiftServiceMock.fetchForMonth.mockReturnValue({
+      call: async () => ({ data: [] }),
+    });
     renderPure(<SessionHarness />);
-    expect(await screen.findByRole("alert")).toHaveTextContent("storage.load_error");
-    expect(screen.queryByRole("button", { name: "Edit day" })).not.toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "storage.load_error",
+    );
+    expect(
+      screen.queryByRole("button", { name: "Edit day" }),
+    ).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "storage.retry" }));
-    expect(await screen.findByRole("button", { name: "Edit day" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: "Edit day" }),
+    ).toBeInTheDocument();
     expect(workDayServiceMock.fetchForMonth).toHaveBeenCalledTimes(2);
   });
 
   it("clears account state on logout and reloads for a different account", async () => {
     authMock.user = { id: "user-1" };
-    workDayServiceMock.fetchForMonth.mockImplementation((userId: string) => ({ call: async () => ({
-      data: userId === "user-1" ? [{ date: "2026-08-10", status: WorkDayStatus.sick }] : [],
-    }) }));
-    shiftServiceMock.fetchForMonth.mockReturnValue({ call: async () => ({ data: [] }) });
+    workDayServiceMock.fetchForMonth.mockImplementation((userId: string) => ({
+      call: async () => ({
+        data:
+          userId === "user-1"
+            ? [{ date: "2026-08-10", status: WorkDayStatus.sick }]
+            : [],
+      }),
+    }));
+    shiftServiceMock.fetchForMonth.mockReturnValue({
+      call: async () => ({ data: [] }),
+    });
     const { rerender } = renderPure(<SessionHarness />);
     expect(await screen.findByText("2026-08-10:sick:0")).toBeInTheDocument();
     authMock.user = null;
@@ -237,22 +285,42 @@ describe("useWorkTableMonthSession", () => {
     expect(screen.getByText("2026-08-10:normal:0")).toBeInTheDocument();
     authMock.user = { id: "user-2" };
     rerender(<SessionHarness />);
-    expect(screen.queryByRole("button", { name: "Edit day" })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Edit day" }),
+    ).not.toBeInTheDocument();
     expect(await screen.findByText("2026-08-10:normal:0")).toBeInTheDocument();
-    expect(workDayServiceMock.fetchForMonth).toHaveBeenLastCalledWith("user-2", "2026-08-01", "2026-09-01");
+    expect(workDayServiceMock.fetchForMonth).toHaveBeenLastCalledWith(
+      "user-2",
+      "2026-08-01",
+      "2026-09-01",
+    );
   });
 
   it("ignores an old account response that completes after switching accounts", async () => {
     authMock.user = { id: "user-1" };
-    let resolveOld!: (value: { data: { date: string; status: WorkDayStatus }[] }) => void;
-    workDayServiceMock.fetchForMonth.mockReturnValueOnce({ call: () => new Promise((resolve) => { resolveOld = resolve; }) })
+    let resolveOld!: (value: {
+      data: { date: string; status: WorkDayStatus }[];
+    }) => void;
+    workDayServiceMock.fetchForMonth
+      .mockReturnValueOnce({
+        call: () =>
+          new Promise((resolve) => {
+            resolveOld = resolve;
+          }),
+      })
       .mockReturnValue({ call: async () => ({ data: [] }) });
-    shiftServiceMock.fetchForMonth.mockReturnValue({ call: async () => ({ data: [] }) });
+    shiftServiceMock.fetchForMonth.mockReturnValue({
+      call: async () => ({ data: [] }),
+    });
     const { rerender } = renderPure(<SessionHarness />);
     authMock.user = { id: "user-2" };
     rerender(<SessionHarness />);
     expect(await screen.findByText("2026-08-10:normal:0")).toBeInTheDocument();
-    await act(async () => { resolveOld({ data: [{ date: "2026-08-10", status: WorkDayStatus.sick }] }); });
+    await act(async () => {
+      resolveOld({
+        data: [{ date: "2026-08-10", status: WorkDayStatus.sick }],
+      });
+    });
     expect(screen.getByText("2026-08-10:normal:0")).toBeInTheDocument();
   });
 });

@@ -10,7 +10,8 @@ export const calendarService = () => {
   const buildUrl = (year: number): string =>
     `${import.meta.env.BASE_URL}calendar/${year}.json`;
 
-  const getYear = (year: number) => toApiResponse(axios.get<unknown>(buildUrl(year)));
+  const getYear = (year: number) =>
+    toApiResponse(axios.get<unknown>(buildUrl(year)));
 
   return { getYear };
 };

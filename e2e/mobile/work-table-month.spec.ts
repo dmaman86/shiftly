@@ -38,7 +38,9 @@ const openDay = async (page: Page, date: string) => {
   return dayCard;
 };
 
-test(`fills and calculates the ${SCENARIO} work table on mobile (he)`, async ({ page }) => {
+test(`fills and calculates the ${SCENARIO} work table on mobile (he)`, async ({
+  page,
+}) => {
   await prepareApp(page, { holidays: input.holidays });
   await page.goto("he/daily");
 
@@ -54,7 +56,9 @@ test(`fills and calculates the ${SCENARIO} work table on mobile (he)`, async ({ 
   for (const { date, status } of input.statuses) {
     if (status === "normal") continue;
     const dayCard = await openDay(page, date);
-    const checkbox = dayCard.getByRole("checkbox", { name: STATUS_LABELS[status] });
+    const checkbox = dayCard.getByRole("checkbox", {
+      name: STATUS_LABELS[status],
+    });
     await checkbox.check();
     await expect(checkbox).toBeChecked();
   }
@@ -65,8 +69,14 @@ test(`fills and calculates the ${SCENARIO} work table on mobile (he)`, async ({ 
 
     const startTime = formatTime(shift.start_time, input.timeZone);
     const endTime = formatTime(shift.end_time, input.timeZone);
-    await fillTimeGroup(dayCard.getByRole("group", { name: "כניסה" }).last(), startTime);
-    await fillTimeGroup(dayCard.getByRole("group", { name: "יציאה" }).last(), endTime);
+    await fillTimeGroup(
+      dayCard.getByRole("group", { name: "כניסה" }).last(),
+      startTime,
+    );
+    await fillTimeGroup(
+      dayCard.getByRole("group", { name: "יציאה" }).last(),
+      endTime,
+    );
 
     if (isCrossDay(shift)) {
       const crossDayToggle = dayCard
@@ -102,23 +112,31 @@ test(`fills and calculates the ${SCENARIO} work table on mobile (he)`, async ({ 
       formatHours(breakdown.regular.hours100.hours),
     );
     await expect(dayCard.getByTestId(`${prefix}-extra-hours`)).toHaveText(
-      formatHours(breakdown.regular.hours125.hours + breakdown.regular.hours150.hours),
+      formatHours(
+        breakdown.regular.hours125.hours + breakdown.regular.hours150.hours,
+      ),
     );
-    await expect(dayCard.getByTestId(`${prefix}-salary`)).toHaveText(formatTileSalary(salary));
+    await expect(dayCard.getByTestId(`${prefix}-salary`)).toHaveText(
+      formatTileSalary(salary),
+    );
   }
 
   const monthly = expected.monthly.breakdown;
-  await expect(page.getByTestId("work-table-month-total-actual-hours")).toHaveText(
-    formatHours(monthly.actualHours),
-  );
-  await expect(page.getByTestId("work-table-month-total-total-hours")).toHaveText(
-    formatHours(monthly.totalHours),
-  );
-  await expect(page.getByTestId("work-table-month-total-regular-hours")).toHaveText(
-    formatHours(monthly.regular.hours100.hours),
-  );
-  await expect(page.getByTestId("work-table-month-total-extra-hours")).toHaveText(
-    formatHours(monthly.regular.hours125.hours + monthly.regular.hours150.hours),
+  await expect(
+    page.getByTestId("work-table-month-total-actual-hours"),
+  ).toHaveText(formatHours(monthly.actualHours));
+  await expect(
+    page.getByTestId("work-table-month-total-total-hours"),
+  ).toHaveText(formatHours(monthly.totalHours));
+  await expect(
+    page.getByTestId("work-table-month-total-regular-hours"),
+  ).toHaveText(formatHours(monthly.regular.hours100.hours));
+  await expect(
+    page.getByTestId("work-table-month-total-extra-hours"),
+  ).toHaveText(
+    formatHours(
+      monthly.regular.hours125.hours + monthly.regular.hours150.hours,
+    ),
   );
   await expect(page.getByTestId("work-table-month-total-salary")).toHaveText(
     formatTileSalary(expected.monthly.salary),

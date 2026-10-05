@@ -39,7 +39,11 @@ const persistDayChange = async (change: DayMutation) => {
       ? shiftService().upsert(change.userId, change.dateKey, change.shift)
       : change.type === "removeShift"
         ? shiftService().remove(change.userId, change.shiftId)
-        : workDayService().setStatus(change.userId, change.dateKey, change.status);
+        : workDayService().setStatus(
+            change.userId,
+            change.dateKey,
+            change.status,
+          );
 
   const result = await endpoint.call();
   if (result.error) throw new Error(result.error);
@@ -50,11 +54,14 @@ export const useWorkTableMonthSession = ({
   domain,
   workDays,
 }: WorkTableMonthSessionProps) => {
-  const { state, dispatch, hydrated, setHydrated } = useWorkTableDayStateContext();
+  const { state, dispatch, hydrated, setHydrated } =
+    useWorkTableDayStateContext();
   const { user, isLoading: isAuthLoading } = useAuth();
   const snackbar = useAppSnackbar();
   const { year, month, standardHours, baseRate } = useGlobalState();
-  const replaceDailyPayMaps = useGlobalStore((store) => store.replaceDailyPayMaps);
+  const replaceDailyPayMaps = useGlobalStore(
+    (store) => store.replaceDailyPayMaps,
+  );
   const { ready: guestDraftReady } = useGuestDraftImportGate();
   const userId = user?.id;
   const previousStateRef = useRef<typeof state | null>(null);
@@ -88,7 +95,11 @@ export const useWorkTableMonthSession = ({
     // Waits for a pending guest draft import, otherwise it would hydrate the
     // pre-import snapshot.
     enabled:
-      workDays.length > 0 && !!userId && !isAuthLoading && guestDraftReady && !hydrated,
+      workDays.length > 0 &&
+      !!userId &&
+      !isAuthLoading &&
+      guestDraftReady &&
+      !hydrated,
     staleTime: 0,
     gcTime: 0,
     refetchOnMount: "always",
@@ -97,7 +108,10 @@ export const useWorkTableMonthSession = ({
     retry: false,
     queryFn: async (): Promise<PersistedWorkTableRecords> => {
       if (!userId) throw new Error("An authenticated user is required");
-      const { startDate, endDate } = domain.services.dateService.getDatesRange(year, month);
+      const { startDate, endDate } = domain.services.dateService.getDatesRange(
+        year,
+        month,
+      );
       const [daysResult, shiftsResult] = await Promise.all([
         workDayService().fetchForMonth(userId, startDate, endDate).call(),
         shiftService().fetchForMonth(userId, startDate, endDate).call(),
@@ -109,7 +123,14 @@ export const useWorkTableMonthSession = ({
   });
 
   useEffect(() => {
-    if (!userId || hydrated || !query.isSuccess || query.isFetching || !query.data) return;
+    if (
+      !userId ||
+      hydrated ||
+      !query.isSuccess ||
+      query.isFetching ||
+      !query.data
+    )
+      return;
     dispatch({
       type: "hydrate",
       state: recordsToWorkTableDayState({
@@ -134,7 +155,10 @@ export const useWorkTableMonthSession = ({
   ]);
 
   useEffect(() => {
-    if (isAuthLoading || (userId && (!hydrated || !query.isSuccess || query.isFetching))) {
+    if (
+      isAuthLoading ||
+      (userId && (!hydrated || !query.isSuccess || query.isFetching))
+    ) {
       return;
     }
 

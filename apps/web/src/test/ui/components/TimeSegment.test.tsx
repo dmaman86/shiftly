@@ -27,7 +27,7 @@ describe("TimeSegment", () => {
 
     it("should apply custom background color", () => {
       const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} color="#ff5722" />
+        <TimeSegment {...defaultProps} color="#ff5722" />,
       );
 
       const segment = container.firstChild as HTMLElement;
@@ -36,7 +36,7 @@ describe("TimeSegment", () => {
 
     it("should apply flex value for width proportions", () => {
       const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} flex={3} />
+        <TimeSegment {...defaultProps} flex={3} />,
       );
 
       const segment = container.firstChild as HTMLElement;
@@ -84,7 +84,7 @@ describe("TimeSegment", () => {
   describe("Different Time Formats", () => {
     it("should handle midnight time correctly", () => {
       renderWithTheme(
-        <TimeSegment {...defaultProps} from="00:00" to="06:00" />
+        <TimeSegment {...defaultProps} from="00:00" to="06:00" />,
       );
 
       expect(screen.getByText("00:00")).toBeInTheDocument();
@@ -93,7 +93,7 @@ describe("TimeSegment", () => {
 
     it("should handle late night hours", () => {
       renderWithTheme(
-        <TimeSegment {...defaultProps} from="22:00" to="23:59" />
+        <TimeSegment {...defaultProps} from="22:00" to="23:59" />,
       );
 
       expect(screen.getByText("22:00")).toBeInTheDocument();
@@ -102,7 +102,7 @@ describe("TimeSegment", () => {
 
     it("should handle same start and end time", () => {
       renderWithTheme(
-        <TimeSegment {...defaultProps} from="12:00" to="12:00" />
+        <TimeSegment {...defaultProps} from="12:00" to="12:00" />,
       );
 
       const times = screen.getAllByText("12:00");
@@ -123,7 +123,7 @@ describe("TimeSegment", () => {
 
     it("should render empty label", () => {
       const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} label="" />
+        <TimeSegment {...defaultProps} label="" />,
       );
 
       // Label box should still exist but be empty
@@ -132,7 +132,7 @@ describe("TimeSegment", () => {
 
     it("should render multi-word labels", () => {
       renderWithTheme(
-        <TimeSegment {...defaultProps} label="Overtime Premium" />
+        <TimeSegment {...defaultProps} label="Overtime Premium" />,
       );
       expect(screen.getByText("Overtime Premium")).toBeInTheDocument();
     });
@@ -141,7 +141,7 @@ describe("TimeSegment", () => {
   describe("Color Variations", () => {
     it("should accept hex color codes", () => {
       const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} color="#2196f3" />
+        <TimeSegment {...defaultProps} color="#2196f3" />,
       );
 
       const segment = container.firstChild as HTMLElement;
@@ -150,7 +150,7 @@ describe("TimeSegment", () => {
 
     it("should accept rgb color values", () => {
       const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} color="rgb(255, 87, 34)" />
+        <TimeSegment {...defaultProps} color="rgb(255, 87, 34)" />,
       );
 
       const segment = container.firstChild as HTMLElement;
@@ -161,7 +161,7 @@ describe("TimeSegment", () => {
       // Named colors are accepted as valid props
       // MUI will handle the conversion internally
       const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} color="red" />
+        <TimeSegment {...defaultProps} color="red" />,
       );
 
       const segment = container.firstChild as HTMLElement;
@@ -172,7 +172,7 @@ describe("TimeSegment", () => {
   describe("Flex Sizing", () => {
     it("should handle small flex values (short duration)", () => {
       const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} flex={1} />
+        <TimeSegment {...defaultProps} flex={1} />,
       );
 
       const segment = container.firstChild as HTMLElement;
@@ -181,7 +181,7 @@ describe("TimeSegment", () => {
 
     it("should handle large flex values (long duration)", () => {
       const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} flex={10} />
+        <TimeSegment {...defaultProps} flex={10} />,
       );
 
       const segment = container.firstChild as HTMLElement;
@@ -190,7 +190,7 @@ describe("TimeSegment", () => {
 
     it("should handle decimal flex values", () => {
       const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} flex={2.5} />
+        <TimeSegment {...defaultProps} flex={2.5} />,
       );
 
       const segment = container.firstChild as HTMLElement;
@@ -199,7 +199,7 @@ describe("TimeSegment", () => {
 
     it("should handle zero flex value", () => {
       const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} flex={0} />
+        <TimeSegment {...defaultProps} flex={0} />,
       );
 
       const segment = container.firstChild as HTMLElement;
@@ -249,7 +249,7 @@ describe("TimeSegment", () => {
 
     it("should handle special characters in times", () => {
       renderWithTheme(
-        <TimeSegment {...defaultProps} from="08:30" to="14:45" />
+        <TimeSegment {...defaultProps} from="08:30" to="14:45" />,
       );
 
       expect(screen.getByText("08:30")).toBeInTheDocument();
@@ -265,7 +265,7 @@ describe("TimeSegment", () => {
           flex={8}
           color="#ff9800"
           crossDay={true}
-        />
+        />,
       );
 
       expect(screen.getByText("09:00")).toBeInTheDocument();

@@ -28,7 +28,11 @@ import { FeatureBoundary } from "@/layout";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const { t } = useTranslation("work-table");
-  const { workDays, isLoading: loading, error: queryError } = useWorkDays(domain);
+  const {
+    workDays,
+    isLoading: loading,
+    error: queryError,
+  } = useWorkDays(domain);
   const error = queryError?.message;
 
   return (
@@ -78,7 +82,9 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
               <ConfigPanel domain={domain} mode={"daily"} />
 
               <MonthlyContentBoundary loading={loading} minHeight={600}>
-                {error ? <Alert severity="error">{error}</Alert> : (
+                {error ? (
+                  <Alert severity="error">{error}</Alert>
+                ) : (
                   <DailyMonthlyContent domain={domain} workDays={workDays} />
                 )}
               </MonthlyContentBoundary>
@@ -90,7 +96,10 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   );
 };
 
-const DailyMonthlyContent = ({ domain, workDays }: {
+const DailyMonthlyContent = ({
+  domain,
+  workDays,
+}: {
   domain: DomainContextType;
   workDays: ReturnType<typeof useWorkDays>["workDays"];
 }) => {
@@ -127,7 +136,10 @@ const DailyMonthlyContent = ({ domain, workDays }: {
             errorContext="MonthlySalarySummary"
             resetKeys={[year, month]}
           >
-            <MonthlySalarySummary domain={domain} monthFullBreakdown={monthFullBreakdown} />
+            <MonthlySalarySummary
+              domain={domain}
+              monthFullBreakdown={monthFullBreakdown}
+            />
           </FeatureBoundary>
           <Feedback />
         </>

@@ -32,7 +32,9 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
   const { year, month, selectMonth } = useGlobalState();
   const pickerButtonRef = useRef<HTMLButtonElement>(null);
   const period = `${year}:${month}`;
-  const [draft, setDraft] = useState<Date | null>(() => new Date(year, month - 1, 1));
+  const [draft, setDraft] = useState<Date | null>(
+    () => new Date(year, month - 1, 1),
+  );
   const [draftPeriod, setDraftPeriod] = useState(period);
   if (draftPeriod !== period) {
     setDraftPeriod(period);
@@ -94,7 +96,11 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                   sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
                 >
                   <CalendarTodayIcon fontSize="small" color="primary" />
-                  <Typography variant="subtitle1" component="h3" fontWeight="bold">
+                  <Typography
+                    variant="subtitle1"
+                    component="h3"
+                    fontWeight="bold"
+                  >
                     {t("config.date_section")}
                   </Typography>
                 </Box>
@@ -110,18 +116,26 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                       openTo="month"
                       // View drafts stay local until acceptance, including on mobile.
                       onAccept={(value, context) => {
-                        if (context.validationError === null) commitMonth(value);
+                        if (context.validationError === null)
+                          commitMonth(value);
                       }}
                       onChange={(value, context) => {
                         setDraft(value);
                         // Keep direct keyboard edits working without a dialog.
-                        if (context.source === "field" && context.validationError === null) {
+                        if (
+                          context.source === "field" &&
+                          context.validationError === null
+                        ) {
                           commitMonth(value);
                         }
                       }}
                       onClose={() => {
                         // Wait until the dialog's focus trap is closed.
-                        queueMicrotask(() => pickerButtonRef.current?.focus({ preventScroll: true }));
+                        queueMicrotask(() =>
+                          pickerButtonRef.current?.focus({
+                            preventScroll: true,
+                          }),
+                        );
                       }}
                       slotProps={{
                         textField: { size: "small", fullWidth: true },
@@ -177,7 +191,11 @@ export const ConfigPanel = ({ domain, mode }: ConfigPanelProps) => {
                   sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
                 >
                   <PaymentsIcon fontSize="small" color="primary" />
-                  <Typography variant="subtitle1" component="h3" fontWeight="bold">
+                  <Typography
+                    variant="subtitle1"
+                    component="h3"
+                    fontWeight="bold"
+                  >
                     {t("config.work_params_section")}
                   </Typography>
                 </Box>

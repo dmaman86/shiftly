@@ -49,5 +49,7 @@ export const prepareApp = async (
 /** Pixels the document extends past the viewport width; 0 means no horizontal page scroll. */
 export const getHorizontalOverflow = (page: Page) =>
   page.evaluate(
-    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    () =>
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
   );

@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { RegularByDayCalculator } from "../../../src/calculator/regular/regularByDay.calculator.js";
-import type { RegularInput, RegularConfig } from "../../../src/types/data-shapes.js";
+import type {
+  RegularInput,
+  RegularConfig,
+} from "../../../src/types/data-shapes.js";
 import { WorkDayType } from "../../../src/constants/index.js";
 
 describe("RegularByDayCalculator", () => {

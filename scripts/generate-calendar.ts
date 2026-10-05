@@ -44,14 +44,20 @@ const toCalendarItem = (value: unknown): CalendarItem | undefined => {
 };
 
 const fetchYear = async (year: number): Promise<CalendarItem[]> => {
-  const response = await fetch(buildHebcalUrl(`${year}-01-01`, `${year}-12-31`));
+  const response = await fetch(
+    buildHebcalUrl(`${year}-01-01`, `${year}-12-31`),
+  );
   if (!response.ok) {
-    throw new Error(`Hebcal request for ${year} failed with status ${response.status}`);
+    throw new Error(
+      `Hebcal request for ${year} failed with status ${response.status}`,
+    );
   }
 
   const payload: unknown = await response.json();
   if (!isRecord(payload) || !Array.isArray(payload.items)) {
-    throw new Error(`Invalid Hebcal response for ${year}: items must be an array`);
+    throw new Error(
+      `Invalid Hebcal response for ${year}: items must be an array`,
+    );
   }
 
   return payload.items

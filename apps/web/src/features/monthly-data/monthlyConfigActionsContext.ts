@@ -8,8 +8,10 @@ type MonthlyConfigActions = {
 
 // Isolated guest editors can work without a remote monthly session.
 export const MonthlyConfigActionsContext = createContext<MonthlyConfigActions>({
-  updateStandardHours: (value) => useGlobalStore.getState().updateStandardHours(value),
+  updateStandardHours: (value) =>
+    useGlobalStore.getState().updateStandardHours(value),
   updateBaseRate: (value) => useGlobalStore.getState().updateBaseRate(value),
 });
 
-export const useMonthlyConfigActions = () => useContext(MonthlyConfigActionsContext);
+export const useMonthlyConfigActions = () =>
+  useContext(MonthlyConfigActionsContext);

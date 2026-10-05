@@ -45,7 +45,9 @@ export const ShiftCrossDayDutyControls = ({
       }
     >
       <Checkbox
-        slotProps={{ input: { "aria-label": t("shift_row.tooltip_cross_day") } }}
+        slotProps={{
+          input: { "aria-label": t("shift_row.tooltip_cross_day") },
+        }}
         data-testid="shift-cross-day-toggle"
         checked={crossDay}
         onChange={(event) => onToggleNextDay(event.target.checked)}
@@ -158,7 +160,11 @@ export const ShiftEditorFields = ({
     >
       <ShiftTimeInput
         label={showLabels ? t("headers.entry") : ""}
-        accessibleLabel={t("a11y.shift_time", { field: t("headers.entry"), number: shiftNumber, date: shift.start.date.toLocaleDateString() })}
+        accessibleLabel={t("a11y.shift_time", {
+          field: t("headers.entry"),
+          number: shiftNumber,
+          date: shift.start.date.toLocaleDateString(),
+        })}
         value={shift.start.date}
         onChange={(value) => onChange("start", value)}
         disabled={disabled}
@@ -168,10 +174,18 @@ export const ShiftEditorFields = ({
         <span>
           <ShiftTimeInput
             label={showLabels ? t("headers.exit") : ""}
-            accessibleLabel={t("a11y.shift_time", { field: t("headers.exit"), number: shiftNumber, date: shift.start.date.toLocaleDateString() })}
-            errorMessage={hasOverlap ? t("a11y.overlap")
-              : shift.start.date.getTime() === shift.end.date.getTime()
-                ? t("a11y.equal_times") : t("a11y.invalid_range")}
+            accessibleLabel={t("a11y.shift_time", {
+              field: t("headers.exit"),
+              number: shiftNumber,
+              date: shift.start.date.toLocaleDateString(),
+            })}
+            errorMessage={
+              hasOverlap
+                ? t("a11y.overlap")
+                : shift.start.date.getTime() === shift.end.date.getTime()
+                  ? t("a11y.equal_times")
+                  : t("a11y.invalid_range")
+            }
             value={shift.end.date}
             onChange={(value) => onChange("end", value)}
             disabled={disabled}

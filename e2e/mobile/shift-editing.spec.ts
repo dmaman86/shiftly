@@ -64,14 +64,18 @@ test("adds, edits and deletes a shift on the day card", async ({ page }) => {
   await expect(actualHours).toHaveText("");
 });
 
-test("marking a day as sick clears its shifts and locks editing", async ({ page }) => {
+test("marking a day as sick clears its shifts and locks editing", async ({
+  page,
+}) => {
   const dayCard = page.getByTestId(`work-day-card-${TODAY}`);
   const addShift = dayCard.getByTestId(`work-day-add-shift-${TODAY}`);
 
   await addShift.click();
   await fillTime(dayCard.getByRole("group", { name: "כניסה" }), "08:00");
   await fillTime(dayCard.getByRole("group", { name: "יציאה" }), "12:00");
-  await expect(dayCard.getByTestId(`work-day-${TODAY}-actual-hours`)).toHaveText("4.00");
+  await expect(
+    dayCard.getByTestId(`work-day-${TODAY}-actual-hours`),
+  ).toHaveText("4.00");
 
   const sick = dayCard.getByRole("checkbox", { name: "מחלה" });
   await sick.check();
@@ -79,7 +83,9 @@ test("marking a day as sick clears its shifts and locks editing", async ({ page 
   await expect(sick).toBeChecked();
   await expect(dayCard.getByTestId(/^work-day-shift-card-/)).toHaveCount(0);
   await expect(addShift).toBeHidden();
-  await expect(dayCard.getByTestId(`work-day-${TODAY}-actual-hours`)).toHaveText("");
+  await expect(
+    dayCard.getByTestId(`work-day-${TODAY}-actual-hours`),
+  ).toHaveText("");
 
   await sick.uncheck();
   await expect(addShift).toBeVisible();

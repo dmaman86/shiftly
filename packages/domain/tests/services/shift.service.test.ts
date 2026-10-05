@@ -16,7 +16,7 @@ describe("ShiftService", () => {
   const createShift = (
     startDate: Date,
     endDate: Date,
-    isDuty: boolean = false
+    isDuty: boolean = false,
   ): Shift => ({
     id: "test-shift-1",
     start: { date: startDate },
@@ -100,7 +100,7 @@ describe("ShiftService", () => {
     it("should calculate duration for 8-hour shift (09:00 to 17:00)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 17, 0, 0)
+        new Date(2025, 0, 15, 17, 0, 0),
       );
 
       const result = service.getDurationShift(shift);
@@ -111,7 +111,7 @@ describe("ShiftService", () => {
     it("should calculate duration for 4-hour shift (10:00 to 14:00)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 10, 0, 0),
-        new Date(2025, 0, 15, 14, 0, 0)
+        new Date(2025, 0, 15, 14, 0, 0),
       );
 
       const result = service.getDurationShift(shift);
@@ -122,7 +122,7 @@ describe("ShiftService", () => {
     it("should calculate duration for 12-hour shift (08:00 to 20:00)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 8, 0, 0),
-        new Date(2025, 0, 15, 20, 0, 0)
+        new Date(2025, 0, 15, 20, 0, 0),
       );
 
       const result = service.getDurationShift(shift);
@@ -133,7 +133,7 @@ describe("ShiftService", () => {
     it("should calculate duration with half hours (09:00 to 13:30)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 13, 30, 0)
+        new Date(2025, 0, 15, 13, 30, 0),
       );
 
       const result = service.getDurationShift(shift);
@@ -144,7 +144,7 @@ describe("ShiftService", () => {
     it("should calculate duration for cross-day shift (22:00 to 06:00)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 22, 0, 0),
-        new Date(2025, 0, 16, 6, 0, 0)
+        new Date(2025, 0, 16, 6, 0, 0),
       );
 
       const result = service.getDurationShift(shift);
@@ -155,7 +155,7 @@ describe("ShiftService", () => {
     it("should calculate duration for night shift (23:00 to 07:00)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 23, 0, 0),
-        new Date(2025, 0, 16, 7, 0, 0)
+        new Date(2025, 0, 16, 7, 0, 0),
       );
 
       const result = service.getDurationShift(shift);
@@ -166,7 +166,7 @@ describe("ShiftService", () => {
     it("should calculate duration for very short shift (30 minutes)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 10, 0, 0),
-        new Date(2025, 0, 15, 10, 30, 0)
+        new Date(2025, 0, 15, 10, 30, 0),
       );
 
       const result = service.getDurationShift(shift);
@@ -177,7 +177,7 @@ describe("ShiftService", () => {
     it("should calculate duration for 24-hour shift", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 8, 0, 0),
-        new Date(2025, 0, 16, 8, 0, 0)
+        new Date(2025, 0, 16, 8, 0, 0),
       );
 
       const result = service.getDurationShift(shift);
@@ -188,7 +188,7 @@ describe("ShiftService", () => {
     it("should handle shifts with minutes (09:15 to 17:45)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 15, 0),
-        new Date(2025, 0, 15, 17, 45, 0)
+        new Date(2025, 0, 15, 17, 45, 0),
       );
 
       const result = service.getDurationShift(shift);
@@ -199,7 +199,7 @@ describe("ShiftService", () => {
     it("should calculate fractional hours correctly", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 10, 0, 0),
-        new Date(2025, 0, 15, 10, 15, 0)
+        new Date(2025, 0, 15, 10, 15, 0),
       );
 
       const result = service.getDurationShift(shift);
@@ -212,7 +212,7 @@ describe("ShiftService", () => {
     it("should return true for valid shift (end after start)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 17, 0, 0)
+        new Date(2025, 0, 15, 17, 0, 0),
       );
 
       const result = service.isValidShiftDuration(shift);
@@ -223,7 +223,7 @@ describe("ShiftService", () => {
     it("should return false for invalid shift (end before start)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 17, 0, 0),
-        new Date(2025, 0, 15, 9, 0, 0)
+        new Date(2025, 0, 15, 9, 0, 0),
       );
 
       const result = service.isValidShiftDuration(shift);
@@ -234,7 +234,7 @@ describe("ShiftService", () => {
     it("should return false for zero duration shift (same time)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 9, 0, 0)
+        new Date(2025, 0, 15, 9, 0, 0),
       );
 
       const result = service.isValidShiftDuration(shift);
@@ -245,7 +245,7 @@ describe("ShiftService", () => {
     it("should return true for cross-day shift", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 22, 0, 0),
-        new Date(2025, 0, 16, 6, 0, 0)
+        new Date(2025, 0, 16, 6, 0, 0),
       );
 
       const result = service.isValidShiftDuration(shift);
@@ -256,7 +256,7 @@ describe("ShiftService", () => {
     it("should return true for shift lasting 1 second", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 9, 0, 1)
+        new Date(2025, 0, 15, 9, 0, 1),
       );
 
       const result = service.isValidShiftDuration(shift);
@@ -267,7 +267,7 @@ describe("ShiftService", () => {
     it("should return true for 24-hour shift", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 8, 0, 0),
-        new Date(2025, 0, 16, 8, 0, 0)
+        new Date(2025, 0, 16, 8, 0, 0),
       );
 
       const result = service.isValidShiftDuration(shift);
@@ -278,7 +278,7 @@ describe("ShiftService", () => {
     it("should validate very short shifts", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 10, 0, 0),
-        new Date(2025, 0, 15, 10, 1, 0)
+        new Date(2025, 0, 15, 10, 1, 0),
       );
 
       const result = service.isValidShiftDuration(shift);
@@ -291,7 +291,7 @@ describe("ShiftService", () => {
     it("should add one day when toNextDay is true", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 17, 0, 0)
+        new Date(2025, 0, 15, 17, 0, 0),
       );
 
       const result = service.toggleNextDay(shift, true);
@@ -304,7 +304,7 @@ describe("ShiftService", () => {
     it("should subtract one day when toNextDay is false", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 16, 6, 0, 0)
+        new Date(2025, 0, 16, 6, 0, 0),
       );
 
       const result = service.toggleNextDay(shift, false);
@@ -317,7 +317,7 @@ describe("ShiftService", () => {
     it("should maintain time when toggling", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 17, 30, 0)
+        new Date(2025, 0, 15, 17, 30, 0),
       );
 
       const result = service.toggleNextDay(shift, true);
@@ -329,7 +329,7 @@ describe("ShiftService", () => {
     it("should handle month boundaries when adding day", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 31, 17, 0, 0)
+        new Date(2025, 0, 31, 17, 0, 0),
       );
 
       const result = service.toggleNextDay(shift, true);
@@ -341,7 +341,7 @@ describe("ShiftService", () => {
     it("should handle month boundaries when subtracting day", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 1, 1, 17, 0, 0)
+        new Date(2025, 1, 1, 17, 0, 0),
       );
 
       const result = service.toggleNextDay(shift, false);
@@ -353,7 +353,7 @@ describe("ShiftService", () => {
     it("should handle year boundaries when adding day", () => {
       const shift = createShift(
         new Date(2024, 11, 15, 9, 0, 0),
-        new Date(2024, 11, 31, 23, 0, 0)
+        new Date(2024, 11, 31, 23, 0, 0),
       );
 
       const result = service.toggleNextDay(shift, true);
@@ -366,7 +366,7 @@ describe("ShiftService", () => {
     it("should handle year boundaries when subtracting day", () => {
       const shift = createShift(
         new Date(2024, 11, 15, 9, 0, 0),
-        new Date(2025, 0, 1, 6, 0, 0)
+        new Date(2025, 0, 1, 6, 0, 0),
       );
 
       const result = service.toggleNextDay(shift, false);
@@ -379,7 +379,7 @@ describe("ShiftService", () => {
     it("should return TimeFieldType with date property", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 17, 0, 0)
+        new Date(2025, 0, 15, 17, 0, 0),
       );
 
       const result = service.toggleNextDay(shift, true);
@@ -393,7 +393,7 @@ describe("ShiftService", () => {
     it("should return false for same-day shift", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 17, 0, 0)
+        new Date(2025, 0, 15, 17, 0, 0),
       );
 
       const result = service.isCrossDay(shift);
@@ -404,7 +404,7 @@ describe("ShiftService", () => {
     it("should return true for cross-day shift", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 22, 0, 0),
-        new Date(2025, 0, 16, 6, 0, 0)
+        new Date(2025, 0, 16, 6, 0, 0),
       );
 
       const result = service.isCrossDay(shift);
@@ -415,7 +415,7 @@ describe("ShiftService", () => {
     it("should return true for night shift (23:00 to 07:00)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 23, 0, 0),
-        new Date(2025, 0, 16, 7, 0, 0)
+        new Date(2025, 0, 16, 7, 0, 0),
       );
 
       const result = service.isCrossDay(shift);
@@ -426,7 +426,7 @@ describe("ShiftService", () => {
     it("should return false for shift ending at 23:59 same day", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 23, 59, 0)
+        new Date(2025, 0, 15, 23, 59, 0),
       );
 
       const result = service.isCrossDay(shift);
@@ -437,7 +437,7 @@ describe("ShiftService", () => {
     it("should return true for shift ending at 00:00 next day", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 16, 0, 0, 0)
+        new Date(2025, 0, 16, 0, 0, 0),
       );
 
       const result = service.isCrossDay(shift);
@@ -448,7 +448,7 @@ describe("ShiftService", () => {
     it("should return true for 24-hour shift", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 8, 0, 0),
-        new Date(2025, 0, 16, 8, 0, 0)
+        new Date(2025, 0, 16, 8, 0, 0),
       );
 
       const result = service.isCrossDay(shift);
@@ -459,7 +459,7 @@ describe("ShiftService", () => {
     it("should return true for shift spanning 2 days", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 8, 0, 0),
-        new Date(2025, 0, 17, 8, 0, 0)
+        new Date(2025, 0, 17, 8, 0, 0),
       );
 
       const result = service.isCrossDay(shift);
@@ -470,7 +470,7 @@ describe("ShiftService", () => {
     it("should handle month boundaries", () => {
       const shift = createShift(
         new Date(2025, 0, 31, 22, 0, 0),
-        new Date(2025, 1, 1, 6, 0, 0)
+        new Date(2025, 1, 1, 6, 0, 0),
       );
 
       const result = service.isCrossDay(shift);
@@ -481,7 +481,7 @@ describe("ShiftService", () => {
     it("should handle year boundaries", () => {
       const shift = createShift(
         new Date(2024, 11, 31, 22, 0, 0),
-        new Date(2025, 0, 1, 6, 0, 0)
+        new Date(2025, 0, 1, 6, 0, 0),
       );
 
       const result = service.isCrossDay(shift);
@@ -494,7 +494,7 @@ describe("ShiftService", () => {
     it("should handle typical day shift workflow", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 17, 0, 0)
+        new Date(2025, 0, 15, 17, 0, 0),
       );
 
       // Check if it's a cross-day shift
@@ -513,7 +513,7 @@ describe("ShiftService", () => {
     it("should handle typical night shift workflow", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 22, 0, 0),
-        new Date(2025, 0, 16, 6, 0, 0)
+        new Date(2025, 0, 16, 6, 0, 0),
       );
 
       // Check if it's a cross-day shift
@@ -532,7 +532,7 @@ describe("ShiftService", () => {
     it("should handle toggling cross-day shift to same-day", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 22, 0, 0),
-        new Date(2025, 0, 16, 2, 0, 0)
+        new Date(2025, 0, 16, 2, 0, 0),
       );
 
       // Initially cross-day
@@ -549,7 +549,7 @@ describe("ShiftService", () => {
     it("should handle toggling same-day shift to cross-day", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 22, 0, 0),
-        new Date(2025, 0, 15, 23, 30, 0)
+        new Date(2025, 0, 15, 23, 30, 0),
       );
 
       // Initially same day
@@ -566,13 +566,13 @@ describe("ShiftService", () => {
     it("should calculate minutes correctly for complex cross-day shift", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 22, 30, 0),
-        new Date(2025, 0, 16, 6, 45, 0)
+        new Date(2025, 0, 16, 6, 45, 0),
       );
 
       const startMinutes = service.getMinutesFromMidnight(shift.start.date);
       const endMinutes = service.getMinutesFromMidnight(
         shift.end.date,
-        shift.start.date
+        shift.start.date,
       );
 
       expect(startMinutes).toBe(1350); // 22*60 + 30
@@ -586,7 +586,7 @@ describe("ShiftService", () => {
       // Create a shift
       const shift = createShift(
         new Date(2025, 0, 15, 8, 0, 0),
-        new Date(2025, 0, 15, 16, 30, 0)
+        new Date(2025, 0, 15, 16, 30, 0),
       );
 
       // Validate it
@@ -613,7 +613,7 @@ describe("ShiftService", () => {
     it("should handle shift at exactly midnight", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 0, 0, 0),
-        new Date(2025, 0, 15, 8, 0, 0)
+        new Date(2025, 0, 15, 8, 0, 0),
       );
 
       const duration = service.getDurationShift(shift);
@@ -626,7 +626,7 @@ describe("ShiftService", () => {
     it("should handle shift ending at exactly midnight", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 16, 0, 0),
-        new Date(2025, 0, 16, 0, 0, 0)
+        new Date(2025, 0, 16, 0, 0, 0),
       );
 
       const duration = service.getDurationShift(shift);
@@ -639,7 +639,7 @@ describe("ShiftService", () => {
     it("should handle very long shift (48 hours)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 8, 0, 0),
-        new Date(2025, 0, 17, 8, 0, 0)
+        new Date(2025, 0, 17, 8, 0, 0),
       );
 
       const duration = service.getDurationShift(shift);
@@ -652,7 +652,7 @@ describe("ShiftService", () => {
     it("should handle shift with seconds precision", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 30),
-        new Date(2025, 0, 15, 17, 0, 30)
+        new Date(2025, 0, 15, 17, 0, 30),
       );
 
       const duration = service.getDurationShift(shift);
@@ -663,7 +663,7 @@ describe("ShiftService", () => {
     it("should handle leap year date", () => {
       const shift = createShift(
         new Date(2024, 1, 29, 9, 0, 0),
-        new Date(2024, 1, 29, 17, 0, 0)
+        new Date(2024, 1, 29, 17, 0, 0),
       );
 
       const isValid = service.isValidShiftDuration(shift);
@@ -676,7 +676,7 @@ describe("ShiftService", () => {
     it("should handle year boundary cross-day shift", () => {
       const shift = createShift(
         new Date(2024, 11, 31, 23, 0, 0),
-        new Date(2025, 0, 1, 7, 0, 0)
+        new Date(2025, 0, 1, 7, 0, 0),
       );
 
       const duration = service.getDurationShift(shift);
@@ -689,7 +689,7 @@ describe("ShiftService", () => {
     it("should handle toggling at month boundary", () => {
       const shift = createShift(
         new Date(2025, 0, 31, 22, 0, 0),
-        new Date(2025, 0, 31, 23, 0, 0)
+        new Date(2025, 0, 31, 23, 0, 0),
       );
 
       const newEnd = service.toggleNextDay(shift, true);
@@ -701,7 +701,7 @@ describe("ShiftService", () => {
     it("should handle very short shift (1 minute)", () => {
       const shift = createShift(
         new Date(2025, 0, 15, 10, 0, 0),
-        new Date(2025, 0, 15, 10, 1, 0)
+        new Date(2025, 0, 15, 10, 1, 0),
       );
 
       const duration = service.getDurationShift(shift);
@@ -714,45 +714,81 @@ describe("ShiftService", () => {
 
   describe("overlaps", () => {
     it("returns true for two identical shifts (duplicate)", () => {
-      const a = createShift(new Date(2025, 0, 15, 6, 30, 0), new Date(2025, 0, 15, 15, 0, 0));
-      const b = createShift(new Date(2025, 0, 15, 6, 30, 0), new Date(2025, 0, 15, 15, 0, 0));
+      const a = createShift(
+        new Date(2025, 0, 15, 6, 30, 0),
+        new Date(2025, 0, 15, 15, 0, 0),
+      );
+      const b = createShift(
+        new Date(2025, 0, 15, 6, 30, 0),
+        new Date(2025, 0, 15, 15, 0, 0),
+      );
 
       expect(service.overlaps(a, b)).toBe(true);
     });
 
     it("returns true when one shift starts in the middle of another", () => {
-      const a = createShift(new Date(2025, 0, 15, 6, 30, 0), new Date(2025, 0, 15, 15, 0, 0));
-      const b = createShift(new Date(2025, 0, 15, 11, 0, 0), new Date(2025, 0, 15, 16, 0, 0));
+      const a = createShift(
+        new Date(2025, 0, 15, 6, 30, 0),
+        new Date(2025, 0, 15, 15, 0, 0),
+      );
+      const b = createShift(
+        new Date(2025, 0, 15, 11, 0, 0),
+        new Date(2025, 0, 15, 16, 0, 0),
+      );
 
       expect(service.overlaps(a, b)).toBe(true);
       expect(service.overlaps(b, a)).toBe(true);
     });
 
     it("returns true when one shift fully contains another", () => {
-      const outer = createShift(new Date(2025, 0, 15, 6, 0, 0), new Date(2025, 0, 15, 20, 0, 0));
-      const inner = createShift(new Date(2025, 0, 15, 10, 0, 0), new Date(2025, 0, 15, 12, 0, 0));
+      const outer = createShift(
+        new Date(2025, 0, 15, 6, 0, 0),
+        new Date(2025, 0, 15, 20, 0, 0),
+      );
+      const inner = createShift(
+        new Date(2025, 0, 15, 10, 0, 0),
+        new Date(2025, 0, 15, 12, 0, 0),
+      );
 
       expect(service.overlaps(outer, inner)).toBe(true);
     });
 
     it("returns false for back-to-back shifts sharing a boundary", () => {
-      const a = createShift(new Date(2025, 0, 15, 6, 30, 0), new Date(2025, 0, 15, 15, 0, 0));
-      const b = createShift(new Date(2025, 0, 15, 15, 0, 0), new Date(2025, 0, 15, 23, 0, 0));
+      const a = createShift(
+        new Date(2025, 0, 15, 6, 30, 0),
+        new Date(2025, 0, 15, 15, 0, 0),
+      );
+      const b = createShift(
+        new Date(2025, 0, 15, 15, 0, 0),
+        new Date(2025, 0, 15, 23, 0, 0),
+      );
 
       expect(service.overlaps(a, b)).toBe(false);
       expect(service.overlaps(b, a)).toBe(false);
     });
 
     it("returns false for shifts on unrelated time ranges", () => {
-      const a = createShift(new Date(2025, 0, 15, 6, 30, 0), new Date(2025, 0, 15, 15, 0, 0));
-      const b = createShift(new Date(2025, 0, 15, 18, 0, 0), new Date(2025, 0, 15, 22, 0, 0));
+      const a = createShift(
+        new Date(2025, 0, 15, 6, 30, 0),
+        new Date(2025, 0, 15, 15, 0, 0),
+      );
+      const b = createShift(
+        new Date(2025, 0, 15, 18, 0, 0),
+        new Date(2025, 0, 15, 22, 0, 0),
+      );
 
       expect(service.overlaps(a, b)).toBe(false);
     });
 
     it("compares by absolute timestamp, so a cross-day shift overlaps the next day's morning shift", () => {
-      const night = createShift(new Date(2025, 0, 15, 22, 0, 0), new Date(2025, 0, 16, 6, 0, 0));
-      const morning = createShift(new Date(2025, 0, 16, 5, 0, 0), new Date(2025, 0, 16, 13, 0, 0));
+      const night = createShift(
+        new Date(2025, 0, 15, 22, 0, 0),
+        new Date(2025, 0, 16, 6, 0, 0),
+      );
+      const morning = createShift(
+        new Date(2025, 0, 16, 5, 0, 0),
+        new Date(2025, 0, 16, 13, 0, 0),
+      );
 
       expect(service.overlaps(night, morning)).toBe(true);
     });
@@ -791,7 +827,7 @@ describe("ShiftService", () => {
 
       expect(mockDateService.getDaysDifference).toHaveBeenCalledWith(
         date,
-        reference
+        reference,
       );
       expect(result).toBe(1560); // 120 + 1*1440
     });
@@ -807,14 +843,14 @@ describe("ShiftService", () => {
       const testService = new ShiftService(mockDateService);
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 17, 0, 0)
+        new Date(2025, 0, 15, 17, 0, 0),
       );
 
       testService.isValidShiftDuration(shift);
 
       expect(mockDateService.isAfterDate).toHaveBeenCalledWith(
         shift.end.date,
-        shift.start.date
+        shift.start.date,
       );
     });
 
@@ -830,14 +866,14 @@ describe("ShiftService", () => {
       const testService = new ShiftService(mockDateService);
       const shift = createShift(
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 17, 0, 0)
+        new Date(2025, 0, 15, 17, 0, 0),
       );
 
       const result = testService.toggleNextDay(shift, true);
 
       expect(mockDateService.addDaysToDate).toHaveBeenCalledWith(
         shift.end.date,
-        1
+        1,
       );
       expect(result.date).toBe(newDate);
     });
@@ -853,14 +889,14 @@ describe("ShiftService", () => {
       const testService = new ShiftService(mockDateService);
       const shift = createShift(
         new Date(2025, 0, 15, 22, 0, 0),
-        new Date(2025, 0, 16, 6, 0, 0)
+        new Date(2025, 0, 16, 6, 0, 0),
       );
 
       const result = testService.isCrossDay(shift);
 
       expect(mockDateService.getDaysDifference).toHaveBeenCalledWith(
         shift.end.date,
-        shift.start.date
+        shift.start.date,
       );
       expect(result).toBe(true);
     });

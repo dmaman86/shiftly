@@ -10,14 +10,17 @@ describe("WorkDayInfoPresenter", () => {
   type WorkDayTestCase = DomainWorkDay & { weekdayLabel: string };
 
   beforeEach(() => {
-    resolver = new WorkDayInfoPresenter(new WorkDayInfoResolver(), new DateService());
+    resolver = new WorkDayInfoPresenter(
+      new WorkDayInfoResolver(),
+      new DateService(),
+    );
   });
 
   const createWorkDayInfo = (
     date: string,
     typeDay: WorkDayType,
     crossDayContinuation: boolean,
-    weekdayLabel: string
+    weekdayLabel: string,
   ): WorkDayTestCase => ({
     meta: {
       date,
@@ -33,7 +36,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-01",
         WorkDayType.Regular,
         false,
-        "א"
+        "א",
       );
 
       const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -46,7 +49,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-15",
         WorkDayType.Regular,
         false,
-        "ב"
+        "ב",
       );
 
       const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -59,7 +62,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         false,
-        "ו"
+        "ו",
       );
 
       const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -72,7 +75,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-06",
         WorkDayType.SpecialFull,
         false,
-        "ש"
+        "ש",
       );
 
       const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -97,7 +100,7 @@ describe("WorkDayInfoPresenter", () => {
           date,
           WorkDayType.Regular,
           false,
-          weekdayLabels[index]
+          weekdayLabels[index],
         );
 
         const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -111,7 +114,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         false,
-        "ו"
+        "ו",
       );
 
       const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -125,7 +128,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-25",
         WorkDayType.Regular,
         false,
-        "ה"
+        "ה",
       );
 
       const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -138,7 +141,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-31",
         WorkDayType.Regular,
         false,
-        "ד"
+        "ד",
       );
 
       const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -151,7 +154,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-15",
         WorkDayType.Regular,
         false,
-        "ב"
+        "ב",
       );
 
       const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -164,13 +167,13 @@ describe("WorkDayInfoPresenter", () => {
         "2024-02-14",
         WorkDayType.Regular,
         false,
-        "ד"
+        "ד",
       );
       const day2 = createWorkDayInfo(
         "2024-12-25",
         WorkDayType.Regular,
         false,
-        "ד"
+        "ד",
       );
 
       const result1 = resolver.formatWorkDayLabel(day1, day1.weekdayLabel);
@@ -185,7 +188,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-03-07",
         WorkDayType.Regular,
         false,
-        "ה"
+        "ה",
       );
 
       const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -199,7 +202,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-10",
         WorkDayType.Regular,
         false,
-        "ד"
+        "ד",
       );
 
       const result = resolver.formatWorkDayLabel(day, "We");
@@ -212,7 +215,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-31",
         WorkDayType.Regular,
         false,
-        "ד"
+        "ד",
       );
 
       expect(resolver.formatWorkDayLabel(day, day.weekdayLabel)).toBe("ד-31");
@@ -226,7 +229,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-02-29",
         WorkDayType.Regular,
         false,
-        "ה"
+        "ה",
       );
 
       const result = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -239,7 +242,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-01",
         WorkDayType.Regular,
         false,
-        "א"
+        "א",
       );
 
       expect(resolver.formatWorkDayLabel(day, day.weekdayLabel)).toBe("א-01");
@@ -253,7 +256,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-12-31",
         WorkDayType.Regular,
         false,
-        "ג"
+        "ג",
       );
 
       expect(resolver.formatWorkDayLabel(day, day.weekdayLabel)).toBe("ג-31");
@@ -285,13 +288,13 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-01",
         WorkDayType.Regular,
         true,
-        "א"
+        "א",
       );
       const dayFalse = createWorkDayInfo(
         "2024-01-01",
         WorkDayType.Regular,
         false,
-        "א"
+        "א",
       );
 
       expect(resolver.hasCrossDayContinuation(dayTrue)).toBe(true);
@@ -305,13 +308,15 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         true,
-        "ו"
+        "ו",
       );
 
       expect(resolver.isSpecialFullDay(friday)).toBe(false);
       expect(resolver.isPartialHolidayStart(friday)).toBe(true);
       expect(resolver.hasCrossDayContinuation(friday)).toBe(true);
-      expect(resolver.formatWorkDayLabel(friday, friday.weekdayLabel)).toBe("ו-05");
+      expect(resolver.formatWorkDayLabel(friday, friday.weekdayLabel)).toBe(
+        "ו-05",
+      );
     });
 
     it("should handle typical Shabbat (Saturday)", () => {
@@ -319,13 +324,15 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-06",
         WorkDayType.SpecialFull,
         false,
-        "ש"
+        "ש",
       );
 
       expect(resolver.isSpecialFullDay(saturday)).toBe(true);
       expect(resolver.isPartialHolidayStart(saturday)).toBe(false);
       expect(resolver.hasCrossDayContinuation(saturday)).toBe(false);
-      expect(resolver.formatWorkDayLabel(saturday, saturday.weekdayLabel)).toBe("ש-06");
+      expect(resolver.formatWorkDayLabel(saturday, saturday.weekdayLabel)).toBe(
+        "ש-06",
+      );
     });
 
     it("should handle typical weekday (Monday)", () => {
@@ -333,13 +340,15 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-01",
         WorkDayType.Regular,
         false,
-        "ב"
+        "ב",
       );
 
       expect(resolver.isSpecialFullDay(monday)).toBe(false);
       expect(resolver.isPartialHolidayStart(monday)).toBe(false);
       expect(resolver.hasCrossDayContinuation(monday)).toBe(false);
-      expect(resolver.formatWorkDayLabel(monday, monday.weekdayLabel)).toBe("ב-01");
+      expect(resolver.formatWorkDayLabel(monday, monday.weekdayLabel)).toBe(
+        "ב-01",
+      );
     });
 
     it("should handle Erev Pesach scenario", () => {
@@ -347,13 +356,15 @@ describe("WorkDayInfoPresenter", () => {
         "2024-04-22",
         WorkDayType.SpecialPartialStart,
         true,
-        "ב"
+        "ב",
       );
 
       expect(resolver.isSpecialFullDay(erevPesach)).toBe(false);
       expect(resolver.isPartialHolidayStart(erevPesach)).toBe(true);
       expect(resolver.hasCrossDayContinuation(erevPesach)).toBe(true);
-      expect(resolver.formatWorkDayLabel(erevPesach, erevPesach.weekdayLabel)).toBe("ב-22");
+      expect(
+        resolver.formatWorkDayLabel(erevPesach, erevPesach.weekdayLabel),
+      ).toBe("ב-22");
     });
 
     it("should handle Pesach I scenario", () => {
@@ -361,13 +372,15 @@ describe("WorkDayInfoPresenter", () => {
         "2024-04-23",
         WorkDayType.SpecialFull,
         false,
-        "ג"
+        "ג",
       );
 
       expect(resolver.isSpecialFullDay(pesach)).toBe(true);
       expect(resolver.isPartialHolidayStart(pesach)).toBe(false);
       expect(resolver.hasCrossDayContinuation(pesach)).toBe(false);
-      expect(resolver.formatWorkDayLabel(pesach, pesach.weekdayLabel)).toBe("ג-23");
+      expect(resolver.formatWorkDayLabel(pesach, pesach.weekdayLabel)).toBe(
+        "ג-23",
+      );
     });
 
     it("should handle regular Thursday before regular Friday", () => {
@@ -375,13 +388,15 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-04",
         WorkDayType.Regular,
         false,
-        "ה"
+        "ה",
       );
 
       expect(resolver.isSpecialFullDay(thursday)).toBe(false);
       expect(resolver.isPartialHolidayStart(thursday)).toBe(false);
       expect(resolver.hasCrossDayContinuation(thursday)).toBe(false);
-      expect(resolver.formatWorkDayLabel(thursday, thursday.weekdayLabel)).toBe("ה-04");
+      expect(resolver.formatWorkDayLabel(thursday, thursday.weekdayLabel)).toBe(
+        "ה-04",
+      );
     });
 
     it("should handle crossDayShift scenario starting Thursday night", () => {
@@ -389,13 +404,15 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-04",
         WorkDayType.Regular,
         true,
-        "ה"
+        "ה",
       );
 
       expect(resolver.isSpecialFullDay(thursday)).toBe(false);
       expect(resolver.isPartialHolidayStart(thursday)).toBe(false);
       expect(resolver.hasCrossDayContinuation(thursday)).toBe(true);
-      expect(resolver.formatWorkDayLabel(thursday, thursday.weekdayLabel)).toBe("ה-04");
+      expect(resolver.formatWorkDayLabel(thursday, thursday.weekdayLabel)).toBe(
+        "ה-04",
+      );
     });
   });
 
@@ -405,7 +422,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-05",
         WorkDayType.SpecialPartialStart,
         true,
-        "ו"
+        "ו",
       );
 
       const result1 = resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -421,7 +438,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-06",
         WorkDayType.SpecialFull,
         false,
-        "ש"
+        "ש",
       );
 
       expect(resolver.isSpecialFullDay(day)).toBe(true);
@@ -434,7 +451,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-15",
         WorkDayType.Regular,
         false,
-        "ב"
+        "ב",
       );
 
       resolver.formatWorkDayLabel(day, day.weekdayLabel);
@@ -454,7 +471,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-10",
         WorkDayType.Regular,
         false,
-        "ד"
+        "ד",
       );
 
       expect(resolver.isSpecialFullDay(day)).toBe(false);
@@ -468,7 +485,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-12",
         WorkDayType.SpecialPartialStart,
         true,
-        "ו"
+        "ו",
       );
 
       expect(resolver.isSpecialFullDay(day)).toBe(false);
@@ -482,7 +499,7 @@ describe("WorkDayInfoPresenter", () => {
         "2024-01-13",
         WorkDayType.SpecialFull,
         false,
-        "ש"
+        "ש",
       );
 
       expect(resolver.isSpecialFullDay(day)).toBe(true);

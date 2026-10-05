@@ -48,9 +48,10 @@ export const breakdownToDetailGroups = (
     key: "extras",
     title: t("headers.extras"),
     items: getAdditionGroups(breakdown.extra).map(({ key, kind, segment }) => ({
-      label: key === "hours20" || key === "hours50"
-        ? `${segment.percent * 100}%`
-        : t(`pay_labels.${kind}`, { percent: segment.percent * 100 }),
+      label:
+        key === "hours20" || key === "hours50"
+          ? `${segment.percent * 100}%`
+          : t(`pay_labels.${kind}`, { percent: segment.percent * 100 }),
       value: segment.hours,
     })),
   },

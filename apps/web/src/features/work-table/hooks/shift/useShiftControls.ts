@@ -1,6 +1,11 @@
 import { useCallback } from "react";
 
-import type { DateService, Shift, ShiftService, TimeFieldType } from "@shiftly/domain";
+import type {
+  DateService,
+  Shift,
+  ShiftService,
+  TimeFieldType,
+} from "@shiftly/domain";
 
 type UseShiftControlsParams = {
   dateService: DateService;
@@ -27,10 +32,8 @@ export const useShiftControls = ({
 
   const handleToggleNextDay = useCallback(
     (checked: boolean) => {
-      const crossDay = dateService.getDaysDifference(
-        shift.end.date,
-        shift.start.date,
-      ) > 0;
+      const crossDay =
+        dateService.getDaysDifference(shift.end.date, shift.start.date) > 0;
 
       if (crossDay === checked) return;
       onChange({

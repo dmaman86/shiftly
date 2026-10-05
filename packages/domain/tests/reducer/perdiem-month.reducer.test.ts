@@ -325,12 +325,11 @@ describe("DefaultPerDiemMonthReducer", () => {
             points: 1,
             amount: 100,
           },
-          add
+          add,
         );
 
         expect(add).toEqual(originalAdd);
       });
     });
   });
-
 });

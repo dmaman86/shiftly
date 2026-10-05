@@ -66,7 +66,7 @@ const CalendarDay = ({
                   content: '""',
                   position: "absolute",
                   bottom: 3,
-                  left: indicatorPosition(hasMultipleIndicators, "-") ,
+                  left: indicatorPosition(hasMultipleIndicators, "-"),
                   width: 4,
                   height: 4,
                   borderRadius: "50%",
@@ -112,16 +112,13 @@ export const MobileWorkTable = ({
     () => new Set(workDays.map((day) => day.meta.date)),
     [workDays],
   );
-  const initialDate =
-    workDays.some((day) => day.meta.date === currentDate)
-      ? currentDate
-      : firstDate;
+  const initialDate = workDays.some((day) => day.meta.date === currentDate)
+    ? currentDate
+    : firstDate;
   const [selectedDate, setSelectedDate] = useState(initialDate);
 
   const activeSelectedDate =
-    selectedDate && workDayDates.has(selectedDate)
-      ? selectedDate
-      : initialDate;
+    selectedDate && workDayDates.has(selectedDate) ? selectedDate : initialDate;
   const selectedWorkDay = workDays.find(
     (day) => day.meta.date === activeSelectedDate,
   );
@@ -141,7 +138,12 @@ export const MobileWorkTable = ({
   return (
     <Stack spacing={2}>
       <Box aria-label={t("table.mobile_calendar_label")}>
-        <Typography variant="subtitle1" component="h3" fontWeight="bold" sx={{ mb: 1 }}>
+        <Typography
+          variant="subtitle1"
+          component="h3"
+          fontWeight="bold"
+          sx={{ mb: 1 }}
+        >
           {t("table.mobile_calendar_label")}
         </Typography>
         <StaticDatePicker

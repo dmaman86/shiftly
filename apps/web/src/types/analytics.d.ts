@@ -9,10 +9,7 @@ interface GtagParams {
 }
 
 type DataLayerValue =
-  | GtagPrimitive
-  | Date
-  | { [key: string]: DataLayerValue }
-  | DataLayerValue[];
+  GtagPrimitive | Date | { [key: string]: DataLayerValue } | DataLayerValue[];
 
 declare global {
   interface Window {

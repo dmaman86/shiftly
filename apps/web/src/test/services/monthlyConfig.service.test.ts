@@ -53,7 +53,9 @@ describe("monthlyConfigService", () => {
   it("returns null data when no config was ever saved for that month", async () => {
     const maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
     fromMock.mockReturnValue({
-      select: () => ({ eq: () => ({ eq: () => ({ eq: () => ({ maybeSingle }) }) }) }),
+      select: () => ({
+        eq: () => ({ eq: () => ({ eq: () => ({ maybeSingle }) }) }),
+      }),
     });
 
     const result = await monthlyConfigService().fetch("user-1", 2026, 8).call();
@@ -67,7 +69,9 @@ describe("monthlyConfigService", () => {
       error: { message: "connection lost" },
     });
     fromMock.mockReturnValue({
-      select: () => ({ eq: () => ({ eq: () => ({ eq: () => ({ maybeSingle }) }) }) }),
+      select: () => ({
+        eq: () => ({ eq: () => ({ eq: () => ({ maybeSingle }) }) }),
+      }),
     });
 
     const result = await monthlyConfigService().fetch("user-1", 2026, 8).call();
@@ -91,11 +95,18 @@ describe("monthlyConfigService", () => {
   });
 
   it("returns an error when the upsert fails", async () => {
-    const upsert = vi.fn().mockResolvedValue({ data: null, error: { message: "denied" } });
+    const upsert = vi
+      .fn()
+      .mockResolvedValue({ data: null, error: { message: "denied" } });
     fromMock.mockReturnValue({ upsert });
 
     const result = await monthlyConfigService()
-      .upsert("user-1", { year: 2026, month: 8, standard_hours: 7, base_rate: 55 })
+      .upsert("user-1", {
+        year: 2026,
+        month: 8,
+        standard_hours: 7,
+        base_rate: 55,
+      })
       .call();
 
     expect(result).toEqual({ error: "denied" });

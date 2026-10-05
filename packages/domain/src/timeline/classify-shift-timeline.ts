@@ -68,7 +68,10 @@ export const classifyShiftTimeline = ({
 
     appendDayIntervals({
       intervals,
-      start: Math.max(start, needsContinuationSegment ? continuationEnd : dayStart),
+      start: Math.max(
+        start,
+        needsContinuationSegment ? continuationEnd : dayStart,
+      ),
       end: dayEnd,
       typeDay,
       date,
@@ -147,7 +150,8 @@ const appendDayIntervals = (params: {
   }
 
   const specialStart = dateService.getSpecialStartMinutes(date);
-  const absoluteSpecialStart = Math.floor(start / MINUTES_PER_DAY) * MINUTES_PER_DAY + specialStart;
+  const absoluteSpecialStart =
+    Math.floor(start / MINUTES_PER_DAY) * MINUTES_PER_DAY + specialStart;
   const regularEnd = Math.min(end, absoluteSpecialStart);
 
   if (start < regularEnd) {

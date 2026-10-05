@@ -33,17 +33,45 @@ describe("MonthPayMapReducer", () => {
       })),
       accumulate: vi.fn((base, add) => ({
         regular: {
-          hours100: { percent: 1, hours: base.regular.hours100.hours + add.workMap.regular.hours100.hours },
-          hours125: { percent: 1.25, hours: base.regular.hours125.hours + add.workMap.regular.hours125.hours },
-          hours150: { percent: 1.5, hours: base.regular.hours150.hours + add.workMap.regular.hours150.hours },
+          hours100: {
+            percent: 1,
+            hours:
+              base.regular.hours100.hours + add.workMap.regular.hours100.hours,
+          },
+          hours125: {
+            percent: 1.25,
+            hours:
+              base.regular.hours125.hours + add.workMap.regular.hours125.hours,
+          },
+          hours150: {
+            percent: 1.5,
+            hours:
+              base.regular.hours150.hours + add.workMap.regular.hours150.hours,
+          },
         },
         extra: {
-          hours20: { percent: 0.2, hours: base.extra.hours20.hours + add.workMap.extra.hours20.hours },
-          hours50: { percent: 0.5, hours: base.extra.hours50.hours + add.workMap.extra.hours50.hours },
+          hours20: {
+            percent: 0.2,
+            hours: base.extra.hours20.hours + add.workMap.extra.hours20.hours,
+          },
+          hours50: {
+            percent: 0.5,
+            hours: base.extra.hours50.hours + add.workMap.extra.hours50.hours,
+          },
         },
         special: {
-          shabbat150: { percent: 1.5, hours: base.special.shabbat150.hours + add.workMap.special.shabbat150.hours },
-          shabbat200: { percent: 2, hours: base.special.shabbat200.hours + add.workMap.special.shabbat200.hours },
+          shabbat150: {
+            percent: 1.5,
+            hours:
+              base.special.shabbat150.hours +
+              add.workMap.special.shabbat150.hours,
+          },
+          shabbat200: {
+            percent: 2,
+            hours:
+              base.special.shabbat200.hours +
+              add.workMap.special.shabbat200.hours,
+          },
         },
       })),
     } as unknown as WorkDayMonthReducer;
@@ -56,9 +84,18 @@ describe("MonthPayMapReducer", () => {
         earnedShabbatCredit: { percent: 1.5, hours: 0 },
       })),
       accumulate: vi.fn((base, add) => ({
-        hours100Sick: { percent: 1, hours: base.hours100Sick.hours + add.hours100Sick.hours },
-        hours100Vacation: { percent: 1, hours: base.hours100Vacation.hours + add.hours100Vacation.hours },
-        earnedShabbatCredit: { percent: 1.5, hours: base.earnedShabbatCredit.hours + add.earnedShabbatCredit.hours },
+        hours100Sick: {
+          percent: 1,
+          hours: base.hours100Sick.hours + add.hours100Sick.hours,
+        },
+        hours100Vacation: {
+          percent: 1,
+          hours: base.hours100Vacation.hours + add.hours100Vacation.hours,
+        },
+        earnedShabbatCredit: {
+          percent: 1.5,
+          hours: base.earnedShabbatCredit.hours + add.earnedShabbatCredit.hours,
+        },
       })),
     } as unknown as FixedSegmentMonthReducer;
 
@@ -69,8 +106,14 @@ describe("MonthPayMapReducer", () => {
         large: { points: 0, amount: 0 },
       })),
       accumulate: vi.fn((base, add) => ({
-        small: { points: base.small.points + add.small.points, amount: base.small.amount + add.small.amount },
-        large: { points: base.large.points + add.large.points, amount: base.large.amount + add.large.amount },
+        small: {
+          points: base.small.points + add.small.points,
+          amount: base.small.amount + add.small.amount,
+        },
+        large: {
+          points: base.large.points + add.large.points,
+          amount: base.large.amount + add.large.amount,
+        },
       })),
     } as unknown as MealAllowanceMonthReducer;
 
@@ -88,7 +131,12 @@ describe("MonthPayMapReducer", () => {
       })),
     } as unknown as PerDiemMonthReducer;
 
-    reducer = new MonthPayMapReducer(mockWorkPay, mockFixed, mockAllowances, mockPerDiem);
+    reducer = new MonthPayMapReducer(
+      mockWorkPay,
+      mockFixed,
+      mockAllowances,
+      mockPerDiem,
+    );
   });
 
   describe("createEmpty", () => {
@@ -329,7 +377,7 @@ describe("MonthPayMapReducer", () => {
 
       expect(mockPerDiem.accumulate).toHaveBeenCalledWith(
         base.perDiem,
-        add.perDiem!.diemInfo
+        add.perDiem!.diemInfo,
       );
     });
 
@@ -372,7 +420,7 @@ describe("MonthPayMapReducer", () => {
 
       expect(mockAllowances.accumulate).toHaveBeenCalledWith(
         base.mealAllowance,
-        add.mealAllowance
+        add.mealAllowance,
       );
     });
 

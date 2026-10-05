@@ -94,10 +94,14 @@ export const DayCardDetails = ({
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
-            sx={{ minHeight: 40, "& .MuiAccordionSummary-content": { my: 0.75 } }}
+            sx={{
+              minHeight: 40,
+              "& .MuiAccordionSummary-content": { my: 0.75 },
+            }}
           >
             <Typography variant="body2" fontWeight={600}>
-              {group.title ?? group.sections?.map((section) => section.label).join(" / ")}
+              {group.title ??
+                group.sections?.map((section) => section.label).join(" / ")}
             </Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ pt: 0 }}>

@@ -27,11 +27,11 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
     dateService = new DateService();
     holidayResolver = new DefaultHolidayCalculator();
     workDayInfoResolver = new WorkDayInfoResolver();
-    
+
     builder = new DefaultWorkDaysForMonthBuilder(
       holidayResolver,
       workDayInfoResolver,
-      dateService
+      dateService,
     );
   });
 
@@ -116,7 +116,6 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       expect(result[14].meta.date).toBe("2024-01-15");
       expect(result[30].meta.date).toBe("2024-01-31");
     });
-
   });
 
   describe("build - WorkDayType assignment", () => {
@@ -129,7 +128,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
       // January 6, 2024 is Saturday
       expect(result[5].meta.typeDay).toBe(WorkDayType.SpecialFull);
-      
+
       // January 13, 2024 is Saturday
       expect(result[12].meta.typeDay).toBe(WorkDayType.SpecialFull);
     });
@@ -143,7 +142,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
       // January 5, 2024 is Friday
       expect(result[4].meta.typeDay).toBe(WorkDayType.SpecialPartialStart);
-      
+
       // January 12, 2024 is Friday
       expect(result[11].meta.typeDay).toBe(WorkDayType.SpecialPartialStart);
     });
@@ -157,10 +156,10 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
       // January 1, 2024 is Monday - Regular
       expect(result[0].meta.typeDay).toBe(WorkDayType.Regular);
-      
+
       // January 2, 2024 is Tuesday - Regular
       expect(result[1].meta.typeDay).toBe(WorkDayType.Regular);
-      
+
       // January 3, 2024 is Wednesday - Regular
       expect(result[2].meta.typeDay).toBe(WorkDayType.Regular);
     });
@@ -277,7 +276,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       // January 31, 2024 is Wednesday, February 1 is Thursday (regular)
       // Should check if it's false unless Feb 1 is a Saturday
       const lastDay = result[result.length - 1];
-      
+
       // February 1, 2024 is Thursday, so crossDayContinuation should be false
       expect(lastDay.meta.crossDayContinuation).toBe(false);
     });
@@ -412,7 +411,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
       expect(result).toBeDefined();
       expect(result.length).toBe(30);
-      
+
       // All days should still have proper typeDay based on weekday
       result.forEach((day) => {
         expect(day.meta.typeDay).toBeDefined();
@@ -458,12 +457,12 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
       // Count Fridays (SpecialPartialStart)
       const fridays = result.filter(
-        (d) => d.meta.typeDay === WorkDayType.SpecialPartialStart
+        (d) => d.meta.typeDay === WorkDayType.SpecialPartialStart,
       );
-      
+
       // Count Saturdays (SpecialFull)
       const saturdays = result.filter(
-        (d) => d.meta.typeDay === WorkDayType.SpecialFull
+        (d) => d.meta.typeDay === WorkDayType.SpecialFull,
       );
 
       expect(fridays.length).toBeGreaterThan(0);
@@ -484,7 +483,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       });
 
       const holidays = result.filter(
-        (d) => d.meta.typeDay === WorkDayType.SpecialFull
+        (d) => d.meta.typeDay === WorkDayType.SpecialFull,
       );
 
       // Should have at least the paid holidays + Saturdays
@@ -544,7 +543,10 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
       // Find Fridays and check crossDayContinuation
       result.forEach((day, index) => {
-        if (day.meta.typeDay === WorkDayType.SpecialPartialStart && index < result.length - 1) {
+        if (
+          day.meta.typeDay === WorkDayType.SpecialPartialStart &&
+          index < result.length - 1
+        ) {
           const nextDay = result[index + 1];
           if (nextDay.meta.typeDay === WorkDayType.SpecialFull) {
             expect(day.meta.crossDayContinuation).toBe(true);
@@ -565,8 +567,9 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
       for (let i = 1; i < result.length; i++) {
         const prevDate = new Date(result[i - 1].meta.date);
         const currDate = new Date(result[i].meta.date);
-        
-        const diffInDays = (currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24);
+
+        const diffInDays =
+          (currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24);
         expect(diffInDays).toBe(1);
       }
     });
@@ -580,7 +583,7 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
 
       const dates = result.map((d) => d.meta.date);
       const uniqueDates = new Set(dates);
-      
+
       expect(uniqueDates.size).toBe(dates.length);
     });
 
@@ -613,7 +616,6 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
         expect(typeof day.meta.crossDayContinuation).toBe("boolean");
       });
     });
-
   });
 
   describe("build - Different years", () => {

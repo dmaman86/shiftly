@@ -5,12 +5,16 @@ describe("gtagService", () => {
   beforeEach(() => {
     vi.stubGlobal("gtag", undefined);
     vi.stubGlobal("dataLayer", undefined);
-    document.querySelectorAll('script[src*="googletagmanager"]').forEach((el) => el.remove());
+    document
+      .querySelectorAll('script[src*="googletagmanager"]')
+      .forEach((el) => el.remove());
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
-    document.querySelectorAll('script[src*="googletagmanager"]').forEach((el) => el.remove());
+    document
+      .querySelectorAll('script[src*="googletagmanager"]')
+      .forEach((el) => el.remove());
   });
 
   describe("load", () => {

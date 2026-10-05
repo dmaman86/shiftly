@@ -23,7 +23,13 @@ const createSnapshot = (): ProfileMonthSnapshot => {
   map.mealAllowance.small.points = 2;
   map.mealAllowance.large.points = 1;
   map.totalHours = 107;
-  return { year: 2026, month: 8, baseRate: 40, usesDefaultConfig: false, breakdown: monthToPayBreakdownVM(map, 3) };
+  return {
+    year: 2026,
+    month: 8,
+    baseRate: 40,
+    usesDefaultConfig: false,
+    breakdown: monthToPayBreakdownVM(map, 3),
+  };
 };
 
 describe("profile metrics", () => {
@@ -42,15 +48,33 @@ describe("profile metrics", () => {
     const metrics = getProfileMetrics(snapshot, domain, t);
     const vm = snapshot.breakdown!;
     const sections = buildSectionsSalary({
-      payVM: vm, baseRate: snapshot.baseRate, t,
+      payVM: vm,
+      baseRate: snapshot.baseRate,
+      t,
       rateDiem: domain.resolvers.perDiemResolver.calculateRate(snapshot),
-      allowanceRate: domain.resolvers.mealAllowanceRateResolver.calculateRates(snapshot),
+      allowanceRate:
+        domain.resolvers.mealAllowanceRateResolver.calculateRates(snapshot),
     });
-    const totals = sections.map((section) => calculateTotal(section.type === "allowance"
-      ? section.buildRows(section.payVM, section.allowanceRate, section.rateDiem)
-      : section.buildRows(section.payVM, section.baseRate)));
-    expect(metrics?.payment).toEqual({ base: totals[0], extras: totals[1], allowances: totals[2] });
-    expect(metrics?.totalPayment).toBeCloseTo(totals.reduce((sum, value) => sum + value, 0), 8);
+    const totals = sections.map((section) =>
+      calculateTotal(
+        section.type === "allowance"
+          ? section.buildRows(
+              section.payVM,
+              section.allowanceRate,
+              section.rateDiem,
+            )
+          : section.buildRows(section.payVM, section.baseRate),
+      ),
+    );
+    expect(metrics?.payment).toEqual({
+      base: totals[0],
+      extras: totals[1],
+      allowances: totals[2],
+    });
+    expect(metrics?.totalPayment).toBeCloseTo(
+      totals.reduce((sum, value) => sum + value, 0),
+      8,
+    );
     expect(metrics?.payment?.base).toBe((80 + 8 + 4 + 3) * 40);
     expect(metrics?.payment?.allowances).toBeGreaterThan(0);
   });

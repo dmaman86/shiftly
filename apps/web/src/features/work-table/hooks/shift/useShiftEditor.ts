@@ -40,7 +40,8 @@ export const useShiftEditor = ({
 
   const updateShift = useCallback(
     (nextShift: Shift) => {
-      const isValidDuration = domain.services.shiftService.isValidShiftDuration(nextShift);
+      const isValidDuration =
+        domain.services.shiftService.isValidShiftDuration(nextShift);
       const overlapsSibling = otherShifts.some((other) =>
         domain.services.shiftService.overlaps(nextShift, other),
       );
@@ -73,8 +74,12 @@ export const useShiftEditor = ({
     ...controls,
     // A newly added placeholder has no entered range yet. Domain validation
     // still rejects it, but the UI waits for an edit before showing an error.
-    hasError: controls.hasError && !(draft?.id !== shift.id
-      && localShift.start.date.getTime() === localShift.end.date.getTime()
-      && controls.startMinutes === 0),
+    hasError:
+      controls.hasError &&
+      !(
+        draft?.id !== shift.id &&
+        localShift.start.date.getTime() === localShift.end.date.getTime() &&
+        controls.startMinutes === 0
+      ),
   };
 };

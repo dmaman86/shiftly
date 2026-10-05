@@ -21,7 +21,12 @@ describe("ShiftTimeInput", () => {
     });
 
     it("should display time value correctly", () => {
-      renderWithTheme(<ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 14, 30)} />);
+      renderWithTheme(
+        <ShiftTimeInput
+          {...defaultProps}
+          value={new Date(2024, 0, 1, 14, 30)}
+        />,
+      );
 
       // Check spinbuttons for time segments
       const spinbuttons = screen.getAllByRole("spinbutton");
@@ -36,7 +41,12 @@ describe("ShiftTimeInput", () => {
     });
 
     it("should use 24-hour format (no AM/PM)", () => {
-      renderWithTheme(<ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 15, 0)} />);
+      renderWithTheme(
+        <ShiftTimeInput
+          {...defaultProps}
+          value={new Date(2024, 0, 1, 15, 0)}
+        />,
+      );
 
       // Should not contain AM/PM indicators
       expect(screen.queryByText(/AM/i)).not.toBeInTheDocument();
@@ -55,14 +65,18 @@ describe("ShiftTimeInput", () => {
     it("should not have disabled spinbuttons when not disabled", () => {
       renderWithTheme(<ShiftTimeInput {...defaultProps} disabled={false} />);
 
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
       expect(hoursSpinbutton).not.toHaveAttribute("aria-disabled", "true");
     });
 
     it("should have disabled spinbuttons when disabled", () => {
       renderWithTheme(<ShiftTimeInput {...defaultProps} disabled={true} />);
 
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
       expect(hoursSpinbutton).toHaveAttribute("aria-disabled", "true");
     });
 
@@ -71,11 +85,17 @@ describe("ShiftTimeInput", () => {
       const handleChange = vi.fn();
 
       renderWithTheme(
-        <ShiftTimeInput {...defaultProps} disabled={true} onChange={handleChange} />
+        <ShiftTimeInput
+          {...defaultProps}
+          disabled={true}
+          onChange={handleChange}
+        />,
       );
 
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
-      
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
+
       // Attempting to interact with disabled input
       await user.click(hoursSpinbutton);
 
@@ -110,54 +130,82 @@ describe("ShiftTimeInput", () => {
   describe("Time Values", () => {
     it("should handle midnight time", () => {
       renderWithTheme(
-        <ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 0, 0)} />
+        <ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 0, 0)} />,
       );
 
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
       expect(hoursSpinbutton).toHaveAttribute("aria-valuenow", "0");
     });
 
     it("should handle noon time", () => {
       renderWithTheme(
-        <ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 12, 0)} />
+        <ShiftTimeInput
+          {...defaultProps}
+          value={new Date(2024, 0, 1, 12, 0)}
+        />,
       );
 
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
       expect(hoursSpinbutton).toHaveAttribute("aria-valuenow", "12");
     });
 
     it("should handle late night hours", () => {
       renderWithTheme(
-        <ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 23, 59)} />
+        <ShiftTimeInput
+          {...defaultProps}
+          value={new Date(2024, 0, 1, 23, 59)}
+        />,
       );
 
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
-      const minutesSpinbutton = screen.getByRole("spinbutton", { name: /Minutes/i });
-      
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
+      const minutesSpinbutton = screen.getByRole("spinbutton", {
+        name: /Minutes/i,
+      });
+
       expect(hoursSpinbutton).toHaveAttribute("aria-valuenow", "23");
       expect(minutesSpinbutton).toHaveAttribute("aria-valuenow", "59");
     });
 
     it("should handle morning hours", () => {
       renderWithTheme(
-        <ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 6, 30)} />
+        <ShiftTimeInput
+          {...defaultProps}
+          value={new Date(2024, 0, 1, 6, 30)}
+        />,
       );
 
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
-      const minutesSpinbutton = screen.getByRole("spinbutton", { name: /Minutes/i });
-      
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
+      const minutesSpinbutton = screen.getByRole("spinbutton", {
+        name: /Minutes/i,
+      });
+
       expect(hoursSpinbutton).toHaveAttribute("aria-valuenow", "6");
       expect(minutesSpinbutton).toHaveAttribute("aria-valuenow", "30");
     });
 
     it("should handle afternoon hours", () => {
       renderWithTheme(
-        <ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 17, 45)} />
+        <ShiftTimeInput
+          {...defaultProps}
+          value={new Date(2024, 0, 1, 17, 45)}
+        />,
       );
 
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
-      const minutesSpinbutton = screen.getByRole("spinbutton", { name: /Minutes/i });
-      
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
+      const minutesSpinbutton = screen.getByRole("spinbutton", {
+        name: /Minutes/i,
+      });
+
       expect(hoursSpinbutton).toHaveAttribute("aria-valuenow", "17");
       expect(minutesSpinbutton).toHaveAttribute("aria-valuenow", "45");
     });
@@ -185,10 +233,20 @@ describe("ShiftTimeInput", () => {
 
   describe("Accessibility", () => {
     it("names the time group and associates its error description", () => {
-      renderWithTheme(<ShiftTimeInput {...defaultProps} accessibleLabel="End, shift 2, September 15"
-        error errorMessage="Start and end times must be different." />);
-      const group = screen.getByRole("group", { name: "End, shift 2, September 15" });
-      expect(group).toHaveAccessibleDescription("Start and end times must be different.");
+      renderWithTheme(
+        <ShiftTimeInput
+          {...defaultProps}
+          accessibleLabel="End, shift 2, September 15"
+          error
+          errorMessage="Start and end times must be different."
+        />,
+      );
+      const group = screen.getByRole("group", {
+        name: "End, shift 2, September 15",
+      });
+      expect(group).toHaveAccessibleDescription(
+        "Start and end times must be different.",
+      );
       expect(screen.getAllByRole("group")).toHaveLength(1);
     });
     it("should have accessible label", () => {
@@ -208,7 +266,9 @@ describe("ShiftTimeInput", () => {
     it("should indicate disabled state to screen readers", () => {
       renderWithTheme(<ShiftTimeInput {...defaultProps} disabled={true} />);
 
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
       expect(hoursSpinbutton).toHaveAttribute("aria-disabled", "true");
     });
 
@@ -222,11 +282,15 @@ describe("ShiftTimeInput", () => {
 
   describe("Edge Cases", () => {
     it("should handle combined disabled and error states", () => {
-      renderWithTheme(<ShiftTimeInput {...defaultProps} disabled={true} error={true} />);
+      renderWithTheme(
+        <ShiftTimeInput {...defaultProps} disabled={true} error={true} />,
+      );
 
       const group = screen.getByRole("group");
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
-      
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
+
       expect(group).toHaveAttribute("aria-invalid", "true");
       expect(hoursSpinbutton).toHaveAttribute("aria-disabled", "true");
     });
@@ -240,31 +304,40 @@ describe("ShiftTimeInput", () => {
           disabled={false}
           error={false}
           onChange={handleChange}
-        />
+        />,
       );
 
       expect(screen.getAllByText("Shift Start")[0]).toBeInTheDocument();
-      
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
+
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
       expect(hoursSpinbutton).toHaveAttribute("aria-valuenow", "9");
       expect(hoursSpinbutton).not.toHaveAttribute("aria-disabled", "true");
     });
 
     it("should handle time with single digit hours", () => {
       renderWithTheme(
-        <ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 7, 0)} />
+        <ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 7, 0)} />,
       );
 
-      const hoursSpinbutton = screen.getByRole("spinbutton", { name: /Hours/i });
+      const hoursSpinbutton = screen.getByRole("spinbutton", {
+        name: /Hours/i,
+      });
       expect(hoursSpinbutton).toHaveAttribute("aria-valuenow", "7");
     });
 
     it("should handle time with single digit minutes", () => {
       renderWithTheme(
-        <ShiftTimeInput {...defaultProps} value={new Date(2024, 0, 1, 10, 5)} />
+        <ShiftTimeInput
+          {...defaultProps}
+          value={new Date(2024, 0, 1, 10, 5)}
+        />,
       );
 
-      const minutesSpinbutton = screen.getByRole("spinbutton", { name: /Minutes/i });
+      const minutesSpinbutton = screen.getByRole("spinbutton", {
+        name: /Minutes/i,
+      });
       expect(minutesSpinbutton).toHaveAttribute("aria-valuenow", "5");
     });
   });

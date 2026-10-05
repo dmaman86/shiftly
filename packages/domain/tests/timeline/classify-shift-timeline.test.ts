@@ -105,7 +105,9 @@ describe("classifyShiftTimeline", () => {
       },
     });
 
-    expect(result.every((interval) => interval.category === "special")).toBe(true);
+    expect(result.every((interval) => interval.category === "special")).toBe(
+      true,
+    );
     expect(result).toEqual([
       {
         point: { start: 1320, end: 1440 },

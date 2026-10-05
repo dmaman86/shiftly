@@ -19,10 +19,7 @@ import { useTranslation } from "react-i18next";
 import { dayToPayBreakdownVM } from "@/adapters";
 import { DomainContextType } from "@/app";
 import { WorkDayType } from "@shiftly/domain";
-import {
-  Shift,
-  WorkDayMeta,
-} from "@shiftly/domain";
+import { Shift, WorkDayMeta } from "@shiftly/domain";
 import type { PayBreakdownViewModel } from "@/app/types";
 import { useGlobalState } from "@/hooks";
 import { WorkParametersInputs } from "@/features/config";
@@ -49,7 +46,9 @@ const getCurrentIsraelDate = () => {
     timeZone: "Asia/Jerusalem",
     year: "numeric",
   }).formatToParts(new Date());
-  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  const values = Object.fromEntries(
+    parts.map(({ type, value }) => [type, value]),
+  );
 
   return `${values.year}-${values.month}-${values.day}`;
 };
@@ -112,7 +111,14 @@ const CalculationExampleShift = ({
           flexWrap="wrap"
           spacing={1.5}
         >
-          <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 1 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
             <Typography fontWeight={700} sx={{ mr: 1 }}>
               {t("calculation_rules_page.example.shift", { number: index + 1 })}
             </Typography>
@@ -159,7 +165,11 @@ const CalculationExampleShift = ({
 
       {contribution ? (
         <Box sx={{ borderTop: "1px solid", borderColor: "divider" }}>
-          <Typography variant="body2" fontWeight={700} sx={{ px: 1.5, pt: 1.5 }}>
+          <Typography
+            variant="body2"
+            fontWeight={700}
+            sx={{ px: 1.5, pt: 1.5 }}
+          >
             {t("calculation_rules_page.example.shift_contribution", {
               hours: formatValue(contribution.breakdown.actualHours),
             })}
@@ -215,8 +225,12 @@ export const CalculationExampleCard = ({
 
   const calculation = useMemo(() => {
     const validShifts = shifts
-      .filter((shift) => domain.services.shiftService.isValidShiftDuration(shift))
-      .sort((left, right) => left.start.date.getTime() - right.start.date.getTime());
+      .filter((shift) =>
+        domain.services.shiftService.isValidShiftDuration(shift),
+      )
+      .sort(
+        (left, right) => left.start.date.getTime() - right.start.date.getTime(),
+      );
 
     const { dayPayMap, shiftPayMaps } = domain.payMap.calculateDayFromShifts({
       meta,
@@ -235,11 +249,7 @@ export const CalculationExampleCard = ({
     return {
       contributionByShiftId,
       dayBreakdown: dayToPayBreakdownVM(dayPayMap, 0),
-      dayCompactBreakdown: dayToCompactPayBreakdownVM(
-        dayPayMap,
-        baseRate,
-        0,
-      ),
+      dayCompactBreakdown: dayToCompactPayBreakdownVM(dayPayMap, baseRate, 0),
       earnedShabbatCreditHours: dayPayMap.earnedShabbatCredit.hours,
     };
   }, [baseRate, domain, meta, month, shifts, standardHours, year]);
@@ -333,9 +343,7 @@ export const CalculationExampleCard = ({
             onChange={(nextShift) => updateShift(shift.id, () => nextShift)}
             onRemove={() =>
               setShifts((current) =>
-                current.filter(
-                  (currentShift) => currentShift.id !== shift.id,
-                ),
+                current.filter((currentShift) => currentShift.id !== shift.id),
               )
             }
             shift={shift}
@@ -381,7 +389,12 @@ export const CalculationExampleCard = ({
             >
               {t("calculation_rules_page.example.daily_pay")}
             </Typography>
-            <Typography variant="h5" component="p" color="primary.main" fontWeight={700}>
+            <Typography
+              variant="h5"
+              component="p"
+              color="primary.main"
+              fontWeight={700}
+            >
               {calculation.dayCompactBreakdown.dailySalary === undefined
                 ? "—"
                 : `₪${calculation.dayCompactBreakdown.dailySalary.toFixed(2)}`}

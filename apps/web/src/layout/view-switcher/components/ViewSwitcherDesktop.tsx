@@ -14,9 +14,15 @@ export const ViewSwitcherDesktop = () => {
     <Toolbar dir={direction}>
       <NavBrand to={homePath} />
 
-      <Box component="nav" aria-label={t("nav.main_navigation")} sx={{ display: "flex", gap: 2 }}>
+      <Box
+        component="nav"
+        aria-label={t("nav.main_navigation")}
+        sx={{ display: "flex", gap: 2 }}
+      >
         {items.map((item) => (
-          <NavItem key={item.to} to={item.to}>{item.label}</NavItem>
+          <NavItem key={item.to} to={item.to}>
+            {item.label}
+          </NavItem>
         ))}
       </Box>
 

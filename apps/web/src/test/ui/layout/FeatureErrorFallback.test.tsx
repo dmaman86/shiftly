@@ -12,10 +12,7 @@ describe("FeatureErrorFallback", () => {
     const resetError = vi.fn();
 
     render(
-      <FeatureErrorFallback
-        featureName="Work table"
-        resetError={resetError}
-      />,
+      <FeatureErrorFallback featureName="Work table" resetError={resetError} />,
     );
 
     expect(screen.getByText("Could not load Work table.")).toBeInTheDocument();

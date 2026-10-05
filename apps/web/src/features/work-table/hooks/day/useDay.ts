@@ -1,10 +1,6 @@
 import { useCallback, useMemo } from "react";
 
-import {
-  Shift,
-  ShiftPayMap,
-  WorkDayMeta,
-} from "@shiftly/domain";
+import { Shift, ShiftPayMap, WorkDayMeta } from "@shiftly/domain";
 import { DomainContextType } from "@/app";
 import { useWorkTableDayState } from "./useWorkTableDayState";
 
@@ -27,34 +23,43 @@ export const useDay = ({
     useWorkTableDayState(meta.date);
   const { calculateDayFromShifts } = domain.payMap;
 
-  const addShift = useCallback((shift: Shift) => {
-    setShiftEntries((prev) => {
-      const next = {
-        ...prev,
-        [shift.id]: { shift, payMap: null },
-      };
-      return next;
-    });
-  }, [setShiftEntries]);
+  const addShift = useCallback(
+    (shift: Shift) => {
+      setShiftEntries((prev) => {
+        const next = {
+          ...prev,
+          [shift.id]: { shift, payMap: null },
+        };
+        return next;
+      });
+    },
+    [setShiftEntries],
+  );
 
-  const updateShift = useCallback((shift: Shift, payMap: ShiftPayMap) => {
-    setShiftEntries((prev) => {
-      const next = {
-        ...prev,
-        [shift.id]: { shift, payMap },
-      };
-      return next;
-    });
-  }, [setShiftEntries]);
+  const updateShift = useCallback(
+    (shift: Shift, payMap: ShiftPayMap) => {
+      setShiftEntries((prev) => {
+        const next = {
+          ...prev,
+          [shift.id]: { shift, payMap },
+        };
+        return next;
+      });
+    },
+    [setShiftEntries],
+  );
 
-  const removeShift = useCallback((id: string) => {
-    setShiftEntries((prev) => {
-      const copy = { ...prev };
-      delete copy[id];
+  const removeShift = useCallback(
+    (id: string) => {
+      setShiftEntries((prev) => {
+        const copy = { ...prev };
+        delete copy[id];
 
-      return copy;
-    });
-  }, [setShiftEntries]);
+        return copy;
+      });
+    },
+    [setShiftEntries],
+  );
 
   const dayPayMap = useMemo(() => {
     const validShifts = Object.values(shiftEntries)

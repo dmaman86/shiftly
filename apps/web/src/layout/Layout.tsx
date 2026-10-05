@@ -12,12 +12,21 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         flexDirection: "column",
       }}
     >
-      <Box component="a" href="#main-content" sx={{
-        position: "absolute", insetInlineStart: 8, top: 8, zIndex: 1500,
-        p: 1, bgcolor: "background.paper", color: "text.primary",
-        transform: "translateY(-200%)",
-        "&:focus": { transform: "translateY(0)" },
-      }}>
+      <Box
+        component="a"
+        href="#main-content"
+        sx={{
+          position: "absolute",
+          insetInlineStart: 8,
+          top: 8,
+          zIndex: 1500,
+          p: 1,
+          bgcolor: "background.paper",
+          color: "text.primary",
+          transform: "translateY(-200%)",
+          "&:focus": { transform: "translateY(0)" },
+        }}
+      >
         {t("nav.skip_to_content")}
       </Box>
       <header>

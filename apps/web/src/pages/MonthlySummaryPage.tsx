@@ -80,7 +80,9 @@ export const MonthlySummaryPage = ({
               <ConfigPanel domain={domain} mode={"monthly"} />
 
               <MonthlyContentBoundary loading={isLoading} minHeight={300}>
-                {error ? <Alert severity="error">{error.message}</Alert> : (
+                {error ? (
+                  <Alert severity="error">{error.message}</Alert>
+                ) : (
                   <MonthlySummaryContent domain={domain} workDays={workDays} />
                 )}
               </MonthlyContentBoundary>
@@ -92,7 +94,10 @@ export const MonthlySummaryPage = ({
   );
 };
 
-const MonthlySummaryContent = ({ domain, workDays }: {
+const MonthlySummaryContent = ({
+  domain,
+  workDays,
+}: {
   domain: DomainContextType;
   workDays: ReturnType<typeof useWorkDays>["workDays"];
 }) => {
@@ -107,14 +112,19 @@ const MonthlySummaryContent = ({ domain, workDays }: {
   });
   return (
     <Stack spacing={3}>
-      <WorkTableDayStateProvider ownerKey={JSON.stringify([user?.id, year, month])}>
+      <WorkTableDayStateProvider
+        ownerKey={JSON.stringify([user?.id, year, month])}
+      >
         <WorkTableDayStateHydrator domain={domain} workDays={workDays}>
           <FeatureBoundary
             featureName={tWT("feature_name_salary_summary")}
             errorContext="MonthlySalarySummary"
             resetKeys={[year, month]}
           >
-            <MonthlySalarySummary domain={domain} monthFullBreakdown={monthFullBreakdown} />
+            <MonthlySalarySummary
+              domain={domain}
+              monthFullBreakdown={monthFullBreakdown}
+            />
           </FeatureBoundary>
         </WorkTableDayStateHydrator>
       </WorkTableDayStateProvider>

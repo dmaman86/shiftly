@@ -43,10 +43,7 @@ export const useDayController = ({
     removeShift,
   } = useDay({ domain, meta: workDay.meta, standardHours, year, month });
 
-  const adjacentShifts = getAdjacentDayShifts(
-    workDay.meta.date,
-    dateService,
-  );
+  const adjacentShifts = getAdjacentDayShifts(workDay.meta.date, dateService);
 
   const specialFullDay = isSpecialFullDay(workDay.meta.date);
   const isEditable = status === WorkDayStatus.normal;

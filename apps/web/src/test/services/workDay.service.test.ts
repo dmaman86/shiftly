@@ -72,7 +72,9 @@ describe("workDayService", () => {
   });
 
   it("returns an error when the fetch fails", async () => {
-    const lt = vi.fn().mockResolvedValue({ data: null, error: { message: "boom" } });
+    const lt = vi
+      .fn()
+      .mockResolvedValue({ data: null, error: { message: "boom" } });
     fromMock.mockReturnValue({
       select: () => ({ eq: () => ({ gte: () => ({ lt }) }) }),
     });

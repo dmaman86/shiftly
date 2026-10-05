@@ -39,10 +39,16 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const isNonNegativeNumber = (value: unknown): value is number =>
   typeof value === "number" && Number.isFinite(value) && value >= 0;
 
-const isIntegerInRange = (value: unknown, min: number, max: number): value is number =>
-  Number.isInteger(value) && (value as number) >= min && (value as number) <= max;
+const isIntegerInRange = (
+  value: unknown,
+  min: number,
+  max: number,
+): value is number =>
+  Number.isInteger(value) &&
+  (value as number) >= min &&
+  (value as number) <= max;
 
-const toTimestamp =(value: unknown): number | null => {
+const toTimestamp = (value: unknown): number | null => {
   if (typeof value !== "string") return null;
   const timestamp = Date.parse(value);
   return Number.isNaN(timestamp) ? null : timestamp;

@@ -9,7 +9,7 @@ describe("RuleCard", () => {
       const { container } = renderWithTheme(
         <RuleCard title="Demo" collapsible lazyMount>
           <video src="/demos/video-desktop.webm" />
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(container.querySelector("video")).not.toBeInTheDocument();
@@ -31,14 +31,16 @@ describe("RuleCard", () => {
       const { container } = renderWithTheme(
         <RuleCard title="Demo" collapsible lazyMount defaultExpanded>
           <video src="/demos/video-mobile.webm" />
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(container.querySelector("video")).toHaveAttribute(
-        "src", "/demos/video-mobile.webm"
+        "src",
+        "/demos/video-mobile.webm",
       );
       expect(screen.getByRole("button", { name: "Demo" })).toHaveAttribute(
-        "aria-expanded", "true"
+        "aria-expanded",
+        "true",
       );
     });
 
@@ -46,7 +48,7 @@ describe("RuleCard", () => {
       renderWithTheme(
         <RuleCard title="Other rules" collapsible>
           <div>Persistent content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(screen.getByText("Persistent content")).toBeInTheDocument();
@@ -58,7 +60,7 @@ describe("RuleCard", () => {
       renderWithTheme(
         <RuleCard title="Regular Hours">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(screen.getByText("Regular Hours")).toBeInTheDocument();
@@ -68,7 +70,7 @@ describe("RuleCard", () => {
       renderWithTheme(
         <RuleCard title="Overtime">
           <div>Overtime is paid at 125%</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(screen.getByText("Overtime is paid at 125%")).toBeInTheDocument();
@@ -78,7 +80,7 @@ describe("RuleCard", () => {
       renderWithTheme(
         <RuleCard title="Night Shift">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       const heading = screen.getByText("Night Shift");
@@ -89,7 +91,7 @@ describe("RuleCard", () => {
       const { container } = renderWithTheme(
         <RuleCard title="Test">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       // MUI Divider should be present
@@ -101,9 +103,7 @@ describe("RuleCard", () => {
   describe("Content Variations", () => {
     it("should handle simple text content", () => {
       renderWithTheme(
-        <RuleCard title="Simple Rule">
-          Simple text description
-        </RuleCard>
+        <RuleCard title="Simple Rule">Simple text description</RuleCard>,
       );
 
       expect(screen.getByText("Simple text description")).toBeInTheDocument();
@@ -120,7 +120,7 @@ describe("RuleCard", () => {
             </ul>
             <p>Paragraph 2</p>
           </div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(screen.getByText("Paragraph 1")).toBeInTheDocument();
@@ -135,7 +135,7 @@ describe("RuleCard", () => {
           <div>First section</div>
           <div>Second section</div>
           <div>Third section</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(screen.getByText("First section")).toBeInTheDocument();
@@ -145,11 +145,11 @@ describe("RuleCard", () => {
 
     it("should handle nested components as children", () => {
       const NestedComponent = () => <span>Nested Content</span>;
-      
+
       renderWithTheme(
         <RuleCard title="Nested Components">
           <NestedComponent />
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(screen.getByText("Nested Content")).toBeInTheDocument();
@@ -161,19 +161,20 @@ describe("RuleCard", () => {
       renderWithTheme(
         <RuleCard title="100%">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(screen.getByText("100%")).toBeInTheDocument();
     });
 
     it("should handle long titles", () => {
-      const longTitle = "Very Long Calculation Rule Title That Contains Multiple Words";
-      
+      const longTitle =
+        "Very Long Calculation Rule Title That Contains Multiple Words";
+
       renderWithTheme(
         <RuleCard title={longTitle}>
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(screen.getByText(longTitle)).toBeInTheDocument();
@@ -183,17 +184,19 @@ describe("RuleCard", () => {
       renderWithTheme(
         <RuleCard title="Overtime: 125% - Night Shift">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
-      expect(screen.getByText("Overtime: 125% - Night Shift")).toBeInTheDocument();
+      expect(
+        screen.getByText("Overtime: 125% - Night Shift"),
+      ).toBeInTheDocument();
     });
 
     it("should handle Hebrew titles", () => {
       renderWithTheme(
         <RuleCard title="שעות רגילות">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(screen.getByText("שעות רגילות")).toBeInTheDocument();
@@ -205,7 +208,7 @@ describe("RuleCard", () => {
       const { container } = renderWithTheme(
         <RuleCard title="Card Test">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       // Should have Card structure
@@ -217,7 +220,7 @@ describe("RuleCard", () => {
       const { container } = renderWithTheme(
         <RuleCard title="Content Test">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       const cardContent = container.querySelector(".MuiCardContent-root");
@@ -228,7 +231,7 @@ describe("RuleCard", () => {
       const { container } = renderWithTheme(
         <RuleCard title="Hover Test">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       // Card should be present (hover is CSS-based)
@@ -242,7 +245,7 @@ describe("RuleCard", () => {
       renderWithTheme(
         <RuleCard title="Accessible Title">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       const heading = screen.getByRole("heading", { name: "Accessible Title" });
@@ -253,23 +256,29 @@ describe("RuleCard", () => {
       renderWithTheme(
         <RuleCard title="Rule Title">
           <p>Rule description that should be accessible</p>
-        </RuleCard>
+        </RuleCard>,
       );
 
-      expect(screen.getByRole("heading", { name: "Rule Title" })).toBeInTheDocument();
-      expect(screen.getByText("Rule description that should be accessible")).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "Rule Title" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Rule description that should be accessible"),
+      ).toBeInTheDocument();
     });
 
     it("should maintain semantic HTML structure", () => {
       const { container } = renderWithTheme(
         <RuleCard title="Semantic Test">
           <div>Content</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       // Should have proper heading and content structure
       expect(container.querySelector("h2")).toBeInTheDocument();
-      expect(container.querySelector(".MuiCardContent-root")).toBeInTheDocument();
+      expect(
+        container.querySelector(".MuiCardContent-root"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -278,30 +287,27 @@ describe("RuleCard", () => {
       renderWithTheme(
         <RuleCard title="">
           <div>Content with no title</div>
-        </RuleCard>
+        </RuleCard>,
       );
 
       expect(screen.getByText("Content with no title")).toBeInTheDocument();
     });
 
     it("should handle very long content", () => {
-      const longContent = "This is a very long content string that contains multiple sentences and should be properly displayed in the card. ".repeat(10);
-      
-      renderWithTheme(
-        <RuleCard title="Long Content">
-          {longContent}
-        </RuleCard>
-      );
+      const longContent =
+        "This is a very long content string that contains multiple sentences and should be properly displayed in the card. ".repeat(
+          10,
+        );
 
-      expect(screen.getByText(/This is a very long content string/)).toBeInTheDocument();
+      renderWithTheme(<RuleCard title="Long Content">{longContent}</RuleCard>);
+
+      expect(
+        screen.getByText(/This is a very long content string/),
+      ).toBeInTheDocument();
     });
 
     it("should render with minimum props", () => {
-      renderWithTheme(
-        <RuleCard title="Minimum">
-          Content
-        </RuleCard>
-      );
+      renderWithTheme(<RuleCard title="Minimum">Content</RuleCard>);
 
       expect(screen.getByText("Minimum")).toBeInTheDocument();
       expect(screen.getByText("Content")).toBeInTheDocument();

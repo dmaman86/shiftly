@@ -1,7 +1,5 @@
 import type { DomainContextType } from "@/app";
-import {
-  type WorkDayMap,
-} from "@shiftly/domain";
+import { type WorkDayMap } from "@shiftly/domain";
 import type { WorkDayInfo } from "@/app/types";
 import type { WorkTableDayState } from "../../context/workTableDayState/workTableDayStateContext";
 
@@ -25,7 +23,9 @@ export const workTableStateToDailyPayMaps = ({
   const dailyPayMaps: Record<string, WorkDayMap> = {};
 
   for (const [dateKey, dayState] of Object.entries(state)) {
-    const meta = workDays.find((workDay) => workDay.meta.date === dateKey)?.meta;
+    const meta = workDays.find(
+      (workDay) => workDay.meta.date === dateKey,
+    )?.meta;
     if (!meta) continue;
 
     const shifts = Object.values(dayState.shiftEntries)

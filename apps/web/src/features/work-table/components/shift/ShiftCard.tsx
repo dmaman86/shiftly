@@ -42,7 +42,14 @@ export const ShiftCard = ({
     handleChange,
     handleToggleNextDay,
     toggleDuty,
-  } = useShiftEditor({ domain, shift, meta, standardHours, otherShifts, onShiftUpdate });
+  } = useShiftEditor({
+    domain,
+    shift,
+    meta,
+    standardHours,
+    otherShifts,
+    onShiftUpdate,
+  });
 
   return (
     <Box

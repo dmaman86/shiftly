@@ -1,4 +1,2 @@
-export {
-  MonthlyDataProvider,
-} from "./MonthlyDataProvider";
+export { MonthlyDataProvider } from "./MonthlyDataProvider";
 export { MonthlyContentBoundary } from "./MonthlyContentBoundary";

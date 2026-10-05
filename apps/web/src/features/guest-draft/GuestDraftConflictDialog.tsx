@@ -11,8 +11,7 @@ import {
 import { useTranslation } from "react-i18next";
 
 export type GuestDraftDialogMode =
-  | { type: "conflict"; savedShiftCount: number }
-  | { type: "error" };
+  { type: "conflict"; savedShiftCount: number } | { type: "error" };
 
 type GuestDraftConflictDialogProps = {
   open: boolean;
@@ -46,7 +45,10 @@ export const GuestDraftConflictDialog = ({
 
   // Backdrop clicks are ignored so the choice is always explicit; Escape maps
   // to the non-destructive option.
-  const handleClose = (_event: object, reason: "backdropClick" | "escapeKeyDown") => {
+  const handleClose = (
+    _event: object,
+    reason: "backdropClick" | "escapeKeyDown",
+  ) => {
     if (reason === "escapeKeyDown" && !busy) {
       if (isError) onDiscard();
       else onKeep();

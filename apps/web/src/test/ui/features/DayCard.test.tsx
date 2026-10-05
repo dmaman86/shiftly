@@ -116,7 +116,9 @@ describe("DayCard", () => {
       />,
     );
 
-    expect(container.querySelector('[aria-current="date"]')).toBeInTheDocument();
+    expect(
+      container.querySelector('[aria-current="date"]'),
+    ).toBeInTheDocument();
     expect(scrollIntoViewMock).toHaveBeenCalledOnce();
     expect(scrollIntoViewMock).toHaveBeenCalledWith({
       behavior: "smooth",
@@ -126,14 +128,12 @@ describe("DayCard", () => {
 
   it("does not scroll a card that is not the current day", () => {
     const { container } = renderWithTheme(
-      <DayCard
-        domain={domainStub}
-        workDay={workDay}
-        shabbatCreditHours={0}
-      />,
+      <DayCard domain={domainStub} workDay={workDay} shabbatCreditHours={0} />,
     );
 
-    expect(container.querySelector('[aria-current="date"]')).not.toBeInTheDocument();
+    expect(
+      container.querySelector('[aria-current="date"]'),
+    ).not.toBeInTheDocument();
     expect(scrollIntoViewMock).not.toHaveBeenCalled();
   });
 
@@ -147,22 +147,21 @@ describe("DayCard", () => {
       />,
     );
 
-    expect(screen.getByText("day_details.shabbat_credit_applied")).toBeInTheDocument();
-    expect(screen.getByText("day_details.shabbat_credit_editable_hint")).toBeInTheDocument();
+    expect(
+      screen.getByText("day_details.shabbat_credit_applied"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("day_details.shabbat_credit_editable_hint"),
+    ).toBeInTheDocument();
   });
 
   it("starts collapsed regardless of the selected day", () => {
     renderWithTheme(
-      <DayCard
-        domain={domainStub}
-        workDay={workDay}
-        shabbatCreditHours={0}
-      />,
+      <DayCard domain={domainStub} workDay={workDay} shabbatCreditHours={0} />,
     );
 
-    expect(screen.getByRole("button", { name: "day_details.show" })).toHaveAttribute(
-      "aria-expanded",
-      "false",
-    );
+    expect(
+      screen.getByRole("button", { name: "day_details.show" }),
+    ).toHaveAttribute("aria-expanded", "false");
   });
 });

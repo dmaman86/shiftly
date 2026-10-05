@@ -11,7 +11,10 @@ import { WorkDayType } from "../constants/index.js";
 export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
   constructor(
     private readonly holidayResolver: {
-      calculate(params: { weekday: number; events: CalendarEvent[] }): WorkDayType;
+      calculate(params: {
+        weekday: number;
+        events: CalendarEvent[];
+      }): WorkDayType;
     },
     private readonly workDayInfoResolver: WorkDayInfoResolver,
     private readonly dateService: DateService,

@@ -14,6 +14,8 @@ const safely = <T>(operation: () => T, fallback: T): T => {
 export const navMenuIntroStorage = {
   // Unreadable storage counts as seen: reopening the menu on every load would
   // be worse than never introducing it.
-  hasSeen: () => safely(() => localStorage.getItem(NAV_MENU_INTRO_KEY) !== null, true),
-  markSeen: () => safely(() => localStorage.setItem(NAV_MENU_INTRO_KEY, "1"), undefined),
+  hasSeen: () =>
+    safely(() => localStorage.getItem(NAV_MENU_INTRO_KEY) !== null, true),
+  markSeen: () =>
+    safely(() => localStorage.setItem(NAV_MENU_INTRO_KEY, "1"), undefined),
 };

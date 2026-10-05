@@ -9,7 +9,9 @@ export const useGlobalState = () => {
   const selectMonth = useGlobalStore((state) => state.selectMonth);
   const updateYear = useGlobalStore((state) => state.updateYear);
   const updateMonth = useGlobalStore((state) => state.updateMonth);
-  const updateStandardHours = useGlobalStore((state) => state.updateStandardHours);
+  const updateStandardHours = useGlobalStore(
+    (state) => state.updateStandardHours,
+  );
   const updateBaseRate = useGlobalStore((state) => state.updateBaseRate);
   const updateDayPayMap = useGlobalStore((state) => state.updateDayPayMap);
   const removeDay = useGlobalStore((state) => state.removeDay);

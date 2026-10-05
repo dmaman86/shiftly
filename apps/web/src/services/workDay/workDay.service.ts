@@ -23,17 +23,26 @@ export const workDayService = () => {
   const setStatus = (userId: string, date: string, status: WorkDayStatus) => ({
     call: async () => {
       if (status === WorkDayStatus.normal) {
-        return supabaseCrud.remove("work_days", [
-          { column: "user_id", operator: "eq", value: userId },
-          { column: "date", operator: "eq", value: date },
-        ]).call();
+        return supabaseCrud
+          .remove("work_days", [
+            { column: "user_id", operator: "eq", value: userId },
+            { column: "date", operator: "eq", value: date },
+          ])
+          .call();
       }
 
-      return supabaseCrud.upsert(
-        "work_days",
-        { user_id: userId, date, status, updated_at: new Date().toISOString() },
-        "user_id,date",
-      ).call();
+      return supabaseCrud
+        .upsert(
+          "work_days",
+          {
+            user_id: userId,
+            date,
+            status,
+            updated_at: new Date().toISOString(),
+          },
+          "user_id,date",
+        )
+        .call();
     },
   });
 
