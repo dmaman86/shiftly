@@ -155,27 +155,37 @@ export const guestDraftStorage = {
     safely(() => sessionStorage.setItem(PENDING_IMPORT_KEY, "1"), undefined);
   },
 
+  clearPendingImport() {
+    safely(() => sessionStorage.removeItem(PENDING_IMPORT_KEY), undefined);
+  },
+
   /**
-   * Called once per page load. Always clears storage, so a draft is only ever
-   * restored right after an explicit sign-in attempt - never after a plain
-   * reload.
+   * Returns the draft only right after an explicit sign-in attempt. It does
+   * not clear storage: the draft must survive until the sign-in outcome is
+   * known, so the caller discards it once the import or restore is resolved.
+   * Anything else (plain reload, unusable draft) is discarded here, since
+   * nothing will ever resolve it.
    */
-  consumePending(now = Date.now()): GuestDraft | null {
-    const stored = safely(
+  readPending(now = Date.now()): GuestDraft | null {
+    const { isPending, raw } = safely(
       () => ({
         isPending: sessionStorage.getItem(PENDING_IMPORT_KEY) !== null,
         raw: sessionStorage.getItem(DRAFT_KEY),
       }),
       { isPending: false, raw: null },
     );
-    discard();
-
-    const { isPending, raw } = stored;
-    if (!isPending || raw === null) return null;
-
-    const draft = safely(() => parseGuestDraft(JSON.parse(raw)), null);
-    if (!draft || isGuestDraftEmpty(draft)) return null;
-    if (now - Date.parse(draft.savedAt) > GUEST_DRAFT_TTL_MS) return null;
+    const draft =
+      isPending && raw !== null
+        ? safely(() => parseGuestDraft(JSON.parse(raw)), null)
+        : null;
+    if (
+      !draft ||
+      isGuestDraftEmpty(draft) ||
+      now - Date.parse(draft.savedAt) > GUEST_DRAFT_TTL_MS
+    ) {
+      discard();
+      return null;
+    }
 
     return draft;
   },

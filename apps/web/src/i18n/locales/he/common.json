@@ -60,6 +60,7 @@
     "sign_out": "התנתקות",
     "loading": "טוען חשבון...",
     "initialization_error": "לא ניתן לטעון את החשבון. יש לנסות שוב.",
+    "sign_in_error": "ההתחברות עם Google לא הושלמה. אפשר להמשיך כאורח ולנסות שוב.",
     "sign_out_success": "התנתקת בהצלחה.",
     "profile_title": "👤 פרופיל",
     "profile_description": "החשבון המחובר שלך ובקרות הנתונים השמורים.",

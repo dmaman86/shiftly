@@ -100,23 +100,37 @@ describe("guestDraftStorage", () => {
     guestDraftStorage.save(draft);
     guestDraftStorage.markPendingImport();
 
-    expect(guestDraftStorage.consumePending(savedAtMs)).toEqual(draft);
+    expect(guestDraftStorage.readPending(savedAtMs)).toEqual(draft);
   });
 
   it("discards the draft on a plain reload without a pending import", () => {
     guestDraftStorage.save(buildDraft());
 
-    expect(guestDraftStorage.consumePending(savedAtMs)).toBeNull();
+    expect(guestDraftStorage.readPending(savedAtMs)).toBeNull();
     expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
   });
 
-  it("is consumed only once", () => {
+  it("keeps a pending draft until the sign-in outcome discards it", () => {
+    const draft = buildDraft();
+    guestDraftStorage.save(draft);
+    guestDraftStorage.markPendingImport();
+
+    expect(guestDraftStorage.readPending(savedAtMs)).toEqual(draft);
+    expect(guestDraftStorage.readPending(savedAtMs)).toEqual(draft);
+
+    guestDraftStorage.discard();
+
+    expect(guestDraftStorage.readPending(savedAtMs)).toBeNull();
+  });
+
+  it("clears only the pending flag so a later reload starts empty", () => {
     guestDraftStorage.save(buildDraft());
     guestDraftStorage.markPendingImport();
-    guestDraftStorage.consumePending(savedAtMs);
+    guestDraftStorage.clearPendingImport();
 
-    expect(guestDraftStorage.consumePending(savedAtMs)).toBeNull();
     expect(sessionStorage.getItem(PENDING_IMPORT_KEY)).toBeNull();
+    expect(guestDraftStorage.readPending(savedAtMs)).toBeNull();
+    expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
   });
 
   it("ignores an expired draft", () => {
@@ -124,7 +138,7 @@ describe("guestDraftStorage", () => {
     guestDraftStorage.markPendingImport();
 
     expect(
-      guestDraftStorage.consumePending(savedAtMs + GUEST_DRAFT_TTL_MS + 1),
+      guestDraftStorage.readPending(savedAtMs + GUEST_DRAFT_TTL_MS + 1),
     ).toBeNull();
   });
 
@@ -133,7 +147,7 @@ describe("guestDraftStorage", () => {
     sessionStorage.setItem(DRAFT_KEY, "{not json");
     guestDraftStorage.markPendingImport();
 
-    expect(guestDraftStorage.consumePending(savedAtMs)).toBeNull();
+    expect(guestDraftStorage.readPending(savedAtMs)).toBeNull();
     expect(warn).toHaveBeenCalledExactlyOnceWith(
       "Guest draft storage is unavailable",
       expect.any(SyntaxError),
@@ -155,7 +169,7 @@ describe("guestDraftStorage", () => {
       throw new Error("SecurityError");
     });
 
-    expect(guestDraftStorage.consumePending(savedAtMs)).toBeNull();
+    expect(guestDraftStorage.readPending(savedAtMs)).toBeNull();
     expect(console.warn).toHaveBeenCalled();
   });
 });

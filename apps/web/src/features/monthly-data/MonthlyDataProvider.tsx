@@ -58,7 +58,7 @@ const MonthlyConfigSession = ({
   children,
 }: MonthlyConfigSessionProps) => {
   const { t } = useTranslation();
-  const { ready: guestDraftReady } = useGuestDraftImportGate();
+  const { ready: guestDraftReady, restoreDraft } = useGuestDraftImportGate();
   const contextKey = JSON.stringify(configKey(userId, year, month));
   const initialized = useGlobalStore(
     (state) => state.monthlyConfigContextKey === contextKey,
@@ -101,13 +101,19 @@ const MonthlyConfigSession = ({
           query.isFetching))
     )
       return;
+    // A guest whose sign-in did not complete gets back the rates of the month
+    // they were filling in, alongside its shifts.
+    const guestValues =
+      restoreDraft?.year === year && restoreDraft.month === month
+        ? restoreDraft.config
+        : defaultMonthlyConfig;
     const values =
       userId && query.data
         ? {
             standardHours: query.data.standard_hours,
             baseRate: query.data.base_rate,
           }
-        : defaultMonthlyConfig;
+        : guestValues;
     initializeMonth(year, month, values, contextKey);
   }, [
     contextKey,
@@ -119,6 +125,7 @@ const MonthlyConfigSession = ({
     query.data,
     query.isFetching,
     query.isSuccess,
+    restoreDraft,
     userId,
     year,
   ]);

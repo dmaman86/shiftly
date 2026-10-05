@@ -41,6 +41,8 @@ import type { WorkDayInfo } from "@/app/types";
 import { WorkTableDayStateHydrator } from "@/features/work-table/components/month/WorkTableDayStateHydrator";
 import { WorkTableDayStateProvider } from "@/features/work-table/context/workTableDayState/WorkTableDayStateProvider";
 import { useWorkTableDayState } from "@/features/work-table/hooks/day/useWorkTableDayState";
+import { GuestDraftImportContext } from "@/features/guest-draft/guestDraftImportContext";
+import type { GuestDraft } from "@/services/guestDraft";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactElement, ReactNode } from "react";
@@ -130,6 +132,63 @@ describe("useWorkTableMonthSession", () => {
 
     expect(screen.getByText("2026-08-10:normal:0")).toBeInTheDocument();
     expect(workDayServiceMock.fetchForMonth).not.toHaveBeenCalled();
+  });
+
+  describe("after a sign-in that did not complete", () => {
+    const restoreDraft: GuestDraft = {
+      version: 1,
+      savedAt: "2026-08-10T10:00:00.000Z",
+      year: 2026,
+      month: 8,
+      config: { standardHours: 6.67, baseRate: 45.5 },
+      days: [{ date: "2026-08-10", status: WorkDayStatus.vacation }],
+      shifts: [
+        {
+          id: "guest-shift",
+          date: "2026-08-10",
+          start_time: "2026-08-10T05:00:00.000Z",
+          end_time: "2026-08-10T14:00:00.000Z",
+          is_duty: false,
+        },
+      ],
+    };
+
+    const renderWithRestore = (draft: GuestDraft, markRestored: () => void) =>
+      renderPure(
+        <GuestDraftImportContext.Provider
+          value={{ ready: true, restoreDraft: draft, markRestored }}
+        >
+          <WorkTableDayStateProvider>
+            <WorkTableDayStateHydrator domain={domainStub} workDays={workDays}>
+              <DayProbe dateKey="2026-08-10" />
+            </WorkTableDayStateHydrator>
+          </WorkTableDayStateProvider>
+        </GuestDraftImportContext.Provider>,
+      );
+
+    it("gives the guest their month back", async () => {
+      const markRestored = vi.fn();
+
+      renderWithRestore(restoreDraft, markRestored);
+
+      expect(
+        await screen.findByText("2026-08-10:vacation:1"),
+      ).toBeInTheDocument();
+      expect(markRestored).toHaveBeenCalled();
+      expect(workDayServiceMock.fetchForMonth).not.toHaveBeenCalled();
+    });
+
+    it("waits until the draft's month is the selected one", async () => {
+      const markRestored = vi.fn();
+
+      renderWithRestore({ ...restoreDraft, month: 7 }, markRestored);
+      await act(async () => {
+        await Promise.resolve();
+      });
+
+      expect(screen.getByText("2026-08-10:normal:0")).toBeInTheDocument();
+      expect(markRestored).not.toHaveBeenCalled();
+    });
   });
 
   it("hydrates persisted status and shifts for an authenticated user", async () => {

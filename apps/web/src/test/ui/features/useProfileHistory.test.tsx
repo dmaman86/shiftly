@@ -35,7 +35,9 @@ const harness = (ready = true) => {
   });
   const wrapper = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={client}>
-      <GuestDraftImportContext.Provider value={{ ready }}>
+      <GuestDraftImportContext.Provider
+        value={{ ready, restoreDraft: null, markRestored: () => {} }}
+      >
         {children}
       </GuestDraftImportContext.Provider>
     </QueryClientProvider>

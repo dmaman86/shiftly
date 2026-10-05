@@ -60,6 +60,7 @@
     "sign_out": "Sign out",
     "loading": "Loading account...",
     "initialization_error": "Your account session could not be loaded. Please try again.",
+    "sign_in_error": "Sign-in with Google did not complete. You can keep working as a guest and try again.",
     "sign_out_success": "You are signed out.",
     "profile_title": "👤 Profile",
     "profile_description": "Your signed-in account and saved data controls.",

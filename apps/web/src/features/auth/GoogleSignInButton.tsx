@@ -5,6 +5,11 @@ import { useAppSnackbar, useFetch } from "@/hooks";
 import { guestDraftStorage } from "@/services/guestDraft";
 import { supabase } from "@/services/supabase/supabase.client";
 import { fromSupabaseResult } from "@/utils";
+import {
+  getCurrentAppPath,
+  getOAuthRedirectUrl,
+  oauthReturnPath,
+} from "./oauthReturn";
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
@@ -38,13 +43,14 @@ export const GoogleSignInButton = ({ size, sx }: GoogleSignInButtonProps) => {
     // Set before the redirect: it is what lets the guest's month be imported
     // after OAuth returns, instead of being discarded as a plain reload.
     guestDraftStorage.markPendingImport();
+    oauthReturnPath.save(getCurrentAppPath());
 
     const result = await callEndPoint({
       call: async () =>
         fromSupabaseResult(
           await supabase.auth.signInWithOAuth({
             provider: "google",
-            options: { redirectTo: window.location.href },
+            options: { redirectTo: getOAuthRedirectUrl() },
           }),
         ),
     });

@@ -986,6 +986,13 @@ VITE_SUPABASE_URL=
 VITE_SUPABASE_PUBLISHABLE_KEY=
 ```
 
+Google sign-in always returns to the app root (`<origin>/shiftly/`) and then restores the page the user started from. Under **Authentication → URL Configuration → Redirect URLs**, allow that root for every origin you use, for example:
+
+```text
+https://dmaman86.github.io/shiftly/**
+http://localhost:5173/shiftly/**
+```
+
 Then run the SQL files under `supabase/migrations/`, in order, in your Supabase project's SQL Editor to create the `monthly_configs`, `work_days`, and `shifts` tables with their Row Level Security policies.
 
 Account deletion requires the `delete-account` Supabase Edge Function because deleting from `auth.users` requires a server-side secret key. Deploy it after linking the project:

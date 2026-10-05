@@ -4,12 +4,14 @@ import { AppProviders } from "./providers";
 import { AppRoutes } from "./routes";
 import { ErrorBoundary, ErrorFallback, Layout } from "@/layout";
 import { GuestDraftImportProvider, MonthlyDataProvider } from "@/features";
+import { OAuthCallbackHandler } from "@/features/auth";
 import { guestDraftStorage } from "@/services/guestDraft";
 
-// Read once per page load, before React renders: a draft is only restored
-// right after the sign-in redirect, and consuming it clears storage so a
-// plain reload never brings guest data back.
-const pendingGuestDraft = guestDraftStorage.consumePending();
+// Read once per page load, before React renders: a draft is only offered
+// right after the sign-in redirect. GuestDraftImportProvider clears storage
+// once the sign-in outcome is known, so a plain reload never brings guest
+// data back.
+const pendingGuestDraft = guestDraftStorage.readPending();
 
 export const App = () => {
   return (
@@ -24,6 +26,7 @@ export const App = () => {
         }}
       >
         <AppProviders>
+          <OAuthCallbackHandler />
           <GuestDraftImportProvider initialDraft={pendingGuestDraft}>
             <MonthlyDataProvider>
               <Layout>

@@ -83,8 +83,18 @@ const draft: GuestDraft = {
 };
 
 const GateProbe = () => {
-  const { ready } = useGuestDraftImportGate();
-  return <div data-testid="gate">{ready ? "ready" : "blocked"}</div>;
+  const { ready, restoreDraft, markRestored } = useGuestDraftImportGate();
+  return (
+    <>
+      <div data-testid="gate">{ready ? "ready" : "blocked"}</div>
+      <div data-testid="restore">
+        {restoreDraft ? `${restoreDraft.year}-${restoreDraft.month}` : "none"}
+      </div>
+      <button type="button" onClick={markRestored}>
+        Mark restored
+      </button>
+    </>
+  );
 };
 
 const renderProvider = (initialDraft: GuestDraft | null = draft) =>
@@ -133,14 +143,37 @@ describe("GuestDraftImportProvider", () => {
     expect(mocks.fetchShifts).not.toHaveBeenCalled();
   });
 
-  it("ignores the draft when the sign-in did not complete", () => {
+  it("hands the draft back to the guest when the sign-in did not complete", async () => {
     mocks.authState.user = null;
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    sessionStorage.setItem(PENDING_IMPORT_KEY, "1");
+    const user = userEvent.setup();
 
     renderProvider();
 
     expect(screen.getByTestId("gate")).toHaveTextContent("ready");
-    expect(mocks.selectMonth).not.toHaveBeenCalled();
+    expect(screen.getByTestId("restore")).toHaveTextContent("2026-8");
+    expect(mocks.selectMonth).toHaveBeenCalledWith(2026, 8);
     expect(mocks.importMonth).not.toHaveBeenCalled();
+    // The draft survives for the next attempt; the flag does not, so a plain
+    // reload afterwards does not restore it again.
+    expect(sessionStorage.getItem(DRAFT_KEY)).not.toBeNull();
+    expect(sessionStorage.getItem(PENDING_IMPORT_KEY)).toBeNull();
+
+    await user.click(screen.getByRole("button", { name: "Mark restored" }));
+
+    expect(screen.getByTestId("restore")).toHaveTextContent("none");
+    expect(screen.getByTestId("gate")).toHaveTextContent("ready");
+  });
+
+  it("waits for auth before deciding between import and restore", () => {
+    mocks.authState.user = null;
+    mocks.authState.isLoading = true;
+
+    renderProvider();
+
+    expect(screen.getByTestId("restore")).toHaveTextContent("none");
+    expect(mocks.selectMonth).not.toHaveBeenCalled();
   });
 
   it("imports into an empty month without asking", async () => {
@@ -165,11 +198,14 @@ describe("GuestDraftImportProvider", () => {
     savedMonth(3);
     const user = userEvent.setup();
 
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
     renderProvider();
 
     expect(
       await screen.findByText("You already have saved data for August 2026"),
     ).toBeInTheDocument();
+    // Still stored while the choice is pending, so a reload asks again.
+    expect(sessionStorage.getItem(DRAFT_KEY)).not.toBeNull();
     expect(
       screen.getByText(/Saved: 3 shifts · Entered as guest: 1 shifts/),
     ).toBeInTheDocument();
@@ -179,6 +215,7 @@ describe("GuestDraftImportProvider", () => {
 
     expect(mocks.importMonth).not.toHaveBeenCalled();
     expect(screen.getByTestId("gate")).toHaveTextContent("ready");
+    expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
     expect(mocks.track).toHaveBeenCalledWith({
       name: "guest_draft_import_resolved",
       params: { outcome: "kept", shift_count: 1 },

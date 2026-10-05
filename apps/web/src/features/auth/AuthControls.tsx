@@ -21,7 +21,7 @@ type AuthControlsProps = {
 
 export const AuthControls = ({ display = "guest" }: AuthControlsProps) => {
   const { t } = useTranslation();
-  const { user, isLoading, initializationError } = useAuth();
+  const { user, isLoading, initializationError, signInError } = useAuth();
   const snackbar = useAppSnackbar();
 
   const handleSignOut = async () => {
@@ -76,6 +76,7 @@ export const AuthControls = ({ display = "guest" }: AuthControlsProps) => {
       {initializationError && (
         <Alert severity="error">{t("auth.initialization_error")}</Alert>
       )}
+      {signInError && <Alert severity="error">{t("auth.sign_in_error")}</Alert>}
 
       <Typography variant="caption" color="text.secondary" align="center">
         {t("auth.sign_in_benefit")}
