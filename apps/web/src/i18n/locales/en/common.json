@@ -6,7 +6,10 @@
     "monthly": "Monthly",
     "account_and_rules": "Rules",
     "calculation_rules": "Rules",
-    "profile": "My Profile"
+    "profile": "My Profile",
+    "main_navigation": "Main navigation",
+    "open_menu": "Open navigation menu",
+    "close_menu": "Close navigation menu"
   },
   "footer": {
     "copyright": "© {{year}} Shiftly – Salary & Shift Simulation & Calculator",
@@ -59,6 +62,9 @@
     "sign_out_success": "You are signed out.",
     "profile_title": "👤 Profile",
     "profile_description": "Your signed-in account and saved data controls.",
+    "guest_profile_description": "You are using Shiftly as a guest.",
+    "guest_profile_name": "Guest",
+    "guest_profile_status": "Not signed in · data is not saved",
     "profile_email": "Email",
     "profile_provider": "Sign-in provider",
     "profile_unknown": "Not available",

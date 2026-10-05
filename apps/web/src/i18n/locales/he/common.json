@@ -6,7 +6,10 @@
     "monthly": "חישוב חודשי",
     "account_and_rules": "כללי חישוב",
     "calculation_rules": "כללי חישוב",
-    "profile": "הפרופיל שלי"
+    "profile": "הפרופיל שלי",
+    "main_navigation": "ניווט ראשי",
+    "open_menu": "פתיחת תפריט הניווט",
+    "close_menu": "סגירת תפריט הניווט"
   },
   "footer": {
     "copyright": "© {{year}} Shiftly – מחשבון סימולציות ובדיקות שכר ומשמרות | Salary & Shift Simulation & Calculator",
@@ -59,6 +62,9 @@
     "sign_out_success": "התנתקת בהצלחה.",
     "profile_title": "👤 פרופיל",
     "profile_description": "החשבון המחובר שלך ובקרות הנתונים השמורים.",
+    "guest_profile_description": "השימוש ב־Shiftly מתבצע במצב אורח.",
+    "guest_profile_name": "מצב אורח",
+    "guest_profile_status": "ללא התחברות · הנתונים לא נשמרים",
     "profile_email": "אימייל",
     "profile_provider": "ספק התחברות",
     "profile_unknown": "לא זמין",
