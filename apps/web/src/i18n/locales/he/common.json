@@ -13,7 +13,8 @@
   },
   "footer": {
     "copyright": "© {{year}} Shiftly – מחשבון סימולציות ובדיקות שכר ומשמרות | Salary & Shift Simulation & Calculator",
-    "contact": "יצירת קשר"
+    "contact": "יצירת קשר",
+    "github": "קוד המקור ב־GitHub"
   },
   "config": {
     "loading": "טוען הגדרות חודשיות...",

@@ -78,8 +78,8 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
             title={t("actual_payable_title")}
             description={t("actual_payable_description")}
             series={[
-              { label: t("actual_hours"), color: "#1976d2" },
-              { label: t("payable_hours"), color: "#2e7d32" },
+              { label: t("actual_hours"), color: "pay.base" },
+              { label: t("payable_hours"), color: "pay.allowances" },
             ]}
             rows={rows((metrics) => [
               metrics.actualHours,
@@ -90,8 +90,8 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
             title={t("base_overtime_title")}
             description={t("base_overtime_description")}
             series={[
-              { label: t("base_hours"), color: "#1976d2" },
-              { label: t("overtime_hours"), color: "#a64400" },
+              { label: t("base_hours"), color: "pay.base" },
+              { label: t("overtime_hours"), color: "pay.extras" },
             ]}
             rows={rows((metrics) => [metrics.baseHours, metrics.overtimeHours])}
             stacked
@@ -100,9 +100,9 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
             title={t("payment_title")}
             description={t("payment_description")}
             series={[
-              { label: t("base_pay"), color: "#1976d2" },
-              { label: t("extras_pay"), color: "#a64400" },
-              { label: t("allowances_pay"), color: "#2e7d32" },
+              { label: t("base_pay"), color: "pay.base" },
+              { label: t("extras_pay"), color: "pay.extras" },
+              { label: t("allowances_pay"), color: "pay.allowances" },
             ]}
             rows={rows(
               (metrics) =>

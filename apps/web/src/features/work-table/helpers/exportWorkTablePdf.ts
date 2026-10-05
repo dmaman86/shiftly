@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 
 import notoSansHebrewFontUrl from "../assets/NotoSansHebrew.ttf?url";
+import { PRINT_COLORS } from "./printColors";
 
 type PdfMetadata = {
   header: string;
@@ -34,9 +35,6 @@ const PDF_LINE_HEIGHT = 2.6;
 const PDF_CELL_PADDING = 1;
 const PDF_WEEK_BORDER_WIDTH = 1;
 const PDF_REGULAR_BORDER_WIDTH = 0.2;
-const PDF_TABLE_HEADER_COLOR = "#f3f3f3";
-const PDF_TEXT_COLOR = "#1d3e91";
-const PDF_MUTED_TEXT_COLOR = "#4a4a4a";
 const FONT_FILE_NAME = "NotoSansHebrew.ttf";
 const FONT_FAMILY = "NotoSansHebrew";
 const HEBREW_CHARACTER_PATTERN = /[\u0590-\u05ff]/;
@@ -299,11 +297,13 @@ const drawRows = ({
       .reduce((sum, columnWidth) => sum + columnWidth, 0);
     const x = pageRight - rightOffset;
 
-    pdf.setFillColor(cell.isHeader ? PDF_TABLE_HEADER_COLOR : "#ffffff");
-    pdf.setDrawColor("#777777");
+    pdf.setFillColor(
+      cell.isHeader ? PRINT_COLORS.headerFill : PRINT_COLORS.paper,
+    );
+    pdf.setDrawColor(PRINT_COLORS.border);
     pdf.setLineWidth(PDF_REGULAR_BORDER_WIDTH);
     pdf.rect(x, cellY, width, height, "FD");
-    pdf.setTextColor(PDF_TEXT_COLOR);
+    pdf.setTextColor(PRINT_COLORS.text);
     drawText(
       pdf,
       cell.text,
@@ -319,7 +319,7 @@ const drawRows = ({
     if (!rows[row - rowOffset]?.isLastInWeek) continue;
 
     const borderY = (rowY.get(row) ?? originY) + rowHeights[row];
-    pdf.setDrawColor("#1d3e91");
+    pdf.setDrawColor(PRINT_COLORS.text);
     pdf.setLineWidth(PDF_WEEK_BORDER_WIDTH);
     pdf.line(
       pageRight - columnWidths.reduce((sum, width) => sum + width, 0),
@@ -404,7 +404,7 @@ export const exportWorkTablePdf = async ({
     if (page > 0) pdf.addPage();
 
     const pageTitle = page === 0 ? title : (metadata?.header ?? metadataHeader);
-    pdf.setTextColor(PDF_MUTED_TEXT_COLOR);
+    pdf.setTextColor(PRINT_COLORS.mutedText);
     drawDirectionalText(
       pdf,
       pageTitle,
@@ -478,7 +478,7 @@ export const exportWorkTablePdf = async ({
       });
     }
 
-    pdf.setTextColor(PDF_MUTED_TEXT_COLOR);
+    pdf.setTextColor(PRINT_COLORS.mutedText);
     if (isRtl) {
       drawMixedRtlText(
         pdf,

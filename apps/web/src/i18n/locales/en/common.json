@@ -13,7 +13,8 @@
   },
   "footer": {
     "copyright": "© {{year}} Shiftly – Salary & Shift Simulation & Calculator",
-    "contact": "Contact"
+    "contact": "Contact",
+    "github": "GitHub Repo"
   },
   "config": {
     "loading": "Loading monthly settings...",

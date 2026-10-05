@@ -266,7 +266,7 @@ export const WorkTable = ({
                         sx={{
                           position: "sticky",
                           bottom: 0,
-                          backgroundColor: "#f0f0f0",
+                          bgcolor: "grey.200",
                           zIndex: 2,
                           "& td": {
                             fontWeight: "bold",

@@ -1,4 +1,5 @@
 import type { PayBreakdownViewModel } from "@/app/types";
+import type { PayTone } from "@/app/theme";
 import { MealAllowanceRates } from "@shiftly/domain";
 
 export type PayRowVM = {
@@ -35,7 +36,7 @@ type BaseSectionConfig = {
   title: string;
   icon: React.ReactNode;
   summaryLabel: string;
-  color: string;
+  tone: PayTone;
   payVM: PayBreakdownViewModel;
 };
 

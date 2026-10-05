@@ -1,11 +1,12 @@
 import { Box, Typography } from "@mui/material";
+import type { RateTier } from "@/app/theme";
 
 type TimeSegmentProps = {
   from: string;
   to: string;
   label: string;
   flex: number;
-  color: string;
+  tier: RateTier;
   crossDay?: boolean;
 };
 
@@ -14,14 +15,14 @@ export const TimeSegment = ({
   to,
   label,
   flex,
-  color,
+  tier,
   crossDay = false,
 }: TimeSegmentProps) => {
   return (
     <Box
       sx={{
         flex,
-        backgroundColor: color,
+        bgcolor: `rateTier.${tier}`,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",

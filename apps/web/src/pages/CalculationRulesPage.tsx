@@ -130,21 +130,21 @@ export const CalculationRulesPage = () => {
                   })}
                   label="100%"
                   flex={1}
-                  color="#e3f2fd"
+                  tier="low"
                 />
                 <TimeSegment
                   from=""
                   to={t(`${cr}.card_extra_hours.segment_overtime_1`)}
                   label="125%"
                   flex={1}
-                  color="#fff8e1"
+                  tier="medium"
                 />
                 <TimeSegment
                   from=""
                   to={t(`${cr}.card_extra_hours.segment_overtime_2`)}
                   label="150%"
                   flex={1}
-                  color="#fce4ec"
+                  tier="high"
                 />
               </WorkDayTimeline>
 
@@ -199,7 +199,7 @@ export const CalculationRulesPage = () => {
                   to="06:00"
                   label="+50%"
                   flex={8}
-                  color="#fce4ec"
+                  tier="high"
                 />
                 <TimeSegment
                   from="06:00"
@@ -208,7 +208,7 @@ export const CalculationRulesPage = () => {
                     `${cr}.card_salary_additions.accordion_weekday.base_salary`,
                   )}
                   flex={8}
-                  color="#e3f2fd"
+                  tier="low"
                 />
               </WorkDayTimeline>
 
@@ -222,14 +222,14 @@ export const CalculationRulesPage = () => {
                   to="22:00"
                   label="+20%"
                   flex={8}
-                  color="#fff8e1"
+                  tier="medium"
                 />
                 <TimeSegment
                   from="22:00"
                   to="6:00"
                   label="+50%"
                   flex={8}
-                  color="#fce4ec"
+                  tier="high"
                   crossDay
                 />
               </WorkDayTimeline>
@@ -262,21 +262,21 @@ export const CalculationRulesPage = () => {
                   to="17:00 או 18:00"
                   label="+20%"
                   flex={8}
-                  color="#e3f2fd"
+                  tier="low"
                 />
                 <TimeSegment
                   from="17:00 או 18:00"
                   to="22:00"
                   label="+150%"
                   flex={8}
-                  color="#fff8e1"
+                  tier="medium"
                 />
                 <TimeSegment
                   from="22:00"
                   to="6:00"
                   label="+200%"
                   flex={8}
-                  color="#fce4ec"
+                  tier="high"
                   crossDay
                 />
               </WorkDayTimeline>
@@ -321,14 +321,14 @@ export const CalculationRulesPage = () => {
                   to="22:00"
                   label="+150%"
                   flex={8}
-                  color="#fff8e1"
+                  tier="medium"
                 />
                 <TimeSegment
                   from="22:00"
                   to="6:00"
                   label="+200%"
                   flex={8}
-                  color="#fce4ec"
+                  tier="high"
                   crossDay
                 />
               </WorkDayTimeline>

@@ -8,7 +8,7 @@ describe("TimeSegment", () => {
     to: "12:00",
     label: "100%",
     flex: 4,
-    color: "#4caf50",
+    tier: "low" as const,
   };
 
   describe("Basic Rendering", () => {
@@ -25,14 +25,21 @@ describe("TimeSegment", () => {
       expect(screen.getByText("125%")).toBeInTheDocument();
     });
 
-    it("should apply custom background color", () => {
-      const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} color="#ff5722" />,
-      );
+    it.each([
+      ["low", "#e3f2fd"],
+      ["medium", "#fff8e1"],
+      ["high", "#fce4ec"],
+    ] as const)(
+      "should shade the %s rate tier from the theme",
+      (tier, color) => {
+        const { container } = renderWithTheme(
+          <TimeSegment {...defaultProps} tier={tier} />,
+        );
 
-      const segment = container.firstChild as HTMLElement;
-      expect(segment).toHaveStyle({ backgroundColor: "#ff5722" });
-    });
+        const segment = container.firstChild as HTMLElement;
+        expect(segment).toHaveStyle({ backgroundColor: color });
+      },
+    );
 
     it("should apply flex value for width proportions", () => {
       const { container } = renderWithTheme(
@@ -138,37 +145,6 @@ describe("TimeSegment", () => {
     });
   });
 
-  describe("Color Variations", () => {
-    it("should accept hex color codes", () => {
-      const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} color="#2196f3" />,
-      );
-
-      const segment = container.firstChild as HTMLElement;
-      expect(segment).toHaveStyle({ backgroundColor: "#2196f3" });
-    });
-
-    it("should accept rgb color values", () => {
-      const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} color="rgb(255, 87, 34)" />,
-      );
-
-      const segment = container.firstChild as HTMLElement;
-      expect(segment).toHaveStyle({ backgroundColor: "rgb(255, 87, 34)" });
-    });
-
-    it("should accept named colors", () => {
-      // Named colors are accepted as valid props
-      // MUI will handle the conversion internally
-      const { container } = renderWithTheme(
-        <TimeSegment {...defaultProps} color="red" />,
-      );
-
-      const segment = container.firstChild as HTMLElement;
-      expect(segment).toBeInTheDocument();
-    });
-  });
-
   describe("Flex Sizing", () => {
     it("should handle small flex values (short duration)", () => {
       const { container } = renderWithTheme(
@@ -263,7 +239,7 @@ describe("TimeSegment", () => {
           to="17:00"
           label="125%"
           flex={8}
-          color="#ff9800"
+          tier="medium"
           crossDay={true}
         />,
       );

@@ -24,6 +24,8 @@
     "format:check": "prettier --check .",
     "preview": "vite preview apps/web --config apps/web/vite.config.ts",
     "calendar:generate": "node scripts/generate-calendar.ts",
+    "docs:diagrams": "node scripts/sync-diagrams.ts",
+    "docs:diagrams:check": "node scripts/sync-diagrams.ts --check",
     "test": "bun run domain:build && vitest",
     "test:ui": "bun run domain:build && vitest --ui",
     "test:domain": "bun run domain:build && vitest run --project domain",
@@ -35,7 +37,7 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui:august-2026": "PLAYWRIGHT_VIDEO=on playwright test e2e/desktop/work-table-month.spec.ts --project=desktop --grep \"\\(he\\)\" --output=test-results/august-2026",
     "test:e2e:ui:august-2026:mobile": "PLAYWRIGHT_VIDEO=on playwright test e2e/mobile/work-table-month.spec.ts --project=android --output=test-results/august-2026-mobile",
-    "predeploy": "bun run typecheck && bun run lint && bun run format:check && bun run test:ci && bun run build",
+    "predeploy": "bun run typecheck && bun run lint && bun run format:check && bun run docs:diagrams:check && bun run test:ci && bun run build",
     "deploy": "gh-pages -d dist"
   },
   "overrides": {

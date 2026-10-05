@@ -116,8 +116,10 @@ export const DayRow = ({
                       size="small"
                       color={specialFullDay ? "warning" : "info"}
                       sx={{
-                        bgcolor: specialFullDay ? "#a64400" : "#005b96",
-                        color: "#fff",
+                        bgcolor: specialFullDay
+                          ? "dayBadge.special"
+                          : "dayBadge.regular",
+                        color: "common.white",
                         height: 16,
                         fontSize: "0.6rem",
                         "& .MuiChip-label": { px: 0.5 },

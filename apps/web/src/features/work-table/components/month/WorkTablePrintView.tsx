@@ -21,6 +21,7 @@ import { useGlobalState } from "@/hooks";
 import { formatValue, groupByShabbat } from "@/utils";
 import { dayToCompactPayBreakdownVM } from "../../mappers/day/dayToCompactPayBreakdownVM";
 import { useWorkTableDayState } from "../../hooks/day/useWorkTableDayState";
+import { PRINT_COLORS } from "../../helpers/printColors";
 
 type WorkTablePrintViewProps = {
   domain: DomainContextType;
@@ -113,7 +114,9 @@ const PrintDayRow = ({
       data-week-end={isLastInWeek ? "true" : undefined}
       sx={{
         "& > td": {
-          borderBottom: isLastInWeek ? "3px solid #1d3e91" : undefined,
+          borderBottom: isLastInWeek
+            ? `3px solid ${PRINT_COLORS.text}`
+            : undefined,
         },
       }}
     >
@@ -207,7 +210,7 @@ export const WorkTablePrintView = forwardRef<
         styles={{
           "@media print": {
             "@page": { size: "landscape", margin: "8mm" },
-            body: { backgroundColor: "#fff" },
+            body: { backgroundColor: PRINT_COLORS.paper },
             "body *": { visibility: "hidden" },
             ".work-table-print-view, .work-table-print-view *": {
               visibility: "visible",
@@ -233,7 +236,7 @@ export const WorkTablePrintView = forwardRef<
           left: "-10000px",
           display: "block",
           width: 1400,
-          backgroundColor: "#fff",
+          backgroundColor: PRINT_COLORS.paper,
           padding: 8,
         }}
       >
@@ -246,7 +249,12 @@ export const WorkTablePrintView = forwardRef<
         {pdfMetadataHeader && (
           <Typography
             component="div"
-            sx={{ mb: 1, color: "#4a4a4a", fontSize: 8, fontWeight: 500 }}
+            sx={{
+              mb: 1,
+              color: PRINT_COLORS.mutedText,
+              fontSize: 8,
+              fontWeight: 500,
+            }}
           >
             {pdfMetadataHeader}
           </Typography>
@@ -257,16 +265,16 @@ export const WorkTablePrintView = forwardRef<
             sx={{
               tableLayout: "fixed",
               borderCollapse: "collapse",
-              color: "#1d3e91",
+              color: PRINT_COLORS.text,
               "& th, & td": {
-                border: "1px solid #777",
+                border: `1px solid ${PRINT_COLORS.border}`,
                 p: "2px 3px",
                 textAlign: "center",
                 verticalAlign: "middle",
                 fontSize: "7px",
                 lineHeight: 1.2,
               },
-              "& th": { fontWeight: 700, bgcolor: "#f3f3f3" },
+              "& th": { fontWeight: 700, bgcolor: PRINT_COLORS.headerFill },
             }}
           >
             <TableHead>

@@ -12,7 +12,7 @@ describe("SalaryCardSection", () => {
     title: "Regular Pay",
     icon: <WorkIcon />,
     summaryLabel: "Total Regular",
-    color: "#4caf50",
+    tone: "base",
     type: "base",
     payVM: {
       totalHours: 180,
@@ -191,8 +191,10 @@ describe("SalaryCardSection", () => {
       const rows = tbody?.querySelectorAll("tr");
       const summaryRow = rows?.[rows.length - 1];
 
-      // Summary row should have background color
-      expect(summaryRow).toBeInTheDocument();
+      // Tinted with the theme's base pay color (#1976d2 at 8% opacity).
+      expect(summaryRow).toHaveStyle({
+        backgroundColor: "rgba(25, 118, 210, 0.08)",
+      });
     });
   });
 
