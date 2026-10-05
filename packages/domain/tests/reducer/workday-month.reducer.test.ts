@@ -26,17 +26,17 @@ describe("WorkDayMonthReducer", () => {
         hours150: { percent: 1.5, hours: 0 },
       })),
       accumulate: vi.fn((base, add) => ({
-        hours100: { 
-          percent: 1, 
-          hours: (base?.hours100?.hours ?? 0) + (add?.hours100?.hours ?? 0) 
+        hours100: {
+          percent: 1,
+          hours: (base?.hours100?.hours ?? 0) + (add?.hours100?.hours ?? 0),
         },
-        hours125: { 
-          percent: 1.25, 
-          hours: (base?.hours125?.hours ?? 0) + (add?.hours125?.hours ?? 0) 
+        hours125: {
+          percent: 1.25,
+          hours: (base?.hours125?.hours ?? 0) + (add?.hours125?.hours ?? 0),
         },
-        hours150: { 
-          percent: 1.5, 
-          hours: (base?.hours150?.hours ?? 0) + (add?.hours150?.hours ?? 0) 
+        hours150: {
+          percent: 1.5,
+          hours: (base?.hours150?.hours ?? 0) + (add?.hours150?.hours ?? 0),
         },
       })),
     };
@@ -48,13 +48,13 @@ describe("WorkDayMonthReducer", () => {
         hours50: { percent: 0.5, hours: 0 },
       })),
       accumulate: vi.fn((base, add) => ({
-        hours20: { 
-          percent: 0.2, 
-          hours: (base?.hours20?.hours ?? 0) + (add?.hours20?.hours ?? 0) 
+        hours20: {
+          percent: 0.2,
+          hours: (base?.hours20?.hours ?? 0) + (add?.hours20?.hours ?? 0),
         },
-        hours50: { 
-          percent: 0.5, 
-          hours: (base?.hours50?.hours ?? 0) + (add?.hours50?.hours ?? 0) 
+        hours50: {
+          percent: 0.5,
+          hours: (base?.hours50?.hours ?? 0) + (add?.hours50?.hours ?? 0),
         },
       })),
     };
@@ -66,13 +66,13 @@ describe("WorkDayMonthReducer", () => {
         shabbat200: { percent: 2, hours: 0 },
       })),
       accumulate: vi.fn((base, add) => ({
-        shabbat150: { 
-          percent: 1.5, 
-          hours: (base?.shabbat150?.hours ?? 0) + (add?.shabbat150?.hours ?? 0) 
+        shabbat150: {
+          percent: 1.5,
+          hours: (base?.shabbat150?.hours ?? 0) + (add?.shabbat150?.hours ?? 0),
         },
-        shabbat200: { 
-          percent: 2, 
-          hours: (base?.shabbat200?.hours ?? 0) + (add?.shabbat200?.hours ?? 0) 
+        shabbat200: {
+          percent: 2,
+          hours: (base?.shabbat200?.hours ?? 0) + (add?.shabbat200?.hours ?? 0),
         },
       })),
     };
@@ -184,7 +184,7 @@ describe("WorkDayMonthReducer", () => {
 
       expect(mockRegularReducer.accumulate).toHaveBeenCalledWith(
         base.regular,
-        add.workMap!.regular
+        add.workMap!.regular,
       );
       expect(result.regular.hours100.hours).toBe(48);
       expect(result.regular.hours125.hours).toBe(12);
@@ -220,7 +220,7 @@ describe("WorkDayMonthReducer", () => {
 
       expect(mockExtraReducer.accumulate).toHaveBeenCalledWith(
         base.extra,
-        add.workMap!.extra
+        add.workMap!.extra,
       );
       expect(result.extra.hours20.hours).toBe(7);
       expect(result.extra.hours50.hours).toBe(4);
@@ -256,7 +256,7 @@ describe("WorkDayMonthReducer", () => {
 
       expect(mockSpecialReducer.accumulate).toHaveBeenCalledWith(
         base.special,
-        add.workMap!.special
+        add.workMap!.special,
       );
       expect(result.special.shabbat150.hours).toBe(18);
       expect(result.special.shabbat200.hours).toBe(7);
@@ -379,7 +379,7 @@ describe("WorkDayMonthReducer", () => {
 
       expect(mockRegularReducer.accumulate).toHaveBeenCalledWith(
         base.regular,
-        add.workMap!.regular
+        add.workMap!.regular,
       );
     });
 
@@ -622,7 +622,7 @@ describe("WorkDayMonthReducer", () => {
 
       expect(mockRegularReducer.accumulate).toHaveBeenCalledWith(
         base.regular,
-        add.workMap!.regular
+        add.workMap!.regular,
       );
     });
 
@@ -657,7 +657,7 @@ describe("WorkDayMonthReducer", () => {
 
       expect(mockExtraReducer.accumulate).toHaveBeenCalledWith(
         base.extra,
-        add.workMap!.extra
+        add.workMap!.extra,
       );
     });
 
@@ -692,7 +692,7 @@ describe("WorkDayMonthReducer", () => {
 
       expect(mockSpecialReducer.accumulate).toHaveBeenCalledWith(
         base.special,
-        add.workMap!.special
+        add.workMap!.special,
       );
     });
   });
@@ -701,7 +701,11 @@ describe("WorkDayMonthReducer", () => {
     it("should return WorkPayPart structure", () => {
       const result = reducer.createEmpty();
 
-      expect(Object.keys(result).sort()).toEqual(["extra", "regular", "special"]);
+      expect(Object.keys(result).sort()).toEqual([
+        "extra",
+        "regular",
+        "special",
+      ]);
     });
   });
 

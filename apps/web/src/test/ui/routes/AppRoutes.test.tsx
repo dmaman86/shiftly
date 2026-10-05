@@ -41,7 +41,7 @@ const renderAtPath = (path: string) =>
     <MemoryRouter initialEntries={[path]}>
       <AppRoutes />
       <LocationTracker />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 
 describe("AppRoutes", () => {
@@ -49,13 +49,19 @@ describe("AppRoutes", () => {
     it("renders the profile publicly without redirecting", async () => {
       renderAtPath("/en/profile?utm_source=test");
       expect(await screen.findByText("Profile Page")).toBeInTheDocument();
-      expect(screen.getByTestId("location")).toHaveTextContent("/en/profile?utm_source=test");
+      expect(screen.getByTestId("location")).toHaveTextContent(
+        "/en/profile?utm_source=test",
+      );
     });
 
     it("preserves search parameters and section hashes on the public rules route", async () => {
       renderAtPath("/he/calculation-rules?utm_source=test#interactive-example");
-      expect(await screen.findByText("Calculation Rules Page")).toBeInTheDocument();
-      expect(screen.getByTestId("location")).toHaveTextContent("/he/calculation-rules?utm_source=test#interactive-example");
+      expect(
+        await screen.findByText("Calculation Rules Page"),
+      ).toBeInTheDocument();
+      expect(screen.getByTestId("location")).toHaveTextContent(
+        "/he/calculation-rules?utm_source=test#interactive-example",
+      );
     });
   });
   describe("Redirects", () => {

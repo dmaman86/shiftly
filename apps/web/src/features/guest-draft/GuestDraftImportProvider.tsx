@@ -24,14 +24,19 @@ import {
 
 type ImportOutcome = "imported" | "replaced";
 
-type FailedStep = { step: "checking" } | { step: "importing"; outcome: ImportOutcome };
+type FailedStep =
+  { step: "checking" } | { step: "importing"; outcome: ImportOutcome };
 
 // In-flight states keep the dialog that triggered them, so it stays open and
 // busy instead of flickering closed while a request runs.
 type GuestDraftImportState =
   | { status: "pending"; draft: GuestDraft }
   | { status: "idle" }
-  | { status: "checking"; draft: GuestDraft; dialog: GuestDraftDialogMode | null }
+  | {
+      status: "checking";
+      draft: GuestDraft;
+      dialog: GuestDraftDialogMode | null;
+    }
   | { status: "confirming"; draft: GuestDraft; savedShiftCount: number }
   | {
       status: "importing";
@@ -63,18 +68,23 @@ export const GuestDraftImportProvider = ({
   const { callEndPoint } = useFetch();
   const snackbar = useAppSnackbar();
   const [state, setState] = useState<GuestDraftImportState>(() =>
-    initialDraft ? { status: "pending", draft: initialDraft } : { status: "idle" },
+    initialDraft
+      ? { status: "pending", draft: initialDraft }
+      : { status: "idle" },
   );
   const startedRef = useRef(false);
   const userId = user?.id;
 
-  const fail = useCallback((draft: GuestDraft, failed: FailedStep, error: string) => {
-    console.error("Guest draft import failed", error);
-    // Put the draft back so a reload retries instead of losing it.
-    guestDraftStorage.save(draft);
-    guestDraftStorage.markPendingImport();
-    setState({ status: "error", draft, failed });
-  }, []);
+  const fail = useCallback(
+    (draft: GuestDraft, failed: FailedStep, error: string) => {
+      console.error("Guest draft import failed", error);
+      // Put the draft back so a reload retries instead of losing it.
+      guestDraftStorage.save(draft);
+      guestDraftStorage.markPendingImport();
+      setState({ status: "error", draft, failed });
+    },
+    [],
+  );
 
   const runImport = useCallback(
     async (
@@ -114,7 +124,9 @@ export const GuestDraftImportProvider = ({
       );
       const [shiftsResult, daysResult] = await Promise.all([
         callEndPoint(shiftService().fetchForMonth(ownerId, startDate, endDate)),
-        callEndPoint(workDayService().fetchForMonth(ownerId, startDate, endDate)),
+        callEndPoint(
+          workDayService().fetchForMonth(ownerId, startDate, endDate),
+        ),
       ]);
       const error = shiftsResult.error ?? daysResult.error;
 
@@ -175,7 +187,8 @@ export const GuestDraftImportProvider = ({
   const handleRetry = () => {
     if (state.status !== "error" || !userId) return;
     const errorDialog: GuestDraftDialogMode = { type: "error" };
-    if (state.failed.step === "checking") void runCheck(state.draft, userId, errorDialog);
+    if (state.failed.step === "checking")
+      void runCheck(state.draft, userId, errorDialog);
     else void runImport(state.draft, state.failed.outcome, errorDialog);
   };
 
@@ -184,7 +197,10 @@ export const GuestDraftImportProvider = ({
     guestDraftStorage.discard();
     analyticsService.track({
       name: "guest_draft_import_resolved",
-      params: { outcome: "discarded_after_error", shift_count: state.draft.shifts.length },
+      params: {
+        outcome: "discarded_after_error",
+        shift_count: state.draft.shifts.length,
+      },
     });
     setState({ status: "idle" });
   };

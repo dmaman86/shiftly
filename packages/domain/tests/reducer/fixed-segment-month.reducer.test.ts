@@ -1,7 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { FixedSegmentMonthReducer } from "../../src/reducer/fixed-segment-month.reducer.js";
 import { FixedSegmentCalculator } from "../../src/calculator/fixed-segment.calculator.js";
-import type { FixedSegmentBundle, MonthPayMap, WorkDayMap, Segment } from "../../src/index.js";
+import type {
+  FixedSegmentBundle,
+  MonthPayMap,
+  WorkDayMap,
+  Segment,
+} from "../../src/index.js";
 
 describe("FixedSegmentMonthReducer", () => {
   let reducer: FixedSegmentMonthReducer;
@@ -238,7 +243,10 @@ describe("FixedSegmentMonthReducer", () => {
       };
 
       for (let i = 0; i < 3; i++) {
-        monthTotal = reducer.accumulate(monthTotal as MonthPayMap, sickDay as WorkDayMap);
+        monthTotal = reducer.accumulate(
+          monthTotal as MonthPayMap,
+          sickDay as WorkDayMap,
+        );
       }
 
       expect(monthTotal.hours100Sick.hours).toBe(24);
@@ -254,7 +262,10 @@ describe("FixedSegmentMonthReducer", () => {
       };
 
       for (let i = 0; i < 5; i++) {
-        monthTotal = reducer.accumulate(monthTotal as MonthPayMap, vacationDay as WorkDayMap);
+        monthTotal = reducer.accumulate(
+          monthTotal as MonthPayMap,
+          vacationDay as WorkDayMap,
+        );
       }
 
       expect(monthTotal.hours100Vacation.hours).toBe(40);
@@ -270,7 +281,10 @@ describe("FixedSegmentMonthReducer", () => {
       };
 
       for (let i = 0; i < 4; i++) {
-        monthTotal = reducer.accumulate(monthTotal as MonthPayMap, shabbatDay as WorkDayMap);
+        monthTotal = reducer.accumulate(
+          monthTotal as MonthPayMap,
+          shabbatDay as WorkDayMap,
+        );
       }
 
       expect(monthTotal.earnedShabbatCredit.hours).toBe(40);
@@ -279,23 +293,32 @@ describe("FixedSegmentMonthReducer", () => {
     it("should handle mixed segment types in month", () => {
       let monthTotal = reducer.createEmpty();
 
-      monthTotal = reducer.accumulate(monthTotal as MonthPayMap, {
-        hours100Sick: { percent: 1, hours: 8 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        earnedShabbatCredit: { percent: 1.5, hours: 0 },
-      } as WorkDayMap);
+      monthTotal = reducer.accumulate(
+        monthTotal as MonthPayMap,
+        {
+          hours100Sick: { percent: 1, hours: 8 },
+          hours100Vacation: { percent: 1, hours: 0 },
+          earnedShabbatCredit: { percent: 1.5, hours: 0 },
+        } as WorkDayMap,
+      );
 
-      monthTotal = reducer.accumulate(monthTotal as MonthPayMap, {
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 8 },
-        earnedShabbatCredit: { percent: 1.5, hours: 0 },
-      } as WorkDayMap);
+      monthTotal = reducer.accumulate(
+        monthTotal as MonthPayMap,
+        {
+          hours100Sick: { percent: 1, hours: 0 },
+          hours100Vacation: { percent: 1, hours: 8 },
+          earnedShabbatCredit: { percent: 1.5, hours: 0 },
+        } as WorkDayMap,
+      );
 
-      monthTotal = reducer.accumulate(monthTotal as MonthPayMap, {
-        hours100Sick: { percent: 1, hours: 0 },
-        hours100Vacation: { percent: 1, hours: 0 },
-        earnedShabbatCredit: { percent: 1.5, hours: 10 },
-      } as WorkDayMap);
+      monthTotal = reducer.accumulate(
+        monthTotal as MonthPayMap,
+        {
+          hours100Sick: { percent: 1, hours: 0 },
+          hours100Vacation: { percent: 1, hours: 0 },
+          earnedShabbatCredit: { percent: 1.5, hours: 10 },
+        } as WorkDayMap,
+      );
 
       expect(monthTotal.hours100Sick.hours).toBe(8);
       expect(monthTotal.hours100Vacation.hours).toBe(8);
@@ -401,15 +424,20 @@ describe("FixedSegmentMonthReducer", () => {
       let result = reducer.createEmpty();
 
       for (let i = 0; i < 10; i++) {
-        result = reducer.accumulate(result as MonthPayMap, {
-          hours100Sick: { percent: 1, hours: 0.1 },
-          hours100Vacation: { percent: 1, hours: 0.1 },
-          earnedShabbatCredit: { percent: 1.5, hours: 0.1 },
-        } as WorkDayMap);
+        result = reducer.accumulate(
+          result as MonthPayMap,
+          {
+            hours100Sick: { percent: 1, hours: 0.1 },
+            hours100Vacation: { percent: 1, hours: 0.1 },
+            earnedShabbatCredit: { percent: 1.5, hours: 0.1 },
+          } as WorkDayMap,
+        );
       }
 
       // Should be called with approximately 1.0
-      const lastSickCall = (mockBundle.sick.calculate as ReturnType<typeof vi.fn>).mock.calls.slice(-1)[0][0];
+      const lastSickCall = (
+        mockBundle.sick.calculate as ReturnType<typeof vi.fn>
+      ).mock.calls.slice(-1)[0][0];
       expect(lastSickCall).toBeCloseTo(1.0, 1);
     });
   });

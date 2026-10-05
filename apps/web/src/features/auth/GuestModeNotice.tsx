@@ -15,7 +15,10 @@ export const GuestModeNotice = ({ sx }: Pick<AlertProps, "sx">) => {
   return (
     <Alert
       severity="info"
-      sx={[{ color: "#004b76", "& .MuiAlert-message": { width: "100%" } }, ...(Array.isArray(sx) ? sx : [sx])]}
+      sx={[
+        { color: "#004b76", "& .MuiAlert-message": { width: "100%" } },
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
     >
       <Stack
         direction={{ xs: "column", sm: "row" }}

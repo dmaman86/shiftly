@@ -81,8 +81,12 @@ describe("DefaultMonthResolver", () => {
       });
 
       it("should handle system start year correctly regardless of current date", () => {
-        const resolver1 = new DefaultMonthResolver(() => new Date("2020-01-01"));
-        const resolver2 = new DefaultMonthResolver(() => new Date("2025-12-31"));
+        const resolver1 = new DefaultMonthResolver(
+          () => new Date("2020-01-01"),
+        );
+        const resolver2 = new DefaultMonthResolver(
+          () => new Date("2025-12-31"),
+        );
 
         expect(resolver1.getAvailableMonths(2015)).toEqual([10, 11]);
         expect(resolver2.getAvailableMonths(2015)).toEqual([10, 11]);
@@ -131,7 +135,7 @@ describe("DefaultMonthResolver", () => {
     describe("current year", () => {
       it("should return months from January to current month (June = 0-5)", () => {
         const resolver = new DefaultMonthResolver(
-          () => new Date("2023-06-15T12:00:00.000Z")
+          () => new Date("2023-06-15T12:00:00.000Z"),
         );
 
         const result = resolver.getAvailableMonths(2023);
@@ -142,7 +146,7 @@ describe("DefaultMonthResolver", () => {
 
       it("should include current month for January (month 0)", () => {
         const resolver = new DefaultMonthResolver(
-          () => new Date("2023-01-15T12:00:00.000Z")
+          () => new Date("2023-01-15T12:00:00.000Z"),
         );
 
         const result = resolver.getAvailableMonths(2023);
@@ -153,7 +157,7 @@ describe("DefaultMonthResolver", () => {
 
       it("should include all months for December (month 11)", () => {
         const resolver = new DefaultMonthResolver(
-          () => new Date("2023-12-15T12:00:00.000Z")
+          () => new Date("2023-12-15T12:00:00.000Z"),
         );
 
         const result = resolver.getAvailableMonths(2023);
@@ -164,7 +168,7 @@ describe("DefaultMonthResolver", () => {
 
       it("should return months 0-2 for March", () => {
         const resolver = new DefaultMonthResolver(
-          () => new Date("2023-03-10T12:00:00.000Z")
+          () => new Date("2023-03-10T12:00:00.000Z"),
         );
 
         const result = resolver.getAvailableMonths(2023);
@@ -174,7 +178,7 @@ describe("DefaultMonthResolver", () => {
 
       it("should return months 0-8 for September", () => {
         const resolver = new DefaultMonthResolver(
-          () => new Date("2023-09-20T12:00:00.000Z")
+          () => new Date("2023-09-20T12:00:00.000Z"),
         );
 
         const result = resolver.getAvailableMonths(2023);
@@ -184,7 +188,7 @@ describe("DefaultMonthResolver", () => {
 
       it("should handle first day of month correctly", () => {
         const resolver = new DefaultMonthResolver(
-          () => new Date(2023, 4, 1, 0, 0, 0, 0) // May 1, 2023 in local time
+          () => new Date(2023, 4, 1, 0, 0, 0, 0), // May 1, 2023 in local time
         );
 
         const result = resolver.getAvailableMonths(2023);
@@ -194,7 +198,7 @@ describe("DefaultMonthResolver", () => {
 
       it("should handle last day of month correctly", () => {
         const resolver = new DefaultMonthResolver(
-          () => new Date(2023, 6, 31, 23, 59, 59, 999) // July 31, 2023 in local time
+          () => new Date(2023, 6, 31, 23, 59, 59, 999), // July 31, 2023 in local time
         );
 
         const result = resolver.getAvailableMonths(2023);
@@ -249,7 +253,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should return current month + 1 for current year (June = 6)", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2023-06-15T12:00:00.000Z")
+        () => new Date("2023-06-15T12:00:00.000Z"),
       );
 
       const result = resolver.resolveDefaultMonth(2023);
@@ -275,7 +279,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should handle January as current month (return 1)", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2023-01-15T12:00:00.000Z")
+        () => new Date("2023-01-15T12:00:00.000Z"),
       );
 
       const result = resolver.resolveDefaultMonth(2023);
@@ -285,7 +289,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should handle December as current month (return 12)", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2023-12-15T12:00:00.000Z")
+        () => new Date("2023-12-15T12:00:00.000Z"),
       );
 
       const result = resolver.resolveDefaultMonth(2023);
@@ -317,7 +321,7 @@ describe("DefaultMonthResolver", () => {
   describe("getCurrentYear", () => {
     it("should return current year from date provider", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2023-06-15T12:00:00.000Z")
+        () => new Date("2023-06-15T12:00:00.000Z"),
       );
 
       const result = resolver.getCurrentYear();
@@ -327,7 +331,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should return consistent year from date provider", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2022-03-10T10:00:00.000Z")
+        () => new Date("2022-03-10T10:00:00.000Z"),
       );
 
       const result1 = resolver.getCurrentYear();
@@ -340,9 +344,15 @@ describe("DefaultMonthResolver", () => {
     });
 
     it("should handle different years correctly", () => {
-      const resolver2020 = new DefaultMonthResolver(() => new Date("2020-01-01"));
-      const resolver2021 = new DefaultMonthResolver(() => new Date("2021-12-31"));
-      const resolver2024 = new DefaultMonthResolver(() => new Date("2024-07-15"));
+      const resolver2020 = new DefaultMonthResolver(
+        () => new Date("2020-01-01"),
+      );
+      const resolver2021 = new DefaultMonthResolver(
+        () => new Date("2021-12-31"),
+      );
+      const resolver2024 = new DefaultMonthResolver(
+        () => new Date("2024-07-15"),
+      );
 
       expect(resolver2020.getCurrentYear()).toBe(2020);
       expect(resolver2021.getCurrentYear()).toBe(2021);
@@ -360,7 +370,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should handle year transitions correctly", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2023-12-15T12:00:00.000Z")
+        () => new Date("2023-12-15T12:00:00.000Z"),
       );
 
       const result = resolver.getCurrentYear();
@@ -372,7 +382,7 @@ describe("DefaultMonthResolver", () => {
   describe("Edge Cases and Boundaries", () => {
     it("should handle leap year (2024) correctly", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2024-02-29T12:00:00.000Z")
+        () => new Date("2024-02-29T12:00:00.000Z"),
       );
 
       const months = resolver.getAvailableMonths(2024);
@@ -394,7 +404,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should handle midnight boundary correctly", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date(2023, 5, 1, 0, 0, 0, 0) // June 1, 2023 in local time
+        () => new Date(2023, 5, 1, 0, 0, 0, 0), // June 1, 2023 in local time
       );
 
       const months = resolver.getAvailableMonths(2023);
@@ -405,7 +415,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should handle end of day boundary correctly", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2023-06-30T12:00:00.000Z")
+        () => new Date("2023-06-30T12:00:00.000Z"),
       );
 
       const months = resolver.getAvailableMonths(2023);
@@ -413,13 +423,12 @@ describe("DefaultMonthResolver", () => {
       expect(months).toContain(5); // June (5)
       expect(months).toHaveLength(6);
     });
-
   });
 
   describe("Integration Scenarios", () => {
     it("should work correctly for complete workflow in current year", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2023-06-15T12:00:00.000Z")
+        () => new Date("2023-06-15T12:00:00.000Z"),
       );
 
       const currentYear = resolver.getCurrentYear();
@@ -453,7 +462,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should handle December edge case correctly", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date("2023-12-31T12:00:00.000Z")
+        () => new Date("2023-12-31T12:00:00.000Z"),
       );
 
       const currentYear = resolver.getCurrentYear();
@@ -467,7 +476,7 @@ describe("DefaultMonthResolver", () => {
 
     it("should handle January edge case correctly", () => {
       const resolver = new DefaultMonthResolver(
-        () => new Date(2023, 0, 1, 0, 0, 0, 0) // January 1, 2023 in local time
+        () => new Date(2023, 0, 1, 0, 0, 0, 0), // January 1, 2023 in local time
       );
 
       const currentYear = resolver.getCurrentYear();
@@ -491,13 +500,16 @@ describe("DefaultMonthResolver", () => {
       expect(months1).toEqual(months2);
       expect(months2).toEqual(months3);
     });
-
   });
 
   describe("Time-dependent Behavior", () => {
     it("should correctly differentiate years based on date", () => {
-      const resolver2020 = new DefaultMonthResolver(() => new Date("2020-06-15"));
-      const resolver2023 = new DefaultMonthResolver(() => new Date("2023-06-15"));
+      const resolver2020 = new DefaultMonthResolver(
+        () => new Date("2020-06-15"),
+      );
+      const resolver2023 = new DefaultMonthResolver(
+        () => new Date("2023-06-15"),
+      );
 
       // For 2020 resolver, 2019 is past, 2020 is current, 2021 is future
       expect(resolver2020.getAvailableMonths(2019)).toHaveLength(12);
@@ -511,9 +523,15 @@ describe("DefaultMonthResolver", () => {
     });
 
     it("should handle different months in same year", () => {
-      const resolverJan = new DefaultMonthResolver(() => new Date("2023-01-15"));
-      const resolverJun = new DefaultMonthResolver(() => new Date("2023-06-15"));
-      const resolverDec = new DefaultMonthResolver(() => new Date("2023-12-15"));
+      const resolverJan = new DefaultMonthResolver(
+        () => new Date("2023-01-15"),
+      );
+      const resolverJun = new DefaultMonthResolver(
+        () => new Date("2023-06-15"),
+      );
+      const resolverDec = new DefaultMonthResolver(
+        () => new Date("2023-12-15"),
+      );
 
       expect(resolverJan.getAvailableMonths(2023)).toHaveLength(1);
       expect(resolverJun.getAvailableMonths(2023)).toHaveLength(6);

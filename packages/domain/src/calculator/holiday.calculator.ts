@@ -1,8 +1,5 @@
 import { Weekend, WorkDayType } from "../constants/index.js";
-import {
-  CalendarEventKind,
-  type CalendarEvent,
-} from "../types/types.js";
+import { CalendarEventKind, type CalendarEvent } from "../types/types.js";
 import type { HolidayCalculator } from "../types/services.js";
 
 export class DefaultHolidayCalculator implements HolidayCalculator {
@@ -18,7 +15,8 @@ export class DefaultHolidayCalculator implements HolidayCalculator {
     if (
       events.some(
         (event) => event.kind === CalendarEventKind.PartialHolidayStart,
-      ) || weekday === Weekend.FRIDAY
+      ) ||
+      weekday === Weekend.FRIDAY
     )
       return WorkDayType.SpecialPartialStart;
 

@@ -11,7 +11,12 @@ export type PendingShiftUpsert = {
 export type DayMutation =
   | ({ type: "upsertShift" } & PendingShiftUpsert)
   | { type: "removeShift"; userId: string; shiftId: string }
-  | { type: "setStatus"; userId: string; dateKey: string; status: WorkDayStatus };
+  | {
+      type: "setStatus";
+      userId: string;
+      dateKey: string;
+      status: WorkDayStatus;
+    };
 
 export type WorkTableStateChanges = {
   statusChanges: Array<Extract<DayMutation, { type: "setStatus" }>>;
@@ -64,15 +69,24 @@ export const getWorkTableStateChanges = (
     }
 
     const previousEntries = Object.fromEntries(
-      getValidEntries(previousState, dateKey).map((entry) => [entry.shift.id, entry]),
+      getValidEntries(previousState, dateKey).map((entry) => [
+        entry.shift.id,
+        entry,
+      ]),
     );
     const currentEntries = Object.fromEntries(
-      getValidEntries(currentState, dateKey).map((entry) => [entry.shift.id, entry]),
+      getValidEntries(currentState, dateKey).map((entry) => [
+        entry.shift.id,
+        entry,
+      ]),
     );
 
     for (const [shiftId, previousEntry] of Object.entries(previousEntries)) {
       const currentEntry = currentEntries[shiftId];
-      if (currentEntry && shiftsAreEqual(previousEntry.shift, currentEntry.shift)) {
+      if (
+        currentEntry &&
+        shiftsAreEqual(previousEntry.shift, currentEntry.shift)
+      ) {
         continue;
       }
       changes.removedShiftIds.push({ type: "removeShift", userId, shiftId });
@@ -80,7 +94,10 @@ export const getWorkTableStateChanges = (
 
     for (const [shiftId, currentEntry] of Object.entries(currentEntries)) {
       const previousEntry = previousEntries[shiftId];
-      if (previousEntry && shiftsAreEqual(previousEntry.shift, currentEntry.shift)) {
+      if (
+        previousEntry &&
+        shiftsAreEqual(previousEntry.shift, currentEntry.shift)
+      ) {
         continue;
       }
       changes.upsertShifts.push({

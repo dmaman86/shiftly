@@ -54,15 +54,16 @@ export const SalaryCardSection = ({
 
   const handleQuantityChange = (index: number, newQuantity: number) => {
     const row = table.rows[index];
-    const updatedRow = { ...row, quantity: newQuantity, total: newQuantity * row.rate };
+    const updatedRow = {
+      ...row,
+      quantity: newQuantity,
+      total: newQuantity * row.rate,
+    };
     table.updateRow(index, updatedRow);
-
   };
 
   return (
-    <CardSurface
-      sx={{ mb: 3, borderRadius: 2, overflow: "hidden" }}
-    >
+    <CardSurface sx={{ mb: 3, borderRadius: 2, overflow: "hidden" }}>
       <CardHeader
         avatar={section.icon}
         title={
@@ -71,7 +72,13 @@ export const SalaryCardSection = ({
           </Typography>
         }
         action={
-          <Tooltip title={editMode ? t("salary_summary.edit_done") : t("salary_summary.edit_quantities")}>
+          <Tooltip
+            title={
+              editMode
+                ? t("salary_summary.edit_done")
+                : t("salary_summary.edit_quantities")
+            }
+          >
             <IconButton
               onClick={() => {
                 if (!editMode) {
@@ -104,7 +111,9 @@ export const SalaryCardSection = ({
             }}
           >
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>{t("salary_summary.table_col_type")}</TableCell>
+              <TableCell sx={{ fontWeight: "bold" }}>
+                {t("salary_summary.table_col_type")}
+              </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 {t("salary_summary.table_col_quantity")}
               </TableCell>

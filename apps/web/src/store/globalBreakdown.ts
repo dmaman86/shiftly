@@ -1,4 +1,8 @@
-import type { MonthPayMap, MonthPayMapReducer, WorkDayMap } from "@shiftly/domain";
+import type {
+  MonthPayMap,
+  MonthPayMapReducer,
+  WorkDayMap,
+} from "@shiftly/domain";
 
 export const calculateGlobalBreakdown = (
   dailyPayMaps: Record<string, WorkDayMap>,

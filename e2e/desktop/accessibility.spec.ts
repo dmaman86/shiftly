@@ -4,7 +4,9 @@ import { getHorizontalOverflow, prepareApp } from "../support/app";
 test.use({ viewport: { width: 1363, height: 936 } });
 
 for (const language of ["en", "he"]) {
-  test(`uses visible page headings and named controls (${language})`, async ({ page }) => {
+  test(`uses visible page headings and named controls (${language})`, async ({
+    page,
+  }) => {
     await prepareApp(page);
     for (const route of ["daily", "monthly", "calculation-rules"]) {
       await page.goto(`${language}/${route}`);
@@ -19,7 +21,9 @@ for (const language of ["en", "he"]) {
   });
 }
 
-test("exposes named controls, single navigation links and associated validation", async ({ page }) => {
+test("exposes named controls, single navigation links and associated validation", async ({
+  page,
+}) => {
   await prepareApp(page);
   await page.goto("en/daily");
   await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
@@ -47,17 +51,26 @@ test("exposes named controls, single navigation links and associated validation"
   await expect(rate).toHaveAttribute("aria-invalid", "true");
   await expect(rate).toHaveAccessibleDescription(/.+/);
   await rate.fill("50");
-  await row.getByRole("group", { name: /^In, shift 1/i }).getByRole("spinbutton", { name: "Hours" }).fill("08");
+  await row
+    .getByRole("group", { name: /^In, shift 1/i })
+    .getByRole("spinbutton", { name: "Hours" })
+    .fill("08");
   const end = row.getByRole("group", { name: /^Out, shift 1/i });
-  await expect(end).toHaveAccessibleDescription(/end time must be after start time/i);
+  await expect(end).toHaveAccessibleDescription(
+    /end time must be after start time/i,
+  );
   await end.getByRole("spinbutton", { name: "Hours" }).fill("16");
-  await expect(page.getByRole("status")).toContainText("Calculation updated", { timeout: 10000 });
+  await expect(page.getByRole("status")).toContainText("Calculation updated", {
+    timeout: 10000,
+  });
   await duty.click();
   await expect(duty).toHaveAttribute("aria-pressed", "true");
   expect(await getHorizontalOverflow(page)).toBe(0);
 });
 
-test("retains accessible shift context in the mobile layout", async ({ page }) => {
+test("retains accessible shift context in the mobile layout", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await prepareApp(page);
   await page.goto("en/daily");
@@ -66,7 +79,9 @@ test("retains accessible shift context in the mobile layout", async ({ page }) =
   await add.click();
   await add.click();
   for (const number of [1, 2]) {
-    await expect(page.getByRole("group", { name: new RegExp(`shift ${number},`) })).toHaveCount(2);
+    await expect(
+      page.getByRole("group", { name: new RegExp(`shift ${number},`) }),
+    ).toHaveCount(2);
   }
   for (const duty of await page.getByTestId("shift-duty-toggle").all()) {
     await expect(duty).toHaveAccessibleName(/duty/i);
@@ -75,11 +90,20 @@ test("retains accessible shift context in the mobile layout", async ({ page }) =
   expect(await getHorizontalOverflow(page)).toBe(0);
 });
 
-test("renders audited text colors above the normal-text contrast threshold", async ({ page }) => {
-  await prepareApp(page, { holidays: [
-    { date: "2026-09-11", title: "Erev Rosh Hashana", category: "holiday" },
-    { date: "2026-09-12", title: "Rosh Hashana I", category: "holiday", yomtov: true },
-  ] });
+test("renders audited text colors above the normal-text contrast threshold", async ({
+  page,
+}) => {
+  await prepareApp(page, {
+    holidays: [
+      { date: "2026-09-11", title: "Erev Rosh Hashana", category: "holiday" },
+      {
+        date: "2026-09-12",
+        title: "Rosh Hashana I",
+        category: "holiday",
+        yomtov: true,
+      },
+    ],
+  });
   await page.goto("en/daily");
   await page.locator('input[name="baseRate"]').fill("50");
   await expect(page.locator(".MuiChip-label")).toHaveCount(2);
@@ -93,27 +117,57 @@ test("renders audited text colors above the normal-text contrast threshold", asy
     const over = (front: Color, back: Color): Color => [
       front[0] * front[3] + back[0] * (1 - front[3]),
       front[1] * front[3] + back[1] * (1 - front[3]),
-      front[2] * front[3] + back[2] * (1 - front[3]), 1,
+      front[2] * front[3] + back[2] * (1 - front[3]),
+      1,
     ];
-    const luminance = (color: Color) => color.slice(0, 3).reduce((sum, channel, index) => {
-      const value = channel / 255;
-      return sum + [0.2126, 0.7152, 0.0722][index] * (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
-    }, 0);
+    const luminance = (color: Color) =>
+      color.slice(0, 3).reduce((sum, channel, index) => {
+        const value = channel / 255;
+        return (
+          sum +
+          [0.2126, 0.7152, 0.0722][index] *
+            (value <= 0.04045
+              ? value / 12.92
+              : ((value + 0.055) / 1.055) ** 2.4)
+        );
+      }, 0);
     const targets = [
       ...Array.from(document.querySelectorAll(".MuiChip-label")),
       ...Array.from(document.querySelectorAll(".MuiAlert-message")),
-      ...Array.from(document.querySelectorAll("td")).filter(element => getComputedStyle(element).color === "rgb(166, 68, 0)"),
+      ...Array.from(document.querySelectorAll("td")).filter(
+        (element) => getComputedStyle(element).color === "rgb(166, 68, 0)",
+      ),
     ];
-    return targets.map(element => {
+    return targets.map((element) => {
       const ancestors: Element[] = [];
-      for (let current: Element | null = element; current; current = current.parentElement) ancestors.push(current);
-      const background = ancestors.reverse().reduce((color, ancestor) => over(parse(getComputedStyle(ancestor).backgroundColor), color), [255, 255, 255, 1] as Color);
-      const foreground = over(parse(getComputedStyle(element).color), background);
-      const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
-      return { text: element.textContent?.trim(), ratio: (values[0] + 0.05) / (values[1] + 0.05) };
+      for (
+        let current: Element | null = element;
+        current;
+        current = current.parentElement
+      )
+        ancestors.push(current);
+      const background = ancestors
+        .reverse()
+        .reduce(
+          (color, ancestor) =>
+            over(parse(getComputedStyle(ancestor).backgroundColor), color),
+          [255, 255, 255, 1] as Color,
+        );
+      const foreground = over(
+        parse(getComputedStyle(element).color),
+        background,
+      );
+      const values = [luminance(foreground), luminance(background)].sort(
+        (a, b) => b - a,
+      );
+      return {
+        text: element.textContent?.trim(),
+        ratio: (values[0] + 0.05) / (values[1] + 0.05),
+      };
     });
   });
   expect(contrasts.length).toBeGreaterThanOrEqual(4);
-  for (const target of contrasts) expect(target.ratio, target.text).toBeGreaterThanOrEqual(4.5);
+  for (const target of contrasts)
+    expect(target.ratio, target.text).toBeGreaterThanOrEqual(4.5);
   console.log("Audited rendered contrast:", contrasts);
 });

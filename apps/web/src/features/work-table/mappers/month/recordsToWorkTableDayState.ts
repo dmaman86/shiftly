@@ -31,7 +31,8 @@ export const recordsToWorkTableDayState = ({
   // Insertion order into shiftEntries becomes display order, so days with
   // multiple shifts need them sorted ascending by start time before insertion.
   const sortedShifts = [...shifts].sort(
-    (a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
+    (a, b) =>
+      new Date(a.start_time).getTime() - new Date(b.start_time).getTime(),
   );
 
   for (const row of sortedShifts) {

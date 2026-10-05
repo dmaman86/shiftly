@@ -1,4 +1,8 @@
-import type { DateService, DayInfoResolver, DomainWorkDay } from "@shiftly/domain";
+import type {
+  DateService,
+  DayInfoResolver,
+  DomainWorkDay,
+} from "@shiftly/domain";
 
 export interface DayInfoPresenter extends DayInfoResolver {
   formatWorkDayLabel(day: DomainWorkDay, weekdayLabel: string): string;

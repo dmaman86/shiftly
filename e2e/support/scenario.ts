@@ -98,7 +98,8 @@ export const formatHours = (value: number) =>
   Math.abs(value) < 0.005 ? "" : roundToCents(value).toFixed(2);
 
 const roundToCents = (value: number) =>
-  Math.round((value + Number.EPSILON * Math.max(1, Math.abs(value))) * 100) / 100;
+  Math.round((value + Number.EPSILON * Math.max(1, Math.abs(value))) * 100) /
+  100;
 
 /** Salary as the desktop table renders it (blank when there is no salary). */
 export const formatTableSalary = (value: number) =>

@@ -12,10 +12,13 @@ afterEach(() => {
 
 describe("MonthlyContentBoundary", () => {
   it("reserves the last measured height through config and calendar loading", () => {
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect")
-      .mockReturnValue(new DOMRect(0, 0, 900, 1400));
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue(
+      new DOMRect(0, 0, 900, 1400),
+    );
     const view = (ready: boolean, loading = false) => (
-      <MonthlyConfigStatusContext.Provider value={{ ready, contextKey: "month" }}>
+      <MonthlyConfigStatusContext.Provider
+        value={{ ready, contextKey: "month" }}
+      >
         <MonthlyContentBoundary loading={loading} minHeight={600}>
           <p>Monthly values</p>
         </MonthlyContentBoundary>
@@ -41,7 +44,9 @@ describe("MonthlyContentBoundary", () => {
     };
     const view = (contextKey: string) => (
       <MonthlyConfigStatusContext.Provider value={{ ready: true, contextKey }}>
-        <MonthlyContentBoundary><Counter /></MonthlyContentBoundary>
+        <MonthlyContentBoundary>
+          <Counter />
+        </MonthlyContentBoundary>
       </MonthlyConfigStatusContext.Provider>
     );
     const { rerender } = render(view("month-a"));

@@ -6,4 +6,5 @@ export const MonthlyConfigStatusContext = createContext<{
   fallback?: ReactNode;
 }>({ ready: true, contextKey: "isolated" });
 
-export const useMonthlyConfigStatus = () => useContext(MonthlyConfigStatusContext);
+export const useMonthlyConfigStatus = () =>
+  useContext(MonthlyConfigStatusContext);

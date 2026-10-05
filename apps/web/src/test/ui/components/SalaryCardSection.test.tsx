@@ -43,7 +43,13 @@ describe("SalaryCardSection", () => {
     baseRate: 50,
     buildRows: () => [
       { id: "regular100", label: "100%", quantity: 160, rate: 50, total: 8000 },
-      { id: "regular125", label: "125%", quantity: 20, rate: 62.5, total: 1250 },
+      {
+        id: "regular125",
+        label: "125%",
+        quantity: 20,
+        rate: 62.5,
+        total: 1250,
+      },
     ],
   };
 
@@ -62,7 +68,9 @@ describe("SalaryCardSection", () => {
     });
 
     it("should render table with rows", () => {
-      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(
+        <SalaryCardSection section={mockSection} />,
+      );
 
       const table = container.querySelector("table");
       expect(table).toBeInTheDocument();
@@ -98,7 +106,7 @@ describe("SalaryCardSection", () => {
       renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const editButton = screen.getByRole("button");
-      
+
       // Initially not in edit mode (no textbox)
       expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
 
@@ -112,10 +120,12 @@ describe("SalaryCardSection", () => {
 
     it("should change icon from edit to done", async () => {
       const user = userEvent.setup();
-      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(
+        <SalaryCardSection section={mockSection} />,
+      );
 
       const editButton = screen.getByRole("button");
-      
+
       // Check for Edit icon initially
       const editIcon = container.querySelector('[data-testid="EditIcon"]');
       expect(editIcon).toBeInTheDocument();
@@ -144,12 +154,13 @@ describe("SalaryCardSection", () => {
 
       expect(firstInput).toHaveValue("200");
     });
-
   });
 
   describe("Table Structure", () => {
     it("should render proper table structure", () => {
-      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(
+        <SalaryCardSection section={mockSection} />,
+      );
 
       const table = container.querySelector("table");
       const thead = table?.querySelector("thead");
@@ -160,7 +171,9 @@ describe("SalaryCardSection", () => {
     });
 
     it("should render correct number of data rows", () => {
-      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(
+        <SalaryCardSection section={mockSection} />,
+      );
 
       const tbody = container.querySelector("tbody");
       const rows = tbody?.querySelectorAll("tr");
@@ -170,7 +183,9 @@ describe("SalaryCardSection", () => {
     });
 
     it("should highlight summary row", () => {
-      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(
+        <SalaryCardSection section={mockSection} />,
+      );
 
       const tbody = container.querySelector("tbody");
       const rows = tbody?.querySelectorAll("tr");
@@ -183,7 +198,9 @@ describe("SalaryCardSection", () => {
 
   describe("Icon Rendering", () => {
     it("should render section icon", () => {
-      const { container } = renderWithProviders(<SalaryCardSection section={mockSection} />);
+      const { container } = renderWithProviders(
+        <SalaryCardSection section={mockSection} />,
+      );
 
       const icon = container.querySelector('[data-testid="WorkIcon"]');
       expect(icon).toBeInTheDocument();
@@ -209,10 +226,10 @@ describe("SalaryCardSection", () => {
       renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const editButton = screen.getByRole("button");
-      
+
       // Enter edit mode
       await user.click(editButton);
-      
+
       // Hover again
       await user.hover(editButton);
 
@@ -240,7 +257,13 @@ describe("SalaryCardSection", () => {
       const singleRowSection: SalarySectionConfig = {
         ...mockSection,
         buildRows: () => [
-          { id: "regular100", label: "100%", quantity: 160, rate: 50, total: 8000 },
+          {
+            id: "regular100",
+            label: "100%",
+            quantity: 160,
+            rate: 50,
+            total: 8000,
+          },
         ],
       };
 
@@ -273,13 +296,13 @@ describe("SalaryCardSection", () => {
       renderWithProviders(<SalaryCardSection section={mockSection} />);
 
       const editButton = screen.getByRole("button");
-      
+
       // Enter edit mode
       await user.click(editButton);
-      
+
       // Exit edit mode
       await user.click(editButton);
-      
+
       // Re-enter edit mode
       await user.click(editButton);
 

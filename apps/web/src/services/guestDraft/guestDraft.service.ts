@@ -16,12 +16,14 @@ export const guestDraftService = () => {
           p_standard_hours: draft.config.standardHours,
           p_base_rate: draft.config.baseRate,
           p_days: draft.days,
-          p_shifts: draft.shifts.map(({ date, start_time, end_time, is_duty }) => ({
-            date,
-            start_time,
-            end_time,
-            is_duty,
-          })),
+          p_shifts: draft.shifts.map(
+            ({ date, start_time, end_time, is_duty }) => ({
+              date,
+              start_time,
+              end_time,
+              is_duty,
+            }),
+          ),
         }),
       ),
   });

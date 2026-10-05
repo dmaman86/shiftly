@@ -162,7 +162,9 @@ const getDateKey = (date: string, index: number): string => {
   }
 
   const [, year, month, day] = match;
-  const parsed = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+  const parsed = new Date(
+    Date.UTC(Number(year), Number(month) - 1, Number(day)),
+  );
   if (
     parsed.getUTCFullYear() !== Number(year) ||
     parsed.getUTCMonth() !== Number(month) - 1 ||
@@ -183,7 +185,9 @@ const parseItems = (payload: unknown): HebcalItem[] => {
 
   return payload.items.map((value, index) => {
     if (!isRecord(value)) {
-      throw new Error(`Invalid Hebcal response: items[${index}] must be an object`);
+      throw new Error(
+        `Invalid Hebcal response: items[${index}] must be an object`,
+      );
     }
 
     return {

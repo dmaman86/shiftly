@@ -53,8 +53,8 @@ describe("CollapsibleCard", () => {
     header.focus();
     await user.keyboard("{Enter}");
 
-    expect(screen.getByRole("region", { name: "Keyboard details" })).toHaveTextContent(
-      "Keyboard content",
-    );
+    expect(
+      screen.getByRole("region", { name: "Keyboard details" }),
+    ).toHaveTextContent("Keyboard content");
   });
 });

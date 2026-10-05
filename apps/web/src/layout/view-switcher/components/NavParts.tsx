@@ -35,7 +35,13 @@ export const NavItem = ({
   </Button>
 );
 
-export const NavBrand = ({ to, onClick }: { to: string; onClick?: () => void }) => {
+export const NavBrand = ({
+  to,
+  onClick,
+}: {
+  to: string;
+  onClick?: () => void;
+}) => {
   const { t } = useTranslation("common");
 
   return (
@@ -64,7 +70,12 @@ export const LanguageToggle = ({ onToggle }: { onToggle: () => void }) => {
 
   return (
     <Tooltip title={label}>
-      <IconButton onClick={onToggle} size="small" sx={{ mx: 1 }} aria-label={label}>
+      <IconButton
+        onClick={onToggle}
+        size="small"
+        sx={{ mx: 1 }}
+        aria-label={label}
+      >
         <TranslateIcon fontSize="small" />
       </IconButton>
     </Tooltip>

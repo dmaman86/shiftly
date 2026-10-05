@@ -32,7 +32,9 @@ export const currentAdditionPolicy: AdditionPolicy = () => ({
  * is not met.
  */
 export class AdditionClassifier {
-  constructor(private readonly policy: AdditionPolicy = currentAdditionPolicy) {}
+  constructor(
+    private readonly policy: AdditionPolicy = currentAdditionPolicy,
+  ) {}
 
   calculate(params: { intervals: TimelineInterval[] }): AdditionInterval[] {
     const calendarDates = new Set(
@@ -76,14 +78,16 @@ export class AdditionClassifier {
 
       if (percent === null || percent === 0) return [];
 
-      return [{
-        point: slice.point,
-        calendarDate: slice.calendarDate,
-        dayOffset: slice.dayOffset,
-        sourceShiftId: slice.sourceShiftId,
-        kind,
-        percent,
-      }];
+      return [
+        {
+          point: slice.point,
+          calendarDate: slice.calendarDate,
+          dayOffset: slice.dayOffset,
+          sourceShiftId: slice.sourceShiftId,
+          kind,
+          percent,
+        },
+      ];
     });
   }
 

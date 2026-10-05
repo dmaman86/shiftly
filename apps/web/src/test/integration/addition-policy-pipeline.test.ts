@@ -14,18 +14,29 @@ describe("addition policy through the salary pipeline", () => {
         eveningQualificationMinutes: 180,
       }),
     });
-    const calculateDay = (date: string) => pipeline.payMap.calculateDayFromShifts({
-      meta: { date, typeDay: WorkDayType.Regular, crossDayContinuation: false },
-      year: 2026,
-      month: 8,
-      standardHours: 8,
-      shifts: [{
-        id: date,
-        start: { date: pipeline.services.dateService.createDateWithTime(date, 14) },
-        end: { date: pipeline.services.dateService.createDateWithTime(date, 18) },
-        isDuty: false,
-      }],
-    });
+    const calculateDay = (date: string) =>
+      pipeline.payMap.calculateDayFromShifts({
+        meta: {
+          date,
+          typeDay: WorkDayType.Regular,
+          crossDayContinuation: false,
+        },
+        year: 2026,
+        month: 8,
+        standardHours: 8,
+        shifts: [
+          {
+            id: date,
+            start: {
+              date: pipeline.services.dateService.createDateWithTime(date, 14),
+            },
+            end: {
+              date: pipeline.services.dateService.createDateWithTime(date, 18),
+            },
+            isDuty: false,
+          },
+        ],
+      });
     const first = calculateDay("2026-08-03");
     const second = calculateDay("2026-08-04");
     const reducer = pipeline.payMap.monthPayMapCalculator;
@@ -34,16 +45,26 @@ describe("addition policy through the salary pipeline", () => {
       second.dayPayMap,
     );
 
-    expect(second.shiftPayMaps[0].extra["evening:0.3"]).toEqual({ percent: 0.3, hours: 4 });
-    expect(second.dayPayMap.workMap.extra["evening:0.3"]).toEqual({ percent: 0.3, hours: 4 });
+    expect(second.shiftPayMaps[0].extra["evening:0.3"]).toEqual({
+      percent: 0.3,
+      hours: 4,
+    });
+    expect(second.dayPayMap.workMap.extra["evening:0.3"]).toEqual({
+      percent: 0.3,
+      hours: 4,
+    });
     expect(month.extra.hours20).toEqual({ percent: 0.2, hours: 4 });
     expect(month.extra["evening:0.3"]).toEqual({ percent: 0.3, hours: 4 });
 
     const viewModel = monthToPayBreakdownVM(month, 0);
-    const allowances = viewModel.perDiemAmount + viewModel.largeAmount + viewModel.smallAmount;
+    const allowances =
+      viewModel.perDiemAmount + viewModel.largeAmount + viewModel.smallAmount;
     expect(computeTotalPay(viewModel, 50)).toBeCloseTo(500 + allowances, 10);
 
-    const afterRemoval = calculateGlobalBreakdown({ "2026-08-03": first.dayPayMap }, reducer);
+    const afterRemoval = calculateGlobalBreakdown(
+      { "2026-08-03": first.dayPayMap },
+      reducer,
+    );
     expect(afterRemoval.extra["evening:0.3"]).toBeUndefined();
     expect(afterRemoval.extra.hours20.hours).toBe(4);
     expect(month.extra["evening:0.3"].hours).toBe(4);
@@ -60,29 +81,46 @@ describe("addition policy through the salary pipeline", () => {
       });
       const date = "2026-08-03";
       return pipeline.payMap.calculateDayFromShifts({
-        meta: { date, typeDay: WorkDayType.Regular, crossDayContinuation: false },
+        meta: {
+          date,
+          typeDay: WorkDayType.Regular,
+          crossDayContinuation: false,
+        },
         year: 2026,
         month: 8,
         standardHours: 8,
-        shifts: [{
-          id: "night",
-          start: { date: pipeline.services.dateService.createDateWithTime(date, 0) },
-          end: { date: pipeline.services.dateService.createDateWithTime(date, 6) },
-          isDuty: false,
-        }],
+        shifts: [
+          {
+            id: "night",
+            start: {
+              date: pipeline.services.dateService.createDateWithTime(date, 0),
+            },
+            end: {
+              date: pipeline.services.dateService.createDateWithTime(date, 6),
+            },
+            isDuty: false,
+          },
+        ],
       }).dayPayMap;
     };
 
     const custom = calculateNight(0.6);
     const baseline = calculateNight(0.5);
-    expect(custom.workMap.extra["night:0.6"]).toEqual({ percent: 0.6, hours: 6 });
+    expect(custom.workMap.extra["night:0.6"]).toEqual({
+      percent: 0.6,
+      hours: 6,
+    });
     expect(baseline.mealAllowance.small.points).toBe(1);
     expect(custom.mealAllowance).toEqual(baseline.mealAllowance);
   });
 
   it("keeps evening qualification per shift rather than combining separate shifts", () => {
     const pipeline = buildPayMapPipeline({
-      additionPolicy: () => ({ eveningPercent: 0.3, nightPercent: 0.5, eveningQualificationMinutes: 180 }),
+      additionPolicy: () => ({
+        eveningPercent: 0.3,
+        nightPercent: 0.5,
+        eveningQualificationMinutes: 180,
+      }),
     });
     const date = "2026-08-03";
     const result = pipeline.payMap.calculateDayFromShifts({
@@ -92,8 +130,15 @@ describe("addition policy through the salary pipeline", () => {
       standardHours: 8,
       shifts: [14, 17].map((hour) => ({
         id: String(hour),
-        start: { date: pipeline.services.dateService.createDateWithTime(date, hour) },
-        end: { date: pipeline.services.dateService.createDateWithTime(date, hour + 2) },
+        start: {
+          date: pipeline.services.dateService.createDateWithTime(date, hour),
+        },
+        end: {
+          date: pipeline.services.dateService.createDateWithTime(
+            date,
+            hour + 2,
+          ),
+        },
         isDuty: false,
       })),
     });

@@ -1,6 +1,14 @@
 import { forwardRef, useState } from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Box, Collapse, IconButton, Tooltip, type CardProps, type SxProps, type Theme } from "@mui/material";
+import {
+  Box,
+  Collapse,
+  IconButton,
+  Tooltip,
+  type CardProps,
+  type SxProps,
+  type Theme,
+} from "@mui/material";
 import { CardSurface } from "./CardSurface";
 
 type CollapsibleCardProps = Omit<CardProps, "children"> & {
@@ -40,7 +48,8 @@ export const CollapsibleCard = forwardRef<HTMLDivElement, CollapsibleCardProps>(
     },
     ref,
   ) => {
-    const [uncontrolledExpanded, setUncontrolledExpanded] = useState(defaultExpanded);
+    const [uncontrolledExpanded, setUncontrolledExpanded] =
+      useState(defaultExpanded);
     const expanded = controlledExpanded ?? uncontrolledExpanded;
     const toggle = () => {
       const next = !expanded;
@@ -95,7 +104,12 @@ export const CollapsibleCard = forwardRef<HTMLDivElement, CollapsibleCardProps>(
         </Box>
         {children}
         <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <Box id={detailsId} role="region" aria-label={regionLabel} sx={detailsSx}>
+          <Box
+            id={detailsId}
+            role="region"
+            aria-label={regionLabel}
+            sx={detailsSx}
+          >
             {collapsibleContent}
           </Box>
         </Collapse>

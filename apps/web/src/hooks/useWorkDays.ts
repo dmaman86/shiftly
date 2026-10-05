@@ -22,8 +22,12 @@ const loadStaticEventMap = async (
   endDate: string,
 ): Promise<CalendarEventMap | undefined> => {
   // A month range can cross into the next year (December includes Jan 1).
-  const years = [...new Set([startDate, endDate].map((date) => Number(date.slice(0, 4))))];
-  const results = await Promise.all(years.map((year) => staticCalendarApi.getYear(year)));
+  const years = [
+    ...new Set([startDate, endDate].map((date) => Number(date.slice(0, 4)))),
+  ];
+  const results = await Promise.all(
+    years.map((year) => staticCalendarApi.getYear(year)),
+  );
 
   const requestError = results.find((result) => result.error)?.error;
   if (requestError) {
@@ -34,7 +38,10 @@ const loadStaticEventMap = async (
   // Hosts with an SPA fallback (e.g. the Vite dev server) answer a missing
   // year with 200 + index.html, so an unparseable payload is also a miss.
   try {
-    return Object.assign({}, ...results.map((result) => buildEventMap(result.data)));
+    return Object.assign(
+      {},
+      ...results.map((result) => buildEventMap(result.data)),
+    );
   } catch (err) {
     trackCalendarError(resolveErrorMessage(err), "static_calendar_invalid");
     return undefined;
@@ -71,7 +78,11 @@ export const useWorkDays = (domain: DomainContextType) => {
     queryFn: async () => {
       const { startDate, endDate } = dateService.getDatesRange(year, month);
       const eventMap = await loadCalendarEventMap(startDate, endDate);
-      return domain.payMap.workDaysMonthBuilder.build({ year, month, eventMap });
+      return domain.payMap.workDaysMonthBuilder.build({
+        year,
+        month,
+        eventMap,
+      });
     },
     // The holiday calendar for a given month never changes.
     staleTime: Infinity,

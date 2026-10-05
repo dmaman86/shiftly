@@ -8,16 +8,13 @@ export const buildShiftLayer = ({
   shiftService,
   additionPolicy,
 }: BuildShiftLayerParams): ShiftLayer => {
-  const shiftMapBuilder = new DefaultShiftMapBuilder(
-    shiftService,
-    {
-      dateService,
-      payCalculator: new TimelineShiftPayCalculator(
-        undefined,
-        new AdditionClassifier(additionPolicy),
-      ),
-    },
-  );
+  const shiftMapBuilder = new DefaultShiftMapBuilder(shiftService, {
+    dateService,
+    payCalculator: new TimelineShiftPayCalculator(
+      undefined,
+      new AdditionClassifier(additionPolicy),
+    ),
+  });
 
   return {
     shiftMapBuilder,

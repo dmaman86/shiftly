@@ -63,6 +63,4 @@ export type AllowanceSectionConfig = BaseSectionConfig & {
 };
 
 export type SalarySectionConfig =
-  | BasePaySectionConfig
-  | ExtraPaySectionConfig
-  | AllowanceSectionConfig;
+  BasePaySectionConfig | ExtraPaySectionConfig | AllowanceSectionConfig;

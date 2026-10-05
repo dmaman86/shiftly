@@ -3,7 +3,10 @@ import { ShiftMapBuilder } from "../types/services.js";
 import { Shift, ShiftPayMap } from "../types/data-shapes.js";
 import { WorkDayMeta } from "../types/types.js";
 import type { DateService } from "../services/date.service.js";
-import { classifyShiftTimeline, normalizeShiftTimeline } from "../timeline/index.js";
+import {
+  classifyShiftTimeline,
+  normalizeShiftTimeline,
+} from "../timeline/index.js";
 import type { TimelineShiftPayCalculator } from "../calculator/timeline-shift-pay.calculator.js";
 
 export class DefaultShiftMapBuilder implements ShiftMapBuilder {

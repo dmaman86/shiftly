@@ -61,7 +61,9 @@ describe("useWorkTableDayStateContext", () => {
       </WorkTableDayStateContext.Provider>
     );
 
-    const { result } = renderHook(() => useWorkTableDayStateContext(), { wrapper });
+    const { result } = renderHook(() => useWorkTableDayStateContext(), {
+      wrapper,
+    });
 
     expect(
       result.current

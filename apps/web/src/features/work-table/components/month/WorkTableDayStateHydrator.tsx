@@ -20,7 +20,10 @@ export const WorkTableDayStateHydrator = ({
   workDays,
   children,
 }: WorkTableDayStateHydratorProps) => {
-  const { ready, error, retry, isFetching } = useWorkTableMonthSession({ domain, workDays });
+  const { ready, error, retry, isFetching } = useWorkTableMonthSession({
+    domain,
+    workDays,
+  });
   const { t } = useTranslation("work-table");
   if (ready) return children ?? null;
   if (error) {
@@ -28,7 +31,11 @@ export const WorkTableDayStateHydrator = ({
       <Alert
         severity="error"
         action={
-          <Button color="inherit" disabled={isFetching} onClick={() => void retry()}>
+          <Button
+            color="inherit"
+            disabled={isFetching}
+            onClick={() => void retry()}
+          >
             {t("storage.retry")}
           </Button>
         }

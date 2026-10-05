@@ -12,7 +12,11 @@ const shiftMapBuilder = {
 
 const workDays: WorkDayInfo[] = [
   {
-    meta: { date: "2026-09-05", typeDay: WorkDayType.Regular, crossDayContinuation: false },
+    meta: {
+      date: "2026-09-05",
+      typeDay: WorkDayType.Regular,
+      crossDayContinuation: false,
+    },
   },
 ];
 
@@ -32,9 +36,21 @@ const shiftRecord = (
 describe("recordsToWorkTableDayState", () => {
   it("orders a day's shifts ascending by start time regardless of fetch order", () => {
     const shifts = [
-      shiftRecord("afternoon", "2026-09-05T14:00:00.000Z", "2026-09-05T18:00:00.000Z"),
-      shiftRecord("morning", "2026-09-05T08:00:00.000Z", "2026-09-05T12:00:00.000Z"),
-      shiftRecord("evening", "2026-09-05T20:00:00.000Z", "2026-09-05T23:00:00.000Z"),
+      shiftRecord(
+        "afternoon",
+        "2026-09-05T14:00:00.000Z",
+        "2026-09-05T18:00:00.000Z",
+      ),
+      shiftRecord(
+        "morning",
+        "2026-09-05T08:00:00.000Z",
+        "2026-09-05T12:00:00.000Z",
+      ),
+      shiftRecord(
+        "evening",
+        "2026-09-05T20:00:00.000Z",
+        "2026-09-05T23:00:00.000Z",
+      ),
     ];
 
     const state = recordsToWorkTableDayState({
@@ -63,13 +79,15 @@ describe("recordsToWorkTableDayState", () => {
           "2026-08-01",
         ),
       ],
-      workDays: [{
-        meta: {
-          date: "2026-08-01",
-          typeDay: WorkDayType.Regular,
-          crossDayContinuation: false,
+      workDays: [
+        {
+          meta: {
+            date: "2026-08-01",
+            typeDay: WorkDayType.Regular,
+            crossDayContinuation: false,
+          },
         },
-      }],
+      ],
       shiftMapBuilder,
       standardHours: 6.67,
     });

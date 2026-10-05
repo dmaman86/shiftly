@@ -12,7 +12,11 @@ import {
   SpecialBreakdown,
   WorkDayMap,
 } from "../types/data-shapes.js";
-import { PerDiemShiftInfo, TimelineInterval, WorkDayMeta } from "../types/types.js";
+import {
+  PerDiemShiftInfo,
+  TimelineInterval,
+  WorkDayMeta,
+} from "../types/types.js";
 import { getAdditionGroups } from "../calculator/additions/addition-groups.js";
 
 export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
@@ -65,9 +69,7 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
     };
   }
 
-  private accumulateShiftInputs(
-    shifts: ShiftPayMap[],
-  ) {
+  private accumulateShiftInputs(shifts: ShiftPayMap[]) {
     let extra = this.payCalculators.extra.createEmpty();
     let special = this.payCalculators.special.createEmpty();
     let totalHours = 0;
@@ -108,8 +110,8 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
     const nightHours =
       getAdditionGroups(params.extra)
         .filter(({ kind }) => kind === "night")
-        .reduce((total, { segment }) => total + segment.hours, 0)
-      + params.special.shabbat200.hours;
+        .reduce((total, { segment }) => total + segment.hours, 0) +
+      params.special.shabbat200.hours;
 
     return {
       totalHours: params.totalHours,
@@ -132,13 +134,8 @@ export class DefaultDayPayMapBuilder implements DayPayMapBuilder {
       return this.buildNonWorkingDay({ status, standardHours });
     }
 
-    const {
-      extra,
-      special,
-      totalHours,
-      perDiemShifts,
-      timelineIntervals,
-    } = this.accumulateShiftInputs(shifts);
+    const { extra, special, totalHours, perDiemShifts, timelineIntervals } =
+      this.accumulateShiftInputs(shifts);
 
     const totalExtraShabbat =
       special.shabbat150.hours + special.shabbat200.hours;

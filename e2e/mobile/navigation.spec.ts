@@ -33,7 +33,9 @@ test("navigates between pages through the mobile menu without horizontal overflo
     await expect(page).toHaveURL(path);
     await expect(link).toBeHidden();
     await expect
-      .poll(() => getHorizontalOverflow(page), { message: `overflow on ${label}` })
+      .poll(() => getHorizontalOverflow(page), {
+        message: `overflow on ${label}`,
+      })
       .toBe(0);
   }
 });
@@ -43,10 +45,18 @@ test("expands the menu on the first visit only", async ({ page }) => {
   await page.goto("he/daily");
 
   const header = page.getByRole("banner");
-  await expect(header.getByRole("button", { name: "סגירת תפריט הניווט" })).toHaveAttribute("aria-expanded", "true");
-  await expect(header.getByRole("link", { name: "כללי חישוב", exact: true })).toBeVisible();
+  await expect(
+    header.getByRole("button", { name: "סגירת תפריט הניווט" }),
+  ).toHaveAttribute("aria-expanded", "true");
+  await expect(
+    header.getByRole("link", { name: "כללי חישוב", exact: true }),
+  ).toBeVisible();
 
   await page.reload();
-  await expect(header.getByRole("button", { name: "פתיחת תפריט הניווט" })).toHaveAttribute("aria-expanded", "false");
-  await expect(header.getByRole("link", { name: "כללי חישוב", exact: true })).toBeHidden();
+  await expect(
+    header.getByRole("button", { name: "פתיחת תפריט הניווט" }),
+  ).toHaveAttribute("aria-expanded", "false");
+  await expect(
+    header.getByRole("link", { name: "כללי חישוב", exact: true }),
+  ).toBeHidden();
 });

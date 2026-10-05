@@ -44,9 +44,14 @@ const applyFilters = (
   }, query);
 };
 
-const select = <T>(table: string, options: CrudOptions = {}): EndpointCall<T[]> => ({
+const select = <T>(
+  table: string,
+  options: CrudOptions = {},
+): EndpointCall<T[]> => ({
   call: async () => {
-    let query = supabase.from(table).select(options.select ?? "*") as unknown as FilterableQuery;
+    let query = supabase
+      .from(table)
+      .select(options.select ?? "*") as unknown as FilterableQuery;
     query = applyFilters(query, options.filters);
 
     return fromSupabaseResult<T[]>(await query);
@@ -58,7 +63,9 @@ const selectOne = <T>(
   options: CrudOptions = {},
 ): EndpointCall<T | null> => ({
   call: async () => {
-    let query = supabase.from(table).select(options.select ?? "*") as unknown as FilterableQuery;
+    let query = supabase
+      .from(table)
+      .select(options.select ?? "*") as unknown as FilterableQuery;
     query = applyFilters(query, options.filters);
 
     return fromSupabaseResult<T | null>(await query.maybeSingle());
@@ -78,7 +85,10 @@ const upsert = <T extends Record<string, unknown>>(
     ),
 });
 
-const remove = (table: string, filters: readonly QueryFilter[]): EndpointCall<null> => ({
+const remove = (
+  table: string,
+  filters: readonly QueryFilter[],
+): EndpointCall<null> => ({
   call: async () => {
     const query = applyFilters(
       supabase.from(table).delete() as unknown as FilterableQuery,

@@ -46,15 +46,18 @@ export class TimelineShiftPayCalculator {
     });
 
     for (const dayIntervals of intervalsByDate.values()) {
-
       for (const addition of this.additions.calculate({
         intervals: dayIntervals,
       })) {
         const key = additionGroupKey(addition.kind, addition.percent);
-        const segment = result.extra[key] ?? { percent: addition.percent, hours: 0 };
+        const segment = result.extra[key] ?? {
+          percent: addition.percent,
+          hours: 0,
+        };
         result.extra[key] = {
           percent: addition.percent,
-          hours: segment.hours + (addition.point.end - addition.point.start) / 60,
+          hours:
+            segment.hours + (addition.point.end - addition.point.start) / 60,
         };
       }
 
@@ -83,5 +86,4 @@ export class TimelineShiftPayCalculator {
       },
     };
   }
-
 }

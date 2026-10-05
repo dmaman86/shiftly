@@ -20,7 +20,9 @@ export const splitTimelineInterval = (params: {
   if (localPoint.start >= localPoint.end) return [];
 
   const cuts = [...new Set(boundaries)]
-    .filter((boundary) => boundary > localPoint.start && boundary < localPoint.end)
+    .filter(
+      (boundary) => boundary > localPoint.start && boundary < localPoint.end,
+    )
     .sort((a, b) => a - b);
   const points = [localPoint.start, ...cuts, localPoint.end];
 
@@ -28,13 +30,15 @@ export const splitTimelineInterval = (params: {
     const end = points[index + 1];
     if (start >= end) return [];
 
-    return [{
-      ...interval,
-      point: {
-        start: dayStart + start,
-        end: dayStart + end,
+    return [
+      {
+        ...interval,
+        point: {
+          start: dayStart + start,
+          end: dayStart + end,
+        },
+        localPoint: { start, end },
       },
-      localPoint: { start, end },
-    }];
+    ];
   });
 };

@@ -44,7 +44,14 @@ export const ShiftRow = ({
     handleChange,
     handleToggleNextDay,
     toggleDuty,
-  } = useShiftEditor({ domain, shift, meta, standardHours, otherShifts, onShiftUpdate });
+  } = useShiftEditor({
+    domain,
+    shift,
+    meta,
+    standardHours,
+    otherShifts,
+    onShiftUpdate,
+  });
 
   return (
     <>
@@ -61,7 +68,11 @@ export const ShiftRow = ({
       >
         <ShiftTimeInput
           label=""
-          accessibleLabel={t("a11y.shift_time", { field: t("headers.entry"), number: shiftNumber, date: meta.date })}
+          accessibleLabel={t("a11y.shift_time", {
+            field: t("headers.entry"),
+            number: shiftNumber,
+            date: meta.date,
+          })}
           value={localShift.start.date}
           onChange={(newVal) => handleChange("start", newVal)}
           disabled={!isEditable}
@@ -84,15 +95,24 @@ export const ShiftRow = ({
           <span>
             <ShiftTimeInput
               label=""
-              accessibleLabel={t("a11y.shift_time", { field: t("headers.exit"), number: shiftNumber, date: meta.date })}
-              errorMessage={hasOverlap ? t("a11y.overlap")
-                : localShift.start.date.getTime() === localShift.end.date.getTime()
-                  ? t("a11y.equal_times") : t("a11y.invalid_range")}
+              accessibleLabel={t("a11y.shift_time", {
+                field: t("headers.exit"),
+                number: shiftNumber,
+                date: meta.date,
+              })}
+              errorMessage={
+                hasOverlap
+                  ? t("a11y.overlap")
+                  : localShift.start.date.getTime() ===
+                      localShift.end.date.getTime()
+                    ? t("a11y.equal_times")
+                    : t("a11y.invalid_range")
+              }
               value={localShift.end.date}
-            onChange={(newVal) => handleChange("end", newVal)}
-            disabled={!isEditable}
-            error={hasError || hasOverlap}
-            testId="shift-end-time"
+              onChange={(newVal) => handleChange("end", newVal)}
+              disabled={!isEditable}
+              error={hasError || hasOverlap}
+              testId="shift-end-time"
             />
           </span>
         </Tooltip>
@@ -121,7 +141,9 @@ export const ShiftRow = ({
               }
             >
               <Checkbox
-                slotProps={{ input: { "aria-label": t("shift_row.tooltip_cross_day") } }}
+                slotProps={{
+                  input: { "aria-label": t("shift_row.tooltip_cross_day") },
+                }}
                 checked={crossDay}
                 onChange={(e) => handleToggleNextDay(e.target.checked)}
                 size="small"
@@ -166,7 +188,10 @@ export const ShiftRow = ({
                 aria-label={t("shift_row.tooltip_delete")}
                 onClick={() => {
                   onRemove(shift.id);
-                  analyticsService.track({ name: "shift_deleted", params: { month, year } });
+                  analyticsService.track({
+                    name: "shift_deleted",
+                    params: { month, year },
+                  });
                 }}
                 sx={{ p: 0.5 }}
               >

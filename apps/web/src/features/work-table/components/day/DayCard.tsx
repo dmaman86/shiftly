@@ -100,7 +100,10 @@ export const DayCard = ({
               label={tHoliday(workDay.meta.holidayKey)}
               size="small"
               color={specialFullDay ? "warning" : "info"}
-              sx={{ bgcolor: specialFullDay ? "#a64400" : "#005b96", color: "#fff" }}
+              sx={{
+                bgcolor: specialFullDay ? "#a64400" : "#005b96",
+                color: "#fff",
+              }}
             />
           )}
         </Stack>
@@ -131,7 +134,9 @@ export const DayCard = ({
                 checked={status === WorkDayStatus.sick}
                 onChange={(e) =>
                   handleStatusChanged(
-                    e.target.checked ? WorkDayStatus.sick : WorkDayStatus.normal,
+                    e.target.checked
+                      ? WorkDayStatus.sick
+                      : WorkDayStatus.normal,
                   )
                 }
                 slotProps={{ input: { "aria-label": t("headers.sick") } }}
@@ -145,7 +150,9 @@ export const DayCard = ({
                 checked={status === WorkDayStatus.vacation}
                 onChange={(e) =>
                   handleStatusChanged(
-                    e.target.checked ? WorkDayStatus.vacation : WorkDayStatus.normal,
+                    e.target.checked
+                      ? WorkDayStatus.vacation
+                      : WorkDayStatus.normal,
                   )
                 }
                 slotProps={{ input: { "aria-label": t("headers.vacation") } }}
@@ -166,7 +173,11 @@ export const DayCard = ({
             })}
           </Typography>
           {shabbatCreditUsage?.sources.map((source) => (
-            <Typography key={`${source.source}-${source.date ?? "previous-month"}`} variant="caption" display="block">
+            <Typography
+              key={`${source.source}-${source.date ?? "previous-month"}`}
+              variant="caption"
+              display="block"
+            >
               {source.source === "previous-month"
                 ? t("day_details.shabbat_credit_source_previous_month", {
                     hours: formatValue(source.hours),
@@ -207,12 +218,12 @@ export const DayCard = ({
           {isEditable && (
             <Box sx={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
               <Tooltip title={t("table.add_shift_label")}>
-              <IconButton
-                aria-label={`${t("a11y.add_shift")} — ${workDay.meta.date}`}
-                size="small"
-                data-testid={`work-day-add-shift-${workDay.meta.date}`}
-                onClick={handleAddShift}
-              >
+                <IconButton
+                  aria-label={`${t("a11y.add_shift")} — ${workDay.meta.date}`}
+                  size="small"
+                  data-testid={`work-day-add-shift-${workDay.meta.date}`}
+                  onClick={handleAddShift}
+                >
                   <AddIcon fontSize="small" />
                 </IconButton>
               </Tooltip>
@@ -255,10 +266,26 @@ export const DayCard = ({
         }}
       >
         {/* Test ids match the desktop DayRow so E2E assertions work on both layouts. */}
-        <StatTile label={t("headers.actual_hours")} value={formatValue(compactBreakdown.actualHours)} testId={`${statTestIdPrefix}-actual-hours`} />
-        <StatTile label={t("headers.total_hours")} value={formatValue(compactBreakdown.totalHours)} testId={`${statTestIdPrefix}-total-hours`} />
-        <StatTile label={t("headers.regular")} value={formatValue(compactBreakdown.regularHours)} testId={`${statTestIdPrefix}-regular-hours`} />
-        <StatTile label={t("headers.extras")} value={formatValue(compactBreakdown.extraHours)} testId={`${statTestIdPrefix}-extra-hours`} />
+        <StatTile
+          label={t("headers.actual_hours")}
+          value={formatValue(compactBreakdown.actualHours)}
+          testId={`${statTestIdPrefix}-actual-hours`}
+        />
+        <StatTile
+          label={t("headers.total_hours")}
+          value={formatValue(compactBreakdown.totalHours)}
+          testId={`${statTestIdPrefix}-total-hours`}
+        />
+        <StatTile
+          label={t("headers.regular")}
+          value={formatValue(compactBreakdown.regularHours)}
+          testId={`${statTestIdPrefix}-regular-hours`}
+        />
+        <StatTile
+          label={t("headers.extras")}
+          value={formatValue(compactBreakdown.extraHours)}
+          testId={`${statTestIdPrefix}-extra-hours`}
+        />
         {compactBreakdown.dailySalary !== undefined && (
           <Box sx={{ gridColumn: "span 2" }}>
             <StatTile
@@ -274,7 +301,6 @@ export const DayCard = ({
           </Box>
         )}
       </Box>
-
     </CollapsibleCard>
   );
 };

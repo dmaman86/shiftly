@@ -23,7 +23,7 @@ const renderAtPath = (path: string) =>
           <Route path="daily" element={<div>Page Content</div>} />
         </Route>
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 
 describe("LanguageLayout", () => {

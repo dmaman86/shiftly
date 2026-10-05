@@ -1,8 +1,4 @@
-import type {
-  PayRowVM,
-  PayTableVM,
-  SalaryQuantityOverrides,
-} from "../vm";
+import type { PayRowVM, PayTableVM, SalaryQuantityOverrides } from "../vm";
 
 export const calculateTotal = (rows: PayRowVM[]): number =>
   rows.reduce((sum, row) => sum + row.total, 0);

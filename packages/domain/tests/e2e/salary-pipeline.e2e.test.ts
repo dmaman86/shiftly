@@ -6,7 +6,7 @@ import { WorkDayType } from "../../src/constants/index.js";
 
 /**
  * END-TO-END TESTS FOR SALARY CALCULATION PIPELINE
- * 
+ *
  * These tests verify the complete salary calculation flow from individual shifts
  * through to monthly aggregations. They test the integration of all components:
  * - Services (DateService, ShiftService)
@@ -28,7 +28,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
     id: string,
     startDate: Date,
     endDate: Date,
-    isDuty: boolean = false
+    isDuty: boolean = false,
   ): Shift => ({
     id,
     start: { date: startDate },
@@ -40,7 +40,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
   const createMeta = (
     date: string,
     typeDay: WorkDayType = WorkDayType.Regular,
-    crossDayContinuation: boolean = false
+    crossDayContinuation: boolean = false,
   ): WorkDayMeta => ({
     date,
     typeDay,
@@ -51,7 +51,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
   const buildShiftMap = (
     shift: Shift,
     meta: WorkDayMeta,
-    standardHours: number = 8
+    standardHours: number = 8,
   ): ShiftPayMap => {
     return pipeline.payMap.shiftMapBuilder.build({
       shift,
@@ -92,7 +92,9 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
 
       // Different instances
       expect(pipeline1).not.toBe(pipeline2);
-      expect(pipeline1.services.dateService).not.toBe(pipeline2.services.dateService);
+      expect(pipeline1.services.dateService).not.toBe(
+        pipeline2.services.dateService,
+      );
     });
   });
 
@@ -103,7 +105,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-1",
           new Date(2025, 0, 15, 9, 0, 0),
-          new Date(2025, 0, 15, 17, 0, 0)
+          new Date(2025, 0, 15, 17, 0, 0),
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -122,7 +124,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-half",
           new Date(2025, 0, 15, 9, 0, 0),
-          new Date(2025, 0, 15, 13, 30, 0)
+          new Date(2025, 0, 15, 13, 30, 0),
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -137,7 +139,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-short",
           new Date(2025, 0, 15, 10, 0, 0),
-          new Date(2025, 0, 15, 10, 30, 0)
+          new Date(2025, 0, 15, 10, 30, 0),
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -155,7 +157,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-overtime",
           new Date(2025, 0, 15, 8, 0, 0),
-          new Date(2025, 0, 15, 18, 0, 0)
+          new Date(2025, 0, 15, 18, 0, 0),
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -174,7 +176,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-extreme",
           new Date(2025, 0, 15, 7, 0, 0),
-          new Date(2025, 0, 15, 19, 0, 0)
+          new Date(2025, 0, 15, 19, 0, 0),
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -192,7 +194,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-24h",
           new Date(2025, 0, 15, 8, 0, 0),
-          new Date(2025, 0, 16, 8, 0, 0)
+          new Date(2025, 0, 16, 8, 0, 0),
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -212,7 +214,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-night",
           new Date(2025, 0, 15, 22, 0, 0),
-          new Date(2025, 0, 16, 6, 0, 0)
+          new Date(2025, 0, 16, 6, 0, 0),
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -228,7 +230,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-night-overtime",
           new Date(2025, 0, 15, 22, 0, 0),
-          new Date(2025, 0, 16, 8, 0, 0)
+          new Date(2025, 0, 16, 8, 0, 0),
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -244,7 +246,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-to-midnight",
           new Date(2025, 0, 15, 16, 0, 0),
-          new Date(2025, 0, 16, 0, 0, 0)
+          new Date(2025, 0, 16, 0, 0, 0),
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -262,7 +264,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
           "shift-duty",
           new Date(2025, 0, 15, 8, 0, 0),
           new Date(2025, 0, 15, 16, 0, 0),
-          true // isDuty = true
+          true, // isDuty = true
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -280,7 +282,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
           "shift-regular",
           new Date(2025, 0, 15, 8, 0, 0),
           new Date(2025, 0, 15, 16, 0, 0),
-          false // isDuty = false
+          false, // isDuty = false
         );
 
         const meta = createMeta("2025-01-15", WorkDayType.Regular);
@@ -297,7 +299,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-shabbat",
           new Date(2025, 0, 11, 10, 0, 0), // Saturday Jan 11, 2025
-          new Date(2025, 0, 11, 18, 0, 0)
+          new Date(2025, 0, 11, 18, 0, 0),
         );
 
         const meta = createMeta("2025-01-11", WorkDayType.SpecialFull);
@@ -313,7 +315,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           "shift-friday-night",
           new Date(2025, 0, 10, 17, 0, 0), // Friday evening
-          new Date(2025, 0, 11, 1, 0, 0)   // Saturday morning
+          new Date(2025, 0, 11, 1, 0, 0), // Saturday morning
         );
 
         const meta = createMeta("2025-01-10", WorkDayType.Regular);
@@ -336,7 +338,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
 
       // Assert: January has 31 days
       expect(workDays).toHaveLength(31);
-      
+
       // Verify first day structure
       expect(workDays[0].meta.date).toBe("2025-01-01");
       expect(workDays[0].meta).toHaveProperty("typeDay");
@@ -374,7 +376,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
 
       // Find all Saturdays
       const saturdays = workDays.filter(
-        (day) => day.meta.typeDay === WorkDayType.SpecialFull
+        (day) => day.meta.typeDay === WorkDayType.SpecialFull,
       );
 
       // January 2025 has 4-5 Saturdays
@@ -390,7 +392,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
       });
 
       const fridays = workDays.filter(
-        (day) => pipeline.services.dateService.getWeekday(day.meta.date) === 5
+        (day) => pipeline.services.dateService.getWeekday(day.meta.date) === 5,
       );
 
       // January 2025 has 4-5 Fridays
@@ -452,7 +454,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
       const shift = createShift(
         "test-shift",
         new Date(2025, 0, 15, 9, 0, 0),
-        new Date(2025, 0, 15, 17, 0, 0)
+        new Date(2025, 0, 15, 17, 0, 0),
       );
 
       const workDay = workDays[14]; // Jan 15 is index 14 (0-based)
@@ -481,12 +483,12 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           `shift-${day}`,
           new Date(2025, 0, day, 9, 0, 0),
-          new Date(2025, 0, day, 17, 0, 0)
+          new Date(2025, 0, day, 17, 0, 0),
         );
-        
+
         const workDay = workDays[day - 1];
         const shiftMap = buildShiftMap(shift, workDay.meta);
-        
+
         weekShifts.push(shiftMap);
       }
 
@@ -494,16 +496,21 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
       const thursdayShift = createShift(
         "shift-thursday-overtime",
         new Date(2025, 0, 16, 9, 0, 0),
-        new Date(2025, 0, 16, 19, 0, 0)
+        new Date(2025, 0, 16, 19, 0, 0),
       );
 
       const thursdayWorkDay = workDays[15]; // Jan 16 is index 15 (0-based)
-      const thursdayShiftMap = buildShiftMap(thursdayShift, thursdayWorkDay.meta);
+      const thursdayShiftMap = buildShiftMap(
+        thursdayShift,
+        thursdayWorkDay.meta,
+      );
 
       // Verify week totals (replace Thursday's 8h with 10h)
-      const regularHours = weekShifts.slice(0, 3).reduce((sum, map) => sum + map.totalHours, 0); // Mon-Wed
+      const regularHours = weekShifts
+        .slice(0, 3)
+        .reduce((sum, map) => sum + map.totalHours, 0); // Mon-Wed
       expect(regularHours).toBe(24); // 3×8
-      
+
       // Verify overtime on Thursday
       expect(thursdayShiftMap.totalHours).toBe(10);
       expect(thursdayShiftMap.regular.hours100.hours).toBe(8);
@@ -531,7 +538,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           `week1-${day}`,
           new Date(2025, 0, day, 9, 0, 0),
-          new Date(2025, 0, day, 17, 0, 0)
+          new Date(2025, 0, day, 17, 0, 0),
         );
         const shiftMap = buildShiftMap(shift, workDays[day - 1].meta);
         allShifts.push(shiftMap);
@@ -541,7 +548,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
       const nightShift = createShift(
         "night-shift",
         new Date(2025, 0, 13, 22, 0, 0),
-        new Date(2025, 0, 14, 6, 0, 0)
+        new Date(2025, 0, 14, 6, 0, 0),
       );
       const nightShiftMap = buildShiftMap(nightShift, workDays[12].meta);
       allShifts.push(nightShiftMap);
@@ -551,14 +558,17 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           `week2-${day}`,
           new Date(2025, 0, day, 9, 0, 0),
-          new Date(2025, 0, day, 17, 0, 0)
+          new Date(2025, 0, day, 17, 0, 0),
         );
         const shiftMap = buildShiftMap(shift, workDays[day - 1].meta);
         allShifts.push(shiftMap);
       }
 
       // Calculate total hours
-      const totalHours = allShifts.reduce((sum, map) => sum + map.totalHours, 0);
+      const totalHours = allShifts.reduce(
+        (sum, map) => sum + map.totalHours,
+        0,
+      );
       expect(totalHours).toBeGreaterThan(0);
       expect(allShifts.length).toBeGreaterThan(0);
     });
@@ -569,7 +579,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
       const shift = createShift(
         "new-year-shift",
         new Date(2024, 11, 31, 22, 0, 0),
-        new Date(2025, 0, 1, 6, 0, 0)
+        new Date(2025, 0, 1, 6, 0, 0),
       );
 
       const meta = createMeta("2024-12-31", WorkDayType.Regular);
@@ -594,7 +604,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
       const shift = createShift(
         "leap-day-shift",
         new Date(2024, 1, 29, 9, 0, 0),
-        new Date(2024, 1, 29, 17, 0, 0)
+        new Date(2024, 1, 29, 17, 0, 0),
       );
 
       const shiftMap = buildShiftMap(shift, feb29.meta);
@@ -642,7 +652,7 @@ describe("Salary Calculation Pipeline - E2E Tests", () => {
         const shift = createShift(
           `shift-${workDay.meta.date}`,
           new Date(workDay.meta.date + "T09:00:00"),
-          new Date(workDay.meta.date + "T17:00:00")
+          new Date(workDay.meta.date + "T17:00:00"),
         );
 
         return buildShiftMap(shift, workDay.meta);

@@ -1,4 +1,10 @@
-import { createContext, Dispatch, SetStateAction, useCallback, useContext } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useContext,
+} from "react";
 
 import { WorkDayStatus } from "@shiftly/domain";
 import type { DateService, Shift, ShiftPayMap } from "@shiftly/domain";

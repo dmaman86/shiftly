@@ -11,7 +11,8 @@ export interface MonthlyConfigRecord {
 export const monthlyConfigService = () => {
   const fetch = (userId: string, year: number, month: number) =>
     supabaseCrud.selectOne<MonthlyConfigRecord>("monthly_configs", {
-      select: "year, month, standard_hours, base_rate, unused_shabbat_credit_hours",
+      select:
+        "year, month, standard_hours, base_rate, unused_shabbat_credit_hours",
       filters: [
         { column: "user_id", operator: "eq", value: userId },
         { column: "year", operator: "eq", value: year },
@@ -21,7 +22,10 @@ export const monthlyConfigService = () => {
 
   const upsert = (
     userId: string,
-    record: Pick<MonthlyConfigRecord, "year" | "month" | "standard_hours" | "base_rate">,
+    record: Pick<
+      MonthlyConfigRecord,
+      "year" | "month" | "standard_hours" | "base_rate"
+    >,
   ) =>
     supabaseCrud.upsert(
       "monthly_configs",

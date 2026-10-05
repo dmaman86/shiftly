@@ -43,8 +43,15 @@ const LABELS = {
 
 type Language = keyof typeof LABELS;
 
-const monthName = (year: number, month: number, locale: string, style: "long" | "short") =>
-  new Intl.DateTimeFormat(locale, { month: style }).format(new Date(year, month - 1, 1));
+const monthName = (
+  year: number,
+  month: number,
+  locale: string,
+  style: "long" | "short",
+) =>
+  new Intl.DateTimeFormat(locale, { month: style }).format(
+    new Date(year, month - 1, 1),
+  );
 
 const fillTimeField = async (
   field: Locator,
@@ -65,9 +72,9 @@ const expectDayDetail = async (
   index: number,
   value: number,
 ) => {
-  await expect(page.getByTestId(`day-details-${date}-${group}-${index}`)).toHaveText(
-    formatHours(value),
-  );
+  await expect(
+    page.getByTestId(`day-details-${date}-${group}-${index}`),
+  ).toHaveText(formatHours(value));
 };
 
 const { input, expected } = loadMonthScenario(SCENARIO);
@@ -85,14 +92,21 @@ const expectSalary = async (locator: Locator, salary: number) => {
 for (const language of Object.keys(LABELS) as Language[]) {
   const labels = LABELS[language];
 
-  test(`fills and calculates the ${SCENARIO} work table (${language})`, async ({ page }) => {
+  test(`fills and calculates the ${SCENARIO} work table (${language})`, async ({
+    page,
+  }) => {
     await prepareApp(page, { holidays: input.holidays });
     await page.goto(`${language}/daily`);
 
     await page.getByRole("button", { name: labels.chooseDate }).click();
     const monthInput = page.getByRole("spinbutton", { name: labels.month });
     const yearInput = page.getByRole("spinbutton", { name: labels.year });
-    const targetMonth = monthName(input.year, input.month, labels.locale, "long");
+    const targetMonth = monthName(
+      input.year,
+      input.month,
+      labels.locale,
+      "long",
+    );
 
     await monthInput.fill(targetMonth);
     await monthInput.press("Tab");
@@ -101,7 +115,9 @@ for (const language of Object.keys(LABELS) as Language[]) {
 
     if ((await monthInput.textContent())?.trim() !== targetMonth) {
       await page
-        .getByText(monthName(input.year, input.month, labels.locale, "short"), { exact: true })
+        .getByText(monthName(input.year, input.month, labels.locale, "short"), {
+          exact: true,
+        })
         .click();
     }
 
@@ -123,14 +139,19 @@ for (const language of Object.keys(LABELS) as Language[]) {
 
     for (const { date, status } of input.statuses) {
       if (status === "normal") continue;
-      const checkbox = page.getByTestId(`work-day-${status}-${date}`).getByRole("checkbox");
+      const checkbox = page
+        .getByTestId(`work-day-${status}-${date}`)
+        .getByRole("checkbox");
       await checkbox.check();
       await expect(checkbox).toBeChecked();
     }
 
     for (const shift of input.shifts) {
       const rows = page.getByTestId(`work-day-row-${shift.date}`);
-      await rows.first().getByTestId(`work-day-add-shift-${shift.date}`).click();
+      await rows
+        .first()
+        .getByTestId(`work-day-add-shift-${shift.date}`)
+        .click();
 
       const shiftRow = rows.last();
       const startField = shiftRow.getByTestId("shift-start-time");
@@ -142,7 +163,9 @@ for (const language of Object.keys(LABELS) as Language[]) {
       await fillTimeField(endField, endTime, labels);
 
       if (isCrossDay(shift)) {
-        const crossDayToggle = shiftRow.getByTestId("shift-cross-day-toggle").getByRole("checkbox");
+        const crossDayToggle = shiftRow
+          .getByTestId("shift-cross-day-toggle")
+          .getByRole("checkbox");
         await crossDayToggle.check();
         await expect(crossDayToggle).toBeChecked();
       }
@@ -157,7 +180,9 @@ for (const language of Object.keys(LABELS) as Language[]) {
 
     await expect(baseRateInput).toHaveValue(String(input.baseRate));
 
-    for (const [date, { breakdown, salary }] of Object.entries(expected.daily)) {
+    for (const [date, { breakdown, salary }] of Object.entries(
+      expected.daily,
+    )) {
       const prefix = `work-day-${date}`;
       await expect(page.getByTestId(`${prefix}-actual-hours`)).toHaveText(
         formatHours(breakdown.actualHours),
@@ -169,23 +194,69 @@ for (const language of Object.keys(LABELS) as Language[]) {
         formatHours(breakdown.regular.hours100.hours),
       );
       await expect(page.getByTestId(`${prefix}-extra-hours`)).toHaveText(
-        formatHours(breakdown.regular.hours125.hours + breakdown.regular.hours150.hours),
+        formatHours(
+          breakdown.regular.hours125.hours + breakdown.regular.hours150.hours,
+        ),
       );
       await expectSalary(page.getByTestId(`${prefix}-salary`), salary);
 
       const detailsRow = page.getByTestId(`work-day-row-${date}`).first();
-      await detailsRow.getByRole("button", { name: labels.showDayDetails }).click();
+      await detailsRow
+        .getByRole("button", { name: labels.showDayDetails })
+        .click();
       await expect(
         detailsRow.getByRole("button", { name: labels.hideDayDetails }),
       ).toBeVisible();
 
-      await expectDayDetail(page, date, "overtime", 0, breakdown.regular.hours100.hours);
-      await expectDayDetail(page, date, "overtime", 1, breakdown.regular.hours125.hours);
-      await expectDayDetail(page, date, "overtime", 2, breakdown.regular.hours150.hours);
-      await expectDayDetail(page, date, "shabbat", 0, breakdown.special.shabbat150.hours);
-      await expectDayDetail(page, date, "shabbat", 1, breakdown.special.shabbat200.hours);
-      await expectDayDetail(page, date, "extras", 0, breakdown.extra.hours20.hours);
-      await expectDayDetail(page, date, "extras", 1, breakdown.extra.hours50.hours);
+      await expectDayDetail(
+        page,
+        date,
+        "overtime",
+        0,
+        breakdown.regular.hours100.hours,
+      );
+      await expectDayDetail(
+        page,
+        date,
+        "overtime",
+        1,
+        breakdown.regular.hours125.hours,
+      );
+      await expectDayDetail(
+        page,
+        date,
+        "overtime",
+        2,
+        breakdown.regular.hours150.hours,
+      );
+      await expectDayDetail(
+        page,
+        date,
+        "shabbat",
+        0,
+        breakdown.special.shabbat150.hours,
+      );
+      await expectDayDetail(
+        page,
+        date,
+        "shabbat",
+        1,
+        breakdown.special.shabbat200.hours,
+      );
+      await expectDayDetail(
+        page,
+        date,
+        "extras",
+        0,
+        breakdown.extra.hours20.hours,
+      );
+      await expectDayDetail(
+        page,
+        date,
+        "extras",
+        1,
+        breakdown.extra.hours50.hours,
+      );
       await expectDayDetail(page, date, "meal", 0, breakdown.perDiemPoints);
       await expectDayDetail(page, date, "meal", 1, breakdown.largePoints);
       await expectDayDetail(page, date, "meal", 2, breakdown.smallPoints);
@@ -193,19 +264,29 @@ for (const language of Object.keys(LABELS) as Language[]) {
 
     const monthly = expected.monthly.breakdown;
     await expect(page.getByTestId("work-table-footer")).toBeVisible();
-    await expect(page.getByTestId("work-table-month-total-actual-hours")).toHaveText(
-      formatHours(monthly.actualHours),
+    await expect(
+      page.getByTestId("work-table-month-total-actual-hours"),
+    ).toHaveText(formatHours(monthly.actualHours));
+    await expect(
+      page.getByTestId("work-table-month-total-total-hours"),
+    ).toHaveText(formatHours(monthly.totalHours));
+    await expect(
+      page.getByTestId("work-table-month-total-regular-hours"),
+    ).toHaveText(formatHours(monthly.regular.hours100.hours));
+    await expect(
+      page.getByTestId("work-table-month-total-extra-hours"),
+    ).toHaveText(
+      formatHours(
+        monthly.regular.hours125.hours + monthly.regular.hours150.hours,
+      ),
     );
-    await expect(page.getByTestId("work-table-month-total-total-hours")).toHaveText(
-      formatHours(monthly.totalHours),
+    await expectSalary(
+      page.getByTestId("work-table-month-total-salary"),
+      expected.monthly.salary,
     );
-    await expect(page.getByTestId("work-table-month-total-regular-hours")).toHaveText(
-      formatHours(monthly.regular.hours100.hours),
+    await expectSalary(
+      page.getByTestId("monthly-salary-total"),
+      expected.monthly.salary,
     );
-    await expect(page.getByTestId("work-table-month-total-extra-hours")).toHaveText(
-      formatHours(monthly.regular.hours125.hours + monthly.regular.hours150.hours),
-    );
-    await expectSalary(page.getByTestId("work-table-month-total-salary"), expected.monthly.salary);
-    await expectSalary(page.getByTestId("monthly-salary-total"), expected.monthly.salary);
   });
 }

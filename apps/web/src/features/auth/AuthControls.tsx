@@ -39,7 +39,12 @@ export const AuthControls = ({ display = "guest" }: AuthControlsProps) => {
     if (display === "account") return null;
 
     return (
-      <Stack direction="row" spacing={1} justifyContent="center" alignItems="center">
+      <Stack
+        direction="row"
+        spacing={1}
+        justifyContent="center"
+        alignItems="center"
+      >
         <CircularProgress size={20} />
         <Typography variant="body2" color="text.secondary">
           {t("auth.loading")}
@@ -68,7 +73,9 @@ export const AuthControls = ({ display = "guest" }: AuthControlsProps) => {
 
   return (
     <Stack spacing={1.5} alignItems="stretch">
-      {initializationError && <Alert severity="error">{t("auth.initialization_error")}</Alert>}
+      {initializationError && (
+        <Alert severity="error">{t("auth.initialization_error")}</Alert>
+      )}
 
       <Typography variant="caption" color="text.secondary" align="center">
         {t("auth.sign_in_benefit")}

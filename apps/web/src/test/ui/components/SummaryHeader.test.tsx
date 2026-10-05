@@ -22,13 +22,14 @@ describe("SummaryHeader", () => {
 
       expect(screen.getByText("Title Only")).toBeInTheDocument();
       // Subtitle should not be present
-      const container = screen.getByText("Title Only").parentElement?.parentElement;
+      const container =
+        screen.getByText("Title Only").parentElement?.parentElement;
       expect(container?.textContent).toBe("Title Only");
     });
 
     it("should render with subtitle when provided", () => {
       renderWithTheme(
-        <SummaryHeader title="Monthly Report" subtitle="January 2024" />
+        <SummaryHeader title="Monthly Report" subtitle="January 2024" />,
       );
 
       expect(screen.getByText("Monthly Report")).toBeInTheDocument();
@@ -44,7 +45,8 @@ describe("SummaryHeader", () => {
     });
 
     it("should handle long titles", () => {
-      const longTitle = "Comprehensive Monthly Salary and Benefits Summary Report";
+      const longTitle =
+        "Comprehensive Monthly Salary and Benefits Summary Report";
       renderWithTheme(<SummaryHeader title={longTitle} />);
 
       expect(screen.getByText(longTitle)).toBeInTheDocument();
@@ -77,32 +79,31 @@ describe("SummaryHeader", () => {
     });
 
     it("should handle long subtitles", () => {
-      const longSubtitle = "Detailed breakdown of all earnings and deductions for the current period";
-      renderWithTheme(<SummaryHeader title="Summary" subtitle={longSubtitle} />);
+      const longSubtitle =
+        "Detailed breakdown of all earnings and deductions for the current period";
+      renderWithTheme(
+        <SummaryHeader title="Summary" subtitle={longSubtitle} />,
+      );
 
       expect(screen.getByText(longSubtitle)).toBeInTheDocument();
     });
 
     it("should handle Hebrew subtitles", () => {
-      renderWithTheme(
-        <SummaryHeader title="Summary" subtitle="ינואר 2024" />
-      );
+      renderWithTheme(<SummaryHeader title="Summary" subtitle="ינואר 2024" />);
 
       expect(screen.getByText("ינואר 2024")).toBeInTheDocument();
     });
 
     it("should handle subtitles with dates", () => {
       renderWithTheme(
-        <SummaryHeader title="Report" subtitle="01/01/2024 - 31/01/2024" />
+        <SummaryHeader title="Report" subtitle="01/01/2024 - 31/01/2024" />,
       );
 
       expect(screen.getByText("01/01/2024 - 31/01/2024")).toBeInTheDocument();
     });
 
     it("should render subtitle with secondary text color", () => {
-      renderWithTheme(
-        <SummaryHeader title="Title" subtitle="Subtitle" />
-      );
+      renderWithTheme(<SummaryHeader title="Title" subtitle="Subtitle" />);
 
       const subtitle = screen.getByText("Subtitle");
       expect(subtitle).toHaveClass("MuiTypography-body2");
@@ -112,7 +113,7 @@ describe("SummaryHeader", () => {
   describe("Layout and Structure", () => {
     it("should use Stack layout", () => {
       const { container } = renderWithTheme(
-        <SummaryHeader title="Test" subtitle="Subtitle" />
+        <SummaryHeader title="Test" subtitle="Subtitle" />,
       );
 
       // MUI Stack should be present
@@ -122,7 +123,7 @@ describe("SummaryHeader", () => {
 
     it("should display title and subtitle in vertical layout", () => {
       renderWithTheme(
-        <SummaryHeader title="Main Title" subtitle="Sub Title" />
+        <SummaryHeader title="Main Title" subtitle="Sub Title" />,
       );
 
       const title = screen.getByText("Main Title");
@@ -134,7 +135,7 @@ describe("SummaryHeader", () => {
 
     it("should have proper spacing between elements", () => {
       const { container } = renderWithTheme(
-        <SummaryHeader title="Title" subtitle="Subtitle" />
+        <SummaryHeader title="Title" subtitle="Subtitle" />,
       );
 
       // Should have margin bottom (mb: 3)
@@ -153,12 +154,12 @@ describe("SummaryHeader", () => {
 
     it("should maintain heading structure with subtitle", () => {
       renderWithTheme(
-        <SummaryHeader title="Main Heading" subtitle="Description text" />
+        <SummaryHeader title="Main Heading" subtitle="Description text" />,
       );
 
       const heading = screen.getByRole("heading", { name: "Main Heading" });
       expect(heading).toBeInTheDocument();
-      
+
       // Subtitle should be regular text, not a heading
       const subtitle = screen.getByText("Description text");
       expect(subtitle.tagName).not.toBe("H1");
@@ -168,7 +169,7 @@ describe("SummaryHeader", () => {
 
     it("should have readable text content", () => {
       renderWithTheme(
-        <SummaryHeader title="Salary Report" subtitle="Monthly breakdown" />
+        <SummaryHeader title="Salary Report" subtitle="Monthly breakdown" />,
       );
 
       expect(screen.getByText("Salary Report")).toBeInTheDocument();
@@ -177,7 +178,7 @@ describe("SummaryHeader", () => {
 
     it("should use semantic HTML elements", () => {
       const { container } = renderWithTheme(
-        <SummaryHeader title="Test Title" subtitle="Test Subtitle" />
+        <SummaryHeader title="Test Title" subtitle="Test Subtitle" />,
       );
 
       // Should have proper heading element
@@ -216,10 +217,7 @@ describe("SummaryHeader", () => {
 
     it("should render with all props", () => {
       renderWithTheme(
-        <SummaryHeader
-          title="Complete Header"
-          subtitle="With full details"
-        />
+        <SummaryHeader title="Complete Header" subtitle="With full details" />,
       );
 
       expect(screen.getByText("Complete Header")).toBeInTheDocument();
@@ -231,7 +229,7 @@ describe("SummaryHeader", () => {
       const longSubtitle = "B".repeat(150);
 
       renderWithTheme(
-        <SummaryHeader title={longTitle} subtitle={longSubtitle} />
+        <SummaryHeader title={longTitle} subtitle={longSubtitle} />,
       );
 
       expect(screen.getByText(longTitle)).toBeInTheDocument();
@@ -240,7 +238,7 @@ describe("SummaryHeader", () => {
 
     it("should handle special Unicode characters", () => {
       renderWithTheme(
-        <SummaryHeader title="Émployé Sàlary™" subtitle="Café • 2024 ★" />
+        <SummaryHeader title="Émployé Sàlary™" subtitle="Café • 2024 ★" />,
       );
 
       expect(screen.getByText("Émployé Sàlary™")).toBeInTheDocument();

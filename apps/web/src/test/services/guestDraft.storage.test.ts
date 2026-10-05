@@ -45,22 +45,41 @@ describe("parseGuestDraft", () => {
     ["an invalid savedAt", buildDraft({ savedAt: "not-a-date" })],
     ["a year before the system start", buildDraft({ year: 2014 })],
     ["a month out of range", buildDraft({ month: 13 })],
-    ["a negative base rate", buildDraft({ config: { standardHours: 6.67, baseRate: -1 } })],
-    ["a day outside the month", buildDraft({ days: [{ date: "2026-10-01", status: WorkDayStatus.sick }] })],
-    ["a persisted normal status", buildDraft({ days: [{ date: "2026-09-10", status: WorkDayStatus.normal }] })],
+    [
+      "a negative base rate",
+      buildDraft({ config: { standardHours: 6.67, baseRate: -1 } }),
+    ],
+    [
+      "a day outside the month",
+      buildDraft({
+        days: [{ date: "2026-10-01", status: WorkDayStatus.sick }],
+      }),
+    ],
+    [
+      "a persisted normal status",
+      buildDraft({
+        days: [{ date: "2026-09-10", status: WorkDayStatus.normal }],
+      }),
+    ],
     [
       "a shift outside the month",
-      buildDraft({ shifts: [{ ...buildDraft().shifts[0], date: "2026-10-01" }] }),
+      buildDraft({
+        shifts: [{ ...buildDraft().shifts[0], date: "2026-10-01" }],
+      }),
     ],
     [
       "a shift ending before it starts",
       buildDraft({
-        shifts: [{ ...buildDraft().shifts[0], end_time: "2026-09-01T04:00:00.000Z" }],
+        shifts: [
+          { ...buildDraft().shifts[0], end_time: "2026-09-01T04:00:00.000Z" },
+        ],
       }),
     ],
     [
       "too many shifts",
-      buildDraft({ shifts: Array.from({ length: 201 }, () => buildDraft().shifts[0]) }),
+      buildDraft({
+        shifts: Array.from({ length: 201 }, () => buildDraft().shifts[0]),
+      }),
     ],
   ])("rejects %s", (_case, value) => {
     expect(parseGuestDraft(value)).toBeNull();

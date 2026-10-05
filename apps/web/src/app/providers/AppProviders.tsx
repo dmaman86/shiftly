@@ -9,7 +9,11 @@ import { he } from "date-fns/locale/he";
 import { enUS as pickerEnUS, heIL } from "@mui/x-date-pickers/locales";
 import { useTranslation } from "react-i18next";
 
-import { AuthProvider, DomainProvider, AppSnackbarProvider } from "@/app/providers";
+import {
+  AuthProvider,
+  DomainProvider,
+  AppSnackbarProvider,
+} from "@/app/providers";
 
 import createCache from "@emotion/cache";
 import rtlPlugin from "stylis-plugin-rtl";
@@ -48,28 +52,30 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
   return (
     <DirectionContext.Provider value={{ direction, setDirection }}>
       <CacheProvider value={direction === "rtl" ? rtlCache : ltrCache}>
-          <ThemeProvider theme={theme}>
-            <AppSnackbarProvider>
-              <AuthProvider>
-                <DomainProvider>
-                  <LocalizationProvider
-                    dateAdapter={AdapterDateFns}
-                    adapterLocale={language === "he" ? he : dateFnsEnUS}
-                    localeText={
-                      language === "he"
-                        ? heIL.components.MuiLocalizationProvider.defaultProps
-                            .localeText
-                        : pickerEnUS.components.MuiLocalizationProvider
-                            .defaultProps.localeText
-                    }
-                  >
-                    <CssBaseline />
-                    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-                  </LocalizationProvider>
-                </DomainProvider>
-              </AuthProvider>
-            </AppSnackbarProvider>
-          </ThemeProvider>
+        <ThemeProvider theme={theme}>
+          <AppSnackbarProvider>
+            <AuthProvider>
+              <DomainProvider>
+                <LocalizationProvider
+                  dateAdapter={AdapterDateFns}
+                  adapterLocale={language === "he" ? he : dateFnsEnUS}
+                  localeText={
+                    language === "he"
+                      ? heIL.components.MuiLocalizationProvider.defaultProps
+                          .localeText
+                      : pickerEnUS.components.MuiLocalizationProvider
+                          .defaultProps.localeText
+                  }
+                >
+                  <CssBaseline />
+                  <QueryClientProvider client={queryClient}>
+                    {children}
+                  </QueryClientProvider>
+                </LocalizationProvider>
+              </DomainProvider>
+            </AuthProvider>
+          </AppSnackbarProvider>
+        </ThemeProvider>
       </CacheProvider>
     </DirectionContext.Provider>
   );

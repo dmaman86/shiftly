@@ -10,9 +10,7 @@ type WorkTableDayStateProviderProps = {
   ownerKey?: string;
 };
 
-const DayStateProvider = ({
-  children,
-}: WorkTableDayStateProviderProps) => {
+const DayStateProvider = ({ children }: WorkTableDayStateProviderProps) => {
   const [state, dispatch] = useReducer(workTableDayStateReducer, {});
   const [hydrated, setHydrated] = useState(false);
   const value = useMemo(

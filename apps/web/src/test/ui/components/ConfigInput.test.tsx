@@ -13,17 +13,13 @@ describe("ConfigInput", () => {
   };
 
   it("should render with label", () => {
-    renderWithTheme(
-      <ConfigInput {...defaultProps} label="Standard Hours" />
-    );
+    renderWithTheme(<ConfigInput {...defaultProps} label="Standard Hours" />);
 
     expect(screen.getByLabelText("Standard Hours")).toBeInTheDocument();
   });
 
   it("should display the provided value", () => {
-    renderWithTheme(
-      <ConfigInput {...defaultProps} value="42" />
-    );
+    renderWithTheme(<ConfigInput {...defaultProps} value="42" />);
 
     const input = screen.getByRole("textbox");
     expect(input).toHaveValue("42");
@@ -33,9 +29,7 @@ describe("ConfigInput", () => {
     const user = userEvent.setup();
     const handleChange = vi.fn();
 
-    renderWithTheme(
-      <ConfigInput {...defaultProps} onChange={handleChange} />
-    );
+    renderWithTheme(<ConfigInput {...defaultProps} onChange={handleChange} />);
 
     const input = screen.getByRole("textbox");
     await user.type(input, "123");
@@ -50,9 +44,7 @@ describe("ConfigInput", () => {
     const user = userEvent.setup();
     const handleBlur = vi.fn();
 
-    renderWithTheme(
-      <ConfigInput {...defaultProps} onBlur={handleBlur} />
-    );
+    renderWithTheme(<ConfigInput {...defaultProps} onBlur={handleBlur} />);
 
     const input = screen.getByRole("textbox");
     await user.click(input);
@@ -67,16 +59,14 @@ describe("ConfigInput", () => {
         {...defaultProps}
         error={true}
         helperText="This field is required"
-      />
+      />,
     );
 
     expect(screen.getByText("This field is required")).toBeInTheDocument();
   });
 
   it("should be disabled when disabled prop is true", () => {
-    renderWithTheme(
-      <ConfigInput {...defaultProps} disabled={true} />
-    );
+    renderWithTheme(<ConfigInput {...defaultProps} disabled={true} />);
 
     const input = screen.getByRole("textbox");
     expect(input).toBeDisabled();
@@ -87,16 +77,14 @@ describe("ConfigInput", () => {
       <ConfigInput
         {...defaultProps}
         icon={<AttachMoneyIcon data-testid="money-icon" />}
-      />
+      />,
     );
 
     expect(screen.getByTestId("money-icon")).toBeInTheDocument();
   });
 
   it("should support number type input", () => {
-    renderWithTheme(
-      <ConfigInput {...defaultProps} type="number" />
-    );
+    renderWithTheme(<ConfigInput {...defaultProps} type="number" />);
 
     const input = screen.getByRole("spinbutton");
     expect(input).toHaveAttribute("type", "number");
@@ -104,7 +92,7 @@ describe("ConfigInput", () => {
 
   it("should support different variants", () => {
     const { rerender } = renderWithTheme(
-      <ConfigInput {...defaultProps} variant="outlined" />
+      <ConfigInput {...defaultProps} variant="outlined" />,
     );
 
     let input = screen.getByRole("textbox");
@@ -133,11 +121,7 @@ describe("ConfigInput", () => {
     const handleChange = vi.fn();
 
     renderWithTheme(
-      <ConfigInput
-        {...defaultProps}
-        disabled={true}
-        onChange={handleChange}
-      />
+      <ConfigInput {...defaultProps} disabled={true} onChange={handleChange} />,
     );
 
     const input = screen.getByRole("textbox");
@@ -148,10 +132,7 @@ describe("ConfigInput", () => {
 
   it("should show helper text without error", () => {
     renderWithTheme(
-      <ConfigInput
-        {...defaultProps}
-        helperText="Enter a positive number"
-      />
+      <ConfigInput {...defaultProps} helperText="Enter a positive number" />,
     );
 
     expect(screen.getByText("Enter a positive number")).toBeInTheDocument();

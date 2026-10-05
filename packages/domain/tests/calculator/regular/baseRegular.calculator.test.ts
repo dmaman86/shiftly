@@ -284,7 +284,6 @@ describe("BaseRegularCalculator", () => {
   });
 
   describe("integration scenarios", () => {
-
     it("should handle special day workflow", () => {
       const calculator = new TestRegularCalculator();
       const specialBreakdown = calculator.handleSpecial(12);
@@ -293,7 +292,7 @@ describe("BaseRegularCalculator", () => {
 
       const accumulated = calculator.accumulate(
         calculator.createEmpty(),
-        specialBreakdown
+        specialBreakdown,
       );
 
       expect(accumulated).toEqual(specialBreakdown);

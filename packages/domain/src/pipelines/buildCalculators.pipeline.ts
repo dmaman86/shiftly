@@ -21,7 +21,6 @@ export const buildCalculators = (): Calculators => {
 
   const mealAllowanceCalculator = new TimelineMealAllowanceCalculator();
 
-
   return {
     regular: {
       byDay: regularByDay,

@@ -1,18 +1,27 @@
 import { describe, expect, it, vi } from "vitest";
-import type { MonthPayMap, MonthPayMapReducer, WorkDayMap } from "@shiftly/domain";
+import type {
+  MonthPayMap,
+  MonthPayMapReducer,
+  WorkDayMap,
+} from "@shiftly/domain";
 import { calculateGlobalBreakdown } from "@/store/globalBreakdown";
 
 describe("calculateGlobalBreakdown", () => {
   it("recomputes totals after replacing or removing a day, including an empty month", () => {
     const calculator = {
       createEmpty: () => ({ totalHours: 0 }),
-      accumulate: (base: MonthPayMap, day: WorkDayMap) => ({ totalHours: base.totalHours + day.totalHours }),
+      accumulate: (base: MonthPayMap, day: WorkDayMap) => ({
+        totalHours: base.totalHours + day.totalHours,
+      }),
     } as unknown as MonthPayMapReducer;
     const original = {
       "2026-09-01": { totalHours: 4 } as WorkDayMap,
       "2026-09-02": { totalHours: 6 } as WorkDayMap,
     };
-    const updated = { ...original, "2026-09-01": { totalHours: 2 } as WorkDayMap };
+    const updated = {
+      ...original,
+      "2026-09-01": { totalHours: 2 } as WorkDayMap,
+    };
     const remaining = { "2026-09-02": updated["2026-09-02"] };
 
     expect(calculateGlobalBreakdown(original, calculator).totalHours).toBe(10);
@@ -22,9 +31,7 @@ describe("calculateGlobalBreakdown", () => {
     expect(original["2026-09-01"].totalHours).toBe(4);
   });
   it("accumulates every daily pay map", () => {
-    const createEmpty = vi.fn(
-      () => ({ totalHours: 0 }) as MonthPayMap,
-    );
+    const createEmpty = vi.fn(() => ({ totalHours: 0 }) as MonthPayMap);
     const accumulate = vi.fn(
       (breakdown: MonthPayMap, dayPayMap: WorkDayMap) =>
         ({
@@ -48,9 +55,7 @@ describe("calculateGlobalBreakdown", () => {
   });
 
   it("calculates the same input consistently", () => {
-    const createEmpty = vi.fn(
-      () => ({ totalHours: 0 }) as MonthPayMap,
-    );
+    const createEmpty = vi.fn(() => ({ totalHours: 0 }) as MonthPayMap);
     const accumulate = vi.fn(
       (breakdown: MonthPayMap, dayPayMap: WorkDayMap) =>
         ({

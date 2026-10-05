@@ -38,7 +38,10 @@ export const CalculationRulesPage = () => {
   const demoVideoSrc = `${import.meta.env.BASE_URL}demos/${isMobile ? "video-mobile.webm" : "video-desktop.webm"}`;
 
   const track = (section: string) =>
-    analyticsService.track({ name: "calculation_rules_accordion_expanded", params: { section } });
+    analyticsService.track({
+      name: "calculation_rules_accordion_expanded",
+      params: { section },
+    });
 
   return (
     <Container maxWidth="md" sx={{ mt: 2 }}>
@@ -111,19 +114,20 @@ export const CalculationRulesPage = () => {
 
           {/* Daily time split */}
           <RuleCard title={t(`${cr}.card_extra_hours.title`)}>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mb: 2 }}
-            >
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               {t(`${cr}.card_extra_hours.sub_title`)}
             </Typography>
 
-            <RuleAccordion title={t(`${cr}.card_extra_hours.accordion_title`)} onExpand={() => track("extra_hours")}>
+            <RuleAccordion
+              title={t(`${cr}.card_extra_hours.accordion_title`)}
+              onExpand={() => track("extra_hours")}
+            >
               <WorkDayTimeline>
                 <TimeSegment
                   from=""
-                  to={t(`${cr}.card_extra_hours.segment_standard`, { standardHours })}
+                  to={t(`${cr}.card_extra_hours.segment_standard`, {
+                    standardHours,
+                  })}
                   label="100%"
                   flex={1}
                   color="#e3f2fd"
@@ -144,7 +148,9 @@ export const CalculationRulesPage = () => {
                 />
               </WorkDayTimeline>
 
-              <Box sx={{ mt: 2, p: 1.5, bgcolor: "action.hover", borderRadius: 1 }}>
+              <Box
+                sx={{ mt: 2, p: 1.5, bgcolor: "action.hover", borderRadius: 1 }}
+              >
                 <Typography variant="body2" fontWeight="medium" gutterBottom>
                   {t(`${cr}.card_extra_hours.example_label`)}
                 </Typography>
@@ -152,10 +158,15 @@ export const CalculationRulesPage = () => {
                   {t(`${cr}.card_extra_hours.example_regular`, { to: std })}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {t(`${cr}.card_extra_hours.example_extra_125`, { from: std + 1, to: std + 2 })}
+                  {t(`${cr}.card_extra_hours.example_extra_125`, {
+                    from: std + 1,
+                    to: std + 2,
+                  })}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {t(`${cr}.card_extra_hours.example_extra_150`, { from: std + 2 })}
+                  {t(`${cr}.card_extra_hours.example_extra_150`, {
+                    from: std + 2,
+                  })}
                 </Typography>
               </Box>
 
@@ -166,20 +177,23 @@ export const CalculationRulesPage = () => {
           </RuleCard>
 
           <RuleCard title={t(`${cr}.card_salary_additions.title`)}>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mb: 2 }}
-            >
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               {t(`${cr}.card_salary_additions.sub_title`)}
             </Typography>
 
-            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_weekday.title`)} onExpand={() => track("salary_additions_weekday")}>
+            <RuleAccordion
+              title={t(`${cr}.card_salary_additions.accordion_weekday.title`)}
+              onExpand={() => track("salary_additions_weekday")}
+            >
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t(`${cr}.card_salary_additions.accordion_weekday.sub_title`)}
               </Typography>
 
-              <WorkDayTimeline title={t(`${cr}.card_salary_additions.accordion_weekday.timeline_start_label`)}>
+              <WorkDayTimeline
+                title={t(
+                  `${cr}.card_salary_additions.accordion_weekday.timeline_start_label`,
+                )}
+              >
                 <TimeSegment
                   from="00:00"
                   to="06:00"
@@ -190,13 +204,19 @@ export const CalculationRulesPage = () => {
                 <TimeSegment
                   from="06:00"
                   to="14:00"
-                  label={t(`${cr}.card_salary_additions.accordion_weekday.base_salary`)}
+                  label={t(
+                    `${cr}.card_salary_additions.accordion_weekday.base_salary`,
+                  )}
                   flex={8}
                   color="#e3f2fd"
                 />
               </WorkDayTimeline>
 
-              <WorkDayTimeline title={t(`${cr}.card_salary_additions.accordion_weekday.timeline_continue_label`)}>
+              <WorkDayTimeline
+                title={t(
+                  `${cr}.card_salary_additions.accordion_weekday.timeline_continue_label`,
+                )}
+              >
                 <TimeSegment
                   from="14:00"
                   to="22:00"
@@ -215,12 +235,23 @@ export const CalculationRulesPage = () => {
               </WorkDayTimeline>
 
               <TimelineNote>
-                <div>{t(`${cr}.card_salary_additions.accordion_weekday.note_midnight`)}</div>
-                <div>{t(`${cr}.card_salary_additions.accordion_weekday.note_next_day`)}</div>
+                <div>
+                  {t(
+                    `${cr}.card_salary_additions.accordion_weekday.note_midnight`,
+                  )}
+                </div>
+                <div>
+                  {t(
+                    `${cr}.card_salary_additions.accordion_weekday.note_next_day`,
+                  )}
+                </div>
               </TimelineNote>
             </RuleAccordion>
 
-            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_friday.title`)} onExpand={() => track("salary_additions_friday")}>
+            <RuleAccordion
+              title={t(`${cr}.card_salary_additions.accordion_friday.title`)}
+              onExpand={() => track("salary_additions_friday")}
+            >
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t(`${cr}.card_salary_additions.accordion_friday.sub_title`)}
               </Typography>
@@ -251,18 +282,35 @@ export const CalculationRulesPage = () => {
               </WorkDayTimeline>
 
               <TimelineNote>
-                <div>{t(`${cr}.card_salary_additions.accordion_friday.note_midnight`)}</div>
-                <div>{t(`${cr}.card_salary_additions.accordion_friday.note_next_day`)}</div>
+                <div>
+                  {t(
+                    `${cr}.card_salary_additions.accordion_friday.note_midnight`,
+                  )}
+                </div>
+                <div>
+                  {t(
+                    `${cr}.card_salary_additions.accordion_friday.note_next_day`,
+                  )}
+                </div>
               </TimelineNote>
 
               <TimelineNote variant="tip">
-                <div>{t(`${cr}.card_salary_additions.accordion_friday.tip_summer`)}</div>
-                <div>{t(`${cr}.card_salary_additions.accordion_friday.tip_winter`)}</div>
-                <div>{t(`${cr}.card_salary_additions.accordion_friday.tip_auto`)}</div>
+                <div>
+                  {t(`${cr}.card_salary_additions.accordion_friday.tip_summer`)}
+                </div>
+                <div>
+                  {t(`${cr}.card_salary_additions.accordion_friday.tip_winter`)}
+                </div>
+                <div>
+                  {t(`${cr}.card_salary_additions.accordion_friday.tip_auto`)}
+                </div>
               </TimelineNote>
             </RuleAccordion>
 
-            <RuleAccordion title={t(`${cr}.card_salary_additions.accordion_shabbat.title`)} onExpand={() => track("salary_additions_shabbat")}>
+            <RuleAccordion
+              title={t(`${cr}.card_salary_additions.accordion_shabbat.title`)}
+              onExpand={() => track("salary_additions_shabbat")}
+            >
               <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                 {t(`${cr}.card_salary_additions.accordion_shabbat.sub_title`)}
               </Typography>
@@ -286,53 +334,97 @@ export const CalculationRulesPage = () => {
               </WorkDayTimeline>
 
               <TimelineNote>
-                <div>{t(`${cr}.card_salary_additions.accordion_shabbat.note_midnight`)}</div>
-                <div>{t(`${cr}.card_salary_additions.accordion_shabbat.note_next_day`)}</div>
+                <div>
+                  {t(
+                    `${cr}.card_salary_additions.accordion_shabbat.note_midnight`,
+                  )}
+                </div>
+                <div>
+                  {t(
+                    `${cr}.card_salary_additions.accordion_shabbat.note_next_day`,
+                  )}
+                </div>
               </TimelineNote>
             </RuleAccordion>
           </RuleCard>
 
           <RuleCard title={t(`${cr}.card_meal_allowance.title`)}>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ mb: 2 }}
-            >
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
               {t(`${cr}.card_meal_allowance.sub_title`)}
             </Typography>
 
-            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_eligibility.title`)} onExpand={() => track("meal_allowance_eligibility")}>
+            <RuleAccordion
+              title={t(`${cr}.card_meal_allowance.accordion_eligibility.title`)}
+              onExpand={() => track("meal_allowance_eligibility")}
+            >
               <Typography variant="body2" color="text.secondary">
-                {t(`${cr}.card_meal_allowance.accordion_eligibility.description`)}
+                {t(
+                  `${cr}.card_meal_allowance.accordion_eligibility.description`,
+                )}
               </Typography>
             </RuleAccordion>
 
-            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_tiers.title`)} onExpand={() => track("meal_allowance_tiers")}>
+            <RuleAccordion
+              title={t(`${cr}.card_meal_allowance.accordion_tiers.title`)}
+              onExpand={() => track("meal_allowance_tiers")}
+            >
               <Table size="small">
                 <TableHead sx={{ bgcolor: "action.hover" }}>
                   <TableRow>
-                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_tiers.col_hours`)}</TableCell>
-                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_tiers.col_tier`)}</TableCell>
-                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_tiers.col_points`)}</TableCell>
+                    <TableCell>
+                      {t(`${cr}.card_meal_allowance.accordion_tiers.col_hours`)}
+                    </TableCell>
+                    <TableCell align="center">
+                      {t(`${cr}.card_meal_allowance.accordion_tiers.col_tier`)}
+                    </TableCell>
+                    <TableCell align="center">
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_tiers.col_points`,
+                      )}
+                    </TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
                   <TableRow>
-                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_tiers.tier_a_hours`)}</TableCell>
-                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_tiers.tier_a_label`)}</TableCell>
+                    <TableCell>
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_tiers.tier_a_hours`,
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_tiers.tier_a_label`,
+                      )}
+                    </TableCell>
                     <TableCell align="center">1</TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_tiers.tier_b_hours`)}</TableCell>
-                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_tiers.tier_b_label`)}</TableCell>
+                    <TableCell>
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_tiers.tier_b_hours`,
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_tiers.tier_b_label`,
+                      )}
+                    </TableCell>
                     <TableCell align="center">2</TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_tiers.tier_c_hours`)}</TableCell>
-                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_tiers.tier_c_label`)}</TableCell>
+                    <TableCell>
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_tiers.tier_c_hours`,
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_tiers.tier_c_label`,
+                      )}
+                    </TableCell>
                     <TableCell align="center">3</TableCell>
                   </TableRow>
                 </TableBody>
@@ -345,35 +437,64 @@ export const CalculationRulesPage = () => {
                 underline="hover"
                 sx={{ display: "block", mt: 2 }}
               >
-                {t(`${cr}.card_meal_allowance.accordion_tiers.official_doc_link`)}
+                {t(
+                  `${cr}.card_meal_allowance.accordion_tiers.official_doc_link`,
+                )}
               </Link>
             </RuleAccordion>
 
-            <RuleAccordion title={t(`${cr}.card_meal_allowance.accordion_per_diem.title`)} onExpand={() => track("meal_allowance_per_diem")}>
+            <RuleAccordion
+              title={t(`${cr}.card_meal_allowance.accordion_per_diem.title`)}
+              onExpand={() => track("meal_allowance_per_diem")}
+            >
               <Table size="small">
                 <TableHead sx={{ bgcolor: "action.hover" }}>
                   <TableRow>
-                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_per_diem.col_condition`)}</TableCell>
-                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_per_diem.col_until_2024`)}</TableCell>
-                    <TableCell align="center">{t(`${cr}.card_meal_allowance.accordion_per_diem.col_from_2024`)}</TableCell>
+                    <TableCell>
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_per_diem.col_condition`,
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_per_diem.col_until_2024`,
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_per_diem.col_from_2024`,
+                      )}
+                    </TableCell>
                   </TableRow>
                 </TableHead>
 
                 <TableBody>
                   <TableRow>
-                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_per_diem.row_overtime_2h`)}</TableCell>
+                    <TableCell>
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_per_diem.row_overtime_2h`,
+                      )}
+                    </TableCell>
                     <TableCell align="center">₪19.70</TableCell>
                     <TableCell align="center">₪21.10</TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_per_diem.row_overtime_2h_no_meal`)}</TableCell>
+                    <TableCell>
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_per_diem.row_overtime_2h_no_meal`,
+                      )}
+                    </TableCell>
                     <TableCell align="center">₪20.70</TableCell>
                     <TableCell align="center">₪23.80</TableCell>
                   </TableRow>
 
                   <TableRow>
-                    <TableCell>{t(`${cr}.card_meal_allowance.accordion_per_diem.row_night_shift`)}</TableCell>
+                    <TableCell>
+                      {t(
+                        `${cr}.card_meal_allowance.accordion_per_diem.row_night_shift`,
+                      )}
+                    </TableCell>
                     <TableCell align="center">₪13.50</TableCell>
                     <TableCell align="center">₪14.50</TableCell>
                   </TableRow>
@@ -394,7 +515,10 @@ export const CalculationRulesPage = () => {
 
           {/* Disclaimer */}
           <RuleCard title={t(`${cr}.card_important_info.title`)}>
-            <RuleAccordion title={t(`${cr}.card_important_info.accordion_limitations.title`)} onExpand={() => track("important_info_limitations")}>
+            <RuleAccordion
+              title={t(`${cr}.card_important_info.accordion_limitations.title`)}
+              onExpand={() => track("important_info_limitations")}
+            >
               <Typography>
                 {t(`${cr}.card_important_info.accordion_limitations.text_1`)}
               </Typography>
@@ -406,7 +530,10 @@ export const CalculationRulesPage = () => {
               </Typography>
             </RuleAccordion>
 
-            <RuleAccordion title={t(`${cr}.card_important_info.accordion_disclaimers.title`)} onExpand={() => track("important_info_disclaimers")}>
+            <RuleAccordion
+              title={t(`${cr}.card_important_info.accordion_disclaimers.title`)}
+              onExpand={() => track("important_info_disclaimers")}
+            >
               <Typography>
                 {t(`${cr}.card_important_info.accordion_disclaimers.text_1`)}
               </Typography>

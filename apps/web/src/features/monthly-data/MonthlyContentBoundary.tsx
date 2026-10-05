@@ -1,4 +1,10 @@
-import { Fragment, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import {
+  Fragment,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { Box, CircularProgress } from "@mui/material";
 import { useMonthlyConfigStatus } from "./monthlyConfigStatusContext";
 
@@ -29,13 +35,18 @@ export const MonthlyContentBoundary = ({
   }, [busy, contextKey]);
 
   return (
-    <Box aria-busy={busy} sx={{
-      minHeight: busy ? Math.max(height, minHeight) : undefined,
-      // Replaced monthly nodes must not become the browser's scroll anchor.
-      overflowAnchor: "none",
-    }}>
+    <Box
+      aria-busy={busy}
+      sx={{
+        minHeight: busy ? Math.max(height, minHeight) : undefined,
+        // Replaced monthly nodes must not become the browser's scroll anchor.
+        overflowAnchor: "none",
+      }}
+    >
       {busy ? (
-        !ready && fallback ? fallback : (
+        !ready && fallback ? (
+          fallback
+        ) : (
           <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
             <CircularProgress />
           </Box>

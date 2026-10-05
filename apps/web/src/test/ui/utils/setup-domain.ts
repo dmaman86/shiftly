@@ -19,9 +19,9 @@ vi.mock("@/app", () => ({
       holidayResolver: pipelineInstance.rateCalculators.holiday,
       perDiemResolver: pipelineInstance.rateCalculators.perDiem,
       dayInfoResolver: new WorkDayInfoPresenter(
-      pipelineInstance.resolvers.workDayInfoResolver,
-      pipelineInstance.services.dateService,
-    ),
+        pipelineInstance.resolvers.workDayInfoResolver,
+        pipelineInstance.services.dateService,
+      ),
       monthResolver: new DefaultMonthResolver(),
       mealAllowanceRateResolver:
         pipelineInstance.rateCalculators.mealAllowanceRate,

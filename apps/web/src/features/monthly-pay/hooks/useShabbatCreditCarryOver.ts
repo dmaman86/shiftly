@@ -45,22 +45,25 @@ export const useShabbatCreditCarryOver = () => {
     };
   }, [user, year, month, services, callEndPoint, snackbar]);
 
-  const persistUnusedHours = useCallback((unusedHours: number) => {
-    if (!user || resolvedKey !== `${user.id}:${year}:${month}`) return;
-    if (previousUnusedHoursRef.current === unusedHours) return;
-    previousUnusedHoursRef.current = unusedHours;
+  const persistUnusedHours = useCallback(
+    (unusedHours: number) => {
+      if (!user || resolvedKey !== `${user.id}:${year}:${month}`) return;
+      if (previousUnusedHoursRef.current === unusedHours) return;
+      previousUnusedHoursRef.current = unusedHours;
 
-    void callEndPoint(
-      monthlyConfigService().setUnusedShabbatCreditHours(
-        user.id,
-        year,
-        month,
-        unusedHours,
-      ),
-    ).then((result) => {
-      if (result.error) snackbar.error(result.error);
-    });
-  }, [callEndPoint, month, resolvedKey, snackbar, user, year]);
+      void callEndPoint(
+        monthlyConfigService().setUnusedShabbatCreditHours(
+          user.id,
+          year,
+          month,
+          unusedHours,
+        ),
+      ).then((result) => {
+        if (result.error) snackbar.error(result.error);
+      });
+    },
+    [callEndPoint, month, resolvedKey, snackbar, user, year],
+  );
 
   return { carriedOverHours, persistUnusedHours };
 };

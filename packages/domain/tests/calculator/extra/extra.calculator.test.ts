@@ -38,8 +38,12 @@ describe("ExtraCalculator rate groups", () => {
   });
 
   it("rejects unknown group kinds instead of silently counting them as night", () => {
-    expect(() => getAdditionGroups(Object.assign(calculator.createEmpty(), {
-      unknown: { percent: 0.2, hours: 1 },
-    }))).toThrow('Unknown addition group: "unknown"');
+    expect(() =>
+      getAdditionGroups(
+        Object.assign(calculator.createEmpty(), {
+          unknown: { percent: 0.2, hours: 1 },
+        }),
+      ),
+    ).toThrow('Unknown addition group: "unknown"');
   });
 });

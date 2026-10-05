@@ -16,10 +16,7 @@ import { dayToPayBreakdownVM } from "@/adapters";
 import { WorkDayStatus, WorkDayType } from "@shiftly/domain";
 import { getAdditionGroups, type AdditionGroupKey } from "@shiftly/domain";
 import { DomainContextType } from "@/app";
-import type {
-  PayBreakdownViewModel,
-  WorkDayInfo,
-} from "@/app/types";
+import type { PayBreakdownViewModel, WorkDayInfo } from "@/app/types";
 import { useGlobalState } from "@/hooks";
 import { formatValue, groupByShabbat } from "@/utils";
 import { dayToCompactPayBreakdownVM } from "../../mappers/day/dayToCompactPayBreakdownVM";
@@ -121,32 +118,56 @@ const PrintDayRow = ({
       }}
     >
       <TableCell>{dayLabel}</TableCell>
-      <TableCell sx={{ whiteSpace: "pre-line" }}>{formatShiftTimes("start")}</TableCell>
-      <TableCell sx={{ whiteSpace: "pre-line" }}>{formatShiftTimes("end")}</TableCell>
+      <TableCell sx={{ whiteSpace: "pre-line" }}>
+        {formatShiftTimes("start")}
+      </TableCell>
+      <TableCell sx={{ whiteSpace: "pre-line" }}>
+        {formatShiftTimes("end")}
+      </TableCell>
       <TableCell>
         {hasDutyShift
           ? t("headers.duty")
           : status === WorkDayStatus.sick
-          ? t("headers.sick")
-          : status === WorkDayStatus.vacation
-            ? t("headers.vacation")
-            : ""}
+            ? t("headers.sick")
+            : status === WorkDayStatus.vacation
+              ? t("headers.vacation")
+              : ""}
       </TableCell>
       <TableCell>{formatValue(calculation.compact.actualHours)}</TableCell>
       <TableCell>{formatValue(calculation.compact.totalHours)}</TableCell>
-      <TableCell>{formatValue(calculation.breakdown.regular.hours100.hours)}</TableCell>
-      <TableCell>{formatValue(calculation.breakdown.regular.hours125.hours)}</TableCell>
-      <TableCell>{formatValue(calculation.breakdown.regular.hours150.hours)}</TableCell>
+      <TableCell>
+        {formatValue(calculation.breakdown.regular.hours100.hours)}
+      </TableCell>
+      <TableCell>
+        {formatValue(calculation.breakdown.regular.hours125.hours)}
+      </TableCell>
+      <TableCell>
+        {formatValue(calculation.breakdown.regular.hours150.hours)}
+      </TableCell>
       {additionKeys.map((key) => (
         <TableCell key={key}>
           {formatValue(calculation.breakdown.extra[key]?.hours)}
         </TableCell>
       ))}
-      <TableCell>{formatValue(calculation.breakdown.special.shabbat150.hours)}</TableCell>
-      <TableCell>{formatValue(calculation.breakdown.special.shabbat200.hours)}</TableCell>
-      <TableCell>{specialFullDay ? "" : formatValue(calculation.breakdown.hours100Sick.hours)}</TableCell>
-      <TableCell>{specialFullDay ? "" : formatValue(calculation.breakdown.hours100Vacation.hours)}</TableCell>
-      <TableCell>{formatValue(calculation.breakdown.appliedShabbatCredit.hours)}</TableCell>
+      <TableCell>
+        {formatValue(calculation.breakdown.special.shabbat150.hours)}
+      </TableCell>
+      <TableCell>
+        {formatValue(calculation.breakdown.special.shabbat200.hours)}
+      </TableCell>
+      <TableCell>
+        {specialFullDay
+          ? ""
+          : formatValue(calculation.breakdown.hours100Sick.hours)}
+      </TableCell>
+      <TableCell>
+        {specialFullDay
+          ? ""
+          : formatValue(calculation.breakdown.hours100Vacation.hours)}
+      </TableCell>
+      <TableCell>
+        {formatValue(calculation.breakdown.appliedShabbatCredit.hours)}
+      </TableCell>
       <TableCell>{formatValue(calculation.breakdown.perDiemPoints)}</TableCell>
       <TableCell>{formatValue(calculation.breakdown.largePoints)}</TableCell>
       <TableCell>{formatValue(calculation.breakdown.smallPoints)}</TableCell>
@@ -159,19 +180,21 @@ const PrintDayRow = ({
   );
 };
 
-export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewProps>(
-  function WorkTablePrintView(
-    {
-      domain,
-      workDays,
-      monthName,
-      shabbatCreditHoursByDate,
-      monthBreakdown,
-      dailySalary,
-      pdfMetadataHeader,
-    },
-    ref,
-  ) {
+export const WorkTablePrintView = forwardRef<
+  HTMLDivElement,
+  WorkTablePrintViewProps
+>(function WorkTablePrintView(
+  {
+    domain,
+    workDays,
+    monthName,
+    shabbatCreditHoursByDate,
+    monthBreakdown,
+    dailySalary,
+    pdfMetadataHeader,
+  },
+  ref,
+) {
   const { t } = useTranslation("work-table");
   const { month, year, baseRate, standardHours } = useGlobalState();
   const groupedWorkDays = useMemo(() => groupByShabbat(workDays), [workDays]);
@@ -214,7 +237,10 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
           padding: 8,
         }}
       >
-        <Typography component="h1" sx={{ mb: 1, fontSize: 14, fontWeight: 700 }}>
+        <Typography
+          component="h1"
+          sx={{ mb: 1, fontSize: 14, fontWeight: 700 }}
+        >
           {t("table.month_hours_title", { monthName, year })}
         </Typography>
         {pdfMetadataHeader && (
@@ -250,7 +276,9 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
                 <TableCell rowSpan={2}>{t("headers.description")}</TableCell>
                 <TableCell colSpan={2}>{t("headers.total_hours")}</TableCell>
                 <TableCell colSpan={3}>{t("headers.regular")}</TableCell>
-                <TableCell colSpan={additionGroups.length}>{t("headers.extras")}</TableCell>
+                <TableCell colSpan={additionGroups.length}>
+                  {t("headers.extras")}
+                </TableCell>
                 <TableCell colSpan={2}>{t("headers.shabbat")}</TableCell>
                 <TableCell colSpan={2}>{t("headers.absence")}</TableCell>
                 <TableCell rowSpan={2}>{t("headers.shabbat_credit")}</TableCell>
@@ -271,7 +299,9 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
                   <TableCell key={key}>
                     {key === "hours20" || key === "hours50"
                       ? `${segment.percent * 100}%`
-                      : t(`pay_labels.${kind}`, { percent: segment.percent * 100 })}
+                      : t(`pay_labels.${kind}`, {
+                          percent: segment.percent * 100,
+                        })}
                   </TableCell>
                 ))}
                 <TableCell>150%</TableCell>
@@ -291,7 +321,9 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
                     year={year}
                     baseRate={baseRate}
                     standardHours={standardHours}
-                    shabbatCreditHours={shabbatCreditHoursByDate[workDay.meta.date] ?? 0}
+                    shabbatCreditHours={
+                      shabbatCreditHoursByDate[workDay.meta.date] ?? 0
+                    }
                     isLastInWeek={dayIndex === group.length - 1}
                     additionKeys={additionKeys}
                   />
@@ -300,27 +332,45 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
             ))}
             <TableFooter>
               <TableRow sx={{ fontWeight: 700 }}>
-                <TableCell colSpan={4}>{t("table.total_gross_label")}</TableCell>
+                <TableCell colSpan={4}>
+                  {t("table.total_gross_label")}
+                </TableCell>
                 <TableCell>{formatValue(monthBreakdown.actualHours)}</TableCell>
                 <TableCell>{formatValue(monthBreakdown.totalHours)}</TableCell>
-                <TableCell>{formatValue(monthBreakdown.regular.hours100.hours)}</TableCell>
-                <TableCell>{formatValue(monthBreakdown.regular.hours125.hours)}</TableCell>
-                <TableCell>{formatValue(monthBreakdown.regular.hours150.hours)}</TableCell>
+                <TableCell>
+                  {formatValue(monthBreakdown.regular.hours100.hours)}
+                </TableCell>
+                <TableCell>
+                  {formatValue(monthBreakdown.regular.hours125.hours)}
+                </TableCell>
+                <TableCell>
+                  {formatValue(monthBreakdown.regular.hours150.hours)}
+                </TableCell>
                 {additionGroups.map(({ key, segment }) => (
                   <TableCell key={key}>{formatValue(segment.hours)}</TableCell>
                 ))}
-                <TableCell>{formatValue(monthBreakdown.special.shabbat150.hours)}</TableCell>
-                <TableCell>{formatValue(monthBreakdown.special.shabbat200.hours)}</TableCell>
-                <TableCell>{formatValue(monthBreakdown.hours100Sick.hours)}</TableCell>
-                <TableCell>{formatValue(monthBreakdown.hours100Vacation.hours)}</TableCell>
-                <TableCell>{formatValue(monthBreakdown.appliedShabbatCredit.hours)}</TableCell>
-                <TableCell>{formatValue(monthBreakdown.perDiemPoints)}</TableCell>
+                <TableCell>
+                  {formatValue(monthBreakdown.special.shabbat150.hours)}
+                </TableCell>
+                <TableCell>
+                  {formatValue(monthBreakdown.special.shabbat200.hours)}
+                </TableCell>
+                <TableCell>
+                  {formatValue(monthBreakdown.hours100Sick.hours)}
+                </TableCell>
+                <TableCell>
+                  {formatValue(monthBreakdown.hours100Vacation.hours)}
+                </TableCell>
+                <TableCell>
+                  {formatValue(monthBreakdown.appliedShabbatCredit.hours)}
+                </TableCell>
+                <TableCell>
+                  {formatValue(monthBreakdown.perDiemPoints)}
+                </TableCell>
                 <TableCell>{formatValue(monthBreakdown.largePoints)}</TableCell>
                 <TableCell>{formatValue(monthBreakdown.smallPoints)}</TableCell>
                 <TableCell>
-                  {dailySalary
-                    ? `₪${formatValue(dailySalary)}`
-                    : ""}
+                  {dailySalary ? `₪${formatValue(dailySalary)}` : ""}
                 </TableCell>
               </TableRow>
             </TableFooter>
@@ -329,5 +379,4 @@ export const WorkTablePrintView = forwardRef<HTMLDivElement, WorkTablePrintViewP
       </div>
     </>
   );
-  },
-);
+});

@@ -3,12 +3,12 @@ import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 
 import { usePayTableVM } from "@/features/salary-summary/hooks/usePayTableVM";
-import type { PayRowVM, SalarySectionConfig } from "@/features/salary-summary/vm";
+import type {
+  PayRowVM,
+  SalarySectionConfig,
+} from "@/features/salary-summary/vm";
 
-const createSection = (
-  rows: PayRowVM[],
-  id = "base",
-): SalarySectionConfig =>
+const createSection = (rows: PayRowVM[], id = "base"): SalarySectionConfig =>
   ({
     id,
     title: id,

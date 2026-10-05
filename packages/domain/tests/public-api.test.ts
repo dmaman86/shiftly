@@ -14,6 +14,8 @@ describe("compiled domain public API", () => {
     expect(days).toHaveLength(31);
     expect(days[0].meta.typeDay).toBe(WorkDayType.SpecialFull);
     expect(pipeline.resolvers).not.toHaveProperty("monthResolver");
-    expect(pipeline.resolvers.workDayInfoResolver).not.toHaveProperty("formatWorkDayLabel");
+    expect(pipeline.resolvers.workDayInfoResolver).not.toHaveProperty(
+      "formatWorkDayLabel",
+    );
   });
 });

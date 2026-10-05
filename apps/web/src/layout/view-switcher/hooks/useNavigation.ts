@@ -19,7 +19,9 @@ export const useNavigation = () => {
     { to: `/${lang}/daily`, label: t("nav.daily") },
     { to: `/${lang}/monthly`, label: t("nav.monthly") },
     { to: `/${lang}/calculation-rules`, label: t("nav.calculation_rules") },
-    ...(showProfile ? [{ to: `/${lang}/profile`, label: t("nav.profile") }] : []),
+    ...(showProfile
+      ? [{ to: `/${lang}/profile`, label: t("nav.profile") }]
+      : []),
   ];
 
   const toggleLang = () => {

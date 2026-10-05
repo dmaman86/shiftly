@@ -38,12 +38,45 @@ export default defineConfig({
       output: {
         manualChunks: (id) => {
           if (id.includes("node_modules")) {
-            if (["react", "react-dom", "react-router-dom"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-react";
-            if (["@mui/icons-material"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-mui-icons";
-            if (["@mui/material", "@emotion/react", "@emotion/styled", "@emotion/cache"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-mui-core";
-            if (["@mui/x-date-pickers", "@date-io/date-fns", "date-fns"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-mui-pickers";
-            if (["notistack", "stylis-plugin-rtl", "stylis"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-ui";
-            if (["i18next", "react-i18next"].some((p) => id.includes(`/node_modules/${p}/`))) return "vendor-i18n";
+            if (
+              ["react", "react-dom", "react-router-dom"].some((p) =>
+                id.includes(`/node_modules/${p}/`),
+              )
+            )
+              return "vendor-react";
+            if (
+              ["@mui/icons-material"].some((p) =>
+                id.includes(`/node_modules/${p}/`),
+              )
+            )
+              return "vendor-mui-icons";
+            if (
+              [
+                "@mui/material",
+                "@emotion/react",
+                "@emotion/styled",
+                "@emotion/cache",
+              ].some((p) => id.includes(`/node_modules/${p}/`))
+            )
+              return "vendor-mui-core";
+            if (
+              ["@mui/x-date-pickers", "@date-io/date-fns", "date-fns"].some(
+                (p) => id.includes(`/node_modules/${p}/`),
+              )
+            )
+              return "vendor-mui-pickers";
+            if (
+              ["notistack", "stylis-plugin-rtl", "stylis"].some((p) =>
+                id.includes(`/node_modules/${p}/`),
+              )
+            )
+              return "vendor-ui";
+            if (
+              ["i18next", "react-i18next"].some((p) =>
+                id.includes(`/node_modules/${p}/`),
+              )
+            )
+              return "vendor-i18n";
             if (id.includes("/node_modules/axios/")) return "vendor-utils";
           }
         },

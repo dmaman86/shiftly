@@ -24,11 +24,12 @@ describe("ConfigPanel", () => {
       holidayResolver: pipelineInstance.rateCalculators.holiday,
       perDiemResolver: pipelineInstance.rateCalculators.perDiem,
       dayInfoResolver: new WorkDayInfoPresenter(
-      pipelineInstance.resolvers.workDayInfoResolver,
-      pipelineInstance.services.dateService,
-    ),
+        pipelineInstance.resolvers.workDayInfoResolver,
+        pipelineInstance.services.dateService,
+      ),
       monthResolver: new DefaultMonthResolver(),
-      mealAllowanceRateResolver: pipelineInstance.rateCalculators.mealAllowanceRate,
+      mealAllowanceRateResolver:
+        pipelineInstance.rateCalculators.mealAllowanceRate,
     },
     services: {
       dateService: pipelineInstance.services.dateService,
@@ -78,8 +79,14 @@ describe("ConfigPanel", () => {
 
       expect(screen.getByRole("group", { name: "תאריך" })).toBeInTheDocument();
       expect(screen.getAllByRole("spinbutton")).toHaveLength(4);
-      expect(screen.getByLabelText("שעות תקן")).toHaveAttribute("type", "number");
-      expect(screen.getByLabelText("שכר שעתי")).toHaveAttribute("type", "number");
+      expect(screen.getByLabelText("שעות תקן")).toHaveAttribute(
+        "type",
+        "number",
+      );
+      expect(screen.getByLabelText("שכר שעתי")).toHaveAttribute(
+        "type",
+        "number",
+      );
     });
   });
 
@@ -106,7 +113,9 @@ describe("ConfigPanel", () => {
         },
       });
 
-      const standardHoursInput = screen.getByLabelText("שעות תקן") as HTMLInputElement;
+      const standardHoursInput = screen.getByLabelText(
+        "שעות תקן",
+      ) as HTMLInputElement;
       expect(standardHoursInput.value).toBe("8");
     });
 
@@ -119,7 +128,9 @@ describe("ConfigPanel", () => {
         },
       });
 
-      const baseRateInput = screen.getByLabelText("שכר שעתי") as HTMLInputElement;
+      const baseRateInput = screen.getByLabelText(
+        "שכר שעתי",
+      ) as HTMLInputElement;
       expect(baseRateInput.value).toBe("75");
       expect(baseRateInput).toHaveAttribute("dir", "ltr");
       expect(baseRateInput).toHaveAttribute("inputmode", "decimal");
@@ -140,13 +151,21 @@ describe("ConfigPanel", () => {
 
     it("should update Redux state when standard hours changes", async () => {
       const user = userEvent.setup();
-      const { store } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
-        preloadedState: {
-          global: createMockGlobalState({
-            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 50 },
-          }),
+      const { store } = renderWithProviders(
+        <ConfigPanel domain={mockDomain} />,
+        {
+          preloadedState: {
+            global: createMockGlobalState({
+              config: {
+                year: 2024,
+                month: 1,
+                standardHours: 6.67,
+                baseRate: 50,
+              },
+            }),
+          },
         },
-      });
+      );
 
       const standardHoursInput = screen.getByLabelText("שעות תקן");
       await user.clear(standardHoursInput);
@@ -157,19 +176,27 @@ describe("ConfigPanel", () => {
         () => {
           expect(store.getState().global.config.standardHours).toBe(8);
         },
-        { timeout: 1000 }
+        { timeout: 1000 },
       );
     });
 
     it("should update Redux state when base rate changes", async () => {
       const user = userEvent.setup();
-      const { store } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
-        preloadedState: {
-          global: createMockGlobalState({
-            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 50 },
-          }),
+      const { store } = renderWithProviders(
+        <ConfigPanel domain={mockDomain} />,
+        {
+          preloadedState: {
+            global: createMockGlobalState({
+              config: {
+                year: 2024,
+                month: 1,
+                standardHours: 6.67,
+                baseRate: 50,
+              },
+            }),
+          },
         },
-      });
+      );
 
       const baseRateInput = screen.getByLabelText("שכר שעתי");
       await user.clear(baseRateInput);
@@ -180,7 +207,7 @@ describe("ConfigPanel", () => {
         () => {
           expect(store.getState().global.config.baseRate).toBe(100);
         },
-        { timeout: 1000 }
+        { timeout: 1000 },
       );
     });
 
@@ -205,7 +232,9 @@ describe("ConfigPanel", () => {
         },
       });
 
-      expect(screen.getByText("יש להזין שכר שעתי להצגת שכר יומי או חודשי")).toBeInTheDocument();
+      expect(
+        screen.getByText("יש להזין שכר שעתי להצגת שכר יומי או חודשי"),
+      ).toBeInTheDocument();
     });
 
     it("should show helper text for zero base rate in monthly mode", () => {
@@ -217,7 +246,9 @@ describe("ConfigPanel", () => {
         },
       });
 
-      expect(screen.getByText("חישוב שכר חודשי מחייב הגדרת שכר שעתי")).toBeInTheDocument();
+      expect(
+        screen.getByText("חישוב שכר חודשי מחייב הגדרת שכר שעתי"),
+      ).toBeInTheDocument();
     });
 
     it("should show default helper text for standard hours", () => {
@@ -275,7 +306,9 @@ describe("ConfigPanel", () => {
         },
       });
 
-      expect(screen.getByRole("heading", { name: "הגדרות חישוב" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { name: "הגדרות חישוב" }),
+      ).toBeInTheDocument();
     });
 
     it("should have accessible labels for all inputs", () => {
@@ -291,11 +324,14 @@ describe("ConfigPanel", () => {
     });
 
     it("should have accessible icons for sections", () => {
-      const { container } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
-        preloadedState: {
-          global: createMockGlobalState(),
+      const { container } = renderWithProviders(
+        <ConfigPanel domain={mockDomain} />,
+        {
+          preloadedState: {
+            global: createMockGlobalState(),
+          },
         },
-      });
+      );
 
       // Settings, Calendar, and Payments icons should be present
       const icons = container.querySelectorAll("svg");
@@ -306,13 +342,21 @@ describe("ConfigPanel", () => {
   describe("Edge Cases", () => {
     it("should handle negative numbers gracefully", async () => {
       const user = userEvent.setup();
-      const { store } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
-        preloadedState: {
-          global: createMockGlobalState({
-            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 50 },
-          }),
+      const { store } = renderWithProviders(
+        <ConfigPanel domain={mockDomain} />,
+        {
+          preloadedState: {
+            global: createMockGlobalState({
+              config: {
+                year: 2024,
+                month: 1,
+                standardHours: 6.67,
+                baseRate: 50,
+              },
+            }),
+          },
         },
-      });
+      );
 
       const standardHoursInput = screen.getByLabelText("שעות תקן");
       await user.clear(standardHoursInput);
@@ -322,21 +366,31 @@ describe("ConfigPanel", () => {
       await waitFor(
         () => {
           // Should remain at original value or not update to negative
-          expect(store.getState().global.config.standardHours).toBeGreaterThanOrEqual(0);
+          expect(
+            store.getState().global.config.standardHours,
+          ).toBeGreaterThanOrEqual(0);
         },
-        { timeout: 1000 }
+        { timeout: 1000 },
       );
     });
 
     it("should handle decimal values in inputs", async () => {
       const user = userEvent.setup();
-      const { store } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
-        preloadedState: {
-          global: createMockGlobalState({
-            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 50 },
-          }),
+      const { store } = renderWithProviders(
+        <ConfigPanel domain={mockDomain} />,
+        {
+          preloadedState: {
+            global: createMockGlobalState({
+              config: {
+                year: 2024,
+                month: 1,
+                standardHours: 6.67,
+                baseRate: 50,
+              },
+            }),
+          },
         },
-      });
+      );
 
       const baseRateInput = screen.getByLabelText("שכר שעתי");
       await user.clear(baseRateInput);
@@ -347,7 +401,7 @@ describe("ConfigPanel", () => {
         () => {
           expect(store.getState().global.config.baseRate).toBe(75.5);
         },
-        { timeout: 1000 }
+        { timeout: 1000 },
       );
     });
 
@@ -360,8 +414,12 @@ describe("ConfigPanel", () => {
         },
       });
 
-      const standardHoursInput = screen.getByLabelText("שעות תקן") as HTMLInputElement;
-      const baseRateInput = screen.getByLabelText("שכר שעתי") as HTMLInputElement;
+      const standardHoursInput = screen.getByLabelText(
+        "שעות תקן",
+      ) as HTMLInputElement;
+      const baseRateInput = screen.getByLabelText(
+        "שכר שעתי",
+      ) as HTMLInputElement;
 
       expect(standardHoursInput.value).toBe("0");
       expect(baseRateInput.value).toBe("0");
@@ -369,13 +427,21 @@ describe("ConfigPanel", () => {
 
     it("should reset base rate to zero when an existing value is cleared", async () => {
       const user = userEvent.setup();
-      const { store } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
-        preloadedState: {
-          global: createMockGlobalState({
-            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 75 },
-          }),
+      const { store } = renderWithProviders(
+        <ConfigPanel domain={mockDomain} />,
+        {
+          preloadedState: {
+            global: createMockGlobalState({
+              config: {
+                year: 2024,
+                month: 1,
+                standardHours: 6.67,
+                baseRate: 75,
+              },
+            }),
+          },
         },
-      });
+      );
 
       const baseRateInput = screen.getByLabelText("שכר שעתי");
       await user.clear(baseRateInput);
@@ -390,13 +456,21 @@ describe("ConfigPanel", () => {
 
     it("should accept zero as a base rate", async () => {
       const user = userEvent.setup();
-      const { store } = renderWithProviders(<ConfigPanel domain={mockDomain} />, {
-        preloadedState: {
-          global: createMockGlobalState({
-            config: { year: 2024, month: 1, standardHours: 6.67, baseRate: 75 },
-          }),
+      const { store } = renderWithProviders(
+        <ConfigPanel domain={mockDomain} />,
+        {
+          preloadedState: {
+            global: createMockGlobalState({
+              config: {
+                year: 2024,
+                month: 1,
+                standardHours: 6.67,
+                baseRate: 75,
+              },
+            }),
+          },
         },
-      });
+      );
 
       const baseRateInput = screen.getByLabelText("שכר שעתי");
       await user.clear(baseRateInput);

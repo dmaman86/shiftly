@@ -85,12 +85,19 @@ export const WorkTable = ({
   return (
     <Card sx={{ mb: 3 }}>
       <CardContent>
-        <CalculationStatus message={t(monthBreakdown.dailySalary === undefined
-          ? "a11y.calculation_updated_no_rate" : "a11y.calculation_updated", {
-          monthName: monthNames[month - 1], year,
-          hours: monthBreakdown.totalHours.toFixed(2),
-          salary: (monthBreakdown.dailySalary ?? 0).toFixed(2),
-        })} />
+        <CalculationStatus
+          message={t(
+            monthBreakdown.dailySalary === undefined
+              ? "a11y.calculation_updated_no_rate"
+              : "a11y.calculation_updated",
+            {
+              monthName: monthNames[month - 1],
+              year,
+              hours: monthBreakdown.totalHours.toFixed(2),
+              salary: (monthBreakdown.dailySalary ?? 0).toFixed(2),
+            },
+          )}
+        />
         {/* Header */}
         <Box
           sx={{
@@ -176,9 +183,7 @@ export const WorkTable = ({
                   shabbatCreditHoursByDate={
                     shabbatCreditAllocation.appliedHoursByDate
                   }
-                  shabbatCreditUsageByDate={
-                    shabbatCreditAllocation.usageByDate
-                  }
+                  shabbatCreditUsageByDate={shabbatCreditAllocation.usageByDate}
                   shabbatCreditTotalHours={
                     shabbatCreditAllocation.totalAvailableHours
                   }

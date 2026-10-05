@@ -1,4 +1,11 @@
-import { Box, TableCell, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import {
+  Box,
+  TableCell,
+  TableRow,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import { formatValue } from "@/utils";
 import { PayRowVM, useEditableQuantity } from "@/features/salary-summary";

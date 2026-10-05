@@ -6,7 +6,10 @@
   "type": "module",
   "license": "MIT",
   "packageManager": "bun@1.3.14",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "engines": {
     "node": ">=24.0.0 <25"
   },
@@ -17,6 +20,8 @@
     "typecheck": "tsc -b --stopBuildOnErrors --pretty false",
     "build": "tsc -b --stopBuildOnErrors --pretty false && vite build apps/web --config apps/web/vite.config.ts",
     "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "preview": "vite preview apps/web --config apps/web/vite.config.ts",
     "calendar:generate": "node scripts/generate-calendar.ts",
     "test": "bun run domain:build && vitest",
@@ -30,7 +35,7 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui:august-2026": "PLAYWRIGHT_VIDEO=on playwright test e2e/desktop/work-table-month.spec.ts --project=desktop --grep \"\\(he\\)\" --output=test-results/august-2026",
     "test:e2e:ui:august-2026:mobile": "PLAYWRIGHT_VIDEO=on playwright test e2e/mobile/work-table-month.spec.ts --project=android --output=test-results/august-2026-mobile",
-    "predeploy": "bun run typecheck && bun run lint && bun run test:ci && bun run build",
+    "predeploy": "bun run typecheck && bun run lint && bun run format:check && bun run test:ci && bun run build",
     "deploy": "gh-pages -d dist"
   },
   "overrides": {
@@ -55,6 +60,7 @@
     "gh-pages": "^6.3.0",
     "globals": "^15.15.0",
     "jsdom": "^26.1.0",
+    "prettier": "3.9.9",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^8.1.3",

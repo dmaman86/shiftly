@@ -12,7 +12,12 @@ const mocks = vi.hoisted(() => ({
     isLoading: false,
   },
   selectMonth: vi.fn(),
-  snackbar: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() },
+  snackbar: {
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn(),
+  },
   track: vi.fn(),
   importMonth: vi.fn(),
   fetchShifts: vi.fn(),
@@ -28,13 +33,17 @@ vi.mock("@/hooks", () => ({
   useDomain: () => ({
     services: {
       dateService: {
-        getDatesRange: () => ({ startDate: "2026-08-01", endDate: "2026-09-01" }),
+        getDatesRange: () => ({
+          startDate: "2026-08-01",
+          endDate: "2026-09-01",
+        }),
       },
     },
   }),
   useFetch: () => ({
     loading: false,
-    callEndPoint: (endpoint: { call: () => Promise<unknown> }) => endpoint.call(),
+    callEndPoint: (endpoint: { call: () => Promise<unknown> }) =>
+      endpoint.call(),
     cancelEndPoint: vi.fn(),
   }),
 }));
@@ -42,7 +51,9 @@ vi.mock("@/hooks", () => ({
 vi.mock("@/services", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/services")>()),
   analyticsService: { track: mocks.track },
-  guestDraftService: () => ({ importMonth: () => ({ call: mocks.importMonth }) }),
+  guestDraftService: () => ({
+    importMonth: () => ({ call: mocks.importMonth }),
+  }),
   shiftService: () => ({ fetchForMonth: () => ({ call: mocks.fetchShifts }) }),
   workDayService: () => ({ fetchForMonth: () => ({ call: mocks.fetchDays }) }),
 }));
@@ -85,7 +96,9 @@ const renderProvider = (initialDraft: GuestDraft | null = draft) =>
 
 const savedMonth = (shiftCount: number) => {
   mocks.fetchShifts.mockResolvedValue({
-    data: Array.from({ length: shiftCount }, (_, index) => ({ id: `saved-${index}` })),
+    data: Array.from({ length: shiftCount }, (_, index) => ({
+      id: `saved-${index}`,
+    })),
   });
   mocks.fetchDays.mockResolvedValue({ data: [] });
 };
@@ -135,7 +148,9 @@ describe("GuestDraftImportProvider", () => {
 
     renderProvider();
 
-    await waitFor(() => expect(screen.getByTestId("gate")).toHaveTextContent("ready"));
+    await waitFor(() =>
+      expect(screen.getByTestId("gate")).toHaveTextContent("ready"),
+    );
     expect(mocks.selectMonth).toHaveBeenCalledWith(2026, 8);
     expect(mocks.importMonth).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -179,7 +194,9 @@ describe("GuestDraftImportProvider", () => {
       await screen.findByRole("button", { name: "Replace with guest data" }),
     );
 
-    await waitFor(() => expect(screen.getByTestId("gate")).toHaveTextContent("ready"));
+    await waitFor(() =>
+      expect(screen.getByTestId("gate")).toHaveTextContent("ready"),
+    );
     expect(mocks.importMonth).toHaveBeenCalledTimes(1);
     expect(mocks.track).toHaveBeenCalledWith({
       name: "guest_draft_import_resolved",
@@ -205,7 +222,9 @@ describe("GuestDraftImportProvider", () => {
 
     await user.click(screen.getByRole("button", { name: "Try again" }));
 
-    await waitFor(() => expect(screen.getByTestId("gate")).toHaveTextContent("ready"));
+    await waitFor(() =>
+      expect(screen.getByTestId("gate")).toHaveTextContent("ready"),
+    );
     expect(mocks.importMonth).toHaveBeenCalledTimes(2);
     expect(sessionStorage.getItem(DRAFT_KEY)).toBeNull();
   });

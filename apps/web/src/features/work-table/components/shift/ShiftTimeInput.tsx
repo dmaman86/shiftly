@@ -35,11 +35,15 @@ export const ShiftTimeInput = ({
         onChange={onChange}
         format="HH:mm"
         ampm={false}
-        slotProps={{ textField: { InputProps: {
-          "aria-label": accessibleLabel || label,
-          "aria-labelledby": undefined,
-          "aria-describedby": error && errorMessage ? messageId : undefined,
-        } } }}
+        slotProps={{
+          textField: {
+            InputProps: {
+              "aria-label": accessibleLabel || label,
+              "aria-labelledby": undefined,
+              "aria-describedby": error && errorMessage ? messageId : undefined,
+            },
+          },
+        }}
         sx={{
           width: 80,
           maxWidth: 80,

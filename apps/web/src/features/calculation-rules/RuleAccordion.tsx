@@ -12,9 +12,18 @@ type RuleAccordionProps = {
   onExpand?: () => void;
 };
 
-export const RuleAccordion = ({ title, children, onExpand }: RuleAccordionProps) => {
+export const RuleAccordion = ({
+  title,
+  children,
+  onExpand,
+}: RuleAccordionProps) => {
   return (
-    <Accordion elevation={0} onChange={(_, expanded) => { if (expanded) onExpand?.(); }}>
+    <Accordion
+      elevation={0}
+      onChange={(_, expanded) => {
+        if (expanded) onExpand?.();
+      }}
+    >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography fontWeight="medium">{title}</Typography>
       </AccordionSummary>

@@ -39,10 +39,11 @@ export const useMonthlySalarySummary = ({
       year,
       month,
     });
-    const allowanceRate = domain.resolvers.mealAllowanceRateResolver.calculateRates({
-      year,
-      month,
-    });
+    const allowanceRate =
+      domain.resolvers.mealAllowanceRateResolver.calculateRates({
+        year,
+        month,
+      });
     return buildSectionsSalary({
       payVM: monthFullBreakdown,
       baseRate,
@@ -50,14 +51,7 @@ export const useMonthlySalarySummary = ({
       rateDiem,
       t,
     });
-  }, [
-    domain,
-    monthFullBreakdown,
-    year,
-    month,
-    baseRate,
-    t,
-  ]);
+  }, [domain, monthFullBreakdown, year, month, baseRate, t]);
 
   const monthlyTotal = useMemo(
     () =>

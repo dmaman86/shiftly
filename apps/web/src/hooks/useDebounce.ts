@@ -5,7 +5,7 @@ type DebounceProps<T> = {
   delay?: number;
 };
 
-export const useDebounce = <T,>({ value, delay = 500 }: DebounceProps<T>) => {
+export const useDebounce = <T>({ value, delay = 500 }: DebounceProps<T>) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {

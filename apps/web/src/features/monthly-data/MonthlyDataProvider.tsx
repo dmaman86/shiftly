@@ -33,7 +33,10 @@ const configKey = (userId: string | undefined, year: number, month: number) =>
 const LoadingConfig = () => {
   const { t } = useTranslation();
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", p: 4 }} aria-busy="true">
+    <Box
+      sx={{ display: "flex", justifyContent: "center", p: 4 }}
+      aria-busy="true"
+    >
       <CircularProgress aria-label={t("config.loading")} />
     </Box>
   );
@@ -65,7 +68,9 @@ const MonthlyConfigSession = ({
   // a filtered subscription can otherwise expose its previous period's count.
   useIsMutating();
   const queryClient = useQueryClient();
-  const pendingSaves = queryClient.isMutating({ mutationKey: configKey(userId, year, month) });
+  const pendingSaves = queryClient.isMutating({
+    mutationKey: configKey(userId, year, month),
+  });
   const query = useQuery({
     queryKey: configKey(userId, year, month),
     enabled: !!userId && guestDraftReady && !initialized && pendingSaves === 0,
@@ -77,7 +82,9 @@ const MonthlyConfigSession = ({
     refetchOnReconnect: false,
     queryFn: async () => {
       if (!userId) throw new Error("An authenticated user is required");
-      const result = await monthlyConfigService().fetch(userId, year, month).call();
+      const result = await monthlyConfigService()
+        .fetch(userId, year, month)
+        .call();
       if (result.error !== undefined) throw new Error(result.error);
       return result.data;
     },
@@ -88,34 +95,59 @@ const MonthlyConfigSession = ({
       initialized ||
       useGlobalStore.getState().monthlyConfigContextKey === contextKey ||
       (userId &&
-        (!guestDraftReady || pendingSaves > 0 || !query.isSuccess || query.isFetching))
-    ) return;
-    const values = userId && query.data
-      ? { standardHours: query.data.standard_hours, baseRate: query.data.base_rate }
-      : defaultMonthlyConfig;
+        (!guestDraftReady ||
+          pendingSaves > 0 ||
+          !query.isSuccess ||
+          query.isFetching))
+    )
+      return;
+    const values =
+      userId && query.data
+        ? {
+            standardHours: query.data.standard_hours,
+            baseRate: query.data.base_rate,
+          }
+        : defaultMonthlyConfig;
     initializeMonth(year, month, values, contextKey);
   }, [
-    contextKey, guestDraftReady, initialized, initializeMonth, month,
-    pendingSaves, query.data, query.isFetching, query.isSuccess, userId, year,
+    contextKey,
+    guestDraftReady,
+    initialized,
+    initializeMonth,
+    month,
+    pendingSaves,
+    query.data,
+    query.isFetching,
+    query.isSuccess,
+    userId,
+    year,
   ]);
 
-  const edit = useCallback((field: keyof MonthlyConfigValues, value: number) => {
-    if (!initialized || !Number.isFinite(value) || value < 0) return;
-    const store = useGlobalStore.getState();
-    if (
-      store.monthlyConfigContextKey !== contextKey ||
-      store.config.year !== year || store.config.month !== month ||
-      store.config[field] === value
-    ) return;
-    if (field === "baseRate") store.updateBaseRate(value);
-    else store.updateStandardHours(value);
-    const { baseRate, standardHours } = useGlobalStore.getState().config;
-    if (userId) save({ userId, year, month, baseRate, standardHours });
-  }, [contextKey, initialized, month, save, userId, year]);
-  const actions = useMemo(() => ({
-    updateBaseRate: (value: number) => edit("baseRate", value),
-    updateStandardHours: (value: number) => edit("standardHours", value),
-  }), [edit]);
+  const edit = useCallback(
+    (field: keyof MonthlyConfigValues, value: number) => {
+      if (!initialized || !Number.isFinite(value) || value < 0) return;
+      const store = useGlobalStore.getState();
+      if (
+        store.monthlyConfigContextKey !== contextKey ||
+        store.config.year !== year ||
+        store.config.month !== month ||
+        store.config[field] === value
+      )
+        return;
+      if (field === "baseRate") store.updateBaseRate(value);
+      else store.updateStandardHours(value);
+      const { baseRate, standardHours } = useGlobalStore.getState().config;
+      if (userId) save({ userId, year, month, baseRate, standardHours });
+    },
+    [contextKey, initialized, month, save, userId, year],
+  );
+  const actions = useMemo(
+    () => ({
+      updateBaseRate: (value: number) => edit("baseRate", value),
+      updateStandardHours: (value: number) => edit("standardHours", value),
+    }),
+    [edit],
+  );
 
   const fallback = query.isError ? (
     <Alert
@@ -128,11 +160,15 @@ const MonthlyConfigSession = ({
     >
       {t("config.load_error")}
     </Alert>
-  ) : <LoadingConfig />;
+  ) : (
+    <LoadingConfig />
+  );
 
   return (
     <MonthlyConfigActionsContext.Provider value={actions}>
-      <MonthlyConfigStatusContext.Provider value={{ ready: initialized, contextKey, fallback }}>
+      <MonthlyConfigStatusContext.Provider
+        value={{ ready: initialized, contextKey, fallback }}
+      >
         {children}
       </MonthlyConfigStatusContext.Provider>
     </MonthlyConfigActionsContext.Provider>
@@ -188,7 +224,10 @@ export const MonthlyDataProvider = ({ children }: MonthlyDataProviderProps) => {
             </Button>
           }
         >
-          {t("config.save_error", { year: mutation.variables.year, month: mutation.variables.month })}
+          {t("config.save_error", {
+            year: mutation.variables.year,
+            month: mutation.variables.month,
+          })}
         </Alert>
       )}
       <MonthlyConfigSession

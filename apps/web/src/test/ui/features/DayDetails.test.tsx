@@ -43,7 +43,11 @@ describe("DayDetails", () => {
 
   it("renders the complete day breakdown in an accessible region", () => {
     renderWithTheme(
-      <DayDetails breakdown={breakdown} id="day-details" showShabbatCreditUsed />,
+      <DayDetails
+        breakdown={breakdown}
+        id="day-details"
+        showShabbatCreditUsed
+      />,
     );
 
     expect(
@@ -69,7 +73,9 @@ describe("DayDetails", () => {
   });
 
   it("keeps the Shabbat table to just the rate tiers when credit usage isn't shown", () => {
-    renderWithTheme(<DayDetails breakdown={breakdown} id="day-details-no-credit" />);
+    renderWithTheme(
+      <DayDetails breakdown={breakdown} id="day-details-no-credit" />,
+    );
 
     expect(
       screen.getByRole("columnheader", { name: "Shabbat" }),

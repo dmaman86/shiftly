@@ -2,15 +2,21 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 
 vi.mock("@/app/providers/domain/DomainProvider", () => ({
-  DomainProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  DomainProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 vi.mock("@/app/providers/snackbar/AppSnackbarProvider", () => ({
-  AppSnackbarProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  AppSnackbarProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 vi.mock("@/app/providers/auth/AuthProvider", () => ({
-  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => (
+    <>{children}</>
+  ),
 }));
 
 import { AppProviders } from "@/app/providers/AppProviders";
@@ -29,7 +35,7 @@ describe("AppProviders", () => {
     render(
       <AppProviders>
         <div>Test Child</div>
-      </AppProviders>
+      </AppProviders>,
     );
     expect(screen.getByText("Test Child")).toBeInTheDocument();
   });
@@ -43,7 +49,7 @@ describe("AppProviders", () => {
     render(
       <AppProviders>
         <div>Child</div>
-      </AppProviders>
+      </AppProviders>,
     );
 
     await waitFor(() => {
@@ -61,7 +67,7 @@ describe("AppProviders", () => {
     render(
       <AppProviders>
         <div>Child</div>
-      </AppProviders>
+      </AppProviders>,
     );
 
     await waitFor(() => {
@@ -80,7 +86,7 @@ describe("AppProviders", () => {
     render(
       <AppProviders>
         <div>Child</div>
-      </AppProviders>
+      </AppProviders>,
     );
 
     await waitFor(() => {
