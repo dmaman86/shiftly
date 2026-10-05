@@ -17,9 +17,9 @@ import {
 
 import createCache from "@emotion/cache";
 import rtlPlugin from "stylis-plugin-rtl";
-import { createTheme } from "@mui/material/styles";
 
 import { resolveLanguageFromPathname } from "@/i18n/language";
+import { createAppTheme } from "@/app/theme";
 import { DirectionContext, type Direction } from "./direction/directionContext";
 
 const getInitialDirection = (): Direction => {
@@ -42,7 +42,7 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
   const { i18n } = useTranslation();
   const language = i18n.resolvedLanguage === "en" ? "en" : "he";
 
-  const theme = useMemo(() => createTheme({ direction }), [direction]);
+  const theme = useMemo(() => createAppTheme(direction), [direction]);
 
   useEffect(() => {
     document.documentElement.dir = direction;

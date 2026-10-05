@@ -38,7 +38,7 @@ export const buildSectionsSalary = ({
       title: t("salary_summary.base_hours_title"),
       icon: <AccessTimeIcon color="primary" />,
       summaryLabel: t("salary_summary.base_hours_summary"),
-      color: "#1976d2",
+      tone: "base",
       payVM,
       baseRate,
       buildRows: (vm, rate) => buildBasePayRows(vm, rate, t),
@@ -46,9 +46,9 @@ export const buildSectionsSalary = ({
 
     createExtraSectionFactory("extra", {
       title: t("salary_summary.extras_title"),
-      icon: <AddCircleOutlineIcon sx={{ color: "#a64400" }} />,
+      icon: <AddCircleOutlineIcon sx={{ color: "pay.extras" }} />,
       summaryLabel: t("salary_summary.extras_summary"),
-      color: "#a64400",
+      tone: "extras",
       payVM,
       baseRate,
       buildRows: (vm, rate) => buildExtraPayRows(vm, rate, t),
@@ -56,9 +56,9 @@ export const buildSectionsSalary = ({
 
     createAllowanceSectionFactory("allowance", {
       title: t("salary_summary.allowance_title"),
-      icon: <RestaurantIcon sx={{ color: "#2e7d32" }} />,
+      icon: <RestaurantIcon sx={{ color: "pay.allowances" }} />,
       summaryLabel: t("salary_summary.allowance_summary"),
-      color: "#2e7d32",
+      tone: "allowances",
       payVM,
       allowanceRate,
       rateDiem,

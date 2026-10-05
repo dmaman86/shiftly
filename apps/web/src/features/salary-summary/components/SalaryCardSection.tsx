@@ -134,14 +134,19 @@ export const SalaryCardSection = ({
                 onQuantityChange={(val) => handleQuantityChange(index, val)}
               />
             ))}
-            <TableRow sx={{ backgroundColor: alpha(section.color, 0.08) }}>
+            <TableRow
+              sx={{
+                bgcolor: (theme) =>
+                  alpha(theme.palette.pay[section.tone], 0.08),
+              }}
+            >
               <TableCell colSpan={2} />
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 {section.summaryLabel}
               </TableCell>
               <TableCell
                 align="center"
-                sx={{ fontWeight: "bold", color: section.color }}
+                sx={{ fontWeight: "bold", color: `pay.${section.tone}` }}
               >
                 ₪{formatValue(table.total)}
               </TableCell>

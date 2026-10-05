@@ -1,7 +1,8 @@
 import { ReactElement } from "react";
 import { render, RenderOptions } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
+import { createAppTheme } from "@/app/theme";
 import { CacheProvider } from "@emotion/react";
 import createCache from "@emotion/cache";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -17,13 +18,8 @@ import {
 // Create RTL cache for tests
 const cache = createCache({ key: "css", prepend: true });
 
-// Create default theme for tests
-const theme = createTheme({
-  direction: "rtl",
-  palette: {
-    mode: "light",
-  },
-});
+// Same theme as the app so components can resolve custom palette tokens.
+const theme = createAppTheme("rtl");
 
 /**
  * Initializes the Zustand store for testing

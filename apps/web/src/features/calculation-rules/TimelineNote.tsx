@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, alpha } from "@mui/material";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 type TimelineNoteProps = {
@@ -16,19 +16,19 @@ export const TimelineNote = ({
     switch (variant) {
       case "warning":
         return {
-          bgcolor: "rgba(255, 152, 0, 0.08)",
+          tint: "warning" as const,
           borderColor: "warning.main",
           iconColor: "warning.main",
         };
       case "tip":
         return {
-          bgcolor: "rgba(76, 175, 80, 0.08)",
+          tint: "success" as const,
           borderColor: "success.main",
           iconColor: "success.main",
         };
       default:
         return {
-          bgcolor: "rgba(33, 150, 243, 0.08)",
+          tint: "info" as const,
           borderColor: "info.main",
           iconColor: "info.main",
         };
@@ -45,7 +45,7 @@ export const TimelineNote = ({
         mt: 2,
         p: 1.5,
         borderRadius: 1,
-        bgcolor: styles.bgcolor,
+        bgcolor: (theme) => alpha(theme.palette[styles.tint].main, 0.08),
         borderRight: 3,
         borderColor: styles.borderColor,
       }}
