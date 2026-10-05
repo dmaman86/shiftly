@@ -57,7 +57,7 @@ export const Footer = () => {
       component="footer"
       sx={{
         py: 2,
-        backgroundColor: "#f5f5f5",
+        bgcolor: "grey.100",
       }}
       dir={direction}
     >
@@ -165,7 +165,7 @@ export const Footer = () => {
                 sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
               >
                 <GitHubIcon fontSize="small" />
-                GitHub Repo
+                {t("footer.github")}
               </Link>
               <Link
                 href="mailto:dmaman86@gmail.com"

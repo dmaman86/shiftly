@@ -19,7 +19,9 @@ vi.mock("@/hooks", () => ({
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string) => (key === "footer.contact" ? "Contact" : key),
+    t: (key: string) =>
+      ({ "footer.contact": "Contact", "footer.github": "GitHub Repo" })[key] ??
+      key,
   }),
 }));
 
