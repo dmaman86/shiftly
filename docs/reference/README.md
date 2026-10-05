@@ -341,9 +341,10 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Source: working tree, 2026-10-05. Base commit: 8e1d6e54901a14284fda7e14f41140f524c8757d.
 %% Selected module dependencies, including lazy page imports; arrows point from consumers to dependencies.
-%% AuthenticatedRoute prioritizes loading, initialization error, guest redirect, then children.
+%% ProfilePage is public: it resolves auth loading and initialization error, then renders the account or guest view.
+%% Guests never mount ProfileHistory, so useProfileHistory only runs for an authenticated user.
 flowchart TD
   subgraph group_ui["Presentation"]
     node_0["App<br/>[apps/web/src/app/App.tsx]"]
@@ -356,9 +357,11 @@ flowchart TD
     node_7["GoogleSignInButton<br/>[apps/web/src/features/auth/GoogleSignInButton.tsx]"]
     node_8["GuestDraftConflictDialog<br/>[apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx]"]
     node_9["MonthlySalarySummary<br/>[apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx]"]
-    profile_page["ProfilePage — authenticated charts<br/>[apps/web/src/pages/ProfilePage.tsx]"]
-    auth_route["AuthenticatedRoute<br/>[apps/web/src/app/routes/AuthenticatedRoute.tsx]"]
+    profile_page["ProfilePage — account or guest view<br/>[apps/web/src/pages/ProfilePage.tsx]"]
     account_card["AccountProfileCard<br/>[apps/web/src/features/auth/AccountProfileCard.tsx]"]
+    guest_card["GuestProfileCard<br/>[apps/web/src/features/auth/GuestProfileCard.tsx]"]
+    profile_history["ProfileHistory — persisted charts<br/>[apps/web/src/features/profile/components/ProfileHistory.tsx]"]
+    locked_history["LockedProfileHistory — disabled range, locked charts<br/>[apps/web/src/features/profile/components/LockedProfileHistory.tsx]"]
     profile_chart["ProfileBarChart<br/>[apps/web/src/features/profile/components/ProfileBarChart.tsx]"]
     range_selector["ProfileRangeSelector<br/>[apps/web/src/features/profile/components/ProfileRangeSelector.tsx]"]
     monthly_boundary["MonthlyContentBoundary — scoped period replacement<br/>[apps/web/src/features/monthly-data/MonthlyContentBoundary.tsx]"]
@@ -374,17 +377,20 @@ flowchart TD
     node_12["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
   end
   node_0 -->|"depends on"| node_1
-  node_1 --> auth_route
   node_1 --> profile_page
-  profile_page --> account_card
-  profile_page --> profile_chart
-  profile_page --> range_selector
-  profile_page --> profile_query
-  profile_page --> profile_metrics
+  profile_page -->|"user"| account_card
+  profile_page -->|"user"| profile_history
+  profile_page -->|"guest"| guest_card
+  profile_page -->|"guest"| locked_history
+  guest_card --> node_7
+  profile_history --> profile_chart
+  profile_history --> range_selector
+  profile_history --> profile_query
+  profile_history --> profile_metrics
+  locked_history --> range_selector
   node_2 --> monthly_boundary
   node_3 --> monthly_boundary
   monthly_boundary --> config_status
-  auth_route -.->|"guest redirect"| node_4
   node_1 -->|"depends on"| node_2
   node_1 -->|"depends on"| node_3
   node_1 -->|"depends on"| node_4
@@ -413,11 +419,13 @@ flowchart TD
   class node_10 toneMint
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
   class node_11,node_12 toneRose
-  class profile_page,auth_route,account_card,profile_chart,range_selector,monthly_boundary toneBlue
+  class profile_page,account_card,guest_card,profile_history,locked_history,profile_chart,range_selector,monthly_boundary toneBlue
   class profile_query,profile_metrics,config_status toneMint
   click profile_page "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/ProfilePage.tsx"
-  click auth_route "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AuthenticatedRoute.tsx"
   click account_card "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/AccountProfileCard.tsx"
+  click guest_card "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GuestProfileCard.tsx"
+  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/components/ProfileHistory.tsx"
+  click locked_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/components/LockedProfileHistory.tsx"
   click profile_chart "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/components/ProfileBarChart.tsx"
   click range_selector "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/components/ProfileRangeSelector.tsx"
   click monthly_boundary "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyContentBoundary.tsx"
