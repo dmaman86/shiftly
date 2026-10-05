@@ -16,9 +16,16 @@ vi.mock("@/features/profile/hooks/useProfileHistory", () => ({ useProfileHistory
   history.rangeSpy(range);
   return history;
 } }));
+const auth = vi.hoisted(() => ({
+  user: { id: "user-1" } as { id: string } | null,
+  isLoading: false,
+  initializationError: null as string | null,
+}));
 vi.mock("@/hooks/useDomain", () => ({ useDomain: () => domain }));
+vi.mock("@/hooks/useAuth", () => ({ useAuth: () => auth }));
 vi.mock("@/features/auth", () => ({
   AccountProfileCard: ({ defaultExpanded }: { defaultExpanded: boolean }) => <div>{defaultExpanded ? "Expanded profile card" : "Collapsed profile card"}</div>,
+  GuestProfileCard: () => <div>Guest profile card</div>,
 }));
 // Page tests isolate range application; real picker localization is covered separately.
 vi.mock("@mui/x-date-pickers/DatePicker", () => ({
@@ -53,6 +60,9 @@ describe("ProfilePage", () => {
     history.waitingForWrites = false;
     history.refetch.mockReset();
     history.rangeSpy.mockReset();
+    auth.user = { id: "user-1" };
+    auth.isLoading = false;
+    auth.initializationError = null;
   });
   afterEach(() => { vi.useRealTimers(); });
 
@@ -152,5 +162,46 @@ describe("ProfilePage", () => {
     expect(screen.getByRole("heading", { name: "שעות בפועל מול שעות לתשלום" })).toBeInTheDocument();
     expect(screen.getByRole("img", { name: /שעות בפועל: 0$/ })).toBeInTheDocument();
     expect(screen.queryByText("אין נתונים שמורים")).not.toBeInTheDocument();
+  });
+
+  describe("guest", () => {
+    beforeEach(() => { auth.user = null; });
+
+    it("shows the guest card, a disabled range and locked charts without querying history", () => {
+      render(<ProfilePage />);
+      expect(screen.getByText("Guest profile card")).toBeInTheDocument();
+      expect(screen.queryByText("Expanded profile card")).not.toBeInTheDocument();
+      expect(screen.getByRole("combobox", { name: "Date range" })).toBeDisabled();
+      for (const title of ["Actual Hrs vs Payable Hrs", "Base Hours vs Overtime Hours", "Total Payment Composition"]) {
+        expect(within(screen.getByRole("region", { name: title })).getByText("Sign in with Google to see this chart.")).toBeInTheDocument();
+      }
+      expect(screen.queryByText("Show exact values")).not.toBeInTheDocument();
+      expect(history.rangeSpy).not.toHaveBeenCalled();
+    });
+
+    it("waits for authentication before choosing the guest or account view", () => {
+      auth.isLoading = true;
+      render(<ProfilePage />);
+      expect(screen.getByRole("progressbar")).toBeInTheDocument();
+      expect(screen.queryByText("Guest profile card")).not.toBeInTheDocument();
+      expect(history.rangeSpy).not.toHaveBeenCalled();
+    });
+
+    it("shows the initialization error instead of a guest view", () => {
+      auth.initializationError = "Session failed";
+      render(<ProfilePage />);
+      expect(screen.getByRole("alert")).toBeInTheDocument();
+      expect(screen.queryByText("Guest profile card")).not.toBeInTheDocument();
+    });
+
+    it("replaces account history with the locked view on sign-out", () => {
+      auth.user = { id: "user-1" };
+      const view = render(<ProfilePage />);
+      expect(screen.getByText("Expanded profile card")).toBeInTheDocument();
+      auth.user = null;
+      view.rerender(<ProfilePage />);
+      expect(screen.getByText("Guest profile card")).toBeInTheDocument();
+      expect(screen.queryByText("Show exact values")).not.toBeInTheDocument();
+    });
   });
 });

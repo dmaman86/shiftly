@@ -14,7 +14,7 @@ test("uses the table layout with the collapsed menu at tablet width", async ({ p
   await prepareApp(page);
   await page.goto("he/daily");
 
-  await expect(page.getByRole("button", { name: "Open navigation menu" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "פתיחת תפריט הניווט" })).toBeVisible();
   await expect(page.getByTestId("work-day-row-2026-09-15").first()).toBeVisible();
   await expect(page.getByTestId(/^mobile-calendar-day-/)).toHaveCount(0);
   expect(await getHorizontalOverflow(page)).toBe(0);

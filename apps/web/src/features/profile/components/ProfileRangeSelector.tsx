@@ -14,10 +14,11 @@ const toMonth = (date: Date | null): ProfileMonth | null =>
     ? { year: date.getFullYear(), month: date.getMonth() + 1 }
     : null;
 
-export const ProfileRangeSelector = ({ range, now, onChange }: {
+export const ProfileRangeSelector = ({ range, now, onChange, disabled = false }: {
   range: ProfileRange;
   now: ProfileMonth;
   onChange: (range: ProfileRange) => void;
+  disabled?: boolean;
 }) => {
   const { t, i18n } = useTranslation("pages", { keyPrefix: "profile_page" });
   const [preset, setPreset] = useState<typeof presets[number]>("last6");
@@ -38,6 +39,7 @@ export const ProfileRangeSelector = ({ range, now, onChange }: {
         size="small"
         label={t("range_label")}
         value={preset}
+        disabled={disabled}
         slotProps={{ select: { native: true } }}
         sx={{ width: { xs: "100%", sm: 260 } }}
         onChange={(event) => {

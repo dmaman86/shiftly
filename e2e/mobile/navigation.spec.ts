@@ -21,7 +21,7 @@ test("navigates between pages through the mobile menu without horizontal overflo
 
   // Page content also links between pages; only the header menu is under test.
   const header = page.getByRole("banner");
-  const menuButton = header.getByRole("button", { name: "Open navigation menu" });
+  const menuButton = header.getByRole("button", { name: "פתיחת תפריט הניווט" });
   await expect(menuButton).toBeVisible();
   expect(await getHorizontalOverflow(page)).toBe(0);
 
@@ -36,4 +36,17 @@ test("navigates between pages through the mobile menu without horizontal overflo
       .poll(() => getHorizontalOverflow(page), { message: `overflow on ${label}` })
       .toBe(0);
   }
+});
+
+test("expands the menu on the first visit only", async ({ page }) => {
+  await prepareApp(page, { firstVisit: true });
+  await page.goto("he/daily");
+
+  const header = page.getByRole("banner");
+  await expect(header.getByRole("button", { name: "סגירת תפריט הניווט" })).toHaveAttribute("aria-expanded", "true");
+  await expect(header.getByRole("link", { name: "כללי חישוב", exact: true })).toBeVisible();
+
+  await page.reload();
+  await expect(header.getByRole("button", { name: "פתיחת תפריט הניווט" })).toHaveAttribute("aria-expanded", "false");
+  await expect(header.getByRole("link", { name: "כללי חישוב", exact: true })).toBeHidden();
 });

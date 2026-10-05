@@ -1,13 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { AppRoutes } from "@/app/routes/AppRoutes";
-
-const auth = vi.hoisted(() => ({
-  user: null as { id: string } | null,
-  isLoading: false,
-  initializationError: null as string | null,
-}));
 
 vi.mock("@/i18n", () => ({
   default: { changeLanguage: vi.fn() },
@@ -17,7 +11,6 @@ vi.mock("@/hooks", () => ({
   useDomain: () => ({}),
   useDirection: () => ({ direction: "rtl", setDirection: vi.fn() }),
   usePageTracking: () => {},
-  useAuth: () => auth,
 }));
 
 vi.mock("@/app/routes/LanguageLayout", async () => {
@@ -52,54 +45,17 @@ const renderAtPath = (path: string) =>
   );
 
 describe("AppRoutes", () => {
-  beforeEach(() => {
-    auth.user = null;
-    auth.isLoading = false;
-    auth.initializationError = null;
-  });
-
-  describe("Protected profile", () => {
-    it("redirects a guest direct URL to calculation rules in the same language", async () => {
+  describe("Profile route", () => {
+    it("renders the profile publicly without redirecting", async () => {
       renderAtPath("/en/profile?utm_source=test");
-      await waitFor(() => expect(screen.getByTestId("location")).toHaveTextContent("/en/calculation-rules?utm_source=test"));
-      expect(screen.queryByText("Profile Page")).not.toBeInTheDocument();
-    });
-
-    it("waits for authentication before redirecting or mounting the profile", () => {
-      auth.isLoading = true;
-      renderAtPath("/he/profile");
-      expect(screen.getByRole("progressbar")).toBeInTheDocument();
-      expect(screen.getByTestId("location")).toHaveTextContent("/he/profile");
-      expect(screen.queryByText("Profile Page")).not.toBeInTheDocument();
-    });
-
-    it("does not mount the profile when authentication initialization fails", () => {
-      auth.initializationError = "Session failed";
-      renderAtPath("/he/profile");
-      expect(screen.getByRole("alert")).toBeInTheDocument();
-      expect(screen.queryByText("Profile Page")).not.toBeInTheDocument();
-    });
-
-    it("renders the profile for an authenticated user", async () => {
-      auth.user = { id: "user-1" };
-      renderAtPath("/en/profile");
       expect(await screen.findByText("Profile Page")).toBeInTheDocument();
+      expect(screen.getByTestId("location")).toHaveTextContent("/en/profile?utm_source=test");
     });
 
     it("preserves search parameters and section hashes on the public rules route", async () => {
       renderAtPath("/he/calculation-rules?utm_source=test#interactive-example");
       expect(await screen.findByText("Calculation Rules Page")).toBeInTheDocument();
       expect(screen.getByTestId("location")).toHaveTextContent("/he/calculation-rules?utm_source=test#interactive-example");
-    });
-
-    it("removes profile content on logout", async () => {
-      auth.user = { id: "user-1" };
-      const view = renderAtPath("/he/profile");
-      expect(await screen.findByText("Profile Page")).toBeInTheDocument();
-      auth.user = null;
-      view.rerender(<MemoryRouter initialEntries={["/he/profile"]}><AppRoutes /><LocationTracker /></MemoryRouter>);
-      expect(await screen.findByText("Calculation Rules Page")).toBeInTheDocument();
-      expect(screen.queryByText("Profile Page")).not.toBeInTheDocument();
     });
   });
   describe("Redirects", () => {
