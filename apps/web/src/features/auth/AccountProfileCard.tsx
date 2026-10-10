@@ -23,9 +23,19 @@ import { useTranslation } from "react-i18next";
 
 import { useAppSnackbar, useAuth, useFetch } from "@/hooks";
 import { accountService } from "@/services/account/account.service";
+import { analyticsService } from "@/services/analytics";
 import { supabase } from "@/services/supabase/supabase.client";
 
 type Metadata = Record<string, unknown>;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const getAccountAgeDays = (createdAt?: string): number | undefined => {
+  const createdAtMs = createdAt ? Date.parse(createdAt) : Number.NaN;
+  if (Number.isNaN(createdAtMs)) return undefined;
+
+  return Math.max(0, Math.floor((Date.now() - createdAtMs) / DAY_MS));
+};
 
 type AccountProfileCardProps = {
   defaultExpanded?: boolean;
@@ -89,6 +99,16 @@ export const AccountProfileCard = ({
       snackbar.error(result.error);
       return;
     }
+
+    // Track before the local sign-out: the account is already gone even if
+    // clearing the local session fails below.
+    analyticsService.track({
+      name: "account_deleted",
+      params: {
+        provider: getMetadataString(user.app_metadata, "provider"),
+        account_age_days: getAccountAgeDays(user.created_at),
+      },
+    });
 
     const { error } = await supabase.auth.signOut({ scope: "local" });
 

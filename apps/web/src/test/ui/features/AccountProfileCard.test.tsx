@@ -16,6 +16,7 @@ const hookMocks = vi.hoisted(() => ({
   authState: {
     user: null as {
       app_metadata?: Record<string, unknown>;
+      created_at?: string;
       email?: string;
       user_metadata?: Record<string, unknown>;
     } | null,
@@ -47,7 +48,23 @@ vi.mock("@/hooks", () => ({
   }),
 }));
 
+vi.mock("@/services/analytics", () => ({
+  analyticsService: { track: vi.fn() },
+}));
+
 import { AccountProfileCard } from "@/features/auth/AccountProfileCard";
+import { analyticsService } from "@/services/analytics";
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const confirmAccountDeletion = async (
+  user: ReturnType<typeof userEvent.setup>,
+) => {
+  await user.click(screen.getByRole("button", { name: "Account removal" }));
+  await user.click(screen.getByRole("button", { name: "Delete account" }));
+  await user.type(screen.getByLabelText("Type DELETE to confirm"), "DELETE");
+  await user.click(screen.getByRole("button", { name: "Delete my account" }));
+};
 
 describe("AccountProfileCard", () => {
   beforeEach(async () => {
@@ -117,6 +134,47 @@ describe("AccountProfileCard", () => {
     );
   });
 
+  it("tracks the deletion with provider and account age, without identity", async () => {
+    const user = userEvent.setup();
+    hookMocks.authState.user = {
+      app_metadata: { provider: "google" },
+      created_at: new Date(Date.now() - 10 * DAY_MS - 1000).toISOString(),
+      email: "worker@example.com",
+    };
+    functionsMocks.invoke.mockResolvedValue({
+      data: { deleted: true },
+      error: null,
+    });
+    authMocks.signOut.mockResolvedValue({ error: null });
+
+    render(<AccountProfileCard defaultExpanded />);
+    await confirmAccountDeletion(user);
+
+    expect(analyticsService.track).toHaveBeenCalledExactlyOnceWith({
+      name: "account_deleted",
+      params: { provider: "google", account_age_days: 10 },
+    });
+  });
+
+  it("tracks the deletion even when the local sign-out fails afterwards", async () => {
+    const user = userEvent.setup();
+    hookMocks.authState.user = { email: "worker@example.com" };
+    functionsMocks.invoke.mockResolvedValue({
+      data: { deleted: true },
+      error: null,
+    });
+    authMocks.signOut.mockResolvedValue({ error: { message: "offline" } });
+
+    render(<AccountProfileCard defaultExpanded />);
+    await confirmAccountDeletion(user);
+
+    expect(hookMocks.snackbar.warning).toHaveBeenCalled();
+    expect(analyticsService.track).toHaveBeenCalledExactlyOnceWith({
+      name: "account_deleted",
+      params: { provider: undefined, account_age_days: undefined },
+    });
+  });
+
   it("does not clear the local session when account deletion fails", async () => {
     const user = userEvent.setup();
     hookMocks.authState.user = { email: "worker@example.com" };
@@ -136,5 +194,6 @@ describe("AccountProfileCard", () => {
     expect(hookMocks.snackbar.error).toHaveBeenCalledWith(
       "Authentication is required",
     );
+    expect(analyticsService.track).not.toHaveBeenCalled();
   });
 });

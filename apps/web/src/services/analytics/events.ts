@@ -71,6 +71,14 @@ export type AnalyticsEvent =
       params: { source: "daily" | "monthly" };
     }
   | {
+      name: "account_deleted";
+      params: { provider?: string; account_age_days?: number };
+    }
+  | {
+      name: "profile_history_viewed";
+      params: { access: "unlocked" | "locked"; has_records?: boolean };
+    }
+  | {
       name: "guest_draft_import_resolved";
       params: {
         outcome: "imported" | "replaced" | "kept" | "discarded_after_error";

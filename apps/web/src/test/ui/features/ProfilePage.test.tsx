@@ -5,6 +5,7 @@ import { monthToPayBreakdownVM } from "@/adapters";
 import i18n from "@/i18n";
 import { ProfilePage } from "@/pages/ProfilePage";
 import type { ProfileMonthSnapshot } from "@/features/profile/helpers/profileHistory";
+import { analyticsService } from "@/services";
 
 const history = vi.hoisted(() => ({
   data: undefined as ProfileMonthSnapshot[] | undefined,
@@ -99,9 +100,63 @@ describe("ProfilePage", () => {
     auth.user = { id: "user-1" };
     auth.isLoading = false;
     auth.initializationError = null;
+    vi.spyOn(analyticsService, "track").mockImplementation(() => {});
   });
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  describe("history view tracking", () => {
+    it("tracks the first loaded history once, not on later range changes", () => {
+      render(<ProfilePage />);
+      fireEvent.change(screen.getByRole("combobox", { name: "Date range" }), {
+        target: { value: "last3" },
+      });
+
+      expect(analyticsService.track).toHaveBeenCalledExactlyOnceWith({
+        name: "profile_history_viewed",
+        params: { access: "unlocked", has_records: true },
+      });
+    });
+
+    it("reports an empty history", () => {
+      history.data = [{ ...snapshot(7), breakdown: null }];
+      render(<ProfilePage />);
+
+      expect(analyticsService.track).toHaveBeenCalledExactlyOnceWith({
+        name: "profile_history_viewed",
+        params: { access: "unlocked", has_records: false },
+      });
+    });
+
+    it("waits until loading finishes and skips failed loads", () => {
+      history.isFetching = true;
+      const view = render(<ProfilePage />);
+      expect(analyticsService.track).not.toHaveBeenCalled();
+
+      history.isFetching = false;
+      history.isError = true;
+      view.rerender(<ProfilePage />);
+      expect(analyticsService.track).not.toHaveBeenCalled();
+
+      history.isError = false;
+      view.rerender(<ProfilePage />);
+      expect(analyticsService.track).toHaveBeenCalledExactlyOnceWith({
+        name: "profile_history_viewed",
+        params: { access: "unlocked", has_records: true },
+      });
+    });
+
+    it("tracks the locked history for guests", () => {
+      auth.user = null;
+      render(<ProfilePage />);
+
+      expect(analyticsService.track).toHaveBeenCalledExactlyOnceWith({
+        name: "profile_history_viewed",
+        params: { access: "locked" },
+      });
+    });
   });
 
   it("starts with the last six months and shows the applied range for all charts", () => {
