@@ -8,6 +8,8 @@ The primary target is the framework-independent payroll domain. UI and browser t
 
 **Repository review: 2026-10-04.** This update inspected source code, test assertions, package scripts and CI configuration. It did not run tests, collect coverage, execute a build, compare a payslip, or independently reverify external rate circulars.
 
+**Update: 2026-10-10.** Added the hour-decomposition invariant suites and the paid-hours contract described below. No execution result is recorded here; consult a CI run tied to the commit that includes them.
+
 The distinction used throughout is:
 
 - **Existing evidence:** a concrete test or configured check is present.
@@ -82,6 +84,7 @@ The linked suites contain examples for the stated scope. They do not establish e
 | Sick and vacation segments | [Fixed-segment calculator](packages/domain/tests/calculator/fixed-segment.calculator.test.ts), [day-pay builder](packages/domain/tests/builder/daypaymap.builder.test.ts) | Supplied credited duration and day composition; generic segment construction does not itself reject negative hours. |
 | Shabbat credit | [Credit allocation](packages/domain/tests/calculator/shabbat-credit.calculator.test.ts) | Monthly pool, carry-over, chronological deficits, eligible days and unused credit. |
 | Monthly aggregation | [Month-pay reducer](packages/domain/tests/reducer/month-pay-map.reducer.test.ts), [salary pipeline](packages/domain/tests/e2e/salary-pipeline.e2e.test.ts) | Reducer composition and representative pipeline scenarios; domain E2E here is not a browser or payslip comparison. |
+| Hour decomposition (paid-hour closure) | [Domain invariants](packages/domain/tests/invariants/hour-decomposition.test.ts), [view-model invariants](apps/web/src/test/adapters/hour-decomposition.test.ts) | Worked tiers equal worked hours; the paid total equals worked + sick + vacation + applied Shabbat credit, per day and per month; the month equals the sum of its days; table rows match detailed day totals. Deterministic scenarios at the default 6.67 and a non-default 8.4 standard hours; not generated property coverage. |
 | Duty-per-diem rates and eligibility | [Rate timeline](packages/domain/tests/calculator/perdiem/timeline-per-diem.calculator.test.ts), [daily entitlement](packages/domain/tests/calculator/perdiem/timeline-per-diem.day.test.ts) | Encoded rate boundaries and duration tiers; older dates are provisional and higher-tier amount derivation needs source reconciliation. |
 | Meal-allowance rates and eligibility | [Rate timeline](packages/domain/tests/calculator/mealallowance/timeline-meal-allowance.test.ts), [daily entitlement](packages/domain/tests/calculator/mealallowance/timeline-meal-allowance.calculator.test.ts) | Encoded small/large rates and eligibility; historical baseline and unimplemented circular categories remain limitations. |
 | Automated checks | [CI workflow](.github/workflows/ci.yml), [package scripts](package.json) | Configured typecheck, lint, test coverage, build and browser E2E jobs; consult a specific CI run for execution results. |
@@ -128,6 +131,16 @@ The application's [default monthly configuration](apps/web/src/store/globalStore
 
 Absence credits also use supplied durations; the [fixed-segment calculator](packages/domain/src/calculator/fixed-segment.calculator.ts) does not hardcode 6.67 hours. Test both the default and a non-default configuration, rather than treating a single threshold as a universal contract rule.
 
+### Paid Hours Versus Worked Hours
+
+`totalHours` is the paid total of a day or month, not only worked time: a sick or vacation day reports the standard hours. Worked time is `actualHours`. The project owner confirmed this contract on 2026-10-10.
+
+- `actualHours` equals the sum of the regular 100/125/150 and Shabbat 150/200 tiers. Evening/night additions are surcharges on those hours, not separate time, and are excluded from the sum.
+- `totalHours = actualHours + sick + vacation + appliedShabbatCredit`, for each day and for the month.
+- [Shabbat credit allocation](packages/domain/src/calculator/shabbat-credit.calculator.ts) fills only `Regular` and `SpecialPartialStart` days, chronologically, up to the standard hours and until the available credit runs out. Sick and vacation days already report the standard hours, so they receive no credit.
+
+Payslip comparisons must therefore compare worked hours with `actualHours`, and paid hours with `totalHours`.
+
 ### Additions and Special Time Are Separate
 
 The current [addition policy](packages/domain/src/calculator/additions/addition.classifier.ts) defaults to evening +20% for qualifying regular time in 14:00–22:00, with at least 180 qualifying minutes per applicable calendar day, and night +50% in 22:00–06:00. Special intervals are excluded from this addition classifier.
@@ -146,7 +159,7 @@ The regression `pays wall-clock hours on the autumn daylight-saving transition n
 
 `AdditionPolicy` can select additions by calendar date, and allowance calculators have effective-period tables. Neither mechanism versions all payroll rules, defaults, calendar inputs or rounding behavior.
 
-The profile recalculates saved months with the current domain engine, as documented in [profile analytics](docs/profile-analytics.md). Do not claim historical totals remain immutable after all future engine changes. A complete historical-rules guarantee requires an explicit supported-period policy and independently reviewed fixtures.
+The profile recalculates saved months with the current domain engine. Do not claim historical totals remain immutable after all future engine changes. A complete historical-rules guarantee requires an explicit supported-period policy and independently reviewed fixtures.
 
 ## Known Limitations and Implementation Gaps
 
@@ -264,7 +277,11 @@ The priorities below add missing evidence before introducing new tools or a comp
 
 ### 2. Specify Invariants on Valid Inputs
 
-Candidate properties are:
+Implemented with deterministic examples (see the hour-decomposition row in the evidence inventory):
+
+- Paid-hour closure: worked tiers equal `actualHours`, and `totalHours` equals worked, sick, vacation and applied Shabbat credit hours, per day and per month, at default and non-default standard hours.
+
+Remaining candidate properties are:
 
 - Base timeline slices conserve normalized wall-clock duration and do not overlap.
 - Valid normalized slices have non-negative duration and ordered endpoints.
@@ -306,7 +323,6 @@ For every new claim, link the responsible test and, when claiming execution succ
 ## Relationship to Other Documentation
 
 - [Reference README](docs/reference/README.md) and [Hebrew reference](docs/reference/README_HE.md): capabilities, architecture and calculation explanations.
-- [Profile analytics](docs/profile-analytics.md): persisted-history chart semantics and current-engine recalculation.
 - [Package scripts](package.json), [Vitest configuration](vitest.config.ts), [Playwright configuration](playwright.config.ts) and [CI workflow](.github/workflows/ci.yml): authoritative tooling and execution setup.
 - This document: current evidence, known guarantees and gaps, retained historical source reference, and the plan for improving confidence.
 

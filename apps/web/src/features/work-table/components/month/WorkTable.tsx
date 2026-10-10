@@ -51,6 +51,157 @@ import { ShabbatCreditAllocation } from "@shiftly/domain";
 import { FeatureBoundary } from "@/layout";
 import { CalculationStatus } from "./CalculationStatus";
 
+const HINT_KEYS = [
+  "table.hint_add_shift",
+  "table.hint_cross_midnight",
+  "table.hint_duty_shift",
+  "table.hint_auto_update",
+] as const;
+
+type DesktopWorkTableProps = {
+  domain: DomainContextType;
+  workDays: WorkDayInfo[];
+  shabbatCreditAllocation: ShabbatCreditAllocation;
+  monthBreakdown: CompactPayBreakdownVM;
+};
+
+const DesktopWorkTable = ({
+  domain,
+  workDays,
+  shabbatCreditAllocation,
+  monthBreakdown,
+}: DesktopWorkTableProps) => {
+  const { baseRate } = useGlobalState();
+  const { t } = useTranslation("work-table");
+  const groupByWeeks = useMemo(() => groupByShabbat(workDays), [workDays]);
+
+  return (
+    <Paper variant="outlined" sx={{ borderRadius: 2, overflow: "hidden" }}>
+      <TableContainer
+        sx={{
+          maxHeight: {
+            xs: "70vh",
+            sm: 600,
+          },
+          overflowY: "auto",
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        <Table
+          stickyHeader
+          size="small"
+          sx={{
+            "& th": {
+              textAlign: "center",
+              fontWeight: "bold",
+              backgroundColor: (theme) => theme.palette.grey[100],
+              borderBottom: "2px solid",
+              borderColor: "divider",
+            },
+            "& td": {
+              textAlign: "center",
+            },
+          }}
+        >
+          <WorkTableHeader
+            headers={headersTable}
+            baseRate={baseRate}
+            viewMode="compact"
+          />
+
+          {groupByWeeks.map((group) => (
+            <TableBody key={group[0].meta.date}>
+              {group.map((day, dayIndex) => (
+                <FeatureBoundary
+                  key={day.meta.date}
+                  featureName={t("feature_name_work_table")}
+                  errorContext="DayRow"
+                  resetKeys={[day.meta.date]}
+                >
+                  <DayRow
+                    domain={domain}
+                    workDay={day}
+                    isLastInWeek={dayIndex === group.length - 1}
+                    shabbatCreditHours={
+                      shabbatCreditAllocation.appliedHoursByDate[
+                        day.meta.date
+                      ] ?? 0
+                    }
+                    shabbatCreditUsage={
+                      shabbatCreditAllocation.usageByDate[day.meta.date]
+                    }
+                    shabbatCreditTotalHours={
+                      shabbatCreditAllocation.totalAvailableHours
+                    }
+                  />
+                </FeatureBoundary>
+              ))}
+            </TableBody>
+          ))}
+
+          <TableFooter data-testid="work-table-footer">
+            <TableRow
+              sx={{
+                position: "sticky",
+                bottom: 0,
+                bgcolor: "grey.200",
+                zIndex: 2,
+                "& td": {
+                  fontWeight: "bold",
+                  borderTop: "3px solid",
+                },
+              }}
+            >
+              <CompactDayRow
+                breakdown={monthBreakdown}
+                isFooter
+                emptyStartCells={7}
+                testIdPrefix="work-table-month-total"
+              />
+              <TableCell />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+    </Paper>
+  );
+};
+
+const ShabbatCreditAlert = ({
+  allocation,
+}: {
+  allocation: ShabbatCreditAllocation;
+}) => {
+  const { t } = useTranslation("work-table");
+
+  if (allocation.totalAvailableHours <= 0) return null;
+
+  return (
+    <Alert
+      severity={allocation.unusedHours > 0 ? "warning" : "info"}
+      sx={{ mt: 2 }}
+    >
+      {allocation.carriedOverHours > 0 && (
+        <Typography variant="body2">
+          {t("table.shabbat_credit_carried_over", {
+            hours: allocation.carriedOverHours.toFixed(2),
+          })}
+        </Typography>
+      )}
+      {t("table.shabbat_credit_summary", {
+        earned: allocation.earnedHours.toFixed(2),
+        used: allocation.usedHours.toFixed(2),
+        unused: allocation.unusedHours.toFixed(2),
+      })}
+      {allocation.unusedHours > 0 && (
+        <Typography variant="body2">
+          {t("table.shabbat_credit_unused_note")}
+        </Typography>
+      )}
+    </Alert>
+  );
+};
+
 type WorkTableProps = {
   domain: DomainContextType;
   workDays: WorkDayInfo[];
@@ -79,8 +230,6 @@ export const WorkTable = ({
   const monthNames = t("months", { returnObjects: true }) as string[];
   const currentDate = domain.services.dateService.formatDate(new Date());
   const copyrightYear = new Date().getFullYear();
-
-  const groupByWeeks = useMemo(() => groupByShabbat(workDays), [workDays]);
 
   const pdfMetadataHeader = [
     user?.email ? `${t("table.pdf_email")}: ${user.email}` : null,
@@ -190,102 +339,12 @@ export const WorkTable = ({
                 />
               </FeatureBoundary>
             ) : (
-              <Paper
-                variant="outlined"
-                sx={{ borderRadius: 2, overflow: "hidden" }}
-              >
-                <TableContainer
-                  sx={{
-                    maxHeight: {
-                      xs: "70vh",
-                      sm: 600,
-                    },
-                    overflowY: "auto",
-                    WebkitOverflowScrolling: "touch",
-                  }}
-                >
-                  <Table
-                    stickyHeader
-                    size="small"
-                    sx={{
-                      "& th": {
-                        textAlign: "center",
-                        fontWeight: "bold",
-                        backgroundColor: (theme) => theme.palette.grey[100],
-                        borderBottom: "2px solid",
-                        borderColor: "divider",
-                      },
-                      "& td": {
-                        textAlign: "center",
-                      },
-                    }}
-                  >
-                    <WorkTableHeader
-                      headers={headersTable}
-                      baseRate={baseRate}
-                      viewMode="compact"
-                    />
-
-                    {groupByWeeks.map((group) => (
-                      <TableBody key={group[0].meta.date}>
-                        {group.map((day, dayIndex) => {
-                          const isLastInWeek = dayIndex === group.length - 1;
-                          return (
-                            <FeatureBoundary
-                              key={day.meta.date}
-                              featureName={t("feature_name_work_table")}
-                              errorContext="DayRow"
-                              resetKeys={[day.meta.date]}
-                            >
-                              <DayRow
-                                domain={domain}
-                                workDay={day}
-                                isLastInWeek={isLastInWeek}
-                                shabbatCreditHours={
-                                  shabbatCreditAllocation.appliedHoursByDate[
-                                    day.meta.date
-                                  ] ?? 0
-                                }
-                                shabbatCreditUsage={
-                                  shabbatCreditAllocation.usageByDate[
-                                    day.meta.date
-                                  ]
-                                }
-                                shabbatCreditTotalHours={
-                                  shabbatCreditAllocation.totalAvailableHours
-                                }
-                              />
-                            </FeatureBoundary>
-                          );
-                        })}
-                      </TableBody>
-                    ))}
-
-                    <TableFooter data-testid="work-table-footer">
-                      <TableRow
-                        sx={{
-                          position: "sticky",
-                          bottom: 0,
-                          bgcolor: "grey.200",
-                          zIndex: 2,
-                          "& td": {
-                            fontWeight: "bold",
-                            borderTop: "3px solid",
-                          },
-                        }}
-                      >
-                        <CompactDayRow
-                          breakdown={monthBreakdown}
-                          isFooter
-                          emptyStartCells={7}
-                          testIdPrefix="work-table-month-total"
-                        />
-                        <TableCell />
-                      </TableRow>
-                    </TableFooter>
-                  </Table>
-                </TableContainer>
-              </Paper>
+              <DesktopWorkTable
+                domain={domain}
+                workDays={workDays}
+                shabbatCreditAllocation={shabbatCreditAllocation}
+                monthBreakdown={monthBreakdown}
+              />
             )}
             <WorkTablePrintView
               ref={printViewRef}
@@ -301,32 +360,7 @@ export const WorkTable = ({
             />
           </WorkTableDayStateHydrator>
         </WorkTableDayStateProvider>
-        {shabbatCreditAllocation.totalAvailableHours > 0 && (
-          <Alert
-            severity={
-              shabbatCreditAllocation.unusedHours > 0 ? "warning" : "info"
-            }
-            sx={{ mt: 2 }}
-          >
-            {shabbatCreditAllocation.carriedOverHours > 0 && (
-              <Typography variant="body2">
-                {t("table.shabbat_credit_carried_over", {
-                  hours: shabbatCreditAllocation.carriedOverHours.toFixed(2),
-                })}
-              </Typography>
-            )}
-            {t("table.shabbat_credit_summary", {
-              earned: shabbatCreditAllocation.earnedHours.toFixed(2),
-              used: shabbatCreditAllocation.usedHours.toFixed(2),
-              unused: shabbatCreditAllocation.unusedHours.toFixed(2),
-            })}
-            {shabbatCreditAllocation.unusedHours > 0 && (
-              <Typography variant="body2">
-                {t("table.shabbat_credit_unused_note")}
-              </Typography>
-            )}
-          </Alert>
-        )}
+        <ShabbatCreditAlert allocation={shabbatCreditAllocation} />
         <Box
           sx={{
             mt: 2,
@@ -336,34 +370,16 @@ export const WorkTable = ({
             gap: 2,
           }}
         >
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ fontStyle: "italic" }}
-          >
-            {t("table.hint_add_shift")}
-          </Typography>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ fontStyle: "italic" }}
-          >
-            {t("table.hint_cross_midnight")}
-          </Typography>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ fontStyle: "italic" }}
-          >
-            {t("table.hint_duty_shift")}
-          </Typography>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{ fontStyle: "italic" }}
-          >
-            {t("table.hint_auto_update")}
-          </Typography>
+          {HINT_KEYS.map((key) => (
+            <Typography
+              key={key}
+              variant="caption"
+              color="text.secondary"
+              sx={{ fontStyle: "italic" }}
+            >
+              {t(key)}
+            </Typography>
+          ))}
         </Box>
         {isMobile && (
           <Box sx={{ mt: 2 }}>

@@ -3,7 +3,7 @@ import type { MonthPayMapReducer } from "@shiftly/domain";
 import type { CompactPayBreakdownVM, PayBreakdownViewModel } from "@/app/types";
 import { monthToPayBreakdownVM } from "@/adapters";
 import { useGlobalBreakdown } from "@/hooks";
-import { monthToCompactPayBreakdownVM } from "../../mappers/month/monthToCompactPayBreakdownVM";
+import { toCompactPayBreakdownVM } from "../../mappers/toCompactPayBreakdownVM";
 
 type UseMonthlyBreakdownsParams = {
   monthPayMapCalculator: MonthPayMapReducer;
@@ -29,7 +29,7 @@ export const useMonthlyBreakdowns = ({
   );
 
   const monthBreakdown = useMemo(
-    () => monthToCompactPayBreakdownVM(monthFullBreakdown, baseRate),
+    () => toCompactPayBreakdownVM(monthFullBreakdown, baseRate),
     [monthFullBreakdown, baseRate],
   );
 
