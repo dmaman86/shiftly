@@ -1,32 +1,14 @@
 import type { CompactPayBreakdownVM } from "@/app/types";
 import { WorkDayMap } from "@shiftly/domain";
-import { dayToPayBreakdownVM } from "./dayToPayBreakdownVM";
-import { calculateActualHours, computeTotalPay } from "@/utils";
+import { dayToPayBreakdownVM } from "@/adapters";
+import { toCompactPayBreakdownVM } from "../toCompactPayBreakdownVM";
 
 export const dayToCompactPayBreakdownVM = (
   day: WorkDayMap,
   baseRate: number,
   shabbatCreditHours: number,
-): CompactPayBreakdownVM => {
-  const dailySalary =
-    baseRate > 0
-      ? computeTotalPay(dayToPayBreakdownVM(day, shabbatCreditHours), baseRate)
-      : undefined;
-
-  const regularHours = day.workMap.regular.hours100.hours;
-
-  const extraHours =
-    day.workMap.regular.hours125.hours + day.workMap.regular.hours150.hours;
-
-  return {
-    totalHours: day.totalHours + shabbatCreditHours,
-    actualHours: calculateActualHours(
-      day.totalHours,
-      day.hours100Sick.hours,
-      day.hours100Vacation.hours,
-    ),
-    regularHours,
-    extraHours,
-    dailySalary,
-  };
-};
+): CompactPayBreakdownVM =>
+  toCompactPayBreakdownVM(
+    dayToPayBreakdownVM(day, shabbatCreditHours),
+    baseRate,
+  );
