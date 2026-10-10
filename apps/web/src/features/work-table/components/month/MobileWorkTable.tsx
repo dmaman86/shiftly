@@ -14,7 +14,7 @@ import { GuestModeNotice } from "@/features/auth";
 import { useGlobalState } from "@/hooks";
 import { useWorkTableDayState } from "../../hooks/day/useWorkTableDayState";
 import { DayCard } from "../day/DayCard";
-import { getCalendarDayIndicators } from "./calendarDayIndicators";
+import { getCalendarDayIndicators } from "../../helpers";
 
 type MobileWorkTableProps = {
   domain: DomainContextType;

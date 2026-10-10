@@ -6,7 +6,7 @@ import type { DomainContextType } from "@/app";
 import { WorkDayType } from "@shiftly/domain";
 import type { WorkDayInfo } from "@/app/types";
 import { MobileWorkTable } from "@/features/work-table/components/month/MobileWorkTable";
-import { getCalendarDayIndicators } from "@/features/work-table/components/month/calendarDayIndicators";
+import { getCalendarDayIndicators } from "@/features/work-table/helpers";
 import { fireEvent, renderWithTheme, screen } from "@/test/ui/utils";
 
 vi.mock("react-i18next", () => ({
