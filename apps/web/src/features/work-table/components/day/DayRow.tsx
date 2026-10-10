@@ -28,6 +28,142 @@ import {
 import { DomainContextType } from "@/app";
 import type { ShabbatCreditUsage } from "@shiftly/domain";
 
+const EMPTY_SHIFT_COLUMNS = ["entry", "exit", "actions"] as const;
+
+type DayLabelCellProps = {
+  dayLabel: string;
+  holidayLabel?: string;
+  specialFullDay: boolean;
+  rowSpan: number;
+};
+
+const DayLabelCell = ({
+  dayLabel,
+  holidayLabel,
+  specialFullDay,
+  rowSpan,
+}: DayLabelCellProps) => (
+  <TableCell
+    rowSpan={rowSpan}
+    sx={{
+      width: tableColumnWidths.day,
+      minWidth: tableColumnWidths.day,
+      maxWidth: tableColumnWidths.day,
+      borderLeft: "1px solid black",
+      borderRight: "1px solid black",
+      textAlign: "center",
+      verticalAlign: "middle",
+    }}
+  >
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 0.5,
+      }}
+    >
+      {dayLabel}
+      {holidayLabel && (
+        <Chip
+          label={holidayLabel}
+          size="small"
+          color={specialFullDay ? "warning" : "info"}
+          sx={{
+            bgcolor: specialFullDay ? "dayBadge.special" : "dayBadge.regular",
+            color: "common.white",
+            height: 16,
+            fontSize: "0.6rem",
+            "& .MuiChip-label": { px: 0.5 },
+          }}
+        />
+      )}
+    </Box>
+  </TableCell>
+);
+
+type StatusCheckboxCellProps = {
+  status: WorkDayStatus.sick | WorkDayStatus.vacation;
+  currentStatus: WorkDayStatus;
+  label: string;
+  hidden: boolean;
+  rowSpan: number;
+  withRightBorder?: boolean;
+  testId: string;
+  onChange: (status: WorkDayStatus) => void;
+};
+
+const StatusCheckboxCell = ({
+  status,
+  currentStatus,
+  label,
+  hidden,
+  rowSpan,
+  withRightBorder = false,
+  testId,
+  onChange,
+}: StatusCheckboxCellProps) => (
+  <TableCell
+    data-testid={testId}
+    rowSpan={rowSpan}
+    sx={{
+      ...(withRightBorder && { borderRight: "1px solid black" }),
+      textAlign: "center",
+      width: tableColumnWidths.sickVacation,
+      minWidth: tableColumnWidths.sickVacation,
+      maxWidth: tableColumnWidths.sickVacation,
+      p: 0.25,
+      verticalAlign: "middle",
+    }}
+  >
+    <Checkbox
+      slotProps={{ input: { "aria-label": label } }}
+      size="small"
+      checked={currentStatus === status}
+      onChange={(e) =>
+        onChange(e.target.checked ? status : WorkDayStatus.normal)
+      }
+      sx={{ display: hidden ? "none" : "inline-flex", p: 0.5 }}
+    />
+  </TableCell>
+);
+
+type DetailsToggleCellProps = {
+  open: boolean;
+  controlsId: string;
+  rowSpan: number;
+  onToggle: () => void;
+};
+
+const DetailsToggleCell = ({
+  open,
+  controlsId,
+  rowSpan,
+  onToggle,
+}: DetailsToggleCellProps) => {
+  const { t } = useTranslation("work-table");
+  const label = open ? t("day_details.hide") : t("day_details.show");
+
+  return (
+    <TableCell
+      rowSpan={rowSpan}
+      sx={{ minWidth: 48, p: 0.5, verticalAlign: "middle" }}
+    >
+      <Tooltip title={label}>
+        <IconButton
+          size="small"
+          aria-label={label}
+          aria-expanded={open}
+          aria-controls={controlsId}
+          onClick={onToggle}
+        >
+          {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+        </IconButton>
+      </Tooltip>
+    </TableCell>
+  );
+};
+
 type DayRowProps = {
   domain: DomainContextType;
   workDay: WorkDayInfo;
@@ -48,8 +184,6 @@ export const DayRow = ({
   const { dateService } = domain.services;
   const { dayInfoResolver } = domain.resolvers;
   const { t } = useTranslation("work-table");
-  const tHoliday = (key: string) =>
-    t(`holidays.${key}` as `holidays.${HolidayKey}`);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   const {
@@ -68,135 +202,55 @@ export const DayRow = ({
     baseRate,
   } = useDayController({ domain, workDay, shabbatCreditHours });
 
+  const date = workDay.meta.date;
   const shiftCount = Math.max(shifts.length, 1);
-  const detailsId = `day-details-${workDay.meta.date}`;
+  const detailsId = `day-details-${date}`;
   const columnCount = countTableColumns(headersTable, "compact", baseRate);
   const eligibleForShabbatCredit =
     workDay.meta.typeDay === WorkDayType.Regular ||
     workDay.meta.typeDay === WorkDayType.SpecialPartialStart;
 
   const days = t("days", { returnObjects: true }) as string[];
-  const weekdayLabel = days[dateService.getWeekday(workDay.meta.date)];
+  const weekdayLabel = days[dateService.getWeekday(date)];
   const dayLabel = dayInfoResolver.formatWorkDayLabel(workDay, weekdayLabel);
+  const holidayLabel = workDay.meta.holidayKey
+    ? t(`holidays.${workDay.meta.holidayKey}` as `holidays.${HolidayKey}`)
+    : undefined;
 
   return (
     <>
       {(shifts.length ? shifts : [null]).map((item, index) => (
         <TableRow
-          key={item?.shift.id ?? `${workDay.meta.date}-empty`}
-          data-testid={`work-day-row-${workDay.meta.date}`}
+          key={item?.shift.id ?? `${date}-empty`}
+          data-testid={`work-day-row-${date}`}
         >
           {index === 0 && (
             <>
-              <TableCell
-                data-testid={`work-day-sick-${workDay.meta.date}`}
+              <DayLabelCell
+                dayLabel={dayLabel}
+                holidayLabel={holidayLabel}
+                specialFullDay={specialFullDay}
                 rowSpan={shiftCount}
-                sx={{
-                  width: tableColumnWidths.day,
-                  minWidth: tableColumnWidths.day,
-                  maxWidth: tableColumnWidths.day,
-                  borderLeft: "1px solid black",
-                  borderRight: "1px solid black",
-                  textAlign: "center",
-                  verticalAlign: "middle",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 0.5,
-                  }}
-                >
-                  {dayLabel}
-                  {workDay.meta.holidayKey && (
-                    <Chip
-                      label={tHoliday(workDay.meta.holidayKey)}
-                      size="small"
-                      color={specialFullDay ? "warning" : "info"}
-                      sx={{
-                        bgcolor: specialFullDay
-                          ? "dayBadge.special"
-                          : "dayBadge.regular",
-                        color: "common.white",
-                        height: 16,
-                        fontSize: "0.6rem",
-                        "& .MuiChip-label": { px: 0.5 },
-                      }}
-                    />
-                  )}
-                </Box>
-              </TableCell>
-
-              <TableCell
+              />
+              <StatusCheckboxCell
+                status={WorkDayStatus.sick}
+                currentStatus={status}
+                label={`${t("headers.sick")} — ${dayLabel}`}
+                hidden={specialFullDay}
                 rowSpan={shiftCount}
-                sx={{
-                  textAlign: "center",
-                  width: tableColumnWidths.sickVacation,
-                  minWidth: tableColumnWidths.sickVacation,
-                  maxWidth: tableColumnWidths.sickVacation,
-                  p: 0.25,
-                  verticalAlign: "middle",
-                }}
-              >
-                <Checkbox
-                  slotProps={{
-                    input: {
-                      "aria-label": `${t("headers.sick")} — ${dayLabel}`,
-                    },
-                  }}
-                  size="small"
-                  checked={status === WorkDayStatus.sick}
-                  onChange={(e) =>
-                    handleStatusChanged(
-                      e.target.checked
-                        ? WorkDayStatus.sick
-                        : WorkDayStatus.normal,
-                    )
-                  }
-                  sx={{
-                    display: specialFullDay ? "none" : "inline-flex",
-                    p: 0.5,
-                  }}
-                />
-              </TableCell>
-
-              <TableCell
-                data-testid={`work-day-vacation-${workDay.meta.date}`}
+                testId={`work-day-sick-${date}`}
+                onChange={handleStatusChanged}
+              />
+              <StatusCheckboxCell
+                status={WorkDayStatus.vacation}
+                currentStatus={status}
+                label={`${t("headers.vacation")} — ${dayLabel}`}
+                hidden={specialFullDay}
                 rowSpan={shiftCount}
-                sx={{
-                  borderRight: "1px solid black",
-                  textAlign: "center",
-                  width: tableColumnWidths.sickVacation,
-                  minWidth: tableColumnWidths.sickVacation,
-                  maxWidth: tableColumnWidths.sickVacation,
-                  p: 0.25,
-                  verticalAlign: "middle",
-                }}
-              >
-                <Checkbox
-                  slotProps={{
-                    input: {
-                      "aria-label": `${t("headers.vacation")} — ${dayLabel}`,
-                    },
-                  }}
-                  size="small"
-                  checked={status === WorkDayStatus.vacation}
-                  onChange={(e) =>
-                    handleStatusChanged(
-                      e.target.checked
-                        ? WorkDayStatus.vacation
-                        : WorkDayStatus.normal,
-                    )
-                  }
-                  sx={{
-                    display: specialFullDay ? "none" : "inline-flex",
-                    p: 0.5,
-                  }}
-                />
-              </TableCell>
-
+                withRightBorder
+                testId={`work-day-vacation-${date}`}
+                onChange={handleStatusChanged}
+              />
               <TableCell
                 rowSpan={shiftCount}
                 sx={{
@@ -211,7 +265,7 @@ export const DayRow = ({
                 {isEditable && (
                   <IconButton
                     size="small"
-                    data-testid={`work-day-add-shift-${workDay.meta.date}`}
+                    data-testid={`work-day-add-shift-${date}`}
                     aria-label={`${t("a11y.add_shift")} — ${dayLabel}`}
                     onClick={handleAddShift}
                     sx={{ p: 0.5 }}
@@ -240,71 +294,32 @@ export const DayRow = ({
               onRemove={removeShift}
             />
           ) : (
-            <>
+            EMPTY_SHIFT_COLUMNS.map((column) => (
               <TableCell
+                key={column}
                 sx={{
                   borderRight: "1px solid black",
-                  width: tableColumnWidths.entry,
-                  maxWidth: tableColumnWidths.entry,
+                  width: tableColumnWidths[column],
+                  maxWidth: tableColumnWidths[column],
                   px: 0,
                   verticalAlign: "middle",
                 }}
-              ></TableCell>
-              <TableCell
-                sx={{
-                  borderRight: "1px solid black",
-                  width: tableColumnWidths.exit,
-                  maxWidth: tableColumnWidths.exit,
-                  px: 0,
-                  verticalAlign: "middle",
-                }}
-              ></TableCell>
-              <TableCell
-                sx={{
-                  borderRight: "1px solid black",
-                  width: tableColumnWidths.actions,
-                  maxWidth: tableColumnWidths.actions,
-                  px: 0,
-                  verticalAlign: "middle",
-                }}
-              ></TableCell>
-            </>
+              />
+            ))
           )}
           {index === 0 && (
             <>
               <CompactDayRow
                 breakdown={compactBreakdown}
                 rowSpan={shiftCount}
-                testIdPrefix={`work-day-${workDay.meta.date}`}
+                testIdPrefix={`work-day-${date}`}
               />
-              <TableCell
+              <DetailsToggleCell
+                open={detailsOpen}
+                controlsId={detailsId}
                 rowSpan={shiftCount}
-                sx={{ minWidth: 48, p: 0.5, verticalAlign: "middle" }}
-              >
-                <Tooltip
-                  title={
-                    detailsOpen ? t("day_details.hide") : t("day_details.show")
-                  }
-                >
-                  <IconButton
-                    size="small"
-                    aria-label={
-                      detailsOpen
-                        ? t("day_details.hide")
-                        : t("day_details.show")
-                    }
-                    aria-expanded={detailsOpen}
-                    aria-controls={detailsId}
-                    onClick={() => setDetailsOpen((open) => !open)}
-                  >
-                    {detailsOpen ? (
-                      <KeyboardArrowUpIcon />
-                    ) : (
-                      <KeyboardArrowDownIcon />
-                    )}
-                  </IconButton>
-                </Tooltip>
-              </TableCell>
+                onToggle={() => setDetailsOpen((open) => !open)}
+              />
             </>
           )}
         </TableRow>
