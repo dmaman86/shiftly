@@ -87,9 +87,7 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
         </Alert>
       ) : (
         <Stack spacing={3}>
-          {!hasRecords && (
-            <Alert severity="info">{t("empty_history")}</Alert>
-          )}
+          {!hasRecords && <Alert severity="info">{t("empty_history")}</Alert>}
           {months.some(({ snapshot }) => snapshot.usesDefaultConfig) && (
             <Alert severity="warning">{t("default_config")}</Alert>
           )}
