@@ -1,7 +1,8 @@
-import { useId } from "react";
+import { useEffect, useId, useRef } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { Card, CardContent, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { analyticsService } from "@/services";
 import {
   getPresetProfileRange,
   type ProfileMonth,
@@ -60,6 +61,17 @@ const LockedChartCard = ({
 // the disabled range and chart shells preview what signing in unlocks.
 export const LockedProfileHistory = ({ now }: { now: ProfileMonth }) => {
   const { t } = useTranslation("pages", { keyPrefix: "profile_page" });
+  const trackedView = useRef(false);
+
+  useEffect(() => {
+    if (trackedView.current) return;
+
+    analyticsService.track({
+      name: "profile_history_viewed",
+      params: { access: "locked" },
+    });
+    trackedView.current = true;
+  }, []);
 
   return (
     <>

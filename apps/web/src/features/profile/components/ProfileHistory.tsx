@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Alert, Box, Button, CircularProgress, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useDomain } from "@/hooks";
+import { analyticsService } from "@/services";
 import { getProfileMetrics } from "../helpers/profileMetrics";
 import {
   getPresetProfileRange,
@@ -17,6 +18,9 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
   const domain = useDomain();
   const [range, setRange] = useState(() => getPresetProfileRange("last6", now));
   const history = useProfileHistory(range);
+  const trackedView = useRef(false);
+  const isLoading =
+    history.isPending || history.isFetching || history.waitingForWrites;
   const monthFormatter = new Intl.DateTimeFormat(i18n.resolvedLanguage, {
     month: "short",
     year: "numeric",
@@ -30,6 +34,21 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
         ? ` · ${t("partial_month")}`
         : ""),
   }));
+  const hasRecords = months.some(({ metrics }) => metrics);
+  const isLoaded = !isLoading && !history.isError;
+
+  // page_view already counts visits; this records the first successful load
+  // per mount so empty histories can be told apart. Range changes do not refire.
+  useEffect(() => {
+    if (!isLoaded || trackedView.current) return;
+
+    analyticsService.track({
+      name: "profile_history_viewed",
+      params: { access: "unlocked", has_records: hasRecords },
+    });
+    trackedView.current = true;
+  }, [isLoaded, hasRecords]);
+
   const rows = (
     values: (
       metrics: NonNullable<ReturnType<typeof getProfileMetrics>>,
@@ -50,7 +69,7 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
     <>
       <ProfileRangeSelector range={range} now={now} onChange={setRange} />
 
-      {history.isPending || history.isFetching || history.waitingForWrites ? (
+      {isLoading ? (
         <Box
           sx={{ display: "flex", justifyContent: "center", p: 4 }}
           aria-busy="true"
@@ -68,9 +87,7 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
         </Alert>
       ) : (
         <Stack spacing={3}>
-          {months.every(({ metrics }) => !metrics) && (
-            <Alert severity="info">{t("empty_history")}</Alert>
-          )}
+          {!hasRecords && <Alert severity="info">{t("empty_history")}</Alert>}
           {months.some(({ snapshot }) => snapshot.usesDefaultConfig) && (
             <Alert severity="warning">{t("default_config")}</Alert>
           )}
