@@ -7,8 +7,114 @@ import { Shift, ShiftPayMap, WorkDayMeta } from "@shiftly/domain";
 import { tableColumnWidths } from "@/app/constants";
 import { useGlobalState } from "@/hooks";
 import { DomainContextType } from "@/app";
-import { ShiftTimeInput, useShiftEditor } from "@/features/work-table";
+import {
+  getShiftEndTimeErrorKey,
+  ShiftTimeInput,
+  useShiftEditor,
+} from "@/features/work-table";
 import { analyticsService } from "@/services/analytics";
+
+type ShiftActionsCellProps = {
+  isEditable: boolean;
+  crossDay: boolean;
+  hasError: boolean;
+  isDuty: boolean;
+  onToggleCrossDay: (checked: boolean) => void;
+  onToggleDuty: () => void;
+  onRemove: () => void;
+};
+
+const ShiftActionsCell = ({
+  isEditable,
+  crossDay,
+  hasError,
+  isDuty,
+  onToggleCrossDay,
+  onToggleDuty,
+  onRemove,
+}: ShiftActionsCellProps) => {
+  const { t } = useTranslation("work-table");
+
+  return (
+    <TableCell
+      sx={{
+        borderRight: "1px solid black",
+        textAlign: "center",
+        whiteSpace: "nowrap",
+        width: tableColumnWidths.actions,
+        maxWidth: tableColumnWidths.actions,
+        p: 0.25,
+        overflow: "visible",
+        verticalAlign: "middle",
+      }}
+      data-testid="shift-cross-day-toggle"
+    >
+      {isEditable && (
+        <>
+          <Tooltip
+            title={
+              hasError
+                ? t("shift_row.tooltip_cross_day_error")
+                : t("shift_row.tooltip_cross_day")
+            }
+          >
+            <Checkbox
+              slotProps={{
+                input: { "aria-label": t("shift_row.tooltip_cross_day") },
+              }}
+              checked={crossDay}
+              onChange={(e) => onToggleCrossDay(e.target.checked)}
+              size="small"
+              sx={{
+                p: 0.5,
+                color: hasError ? "warning.main" : undefined,
+                "&.Mui-checked": {
+                  color: hasError ? "warning.main" : undefined,
+                },
+                ...(hasError && {
+                  animation: "blink 1.5s ease-in-out infinite",
+                  "@keyframes blink": {
+                    "0%, 100%": { opacity: 1 },
+                    "50%": { opacity: 0.3 },
+                  },
+                }),
+              }}
+            />
+          </Tooltip>
+
+          <Tooltip title={t("shift_row.tooltip_duty")}>
+            <span>
+              <IconButton
+                size="small"
+                onClick={onToggleDuty}
+                aria-label={t("shift_row.tooltip_duty")}
+                aria-pressed={isDuty}
+                sx={{ p: 0.5 }}
+              >
+                {isDuty ? (
+                  <DirectionsCarIcon fontSize="small" color="primary" />
+                ) : (
+                  <DirectionsCarOutlinedIcon fontSize="small" />
+                )}
+              </IconButton>
+            </span>
+          </Tooltip>
+
+          <Tooltip title={t("shift_row.tooltip_delete")}>
+            <IconButton
+              size="small"
+              aria-label={t("shift_row.tooltip_delete")}
+              onClick={onRemove}
+              sx={{ p: 0.5 }}
+            >
+              <DeleteIcon fontSize="small" color="error" />
+            </IconButton>
+          </Tooltip>
+        </>
+      )}
+    </TableCell>
+  );
+};
 
 type ShiftRowProps = {
   domain: DomainContextType;
@@ -52,6 +158,14 @@ export const ShiftRow = ({
     otherShifts,
     onShiftUpdate,
   });
+
+  const handleRemove = () => {
+    onRemove(shift.id);
+    analyticsService.track({
+      name: "shift_deleted",
+      params: { month, year },
+    });
+  };
 
   return (
     <>
@@ -100,14 +214,13 @@ export const ShiftRow = ({
                 number: shiftNumber,
                 date: meta.date,
               })}
-              errorMessage={
-                hasOverlap
-                  ? t("a11y.overlap")
-                  : localShift.start.date.getTime() ===
-                      localShift.end.date.getTime()
-                    ? t("a11y.equal_times")
-                    : t("a11y.invalid_range")
-              }
+              errorMessage={t(
+                getShiftEndTimeErrorKey(
+                  hasOverlap,
+                  localShift.start.date,
+                  localShift.end.date,
+                ),
+              )}
               value={localShift.end.date}
               onChange={(newVal) => handleChange("end", newVal)}
               disabled={!isEditable}
@@ -118,89 +231,15 @@ export const ShiftRow = ({
         </Tooltip>
       </TableCell>
 
-      <TableCell
-        sx={{
-          borderRight: "1px solid black",
-          textAlign: "center",
-          whiteSpace: "nowrap",
-          width: tableColumnWidths.actions,
-          maxWidth: tableColumnWidths.actions,
-          p: 0.25,
-          overflow: "visible",
-          verticalAlign: "middle",
-        }}
-        data-testid="shift-cross-day-toggle"
-      >
-        {isEditable && (
-          <>
-            <Tooltip
-              title={
-                hasError
-                  ? t("shift_row.tooltip_cross_day_error")
-                  : t("shift_row.tooltip_cross_day")
-              }
-            >
-              <Checkbox
-                slotProps={{
-                  input: { "aria-label": t("shift_row.tooltip_cross_day") },
-                }}
-                checked={crossDay}
-                onChange={(e) => handleToggleNextDay(e.target.checked)}
-                size="small"
-                sx={{
-                  p: 0.5,
-                  color: hasError ? "warning.main" : undefined,
-                  "&.Mui-checked": {
-                    color: hasError ? "warning.main" : undefined,
-                  },
-                  ...(hasError && {
-                    animation: "blink 1.5s ease-in-out infinite",
-                    "@keyframes blink": {
-                      "0%, 100%": { opacity: 1 },
-                      "50%": { opacity: 0.3 },
-                    },
-                  }),
-                }}
-              />
-            </Tooltip>
-
-            <Tooltip title={t("shift_row.tooltip_duty")}>
-              <span>
-                <IconButton
-                  size="small"
-                  onClick={toggleDuty}
-                  aria-label={t("shift_row.tooltip_duty")}
-                  aria-pressed={localShift.isDuty}
-                  sx={{ p: 0.5 }}
-                >
-                  {localShift.isDuty ? (
-                    <DirectionsCarIcon fontSize="small" color="primary" />
-                  ) : (
-                    <DirectionsCarOutlinedIcon fontSize="small" />
-                  )}
-                </IconButton>
-              </span>
-            </Tooltip>
-
-            <Tooltip title={t("shift_row.tooltip_delete")}>
-              <IconButton
-                size="small"
-                aria-label={t("shift_row.tooltip_delete")}
-                onClick={() => {
-                  onRemove(shift.id);
-                  analyticsService.track({
-                    name: "shift_deleted",
-                    params: { month, year },
-                  });
-                }}
-                sx={{ p: 0.5 }}
-              >
-                <DeleteIcon fontSize="small" color="error" />
-              </IconButton>
-            </Tooltip>
-          </>
-        )}
-      </TableCell>
+      <ShiftActionsCell
+        isEditable={isEditable}
+        crossDay={crossDay}
+        hasError={hasError}
+        isDuty={localShift.isDuty}
+        onToggleCrossDay={handleToggleNextDay}
+        onToggleDuty={toggleDuty}
+        onRemove={handleRemove}
+      />
     </>
   );
 };

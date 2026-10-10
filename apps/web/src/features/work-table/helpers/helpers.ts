@@ -63,3 +63,13 @@ export const isSameDayPayMap = (a: WorkDayMap, b: WorkDayMap) => {
     JSON.stringify(a.workMap) === JSON.stringify(b.workMap)
   );
 };
+
+export const getShiftEndTimeErrorKey = (
+  hasOverlap: boolean,
+  start: Date,
+  end: Date,
+): "a11y.overlap" | "a11y.equal_times" | "a11y.invalid_range" => {
+  if (hasOverlap) return "a11y.overlap";
+  if (start.getTime() === end.getTime()) return "a11y.equal_times";
+  return "a11y.invalid_range";
+};
