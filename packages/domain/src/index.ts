@@ -60,3 +60,4 @@ export { WorkDayInfoResolver } from "./resolve/workdayinfo.resolver.js";
 export { DateService } from "./services/date.service.js";
 export { ShiftService } from "./services/shift.service.js";
 export { buildPayMapPipeline } from "./composition.js";
+export type { PayMapPipeline } from "./types/domain.types.js";

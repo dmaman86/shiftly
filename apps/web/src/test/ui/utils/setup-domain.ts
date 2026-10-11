@@ -1,10 +1,10 @@
 import { DefaultMonthResolver } from "@/app/months/month.resolver";
 import { WorkDayInfoPresenter } from "@/app/domain/workdayinfo.presenter";
 import { vi } from "vitest";
-import { buildPayMapPipeline } from "@shiftly/domain";
+import { buildPayMapPipeline, type PayMapPipeline } from "@shiftly/domain";
 
 // Initialize domain pipeline once for all tests
-const pipelineInstance = buildPayMapPipeline();
+const pipelineInstance: PayMapPipeline = buildPayMapPipeline();
 
 vi.mock("@/app", () => ({
   domain: {
