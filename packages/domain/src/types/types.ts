@@ -10,6 +10,8 @@ export interface WorkDayMeta {
   typeDay: WorkDayType;
   crossDayContinuation: boolean;
   holidayKey?: HolidayKey;
+  /** Date-specific holiday classifications shared by the month's day metadata. */
+  calendarDayTypes?: Readonly<Record<string, WorkDayType>>;
 }
 
 export interface Point {
@@ -58,14 +60,7 @@ export type CalendarEventMap = Record<string, CalendarEvent[]>;
 
 export interface DayInfoResolver {
   isSpecialFullDay(day: DomainWorkDay): boolean;
-  isPartialHolidayStart(day: DomainWorkDay): boolean;
   hasCrossDayContinuation(day: DomainWorkDay): boolean;
-}
-
-export enum Mode {
-  BY_SHIFT,
-  BY_DAY,
-  BY_MONTH,
 }
 
 export interface MealAllowanceRates {

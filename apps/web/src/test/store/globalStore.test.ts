@@ -9,6 +9,7 @@ describe("globalStore", () => {
     useGlobalStore.setState({
       ...initialGlobalState,
       monthlyConfigContextKey: null,
+      dailyPayMapsContextKey: null,
     }),
   );
 
@@ -25,6 +26,19 @@ describe("globalStore", () => {
       "2026-09-01": replacementDayPayMap,
     });
     expect(withReplacement).not.toHaveProperty("globalBreakdown");
+  });
+
+  it("publishes maps and readiness atomically and invalidates them on period or standard-hours changes", () => {
+    const store = useGlobalStore.getState();
+    store.replaceDailyPayMaps({}, "resolved-month");
+    expect(useGlobalStore.getState().dailyPayMapsContextKey).toBe(
+      "resolved-month",
+    );
+    store.updateStandardHours(9);
+    expect(useGlobalStore.getState().dailyPayMapsContextKey).toBeNull();
+    store.replaceDailyPayMaps({}, "new-hours");
+    store.selectMonth(2027, 1);
+    expect(useGlobalStore.getState().dailyPayMapsContextKey).toBeNull();
   });
 
   it("removes a daily pay map", () => {

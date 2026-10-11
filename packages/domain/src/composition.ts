@@ -1,22 +1,23 @@
 import {
   buildCalculators,
-  buildCoreServices,
   buildDayLayer,
   buildMonthLayer,
   buildRateCalculators,
-  buildResolvers,
   buildShiftLayer,
 } from "./pipelines/index.js";
 import { calculateDayFromShifts } from "./calculator/day-from-shifts.calculator.js";
 import { PayMapPipeline } from "./types/domain.types.js";
 import type { AdditionPolicy } from "./calculator/additions/addition.classifier.js";
+import { DateService, ShiftService } from "./services/index.js";
+import { WorkDayInfoResolver } from "./resolve/workdayinfo.resolver.js";
 
 export const buildPayMapPipeline = (
   options: { additionPolicy?: AdditionPolicy } = {},
 ): PayMapPipeline => {
-  const services = buildCoreServices();
+  const dateService = new DateService();
+  const services = { dateService, shiftService: new ShiftService(dateService) };
 
-  const resolvers = buildResolvers();
+  const resolvers = { workDayInfoResolver: new WorkDayInfoResolver() };
   const rateCalculators = buildRateCalculators();
 
   const calculators = buildCalculators();

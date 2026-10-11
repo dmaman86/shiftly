@@ -25,6 +25,7 @@ import { useGlobalState, useWorkDays } from "@/hooks";
 import { DomainContextType } from "@/app";
 import { CalculationHelpLinks } from "@/features/calculation-rules/CalculationHelpLinks";
 import { FeatureBoundary } from "@/layout";
+import { ShabbatCreditSyncAlert } from "@/features/monthly-pay/ShabbatCreditSyncAlert";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const { t } = useTranslation("work-table");
@@ -113,6 +114,10 @@ const DailyMonthlyContent = ({
   });
   return (
     <Stack spacing={3}>
+      <ShabbatCreditSyncAlert
+        error={shabbatCreditAllocation.error}
+        retry={shabbatCreditAllocation.retry}
+      />
       {workDays.length > 0 && (
         <FeatureBoundary
           featureName={t("feature_name_work_table")}

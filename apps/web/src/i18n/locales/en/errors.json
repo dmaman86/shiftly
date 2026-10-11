@@ -1,6 +1,10 @@
 {
   "global_title": "Oops! Something went wrong",
   "unexpected": "Unexpected error",
+  "cancelled": "The request was cancelled.",
+  "network": "Could not connect. Please try again.",
+  "server": "The server could not complete the request. Please try again.",
+  "shabbat_credit": "Shabbat credit could not be loaded or saved. The balance is not confirmed.",
   "apology": "We apologize for the inconvenience. Please try refreshing the page or returning to the main screen.",
   "feature_load": "Could not load {{featureName}}."
 }

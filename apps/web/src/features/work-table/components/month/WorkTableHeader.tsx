@@ -1,48 +1,11 @@
-import { TableHeader, TableViewMode } from "@/app/types/table.types";
+import {
+  TableHeader,
+  TableViewMode,
+  TableHeaderLabel,
+} from "@/app/types/table.types";
 import { TableCell, TableHead, TableRow } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { filterHeadersByViewMode } from "../../helpers";
-
-type HeaderKey =
-  | "day"
-  | "sick"
-  | "vacation"
-  | "hours"
-  | "total_hours"
-  | "actual_hours"
-  | "regular"
-  | "extras"
-  | "overtime"
-  | "shabbat"
-  | "absence"
-  | "meal_allowance"
-  | "meal_per_diem"
-  | "large"
-  | "small"
-  | "shabbat_credit"
-  | "entry"
-  | "exit";
-
-const HEADER_KEY_MAP: Record<string, HeaderKey> = {
-  יום: "day",
-  מחלה: "sick",
-  חופש: "vacation",
-  שעות: "hours",
-  "סך שעות לתשלום": "total_hours",
-  "סך שעות בפועל": "actual_hours",
-  רגילות: "regular",
-  תוספות: "extras",
-  "ש״נ": "overtime",
-  שבת: "shabbat",
-  היעדרות: "absence",
-  "אש״ל": "meal_allowance",
-  כלכלה: "meal_per_diem",
-  גדולה: "large",
-  קטנה: "small",
-  "זכות שבת": "shabbat_credit",
-  כניסה: "entry",
-  יציאה: "exit",
-};
 
 type WorkTableHeaderProps = {
   headers: TableHeader[];
@@ -57,9 +20,8 @@ export const WorkTableHeader = ({
 }: WorkTableHeaderProps) => {
   const { t } = useTranslation("work-table");
 
-  const tLabel = (label: string): string => {
-    const key = HEADER_KEY_MAP[label];
-    return key ? t(`headers.${key}`) : label;
+  const tLabel = (label: TableHeaderLabel): string => {
+    return label ? t(`headers.${label}`, { defaultValue: label }) : "";
   };
 
   const filteredHeaders = filterHeadersByViewMode(headers, viewMode);

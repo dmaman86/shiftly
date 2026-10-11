@@ -1,6 +1,7 @@
 import { BaseRegularCalculator } from "./baseRegular.calculator.js";
 import type { RegularBreakdown } from "../../types/data-shapes.js";
-import type { TimelineInterval } from "../../types/types.js";
+import type { TimelineInterval, WorkDayMeta } from "../../types/types.js";
+import { Weekend, WorkDayType } from "../../constants/index.js";
 
 /**
  * Applies base-hours progression to the supplied Regular timeline.
@@ -12,6 +13,7 @@ export class BaseHoursClassifier extends BaseRegularCalculator {
   calculate(params: {
     intervals: TimelineInterval[];
     standardHours: number;
+    meta?: WorkDayMeta;
   }): RegularBreakdown {
     const regularHours = params.intervals
       .filter((interval) => interval.category === "regular")
@@ -20,6 +22,18 @@ export class BaseHoursClassifier extends BaseRegularCalculator {
           total + (interval.point.end - interval.point.start) / 60,
         0,
       );
+
+    // A Saturday-start shift keeps its regular remainder at 150%, regardless
+    // of duration or whether the immediately following date is also special.
+    const startsOnSaturday =
+      params.meta &&
+      new Date(params.meta.date).getUTCDay() === Weekend.SATURDAY;
+    if (
+      params.meta?.typeDay === WorkDayType.SpecialFull &&
+      (startsOnSaturday || !params.meta.crossDayContinuation)
+    ) {
+      return this.handleSpecial(regularHours);
+    }
 
     const hours100 = Math.min(regularHours, params.standardHours);
     const after100 = regularHours - hours100;

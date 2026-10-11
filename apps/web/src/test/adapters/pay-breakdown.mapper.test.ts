@@ -51,6 +51,20 @@ const createMonthPayMap = (): MonthPayMap => ({
 });
 
 describe("pay breakdown mappers", () => {
+  it("maps equivalent daily and monthly inputs identically without mutation", () => {
+    const day = createDayPayMap();
+    const month: MonthPayMap = {
+      ...day,
+      ...day.workMap,
+      totalHours: day.totalHours,
+      perDiem: day.perDiem.diemInfo,
+    };
+    const before = structuredClone(day);
+    expect(dayToPayBreakdownVM(day, 2)).toEqual(
+      monthToPayBreakdownVM(month, 2),
+    );
+    expect(day).toEqual(before);
+  });
   it("adds only applied Shabbat credit to the daily total", () => {
     const result = dayToPayBreakdownVM(createDayPayMap(), 2);
 

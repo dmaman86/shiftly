@@ -6,10 +6,6 @@ export class WorkDayInfoResolver implements DayInfoResolver {
     return day.meta.typeDay === WorkDayType.SpecialFull;
   }
 
-  isPartialHolidayStart(day: DomainWorkDay): boolean {
-    return day.meta.typeDay === WorkDayType.SpecialPartialStart;
-  }
-
   hasCrossDayContinuation(day: DomainWorkDay): boolean {
     return day.meta.crossDayContinuation === true;
   }

@@ -41,7 +41,7 @@ vi.mock("jspdf", () => {
   return { jsPDF: FakeJsPdf };
 });
 
-import { exportWorkTablePdf } from "@/features/work-table/helpers/exportWorkTablePdf";
+import { exportWorkTablePdf } from "@/features/work-table/export/exportWorkTablePdf";
 
 const buildWorkTable = () => {
   const element = document.createElement("div");

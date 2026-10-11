@@ -9,6 +9,7 @@ import { shiftService, workDayService } from "@/services";
 import type { ShiftRecord } from "@/services/shift/shift.service";
 import type { WorkDayRecord } from "@/services/workDay/workDay.service";
 import { useGlobalStore } from "@/store/globalStore";
+import { monthCalculationKey } from "@/store/monthCalculationKey";
 import { resolveErrorMessage } from "@/utils";
 import { useWorkTableDayStateContext } from "../../context/workTableDayState/workTableDayStateContext";
 import {
@@ -199,12 +200,18 @@ export const useWorkTableMonthSession = ({
   useEffect(() => {
     if (
       isAuthLoading ||
+      !workDays[0]?.meta.date.startsWith(
+        `${year}-${String(month).padStart(2, "0")}-`,
+      ) ||
       (userId && (!hydrated || !query.isSuccess || query.isFetching))
     ) {
       return;
     }
 
-    replaceDailyPayMaps(dailyPayMaps);
+    replaceDailyPayMaps(
+      dailyPayMaps,
+      monthCalculationKey(userId, year, month, standardHours),
+    );
   }, [
     dailyPayMaps,
     hydrated,
@@ -214,6 +221,10 @@ export const useWorkTableMonthSession = ({
     query.isSuccess,
     replaceDailyPayMaps,
     userId,
+    year,
+    month,
+    standardHours,
+    workDays,
   ]);
 
   const { mutate } = useMutation({

@@ -724,8 +724,11 @@ describe("DefaultDayPayMapBuilder", () => {
       expect(accumulateSpy).toHaveBeenCalled();
     });
 
-    it("should call regular calculator calculate", () => {
-      const calculateSpy = vi.spyOn(payCalculators.regular, "calculate");
+    it("should pass the aggregated timeline to the regular calculator", () => {
+      const calculateSpy = vi.spyOn(
+        payCalculators.regular,
+        "calculateFromTimeline",
+      );
 
       const shifts = [createShiftPayMap(8, 8)];
 

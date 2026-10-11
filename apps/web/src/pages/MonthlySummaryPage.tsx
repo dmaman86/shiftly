@@ -28,6 +28,7 @@ import {
 import { useAuth, useGlobalState, useWorkDays } from "@/hooks";
 import { FeatureBoundary } from "@/layout";
 import { CalculationHelpLinks } from "@/features/calculation-rules/CalculationHelpLinks";
+import { ShabbatCreditSyncAlert } from "@/features/monthly-pay/ShabbatCreditSyncAlert";
 
 export const MonthlySummaryPage = ({
   domain,
@@ -112,6 +113,10 @@ const MonthlySummaryContent = ({
   });
   return (
     <Stack spacing={3}>
+      <ShabbatCreditSyncAlert
+        error={shabbatCreditAllocation.error}
+        retry={shabbatCreditAllocation.retry}
+      />
       <WorkTableDayStateProvider
         ownerKey={JSON.stringify([user?.id, year, month])}
       >

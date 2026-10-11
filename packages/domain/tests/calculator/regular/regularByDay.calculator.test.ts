@@ -13,6 +13,48 @@ describe("RegularByDayCalculator", () => {
     calculator = new RegularByDayCalculator();
   });
 
+  it.each([false, true])(
+    "applies the full-special starting day's continuation policy (continuation: %s)",
+    (crossDayContinuation) => {
+      const customCalculator = new RegularByDayCalculator({
+        midTierThreshold: 3,
+      });
+      const result = customCalculator.calculateFromTimeline({
+        intervals: [
+          {
+            point: { start: 1200, end: 1440 },
+            category: "special",
+            calendarDate: "2026-09-26",
+            dayOffset: 0,
+          },
+          {
+            point: { start: 1440, end: 1800 },
+            category: "special",
+            calendarDate: "2026-09-27",
+            dayOffset: 1,
+          },
+          {
+            point: { start: 1800, end: 2640 },
+            category: "regular",
+            calendarDate: "2026-09-27",
+            dayOffset: 1,
+          },
+        ],
+        standardHours: 8,
+        meta: {
+          date: "2026-09-26",
+          typeDay: WorkDayType.SpecialFull,
+          crossDayContinuation,
+        },
+      });
+      expect(result).toEqual({
+        hours100: { percent: 1, hours: 0 },
+        hours125: { percent: 1.25, hours: 0 },
+        hours150: { percent: 1.5, hours: 14 },
+      });
+    },
+  );
+
   describe("calculate - Regular Day", () => {
     it("should calculate hours within standard hours (all 100%)", () => {
       const input: RegularInput = {

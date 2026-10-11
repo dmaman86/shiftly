@@ -14,20 +14,20 @@ export const tableColumnWidths = {
 
 export const headersTable: TableHeader[] = [
   {
-    label: "יום",
+    label: "day",
     widths: [tableColumnWidths.day],
     viewMode: "both",
     rowSpan: 2,
   },
   {
     label: "",
-    children: ["מחלה", "חופש"],
+    children: ["sick", "vacation"],
     widths: [tableColumnWidths.sickVacation, tableColumnWidths.sickVacation],
     viewMode: "both",
   },
   {
-    label: "שעות",
-    children: ["", "כניסה", "יציאה", ""],
+    label: "hours",
+    children: ["", "entry", "exit", ""],
     widths: [
       tableColumnWidths.addShift,
       tableColumnWidths.entry,
@@ -37,25 +37,25 @@ export const headersTable: TableHeader[] = [
     viewMode: "both",
   },
   {
-    label: "סך שעות בפועל",
+    label: "actual_hours",
     widths: [tableColumnWidths.compactStat],
     viewMode: "both",
     rowSpan: 2,
   },
   {
-    label: "סך שעות לתשלום",
+    label: "total_hours",
     widths: [tableColumnWidths.compactStat],
     viewMode: "both",
     rowSpan: 2,
   },
   {
-    label: "רגילות",
+    label: "regular",
     widths: [tableColumnWidths.compactStat],
     viewMode: "compact",
     rowSpan: 2,
   },
   {
-    label: "תוספות",
+    label: "extras",
     widths: [tableColumnWidths.compactStat],
     viewMode: "compact",
     rowSpan: 2,
