@@ -28,6 +28,13 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
     const { year, month, eventMap } = params;
     const daysInMonth = this.dateService.getDaysInMonth(year, month);
     const workDays: DomainWorkDay[] = [];
+    const calendarDayTypes: Record<string, WorkDayType> = {};
+    for (const [dateKey, events] of Object.entries(eventMap)) {
+      calendarDayTypes[dateKey] = this.holidayResolver.calculate({
+        weekday: this.dateService.createDateWithTime(dateKey).getDay(),
+        events,
+      });
+    }
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month - 1, day);
@@ -49,6 +56,7 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
           typeDay: typeDay,
           crossDayContinuation: false,
           holidayKey,
+          calendarDayTypes,
         },
       };
       workDays[day - 1] = row;

@@ -1,4 +1,5 @@
 import { WorkDayType } from "../constants/index.js";
+import { DefaultHolidayCalculator } from "../calculator/holiday.calculator.js";
 import type { DateService } from "../services/date.service.js";
 import type {
   NormalizedShiftTimeline,
@@ -31,6 +32,7 @@ export const classifyShiftTimeline = ({
   const firstDate = dateService.createDateWithTime(meta.date);
   const lastDayOffset = Math.floor((end - 1) / MINUTES_PER_DAY);
   let previousTypeDay: WorkDayType | undefined;
+  const holidayCalculator = new DefaultHolidayCalculator();
 
   for (let dayOffset = 0; dayOffset <= lastDayOffset; dayOffset += 1) {
     const dayStart = dayOffset * MINUTES_PER_DAY;
@@ -41,9 +43,16 @@ export const classifyShiftTimeline = ({
     const typeDay =
       dayOffset === 0
         ? meta.typeDay
-        : meta.crossDayContinuation
-          ? WorkDayType.SpecialFull
-          : WorkDayType.Regular;
+        : (meta.calendarDayTypes?.[date] ??
+          // Legacy callers supply only the next day's full-special flag.
+          (dayOffset === 1 &&
+          !meta.calendarDayTypes &&
+          meta.crossDayContinuation
+            ? WorkDayType.SpecialFull
+            : holidayCalculator.calculate({
+                weekday: dateService.createDateWithTime(date).getDay(),
+                events: [],
+              })));
 
     const continuationEnd = dayStart + 6 * 60;
     const carriesSpecialIntoDay =

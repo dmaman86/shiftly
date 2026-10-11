@@ -5,12 +5,10 @@ import {
   TimelineMealAllowanceCalculator,
   SpecialCalculator,
 } from "../calculator/index.js";
-import { RegularByMonthAccumulator } from "../reducer/index.js";
 import { Calculators } from "../types/domain.types.js";
 
 export const buildCalculators = (): Calculators => {
   const regularByDay = new RegularByDayCalculator();
-  const regularAccumulator = new RegularByMonthAccumulator();
 
   const extraCalculator = new ExtraCalculator();
   const specialCalculator = new SpecialCalculator();
@@ -24,7 +22,7 @@ export const buildCalculators = (): Calculators => {
   return {
     regular: {
       byDay: regularByDay,
-      accumulator: regularAccumulator,
+      accumulator: regularByDay,
     },
     extra: extraCalculator,
     special: specialCalculator,

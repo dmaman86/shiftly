@@ -15,5 +15,6 @@ export function createMockGlobalState(
       ...overrides?.config,
     },
     dailyPayMaps: overrides?.dailyPayMaps ?? {},
+    dailyPayMapsContextKey: overrides?.dailyPayMapsContextKey ?? null,
   };
 }

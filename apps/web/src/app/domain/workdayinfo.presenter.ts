@@ -18,10 +18,6 @@ export class WorkDayInfoPresenter implements DayInfoPresenter {
     return this.resolver.isSpecialFullDay(day);
   }
 
-  isPartialHolidayStart(day: DomainWorkDay): boolean {
-    return this.resolver.isPartialHolidayStart(day);
-  }
-
   hasCrossDayContinuation(day: DomainWorkDay): boolean {
     return this.resolver.hasCrossDayContinuation(day);
   }

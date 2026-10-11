@@ -221,10 +221,8 @@ flowchart TD
   subgraph group_domain["Payroll logic"]
     node_0["composition<br/>[packages/domain/src/composition.ts]"]
     node_1["buildDayLayer.pipeline<br/>[packages/domain/src/pipelines/buildDayLayer.pipeline.ts]"]
-    node_2["buildResolvers.pipeline<br/>[packages/domain/src/pipelines/buildResolvers.pipeline.ts]"]
     node_3["buildMonthLayer.pipeline<br/>[packages/domain/src/pipelines/buildMonthLayer.pipeline.ts]"]
     node_4["buildCalculators.pipeline<br/>[packages/domain/src/pipelines/buildCalculators.pipeline.ts]"]
-    node_5["buildCoreServices.pipeline<br/>[packages/domain/src/pipelines/buildCoreServices.pipeline.ts]"]
     node_6["shiftmap.builder<br/>[packages/domain/src/builder/shiftmap.builder.ts]"]
     node_7["daypaymap.builder<br/>[packages/domain/src/builder/daypaymap.builder.ts]"]
     node_8["workdaysformonth.builder<br/>[packages/domain/src/builder/workdaysformonth.builder.ts]"]
@@ -250,21 +248,19 @@ flowchart TD
   node_19 --> addition_classifier
   node_9 --> addition_classifier
   node_0 -->|"depends on"| node_4
-  node_0 -->|"depends on"| node_5
+  node_0 -->|"depends on"| node_13
+  node_0 -->|"depends on"| node_14
   node_0 -->|"depends on"| node_1
   node_0 -->|"depends on"| node_3
-  node_0 -->|"depends on"| node_2
+  node_0 -->|"depends on"| node_12
   node_0 -->|"depends on"| node_19
   node_1 -->|"depends on"| node_7
   node_1 -->|"depends on"| node_8
-  node_2 -->|"depends on"| node_12
   node_3 -->|"depends on"| node_17
   node_3 -->|"depends on"| node_18
   node_3 -->|"depends on"| node_11
   node_3 -->|"depends on"| node_15
   node_3 -->|"depends on"| node_16
-  node_5 -->|"depends on"| node_13
-  node_5 -->|"depends on"| node_14
   node_6 -->|"depends on"| node_14
   node_6 -->|"depends on"| node_13
   node_6 -->|"depends on"| node_10
@@ -280,10 +276,8 @@ flowchart TD
   node_19 -->|"depends on"| node_9
   click node_0 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/composition.ts"
   click node_1 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildDayLayer.pipeline.ts"
-  click node_2 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildResolvers.pipeline.ts"
   click node_3 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildMonthLayer.pipeline.ts"
   click node_4 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildCalculators.pipeline.ts"
-  click node_5 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildCoreServices.pipeline.ts"
   click node_6 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/shiftmap.builder.ts"
   click node_7 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/daypaymap.builder.ts"
   click node_8 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/builder/workdaysformonth.builder.ts"
@@ -299,7 +293,7 @@ flowchart TD
   click node_18 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reducer/meal-allowance-month.reducer.ts"
   click node_19 "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildShiftLayer.pipeline.ts"
   classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
-  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15,node_16,node_17,node_18,node_19 toneAmber
+  class node_0,node_1,node_3,node_4,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15,node_16,node_17,node_18,node_19 toneAmber
   class rate_pipeline,day_from_shifts,addition_classifier,shabbat_credit toneAmber
   click rate_pipeline "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/pipelines/buildRateCalculators.pipeline.ts"
   click day_from_shifts "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/day-from-shifts.calculator.ts"
@@ -732,7 +726,7 @@ flowchart TD
 - **מקטעים קבועים**: מחלה, חופשה וזכות שבת שנצברה
 - **סיווג סוג יום לפי חג**: מבוסס Hebcal
 
-ההתקדמות הבסיסית נצברת לאורך היום לפי ההגדרות `standardHours` ו־`midTierThreshold`: ברירת המחדל היא בדרך כלל 8 שעות תקן ושעתיים בדרגת הביניים. השעות הראשונות מחושבות ב־100%, הדרגה הבאה ב־125%, והיתרה ב־150%. גבולות שנוצרו על ידי סיווג הציר, חצות או זמן מיוחד אינם מאפסים את ההתקדמות. התוספות `+20%` ו־`+50%` מחושבות בנפרד באמצעות policy המבוססת על תאריך, כולל כלל זכאות של שלוש שעות כאשר הוא חל.
+ההתקדמות הבסיסית נצברת לאורך היום לפי ההגדרות `standardHours` ו־`midTierThreshold`: ברירת המחדל היא בדרך כלל 8 שעות תקן ושעתיים בדרגת הביניים. השעות הראשונות מחושבות ב־100%, הדרגה הבאה ב־125%, והיתרה ב־150%. גבולות שנוצרו על ידי סיווג הציר, חצות או זמן מיוחד אינם מאפסים את ההתקדמות. התוספות `+20%` ו־`+50%` מחושבות בנפרד באמצעות policy המבוססת על תאריך. הזכאות לתוספת ערב דורשת לפחות שלוש שעות רגילות מזכות במשמרת אחת באותו תאריך קלנדרי; שעות ממשמרות נפרדות באותו תאריך אינן מצטברות לצורך הסף. במשמרת שחוצה חצות, הזכאות נבדקת בנפרד לכל תאריך קלנדרי בתוך המשמרת.
 
 #### מונחים עבור זכות שבת
 
@@ -796,8 +790,6 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 
 צינורות הרכבה לחיבור רכיבי דומיין:
 
-- `buildCoreServices`: שירותי תאריך ומשמרת
-- `buildResolvers`: מופעי Resolver חודש ומידע יום עבודה
 - `buildRateCalculators`: מחשבוני חגים, תעריף אש״ל ותעריף כלכלה
 - `buildCalculators`: מופעי Calculators
 - `buildShiftLayer`: לוגיקה ברמת משמרת

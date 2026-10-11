@@ -19,6 +19,42 @@ const createShift = (
 });
 
 describe("calculateDayFromShifts", () => {
+  it.each([8, 20])(
+    "pays all Sunday hours after 06:00 at 150% for a Saturday-start shift ending at %s:00",
+    (endHour) => {
+      const result = pipeline.payMap.calculateDayFromShifts({
+        meta: {
+          date: "2026-09-26",
+          typeDay: WorkDayType.SpecialFull,
+          crossDayContinuation: false,
+        },
+        year: 2026,
+        month: 9,
+        standardHours: 8,
+        shifts: [
+          {
+            id: "saturday-sunday",
+            start: { date: new Date("2026-09-26T20:00:00") },
+            end: { date: new Date(2026, 8, 27, endHour) },
+            isDuty: false,
+          },
+        ],
+      });
+      const shiftMap = result.shiftPayMaps[0];
+      expect(shiftMap.regular).toEqual({
+        hours100: { percent: 1, hours: 0 },
+        hours125: { percent: 1.25, hours: 0 },
+        hours150: { percent: 1.5, hours: endHour - 6 },
+      });
+      expect(result.dayPayMap.workMap.regular).toEqual(shiftMap.regular);
+      expect(result.dayPayMap.workMap.special).toEqual(shiftMap.special);
+      expect(result.dayPayMap.totalHours).toBe(endHour + 4);
+      expect(
+        shiftMap.special.shabbat150.hours + shiftMap.special.shabbat200.hours,
+      ).toBe(10);
+    },
+  );
+
   it("pays wall-clock hours on the autumn daylight-saving transition night", () => {
     const startTime = "2025-10-25T22:47:00+03:00";
     const endTime = "2025-10-26T07:01:00+02:00";
@@ -54,6 +90,7 @@ describe("calculateDayFromShifts", () => {
       1.0166666666666666,
       10,
     );
+    expect(result.dayPayMap.workMap.regular.hours100.hours).toBe(0);
     expect(result.dayPayMap.workMap.special.shabbat200.hours).toBeCloseTo(
       7.216666666666667,
       10,

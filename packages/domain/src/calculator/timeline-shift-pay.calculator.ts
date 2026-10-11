@@ -7,7 +7,7 @@ import type {
   RegularBreakdown,
   SpecialBreakdown,
 } from "../types/data-shapes.js";
-import type { TimelineInterval } from "../types/types.js";
+import type { TimelineInterval, WorkDayMeta } from "../types/types.js";
 
 export interface TimelineShiftPay {
   regular: RegularBreakdown;
@@ -30,6 +30,7 @@ export class TimelineShiftPayCalculator {
   calculate(params: {
     intervals: TimelineInterval[];
     standardHours: number;
+    meta?: WorkDayMeta;
   }): TimelineShiftPay {
     const result = this.createEmpty();
     const intervalsByDate = new Map<string, TimelineInterval[]>();
@@ -43,6 +44,7 @@ export class TimelineShiftPayCalculator {
     result.regular = this.baseHours.calculate({
       intervals: params.intervals,
       standardHours: params.standardHours,
+      meta: params.meta,
     });
 
     for (const dayIntervals of intervalsByDate.values()) {

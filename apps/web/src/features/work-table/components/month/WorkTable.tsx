@@ -37,8 +37,8 @@ import {
   WorkTableDayStateProvider,
   WorkTableDayStateHydrator,
   WorkTablePrintView,
-  exportWorkTablePdf,
 } from "@/features/work-table";
+import { exportWorkTablePdf } from "../../export/exportWorkTablePdf";
 import { GuestModeNotice } from "@/features/auth";
 import { DomainContextType } from "@/app";
 import { analyticsService } from "@/services";

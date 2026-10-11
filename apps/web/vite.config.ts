@@ -87,6 +87,13 @@ export default defineConfig({
   },
   test: {
     name: "web",
+    // Exercise the current public source API without requiring a domain build.
+    alias: {
+      "@shiftly/domain": path.resolve(
+        __dirname,
+        "../../packages/domain/src/index.ts",
+      ),
+    },
     include: ["src/test/**/*.test.{ts,tsx}"],
     sequence: { groupOrder: 1 },
     globals: true,

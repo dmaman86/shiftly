@@ -11,6 +11,18 @@ describe("formatValue", () => {
   it("rounds currency values consistently at half-cent boundaries", () => {
     expect(formatValue(803.8549999999999)).toBe("803.86");
   });
+
+  it("formats floating-point multiplication without exposing representation noise", () => {
+    expect(formatValue(36.3 * 3)).toBe("108.90");
+    expect(formatValue(1.005)).toBe("1.01");
+    expect(formatValue(-1.005)).toBe("-1.01");
+  });
+
+  it("makes final-total rounding distinct from rounding each component", () => {
+    const amount = 0.004;
+    expect(formatValue(amount)).toBe("");
+    expect(formatValue(amount + amount)).toBe("0.01");
+  });
 });
 
 describe("calculateActualHours", () => {

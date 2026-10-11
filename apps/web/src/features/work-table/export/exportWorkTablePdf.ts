@@ -2,7 +2,7 @@
 import type { jsPDF } from "jspdf";
 
 import notoSansHebrewFontUrl from "../assets/NotoSansHebrew.ttf?url";
-import { PRINT_COLORS } from "./printColors";
+import { PRINT_COLORS } from "../helpers/printColors";
 
 type PdfMetadata = {
   header: string;

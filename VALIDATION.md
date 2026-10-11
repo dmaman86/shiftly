@@ -143,13 +143,17 @@ Payslip comparisons must therefore compare worked hours with `actualHours`, and 
 
 ### Additions and Special Time Are Separate
 
-The current [addition policy](packages/domain/src/calculator/additions/addition.classifier.ts) defaults to evening +20% for qualifying regular time in 14:00–22:00, with at least 180 qualifying minutes per applicable calendar day, and night +50% in 22:00–06:00. Special intervals are excluded from this addition classifier.
+The current [addition policy](packages/domain/src/calculator/additions/addition.classifier.ts) defaults to evening +20% for qualifying regular time in 14:00–22:00, with at least 180 qualifying minutes within one shift on an applicable calendar date, and night +50% in 22:00–06:00. Qualification is evaluated independently for each shift; separate shifts on the same date do not combine their qualifying minutes. For example, 14:00–15:30 and 19:00–20:30 as separate shifts each fail the threshold, while one 14:00–17:00 shift qualifies for three evening hours. A cross-day shift is evaluated separately for each calendar date within that shift. Special intervals are excluded from this addition classifier.
 
 The [timeline pay calculator](packages/domain/src/calculator/timeline-shift-pay.calculator.ts) composes base, additions and special classifications. Tests must distinguish mutually exclusive base categories from additive representations; overlapping supplement representations are not automatically duplicated worked time.
 
 The current enum uses `SpecialPartialStart`, not `SpecialPartial`. Special-day transitions and carry-through to 06:00 must be checked with explicit day metadata and calendar expectations, not inferred from weekday names alone.
 
+For a shift starting on Saturday (`SpecialFull`), all remaining regular intervals after the special continuation ends at 06:00 retain the 150% base rate, regardless of their duration. They remain regular timeline intervals, not special 150%/200% intervals. Both the shift and consolidated day calculation apply this rule. For example, Saturday 20:00–Sunday 08:00 has ten special hours and two regular hours at 150%; extending the shift to Sunday 20:00 gives fourteen regular hours at 150%. This is the owner-confirmed calculation contract, not an independent legal determination.
+
 ### Wall-Clock Duration and DST
+
+Deterministic transition tests and historical fixtures establish implementation behavior, not independent payroll authority. Spring and ordinary-night controls supplement the autumn regression; original payslip evidence and the payroll rounding order remain outstanding.
 
 Payroll duration uses local wall-clock minutes, not simply elapsed UTC milliseconds. The [shift service](packages/domain/src/services/shift.service.ts) normalizes cross-day minutes using 1,440 minutes per local day.
 
@@ -270,7 +274,7 @@ The priorities below add missing evidence before introducing new tools or a comp
 ### 1. Close High-Risk Example Gaps
 
 - For each supported rule, exercise a typical input plus immediately below, exactly at and immediately above relevant boundaries: 06:00, 14:00, seasonal 17:00/18:00, 22:00, midnight, overtime and qualification thresholds.
-- Include non-default standard hours, special-day interactions and per-calendar-day addition qualification.
+- Include non-default standard hours, special-day interactions and per-shift addition qualification on each applicable calendar date; separate shifts must not combine qualifying minutes.
 - Define and test persisted cross-month ownership, both DST transitions and repeated/nonexistent local-time handling.
 - Confirm historical effective dates, all supported rate categories and rounding against authoritative evidence. Preserve unresolved cases explicitly.
 - Convert each confirmed defect into a permanent regression with the original scenario, expected result and responsible test. Do not invent previous bug behavior from a test name.
@@ -287,7 +291,7 @@ Remaining candidate properties are:
 - Valid normalized slices have non-negative duration and ordered endpoints.
 - Recalculation with identical inputs and the same engine/policy yields the same result.
 - Aggregation is order-independent only for rules whose semantics do not depend on chronological accumulation.
-- Artificial splitting preserves results only within the same semantic aggregation scope. Shift-level overtime, per-day qualification and fixed allowances can make independent recalculation of split pieces inequivalent.
+- Artificial splitting preserves results only within the same semantic aggregation scope. Shift-level overtime, per-shift evening qualification on each calendar date and fixed allowances can make independent recalculation of split pieces inequivalent.
 - Shabbat credit respects available credit, eligible deficits and chronological allocation.
 
 Apply numerical tolerances where the implementation uses floating-point hours. Define which base quantities are conserved; do not sum base hours and overlapping supplement hours as if both were worked time.

@@ -10,6 +10,7 @@ export interface GlobalState {
     month: number;
   };
   dailyPayMaps: Record<string, WorkDayMap>;
+  dailyPayMapsContextKey: string | null;
 }
 
 export interface GlobalStore extends GlobalState {
@@ -27,7 +28,10 @@ export interface GlobalStore extends GlobalState {
   updateStandardHours: (standardHours: number) => void;
   updateBaseRate: (baseRate: number) => void;
   updateDayPayMap: (dateKey: string, dayPayMap: WorkDayMap) => void;
-  replaceDailyPayMaps: (dailyPayMaps: Record<string, WorkDayMap>) => void;
+  replaceDailyPayMaps: (
+    dailyPayMaps: Record<string, WorkDayMap>,
+    contextKey?: string,
+  ) => void;
   removeDay: (dateKey: string) => void;
   reset: () => void;
 }
@@ -51,9 +55,13 @@ export const initialGlobalState: GlobalState = {
     month: now.getMonth() + 1,
   },
   dailyPayMaps: {},
+  dailyPayMapsContextKey: null,
 };
 
-const resetMonthData = () => ({ dailyPayMaps: {} });
+const resetMonthData = () => ({
+  dailyPayMaps: {},
+  dailyPayMapsContextKey: null,
+});
 
 export const useGlobalStore = create<GlobalStore>((set) => ({
   ...initialGlobalState,
@@ -83,19 +91,24 @@ export const useGlobalStore = create<GlobalStore>((set) => ({
       ...resetMonthData(),
     })),
   updateStandardHours: (standardHours) =>
-    set((state) => ({ config: { ...state.config, standardHours } })),
+    set((state) => ({
+      config: { ...state.config, standardHours },
+      dailyPayMapsContextKey: null,
+    })),
   updateBaseRate: (baseRate) =>
     set((state) => ({ config: { ...state.config, baseRate } })),
   updateDayPayMap: (dateKey, dayPayMap) =>
     set((state) => ({
       dailyPayMaps: { ...state.dailyPayMaps, [dateKey]: dayPayMap },
+      dailyPayMapsContextKey: null,
     })),
-  replaceDailyPayMaps: (dailyPayMaps) => set({ dailyPayMaps }),
+  replaceDailyPayMaps: (dailyPayMaps, contextKey) =>
+    set({ dailyPayMaps, dailyPayMapsContextKey: contextKey ?? null }),
   removeDay: (dateKey) =>
     set((state) => {
       const dailyPayMaps = { ...state.dailyPayMaps };
       delete dailyPayMaps[dateKey];
-      return { dailyPayMaps };
+      return { dailyPayMaps, dailyPayMapsContextKey: null };
     }),
   reset: () => set(resetMonthData()),
 }));

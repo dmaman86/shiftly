@@ -1,5 +1,6 @@
 import { WorkDayType } from "../../constants/index.js";
 import { BaseRegularCalculator } from "./baseRegular.calculator.js";
+import { BaseHoursClassifier } from "./base-hours.classifier.js";
 import type { Calculator } from "../../types/core-behaviors.js";
 import type {
   RegularBreakdown,
@@ -37,16 +38,8 @@ export class RegularByDayCalculator
     standardHours: number;
     meta: WorkDayMeta;
   }): RegularBreakdown {
-    const regularHours = params.intervals
-      .filter((interval) => interval.category === "regular")
-      .reduce(
-        (total, interval) =>
-          total + (interval.point.end - interval.point.start) / 60,
-        0,
-      );
-
-    return this.calculate({
-      totalHours: regularHours,
+    return new BaseHoursClassifier(this.config).calculate({
+      intervals: params.intervals,
       standardHours: params.standardHours,
       meta: params.meta,
     });

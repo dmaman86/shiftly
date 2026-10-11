@@ -39,6 +39,7 @@ export class DefaultShiftMapBuilder implements ShiftMapBuilder {
     const timelinePay = this.timelineLayer.payCalculator.calculate({
       intervals: timeline,
       standardHours,
+      meta,
     });
     const totalHours = normalizedTimeline
       ? this.shiftService.getDurationShift(shift)

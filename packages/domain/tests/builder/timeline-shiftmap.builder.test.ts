@@ -19,15 +19,32 @@ const meta = (date: string, typeDay = WorkDayType.Regular) => ({
 });
 
 describe("DefaultShiftMapBuilder timeline path", () => {
+  it("pays Friday's 17:00–18:00 special hour in a 24-hour winter shift", () => {
+    const result = builder.build({
+      shift: {
+        id: "thursday-friday",
+        start: { date: new Date("2026-01-08T18:00:00") },
+        end: { date: new Date("2026-01-09T18:00:00") },
+        isDuty: false,
+      },
+      meta: meta("2026-01-08"),
+      standardHours: 8,
+      isFieldDutyShift: false,
+    });
+    expect(result.special.shabbat150.hours).toBe(1);
+    expect(result.special.shabbat200.hours).toBe(0);
+    expect(result.totalHours).toBe(24);
+  });
+
   it("returns a continuous classified timeline for a cross-day shift", () => {
     const result = builder.build({
       shift: {
         id: "cross-day",
-        start: { date: new Date("2026-09-25T14:30:00") },
-        end: { date: new Date("2026-09-26T07:00:00") },
+        start: { date: new Date("2026-09-21T14:30:00") },
+        end: { date: new Date("2026-09-22T07:00:00") },
         isDuty: false,
       },
-      meta: meta("2026-09-25"),
+      meta: meta("2026-09-21"),
       standardHours: 8,
       isFieldDutyShift: false,
     });

@@ -1,17 +1,17 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { RegularByMonthAccumulator } from "../../src/reducer/regular-accumulator.reducer.js";
+import { RegularByDayCalculator } from "../../src/calculator/regular/regularByDay.calculator.js";
 import type { RegularBreakdown, RegularConfig } from "../../src/index.js";
 
-describe("RegularByMonthAccumulator", () => {
-  let accumulator: RegularByMonthAccumulator;
+describe("RegularByDayCalculator", () => {
+  let accumulator: RegularByDayCalculator;
 
   beforeEach(() => {
-    accumulator = new RegularByMonthAccumulator();
+    accumulator = new RegularByDayCalculator();
   });
 
   describe("constructor", () => {
     it("should create with default config", () => {
-      const acc = new RegularByMonthAccumulator();
+      const acc = new RegularByDayCalculator();
       const empty = acc.createEmpty();
 
       expect(empty.hours100.percent).toBe(1);
@@ -20,7 +20,7 @@ describe("RegularByMonthAccumulator", () => {
     });
 
     it("should accept custom percentages", () => {
-      const acc = new RegularByMonthAccumulator({
+      const acc = new RegularByDayCalculator({
         percentages: {
           hours100: 1.0,
           hours125: 1.3,
@@ -35,7 +35,7 @@ describe("RegularByMonthAccumulator", () => {
     });
 
     it("should accept custom midTierThreshold", () => {
-      const acc = new RegularByMonthAccumulator({
+      const acc = new RegularByDayCalculator({
         midTierThreshold: 3,
       });
 
@@ -46,7 +46,7 @@ describe("RegularByMonthAccumulator", () => {
     });
 
     it("should accept partial config", () => {
-      const acc = new RegularByMonthAccumulator({
+      const acc = new RegularByDayCalculator({
         percentages: {
           hours100: 1,
           hours125: 1.3,
@@ -142,7 +142,7 @@ describe("RegularByMonthAccumulator", () => {
     });
 
     it("should work with custom percentages", () => {
-      const customAcc = new RegularByMonthAccumulator({
+      const customAcc = new RegularByDayCalculator({
         percentages: {
           hours100: 1,
           hours125: 1.25,
@@ -464,7 +464,7 @@ describe("RegularByMonthAccumulator", () => {
           hours150: 1.6,
         },
       };
-      const customAcc = new RegularByMonthAccumulator(customConfig);
+      const customAcc = new RegularByDayCalculator(customConfig);
 
       const empty = customAcc.createEmpty();
       const special = customAcc.handleSpecial(8);
@@ -476,7 +476,7 @@ describe("RegularByMonthAccumulator", () => {
     });
 
     it("should maintain custom percentages through accumulation", () => {
-      const customAcc = new RegularByMonthAccumulator({
+      const customAcc = new RegularByDayCalculator({
         percentages: {
           hours100: 1,
           hours125: 1.3,
