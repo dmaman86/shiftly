@@ -11,6 +11,7 @@ config:
 ---
 %% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
 %% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
+%% Election additions verified against the working tree, 2026-10-19. Dashed arrows show injected runtime calls.
 flowchart TD
   subgraph group_domain["Payroll logic"]
     node_0["composition<br/>[packages/domain/src/composition.ts]"]
@@ -34,6 +35,10 @@ flowchart TD
     rate_pipeline["buildRateCalculators.pipeline<br/>[packages/domain/src/pipelines/buildRateCalculators.pipeline.ts]"]
     day_from_shifts["calculateDayFromShifts<br/>[packages/domain/src/calculator/day-from-shifts.calculator.ts]"]
     addition_classifier["AdditionClassifier<br/>[packages/domain/src/calculator/additions/addition.classifier.ts]"]
+    base_hours["BaseHoursClassifier<br/>Base progression + election pay-equivalent hours<br/>[packages/domain/src/calculator/regular/base-hours.classifier.ts]"]
+    election_hours["calculateElectionHours<br/>Regular overlap with election date 07:00–22:00<br/>[packages/domain/src/calculator/election-hours.calculator.ts]"]
+    regular_day["RegularByDayCalculator<br/>Consolidated day timeline<br/>[packages/domain/src/calculator/regular/regularByDay.calculator.ts]"]
+    calendar_types["CalendarEventKind / WorkDayMeta<br/>knessetNumber; calendarKnessetNumbers<br/>[packages/domain/src/types/types.ts]"]
     shabbat_credit["allocateShabbatCredit — exported credit allocation API<br/>[packages/domain/src/calculator/shabbat-credit.calculator.ts]"]
   end
   node_0 --> rate_pipeline
@@ -41,6 +46,14 @@ flowchart TD
   node_0 -->|"policy type"| addition_classifier
   node_19 --> addition_classifier
   node_9 --> addition_classifier
+  node_9 --> base_hours
+  node_4 --> regular_day
+  node_7 -.->|"calculateFromTimeline via injected calculator"| regular_day
+  regular_day --> base_hours
+  base_hours --> election_hours
+  base_hours -->|"metadata type"| calendar_types
+  election_hours -->|"timeline and election metadata types"| calendar_types
+  node_8 -->|"build election metadata"| calendar_types
   node_0 -->|"depends on"| node_4
   node_0 -->|"depends on"| node_13
   node_0 -->|"depends on"| node_14
@@ -93,3 +106,8 @@ flowchart TD
   click day_from_shifts "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/day-from-shifts.calculator.ts"
   click addition_classifier "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/additions/addition.classifier.ts"
   click shabbat_credit "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/shabbat-credit.calculator.ts"
+  class base_hours,election_hours,regular_day,calendar_types toneAmber
+  click base_hours "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/regular/base-hours.classifier.ts"
+  click election_hours "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/election-hours.calculator.ts"
+  click regular_day "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/regular/regularByDay.calculator.ts"
+  click calendar_types "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/types/types.ts"

@@ -13,6 +13,13 @@
       "subcat": "modern"
     },
     {
+      "date": "2020-03-02",
+      "title": "Knesset Election Day",
+      "category": "election",
+      "subcat": "knesset",
+      "knessetNumber": 23
+    },
+    {
       "date": "2020-03-09",
       "title": "Erev Purim",
       "category": "holiday",

@@ -243,6 +243,13 @@
       "subcat": "modern"
     },
     {
+      "date": "2026-10-27",
+      "title": "Knesset Election Day",
+      "category": "election",
+      "subcat": "knesset",
+      "knessetNumber": 26
+    },
+    {
       "date": "2026-11-09",
       "title": "Sigd",
       "category": "holiday",

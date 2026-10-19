@@ -55,7 +55,8 @@ type MonthFixtureResult = {
   monthly: { breakdown: Record<string, unknown>; salary: number };
 };
 
-const FIXTURES = [
+const FIXTURES: { name: string; file: string; precision?: number }[] = [
+  { name: "March 2021", file: "march-2021", precision: 2 },
   { name: "October 2021", file: "october-2021" },
   { name: "March 2022", file: "march-2022" },
   { name: "October 2025", file: "october-2025" },
@@ -72,10 +73,15 @@ const loadFixture = <T>(file: string): T =>
     ),
   ) as T;
 
-const expectCloseTo = (actual: unknown, expected: unknown, path: string) => {
+const expectCloseTo = (
+  actual: unknown,
+  expected: unknown,
+  path: string,
+  precision = PRECISION,
+) => {
   if (typeof expected === "number") {
     expect(actual, path).toBeTypeOf("number");
-    expect(actual as number, path).toBeCloseTo(expected, PRECISION);
+    expect(actual as number, path).toBeCloseTo(expected, precision);
     return;
   }
   if (expected !== null && typeof expected === "object") {
@@ -85,6 +91,7 @@ const expectCloseTo = (actual: unknown, expected: unknown, path: string) => {
         (actual as Record<string, unknown>)[key],
         value,
         `${path}.${key}`,
+        precision,
       );
     }
     return;
@@ -99,10 +106,22 @@ const expectSalary = (actual: number | undefined, expected: number) => {
 
 const calculateMonth = (input: MonthFixture) => {
   const { year, month, standardHours, baseRate } = input;
+  const calendar: { items: unknown[] } = input.holidays
+    ? { items: input.holidays }
+    : JSON.parse(
+        readFileSync(
+          resolve(
+            import.meta.dirname,
+            "../../../public/calendar",
+            `${year}.json`,
+          ),
+          "utf8",
+        ),
+      );
   const workDays = domain.payMap.workDaysMonthBuilder.build({
     year,
     month,
-    eventMap: buildEventMap({ items: input.holidays ?? [] }),
+    eventMap: buildEventMap(calendar),
   });
 
   const state = recordsToWorkTableDayState({
@@ -162,7 +181,7 @@ const calculateMonth = (input: MonthFixture) => {
 };
 
 describe("work table month fixtures", () => {
-  describe.each(FIXTURES)("$name", ({ file }) => {
+  describe.each(FIXTURES)("$name", ({ file, precision = PRECISION }) => {
     const input = loadFixture<MonthFixture>(`${file}.json`);
     const expected = loadFixture<MonthFixtureResult>(`${file}.result.json`);
     const actual = calculateMonth(input);
@@ -172,6 +191,7 @@ describe("work table month fixtures", () => {
         actual.allocation,
         expected.shabbatCreditAllocation,
         "allocation",
+        precision,
       );
       expect(Object.keys(actual.allocation.appliedHoursByDate).sort()).toEqual(
         Object.keys(expected.shabbatCreditAllocation.appliedHoursByDate).sort(),
@@ -191,6 +211,7 @@ describe("work table month fixtures", () => {
         actual.daily[date]?.breakdown,
         breakdown,
         `${date}.breakdown`,
+        precision,
       );
       expectSalary(actual.daily[date]?.salary, salary);
     });
@@ -200,6 +221,7 @@ describe("work table month fixtures", () => {
         actual.monthly.breakdown,
         expected.monthly.breakdown,
         "monthly.breakdown",
+        precision,
       );
       expectSalary(actual.monthly.salary, expected.monthly.salary);
     });

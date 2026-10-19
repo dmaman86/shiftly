@@ -231,6 +231,13 @@
       "subcat": "modern"
     },
     {
+      "date": "2022-11-01",
+      "title": "Knesset Election Day",
+      "category": "election",
+      "subcat": "knesset",
+      "knessetNumber": 25
+    },
+    {
       "date": "2022-11-06",
       "title": "Yitzhak Rabin Memorial Day",
       "category": "holiday",

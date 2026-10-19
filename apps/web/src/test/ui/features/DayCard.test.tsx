@@ -14,18 +14,20 @@ vi.mock("@/features/work-table", () => ({
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string) =>
-      key === "days"
-        ? [
-            "Sunday",
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-          ]
-        : key,
+    t: (key: string, options?: { number?: number }) =>
+      key === "knesset_election_day"
+        ? `Knesset ${options?.number} Election Day`
+        : key === "days"
+          ? [
+              "Sunday",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+            ]
+          : key,
   }),
 }));
 
@@ -78,6 +80,30 @@ const breakdown: PayBreakdownViewModel = {
 };
 
 describe("DayCard", () => {
+  it("shows the Knesset number alongside an existing holiday badge", () => {
+    renderWithTheme(
+      <DayCard
+        domain={domainStub}
+        workDay={{
+          ...workDay,
+          meta: { ...workDay.meta, knessetNumber: 26, holidayKey: "pesach" },
+        }}
+        shabbatCreditHours={0}
+      />,
+    );
+    expect(screen.getByText("Knesset 26 Election Day")).toBeInTheDocument();
+    expect(screen.getByText("holidays.pesach")).toBeInTheDocument();
+  });
+
+  it("does not show an election badge on ordinary days", () => {
+    renderWithTheme(
+      <DayCard domain={domainStub} workDay={workDay} shabbatCreditHours={0} />,
+    );
+    expect(
+      screen.queryByText(/Knesset .* Election Day/),
+    ).not.toBeInTheDocument();
+  });
+
   const scrollIntoViewMock = vi.fn();
 
   beforeEach(() => {

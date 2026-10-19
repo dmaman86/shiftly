@@ -10,8 +10,11 @@ export interface WorkDayMeta {
   typeDay: WorkDayType;
   crossDayContinuation: boolean;
   holidayKey?: HolidayKey;
+  knessetNumber?: number;
   /** Date-specific holiday classifications shared by the month's day metadata. */
   calendarDayTypes?: Readonly<Record<string, WorkDayType>>;
+  /** Election dates available to shifts continuing into another calendar day. */
+  calendarKnessetNumbers?: Readonly<Record<string, number>>;
 }
 
 export interface Point {
@@ -49,11 +52,13 @@ export interface DomainWorkDay {
 export enum CalendarEventKind {
   PaidHoliday = "paid-holiday",
   PartialHolidayStart = "partial-holiday-start",
+  KnessetElectionDay = "knesset-election-day",
 }
 
 export interface CalendarEvent {
   kind: CalendarEventKind;
   holidayKey?: HolidayKey;
+  knessetNumber?: number;
 }
 
 export type CalendarEventMap = Record<string, CalendarEvent[]>;

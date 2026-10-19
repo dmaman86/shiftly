@@ -10,6 +10,16 @@ export type HolidayItem = {
   yomtov?: boolean;
 };
 
+export type ElectionItem = {
+  date: string;
+  title: string;
+  category: "election";
+  subcat: "knesset";
+  knessetNumber: number;
+};
+
+export type CalendarItem = HolidayItem | ElectionItem;
+
 export type ShiftInput = {
   id: string;
   date: string;
@@ -24,7 +34,7 @@ export type MonthInput = {
   baseRate: number;
   standardHours: number;
   timeZone: string;
-  holidays?: HolidayItem[];
+  holidays?: CalendarItem[];
   statuses: Array<{ date: string; status: WorkDayStatusValue }>;
   shifts: ShiftInput[];
 };
@@ -70,6 +80,15 @@ const loadJson = <T>(file: string): T =>
 export const loadMonthScenario = (name: string): MonthScenario => {
   const input = loadJson<MonthInput>(`${name}.json`);
   const expected = loadJson<MonthResult>(`${name}.result.json`);
+  if (input.holidays === undefined) {
+    const calendar = JSON.parse(
+      readFileSync(
+        resolve("apps/web/public/calendar", `${input.year}.json`),
+        "utf8",
+      ),
+    ) as { items: CalendarItem[] };
+    input.holidays = calendar.items;
+  }
 
   if (expected.year !== input.year || expected.month !== input.month) {
     throw new Error(`Fixture ${name}: result month does not match input month`);

@@ -26,6 +26,13 @@ export const selectMonthInDialog = async (
 
   await page.getByRole("button", { name: /בחירת תאריך|בחר תאריך/i }).click();
   const datePickerDialog = page.getByRole("dialog");
+  await expect(datePickerDialog).toBeVisible();
+  await datePickerDialog
+    .getByRole("button", { name: /מעבר לתצוגת שנה/ })
+    .click();
+  await datePickerDialog
+    .getByRole("radio", { name: String(year), exact: true })
+    .click();
   await datePickerDialog.getByText(shortLabel, { exact: true }).click();
   await expect(
     datePickerDialog.getByRole("button", { name: "אישור" }),

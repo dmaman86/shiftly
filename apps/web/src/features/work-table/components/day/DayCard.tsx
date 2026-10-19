@@ -95,19 +95,31 @@ export const DayCard = ({
       header={
         <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
           <Typography fontWeight="bold">{dayLabel}</Typography>
-          {workDay.meta.holidayKey && (
-            <Chip
-              label={tHoliday(workDay.meta.holidayKey)}
-              size="small"
-              color={specialFullDay ? "warning" : "info"}
-              sx={{
-                bgcolor: specialFullDay
-                  ? "dayBadge.special"
-                  : "dayBadge.regular",
-                color: "common.white",
-              }}
-            />
-          )}
+          {[
+            workDay.meta.holidayKey
+              ? tHoliday(workDay.meta.holidayKey)
+              : undefined,
+            workDay.meta.knessetNumber !== undefined
+              ? t("knesset_election_day", {
+                  number: workDay.meta.knessetNumber,
+                })
+              : undefined,
+          ]
+            .filter((label) => label !== undefined)
+            .map((label) => (
+              <Chip
+                key={label}
+                label={label}
+                size="small"
+                color={specialFullDay ? "warning" : "info"}
+                sx={{
+                  bgcolor: specialFullDay
+                    ? "dayBadge.special"
+                    : "dayBadge.regular",
+                  color: "common.white",
+                }}
+              />
+            ))}
         </Stack>
       }
       collapsibleContent={

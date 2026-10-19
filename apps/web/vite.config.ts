@@ -29,7 +29,19 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
+      ...(process.env.SHIFTLY_E2E === "1"
+        ? {
+            "@shiftly/domain": path.resolve(
+              __dirname,
+              "../../packages/domain/src/index.ts",
+            ),
+          }
+        : {}),
     },
+  },
+  server: {
+    // E2E must not lose the month and entered shifts to dev-server reloads.
+    hmr: process.env.SHIFTLY_E2E === "1" ? false : undefined,
   },
   build: {
     outDir: path.resolve(__dirname, "../../dist"),

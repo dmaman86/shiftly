@@ -25,6 +25,13 @@
       "subcat": "major"
     },
     {
+      "date": "2015-03-17",
+      "title": "Knesset Election Day",
+      "category": "election",
+      "subcat": "knesset",
+      "knessetNumber": 20
+    },
+    {
       "date": "2015-04-03",
       "title": "Erev Pesach",
       "category": "holiday",

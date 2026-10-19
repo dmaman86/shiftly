@@ -5,6 +5,51 @@ import { CalendarEventKind } from "@shiftly/domain";
 const responseWith = (...items: unknown[]) => ({ items });
 
 describe("buildEventMap", () => {
+  it("maps Knesset elections independently of paid holidays and deduplicates them", () => {
+    const election = {
+      date: "2026-10-27",
+      title: "Knesset Election Day",
+      category: "election",
+      subcat: "knesset",
+      knessetNumber: 26,
+    };
+    expect(buildEventMap(responseWith(election, election))).toEqual({
+      "2026-10-27": [
+        { kind: CalendarEventKind.KnessetElectionDay, knessetNumber: 26 },
+      ],
+    });
+  });
+
+  it.each([undefined, null, "26", 0, -1, 2.5])(
+    "rejects invalid Knesset number %s",
+    (knessetNumber) => {
+      expect(() =>
+        buildEventMap(
+          responseWith({
+            date: "2026-10-27",
+            title: "Knesset Election Day",
+            category: "election",
+            subcat: "knesset",
+            knessetNumber,
+          }),
+        ),
+      ).toThrow("knessetNumber must be a positive integer");
+    },
+  );
+
+  it("ignores other election categories", () => {
+    expect(
+      buildEventMap(
+        responseWith({
+          date: "2026-10-27",
+          title: "Local Election",
+          category: "election",
+          subcat: "municipal",
+        }),
+      ),
+    ).toEqual({});
+  });
+
   it("returns an empty map for an empty response", () => {
     expect(buildEventMap(responseWith())).toEqual({});
   });

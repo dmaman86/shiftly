@@ -43,7 +43,7 @@ This makes it possible to **recalculate past months accurately** using the same 
   - Regular workdays
   - Partial special days (e.g. Fridays, holiday eves)
   - Full special days (Shabbat, holidays)
-- **Holiday detection via Hebcal API**
+- **Static holiday calendars generated from Hebcal, plus Knesset election events**
   - Automatic resolution of Jewish holidays
   - Differentiation between full and partial special days
 - Sick days & vacation days
@@ -216,6 +216,7 @@ config:
 ---
 %% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
 %% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
+%% Election additions verified against the working tree, 2026-10-19. Dashed arrows show injected runtime calls.
 flowchart TD
   subgraph group_domain["Payroll logic"]
     node_0["composition<br/>[packages/domain/src/composition.ts]"]
@@ -239,6 +240,10 @@ flowchart TD
     rate_pipeline["buildRateCalculators.pipeline<br/>[packages/domain/src/pipelines/buildRateCalculators.pipeline.ts]"]
     day_from_shifts["calculateDayFromShifts<br/>[packages/domain/src/calculator/day-from-shifts.calculator.ts]"]
     addition_classifier["AdditionClassifier<br/>[packages/domain/src/calculator/additions/addition.classifier.ts]"]
+    base_hours["BaseHoursClassifier<br/>Base progression + election pay-equivalent hours<br/>[packages/domain/src/calculator/regular/base-hours.classifier.ts]"]
+    election_hours["calculateElectionHours<br/>Regular overlap with election date 07:00–22:00<br/>[packages/domain/src/calculator/election-hours.calculator.ts]"]
+    regular_day["RegularByDayCalculator<br/>Consolidated day timeline<br/>[packages/domain/src/calculator/regular/regularByDay.calculator.ts]"]
+    calendar_types["CalendarEventKind / WorkDayMeta<br/>knessetNumber; calendarKnessetNumbers<br/>[packages/domain/src/types/types.ts]"]
     shabbat_credit["allocateShabbatCredit — exported credit allocation API<br/>[packages/domain/src/calculator/shabbat-credit.calculator.ts]"]
   end
   node_0 --> rate_pipeline
@@ -246,6 +251,14 @@ flowchart TD
   node_0 -->|"policy type"| addition_classifier
   node_19 --> addition_classifier
   node_9 --> addition_classifier
+  node_9 --> base_hours
+  node_4 --> regular_day
+  node_7 -.->|"calculateFromTimeline via injected calculator"| regular_day
+  regular_day --> base_hours
+  base_hours --> election_hours
+  base_hours -->|"metadata type"| calendar_types
+  election_hours -->|"timeline and election metadata types"| calendar_types
+  node_8 -->|"build election metadata"| calendar_types
   node_0 -->|"depends on"| node_4
   node_0 -->|"depends on"| node_13
   node_0 -->|"depends on"| node_14
@@ -298,6 +311,11 @@ flowchart TD
   click day_from_shifts "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/day-from-shifts.calculator.ts"
   click addition_classifier "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/additions/addition.classifier.ts"
   click shabbat_credit "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/shabbat-credit.calculator.ts"
+  class base_hours,election_hours,regular_day,calendar_types toneAmber
+  click base_hours "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/regular/base-hours.classifier.ts"
+  click election_hours "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/election-hours.calculator.ts"
+  click regular_day "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/regular/regularByDay.calculator.ts"
+  click calendar_types "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/types/types.ts"
 ```
 
 <!-- /diagram:domain -->
@@ -611,6 +629,7 @@ config:
 %% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
 %% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
 %% Profile history reads saved config, shifts and days without persisting recalculated results.
+%% Election maintenance verified against the working tree, 2026-10-19. Dashed arrows show scheduled operations and file I/O, not imports.
 flowchart TD
   subgraph group_data["Infrastructure and adapters"]
     node_0["supabase.crud<br/>[apps/web/src/services/supabase/supabase.crud.ts]"]
@@ -627,9 +646,35 @@ flowchart TD
     node_11["hebcal.request<br/>[apps/web/src/services/hebcal/hebcal.request.ts]"]
     node_12["gtag<br/>[apps/web/src/services/analytics/gtag.ts]"]
     node_13["event.adapter<br/>[apps/web/src/adapters/event.adapter.ts]"]
-    node_14["dayToPayBreadownVM<br/>[apps/web/src/adapters/dayToPayBreadownVM.ts]"]
+    node_14["dayToPayBreakdownVM<br/>[apps/web/src/adapters/dayToPayBreakdownVM.ts]"]
     node_15["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
   end
+  subgraph calendar_maintenance["Calendar maintenance — outside application runtime"]
+    election_workflow["Weekly / manual review workflow<br/>[.github/workflows/knesset-elections.yml]"]
+    election_update["update-knesset-elections<br/>Validate current and next election<br/>[scripts/update-knesset-elections.ts]"]
+    wikipedia_client["MediaWiki query and infobox extraction<br/>[scripts/wikipedia-elections.ts]"]
+    calendar_tools["Registry validation and calendar merging<br/>[scripts/knesset-elections.ts]"]
+    calendar_generate["Hebcal calendar generation<br/>[scripts/generate-calendar.ts]"]
+    election_registry["Versioned Knesset election registry<br/>[scripts/data/knesset-elections.json]"]
+    calendar_files["Versioned yearly calendars<br/>Hebcal holidays + Knesset election items<br/>[apps/web/public/calendar/]"]
+    calendar_review["Create / update review PR<br/>No automatic merge; failures preserve published data"]
+  end
+  external_wikipedia{{"Hebrew Wikipedia / MediaWiki API"}}
+  external_hebcal{{"Hebcal API"}}
+  election_update --> wikipedia_client
+  election_update --> calendar_tools
+  wikipedia_client -->|"election validation"| calendar_tools
+  calendar_generate --> calendar_tools
+  calendar_generate --> node_11
+  election_workflow -.->|"runs"| election_update
+  election_workflow -.->|"proposes changed registry and calendars"| calendar_review
+  wikipedia_client -.->|"fetch wikitext and revision metadata"| external_wikipedia
+  calendar_generate -.->|"fetch holiday items"| external_hebcal
+  calendar_tools -.->|"read registry"| election_registry
+  election_update -.->|"write validated workspace changes"| election_registry
+  election_update -.->|"write affected workspace calendars"| calendar_files
+  calendar_generate -.->|"write merged calendars"| calendar_files
+  node_6 -.->|"load deployed static calendar"| calendar_files
   profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
   profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
   profile_loader --> profile_history
@@ -680,7 +725,7 @@ flowchart TD
   click node_11 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/hebcal/hebcal.request.ts"
   click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/gtag.ts"
   click node_13 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/event.adapter.ts"
-  click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreadownVM.ts"
+  click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreakdownVM.ts"
   click node_15 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
   class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15 toneRose
@@ -692,6 +737,14 @@ flowchart TD
   click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
   click salary_rows "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/mappers/payRows.mapper.ts"
   click salary_total "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/helpers/helper.ts"
+  class election_workflow,election_update,wikipedia_client,calendar_tools,calendar_generate,election_registry,calendar_files,calendar_review toneRose
+  click election_workflow "https://github.com/dmaman86/shiftly/blob/main/.github/workflows/knesset-elections.yml"
+  click election_update "https://github.com/dmaman86/shiftly/blob/main/scripts/update-knesset-elections.ts"
+  click wikipedia_client "https://github.com/dmaman86/shiftly/blob/main/scripts/wikipedia-elections.ts"
+  click calendar_tools "https://github.com/dmaman86/shiftly/blob/main/scripts/knesset-elections.ts"
+  click calendar_generate "https://github.com/dmaman86/shiftly/blob/main/scripts/generate-calendar.ts"
+  click election_registry "https://github.com/dmaman86/shiftly/blob/main/scripts/data/knesset-elections.json"
+  click calendar_files "https://github.com/dmaman86/shiftly/tree/main/apps/web/public/calendar"
 ```
 
 <!-- /diagram:data -->
@@ -769,6 +822,16 @@ totalHours = worked hours + sick hours + vacation hours + appliedShabbatCredit
 ```
 
 Unused credit is displayed to the user but is excluded from total hours and salary calculations.
+
+### Knesset Election Day
+
+Knesset elections remain separate from religious `yomtov` holidays. The event adapter recognizes `category: "election"`, `subcat: "knesset"` and `knessetNumber`, and carries the number into day metadata for translated desktop/mobile badges. Adjacent election dates are available to cross-midnight shifts through `calendarKnessetNumbers`.
+
+Under the owner-specified payroll rule, regular work overlapping **07:00–22:00 on the election calendar date** earns an additional 100%. The premium is added to `regular.hours100.hours` after the normal 100/125/150 progression. It does not consume `standardHours`, change overtime tiers, increase `actualHours`/`totalHours`, or apply to special intervals or unworked absences. Evening/night additions remain separate. These 100% hours are pay-equivalent quantities, not all actual worked time.
+
+For 2021-03-23, 06:37–14:32 with seven standard hours: actual work is `475/60`, election overlap is `452/60`, 100% is `7 + 452/60` and 125% is `55/60`. The UI shows 7.92 actual hours, 14.53 at 100% and 0.92 at 125%; internal calculations retain minute precision. This is the agreed implementation contract, not independently verified legal entitlement.
+
+Calendars in `apps/web/public/calendar/{year}.json` merge Hebcal holidays with `scripts/data/knesset-elections.json`; regeneration preserves elections. A weekly/manual [GitHub workflow](../../.github/workflows/knesset-elections.yml) reads explicit Hebrew Wikipedia infobox dates through MediaWiki, checks the next linked Knesset and opens/updates a review PR. It logs revision evidence, does not extrapolate dates or auto-merge, and preserves published data on errors. See [calendar maintenance](../../scripts/README.md) and [validation limitations](../../VALIDATION.md).
 
 ### Reducers
 
@@ -898,6 +961,7 @@ The golden month scenarios (inputs and expected outputs) are stored in:
 e2e/
 ├── fixtures/
 │   ├── august-2026.json / august-2026.result.json
+│   ├── march-2021.json / march-2021.result.json
 │   ├── march-2022.json / march-2022.result.json
 │   ├── october-2021.json / october-2021.result.json
 │   └── october-2025.json / october-2025.result.json
@@ -912,9 +976,9 @@ e2e/
     └── navigation.spec.ts
 ```
 
-Every fixture is verified by the Vitest integration test `apps/web/src/test/integration/work-table-month-fixtures.test.ts`, which runs the same calculation path as the app without a browser. Playwright drives only the August 2026 scenario through the UI.
+Every fixture is verified by the Vitest integration test `apps/web/src/test/integration/work-table-month-fixtures.test.ts`, which runs the same calculation path as the app without a browser. Playwright drives March 2021 and August 2026 through the UI (desktop English/Hebrew and Android Hebrew), including the election badge. The loader uses the yearly static calendar unless the fixture supplies an explicit calendar override. March 2021 was generated as a starting point, then corrected by the owner against their own actual payslip, as confirmed on 2026-10-19. Its current expected values are owner-confirmed real-world references compared at two decimals. Preserve those corrections; do not replace them with regenerated domain output to make tests pass.
 
-Locally, the Playwright web server starts the Vite dev server on `127.0.0.1` with the `/shiftly` base path. In CI it serves the prebuilt `dist/` with `vite preview`. Hebcal is mocked by the tests so scenarios stay deterministic.
+Locally, Playwright starts an isolated Vite server on `127.0.0.1:4173` with the `/shiftly/` base path, aliases the domain to current source, disables HMR and does not build or reuse another server. In CI it serves the prebuilt `dist/` with `vite preview`. Calendar requests are mocked from scenario data to keep tests deterministic. The desktop flow closes each verified day breakdown and waits for its exit transition before continuing; controls are centered away from the sticky footer.
 The CI workflow installs Chromium and WebKit and runs the E2E suite automatically.
 
 ### Quality Checks and Production Build
