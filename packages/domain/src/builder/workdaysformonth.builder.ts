@@ -1,6 +1,7 @@
 import { WorkDayInfoResolver } from "../resolve/workdayinfo.resolver.js";
 import { DateService } from "../services/date.service.js";
 import {
+  CalendarEventKind,
   CalendarEvent,
   CalendarEventMap,
   DomainWorkDay,
@@ -29,7 +30,14 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
     const daysInMonth = this.dateService.getDaysInMonth(year, month);
     const workDays: DomainWorkDay[] = [];
     const calendarDayTypes: Record<string, WorkDayType> = {};
+    const calendarKnessetNumbers: Record<string, number> = {};
     for (const [dateKey, events] of Object.entries(eventMap)) {
+      const election = events.find(
+        (event) => event.kind === CalendarEventKind.KnessetElectionDay,
+      );
+      if (election?.knessetNumber !== undefined) {
+        calendarKnessetNumbers[dateKey] = election.knessetNumber;
+      }
       calendarDayTypes[dateKey] = this.holidayResolver.calculate({
         weekday: this.dateService.createDateWithTime(dateKey).getDay(),
         events,
@@ -56,7 +64,11 @@ export class DefaultWorkDaysForMonthBuilder implements WorkDaysForMonthBuilder {
           typeDay: typeDay,
           crossDayContinuation: false,
           holidayKey,
+          knessetNumber: events.find(
+            (event) => event.kind === CalendarEventKind.KnessetElectionDay,
+          )?.knessetNumber,
           calendarDayTypes,
+          calendarKnessetNumbers,
         },
       };
       workDays[day - 1] = row;

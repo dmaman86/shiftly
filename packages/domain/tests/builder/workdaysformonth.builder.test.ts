@@ -36,6 +36,42 @@ describe("DefaultWorkDaysForMonthBuilder", () => {
   });
 
   describe("build - Basic functionality", () => {
+    it("preserves election metadata without changing day classification or adjacent days", () => {
+      const result = builder.build({
+        year: 2026,
+        month: 10,
+        eventMap: {
+          "2026-10-27": [
+            { kind: CalendarEventKind.KnessetElectionDay, knessetNumber: 26 },
+          ],
+        },
+      });
+      expect(result[26].meta.knessetNumber).toBe(26);
+      expect(result[26].meta.typeDay).toBe(WorkDayType.Regular);
+      expect(result[26].meta.holidayKey).toBeUndefined();
+      expect(result[25].meta.crossDayContinuation).toBe(false);
+      expect(result[25].meta.knessetNumber).toBeUndefined();
+      expect(result[25].meta.calendarKnessetNumbers).toEqual({
+        "2026-10-27": 26,
+      });
+    });
+
+    it("keeps election and holiday metadata when events share a date", () => {
+      const result = builder.build({
+        year: 2026,
+        month: 10,
+        eventMap: {
+          "2026-10-27": [
+            paidHoliday("pesach"),
+            { kind: CalendarEventKind.KnessetElectionDay, knessetNumber: 26 },
+          ],
+        },
+      });
+      expect(result[26].meta.knessetNumber).toBe(26);
+      expect(result[26].meta.holidayKey).toBe("pesach");
+      expect(result[26].meta.typeDay).toBe(WorkDayType.SpecialFull);
+    });
+
     it("should build array of WorkDayInfo for given month", () => {
       const result = builder.build({
         year: 2024,

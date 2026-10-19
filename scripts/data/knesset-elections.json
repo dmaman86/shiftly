@@ -1,0 +1,13 @@
+{
+  "historicalSource": "https://main.knesset.gov.il/mk/elections/Pages/default.aspx",
+  "upcomingSource": "https://he.wikipedia.org/wiki/הבחירות_לכנסת_העשרים_ושש",
+  "elections": [
+    { "knessetNumber": 20, "date": "2015-03-17" },
+    { "knessetNumber": 21, "date": "2019-04-09" },
+    { "knessetNumber": 22, "date": "2019-09-17" },
+    { "knessetNumber": 23, "date": "2020-03-02" },
+    { "knessetNumber": 24, "date": "2021-03-23" },
+    { "knessetNumber": 25, "date": "2022-11-01" },
+    { "knessetNumber": 26, "date": "2026-10-27" }
+  ]
+}

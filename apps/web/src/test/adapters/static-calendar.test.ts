@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { buildEventMap } from "@/adapters";
 import { SYSTEM_START_YEAR } from "@/app/constants/ui.constant";
+import { CalendarEventKind } from "@shiftly/domain";
 
 const CALENDAR_DIR = resolve(__dirname, "../../../public/calendar");
 
@@ -17,6 +18,15 @@ const availableYears = readdirSync(CALENDAR_DIR)
   .sort((a, b) => a - b);
 
 describe("static calendar files", () => {
+  it("loads the Knesset election from the generated 2026 calendar", () => {
+    const payload: unknown = JSON.parse(
+      readFileSync(resolve(CALENDAR_DIR, "2026.json"), "utf8"),
+    );
+    expect(buildEventMap(payload)["2026-10-27"]).toEqual([
+      { kind: CalendarEventKind.KnessetElectionDay, knessetNumber: 26 },
+    ]);
+  });
+
   it(`cover every selectable year and the next ${REQUIRED_YEARS_AHEAD}`, () => {
     const lastRequiredYear = new Date().getFullYear() + REQUIRED_YEARS_AHEAD;
     const missing = [];

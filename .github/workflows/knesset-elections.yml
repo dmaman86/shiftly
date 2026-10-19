@@ -1,0 +1,68 @@
+name: Update Knesset election calendar
+
+on:
+  schedule:
+    - cron: "23 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: knesset-election-calendar
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+      - name: Test electoral calendar tooling
+        run: node --test scripts/knesset-elections.test.ts
+      - name: Check Wikipedia election dates
+        run: node scripts/update-knesset-elections.ts
+      - name: Validate updated calendars
+        run: node --test scripts/knesset-elections.test.ts
+      - name: Create or update review pull request
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: automation/knesset-election-calendar
+          commit-message: "chore(calendar): update Knesset election dates"
+          title: "chore(calendar): update Knesset election dates"
+          body: |
+            Updates the electoral registry and generated calendars using Hebrew Wikipedia via the MediaWiki API.
+            Article links are recorded in scripts/data/knesset-elections.json.
+            Consult the workflow logs for the exact Wikipedia revision IDs and timestamps:
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            Review the Knesset number and date against the source before merging.
+            Election tooling tests ran before creating this PR. No automatic merge is enabled.
+          add-paths: |
+            scripts/data/knesset-elections.json
+            apps/web/public/calendar/*.json
+      - name: Report failure without changing published calendars
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          echo "::error::Election update failed. Published calendars were not changed."
+          title="Knesset election calendar check failed"
+          issue=$(gh issue list --state open --search "$title in:title" --json number,title --jq '.[] | select(.title == "Knesset election calendar check failed") | .number' | head -1)
+          body="The weekly election check failed. Existing published data was preserved. Inspect: $RUN_URL"
+          if [ -n "$issue" ]; then
+            gh issue comment "$issue" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi

@@ -31,6 +31,13 @@
       "subcat": "modern"
     },
     {
+      "date": "2021-03-23",
+      "title": "Knesset Election Day",
+      "category": "election",
+      "subcat": "knesset",
+      "knessetNumber": 24
+    },
+    {
       "date": "2021-03-27",
       "title": "Erev Pesach",
       "category": "holiday",

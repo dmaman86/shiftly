@@ -1,6 +1,6 @@
 import type { Page } from "@playwright/test";
 
-import type { HolidayItem } from "./scenario";
+import type { CalendarItem } from "./scenario";
 
 /**
  * "Today" for every E2E test. The app defaults to the current month and caps
@@ -25,7 +25,7 @@ export const prepareApp = async (
   {
     holidays = [],
     firstVisit = false,
-  }: { holidays?: HolidayItem[]; firstVisit?: boolean } = {},
+  }: { holidays?: CalendarItem[]; firstVisit?: boolean } = {},
 ) => {
   const fulfillHolidays: Parameters<Page["route"]>[1] = (route) =>
     route.fulfill({

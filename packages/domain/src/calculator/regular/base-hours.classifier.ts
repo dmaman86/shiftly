@@ -2,6 +2,7 @@ import { BaseRegularCalculator } from "./baseRegular.calculator.js";
 import type { RegularBreakdown } from "../../types/data-shapes.js";
 import type { TimelineInterval, WorkDayMeta } from "../../types/types.js";
 import { Weekend, WorkDayType } from "../../constants/index.js";
+import { calculateElectionHours } from "../election-hours.calculator.js";
 
 /**
  * Applies base-hours progression to the supplied Regular timeline.
@@ -32,7 +33,12 @@ export class BaseHoursClassifier extends BaseRegularCalculator {
       params.meta?.typeDay === WorkDayType.SpecialFull &&
       (startsOnSaturday || !params.meta.crossDayContinuation)
     ) {
-      return this.handleSpecial(regularHours);
+      const result = this.handleSpecial(regularHours);
+      result.hours100.hours += calculateElectionHours(
+        params.intervals,
+        params.meta,
+      );
+      return result;
     }
 
     const hours100 = Math.min(regularHours, params.standardHours);
@@ -42,7 +48,8 @@ export class BaseHoursClassifier extends BaseRegularCalculator {
     return {
       hours100: {
         percent: this.config.percentages.hours100,
-        hours: hours100,
+        // Pay-equivalent hours only: the timeline and actual duration stay unchanged.
+        hours: hours100 + calculateElectionHours(params.intervals, params.meta),
       },
       hours125: {
         percent: this.config.percentages.hours125,

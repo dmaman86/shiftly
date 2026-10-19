@@ -19,6 +19,13 @@
       "subcat": "major"
     },
     {
+      "date": "2019-04-09",
+      "title": "Knesset Election Day",
+      "category": "election",
+      "subcat": "knesset",
+      "knessetNumber": 21
+    },
+    {
       "date": "2019-04-15",
       "title": "Yom HaAliyah",
       "category": "holiday",
@@ -134,6 +141,13 @@
       "title": "Tish’a B’Av (observed)",
       "category": "holiday",
       "subcat": "major"
+    },
+    {
+      "date": "2019-09-17",
+      "title": "Knesset Election Day",
+      "category": "election",
+      "subcat": "knesset",
+      "knessetNumber": 22
     },
     {
       "date": "2019-09-29",

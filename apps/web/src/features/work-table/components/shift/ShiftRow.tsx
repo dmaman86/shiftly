@@ -87,6 +87,7 @@ const ShiftActionsCell = ({
               <IconButton
                 size="small"
                 onClick={onToggleDuty}
+                data-testid="shift-duty-toggle"
                 aria-label={t("shift_row.tooltip_duty")}
                 aria-pressed={isDuty}
                 sx={{ p: 0.5 }}

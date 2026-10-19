@@ -15,8 +15,12 @@ const BASE_RATE = 50;
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string, options?: { returnObjects?: boolean }) =>
-      options?.returnObjects ? ["Sun", "Mon", "Tue"] : key,
+    t: (key: string, options?: { returnObjects?: boolean; number?: number }) =>
+      key === "knesset_election_day"
+        ? `Knesset ${options?.number} Election Day`
+        : options?.returnObjects
+          ? ["Sun", "Mon", "Tue"]
+          : key,
   }),
 }));
 
@@ -111,6 +115,21 @@ const firstRowCellCount = () =>
     .length;
 
 describe("DayRow", () => {
+  it("shows the Knesset number alongside an existing holiday badge", () => {
+    const day = workDay("pesach");
+    day.meta.knessetNumber = 26;
+    renderDayRow(day);
+    expect(screen.getByText("Knesset 26 Election Day")).toBeInTheDocument();
+    expect(screen.getByText("holidays.pesach")).toBeInTheDocument();
+  });
+
+  it("does not show an election badge on ordinary days", () => {
+    renderDayRow();
+    expect(
+      screen.queryByText(/Knesset .* Election Day/),
+    ).not.toBeInTheDocument();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     controller.status = WorkDayStatus.normal;

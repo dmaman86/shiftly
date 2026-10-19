@@ -3,14 +3,15 @@
  * on Hebcal at runtime. Jewish holidays are deterministic, so the output only
  * needs regenerating when the year range is extended.
  *
- * Only holiday items are kept; classification stays in the app's event
- * adapter so rule changes do not require regenerating these files.
+ * Hebcal holiday items are merged with the verified Knesset election registry.
+ * Classification stays in the app's adapter; regeneration preserves elections.
  *
  * Usage: bun run calendar:generate
  */
 import { mkdir, writeFile } from "node:fs/promises";
 
 import { buildHebcalUrl } from "../apps/web/src/services/hebcal/hebcal.request.ts";
+import { mergeElectionItems, readRegistry } from "./knesset-elections.ts";
 
 // Must stay aligned with SYSTEM_START_YEAR in apps/web/src/app/constants/ui.constant.ts.
 const FIRST_YEAR = 2015;
@@ -66,10 +67,11 @@ const fetchYear = async (year: number): Promise<CalendarItem[]> => {
 };
 
 const main = async () => {
+  const { elections } = await readRegistry();
   await mkdir(OUTPUT_DIR, { recursive: true });
 
   for (let year = FIRST_YEAR; year <= LAST_YEAR; year++) {
-    const items = await fetchYear(year);
+    const items = mergeElectionItems(await fetchYear(year), elections, year);
     const file = new URL(`${year}.json`, OUTPUT_DIR);
     await writeFile(file, `${JSON.stringify({ items }, null, 2)}\n`);
     console.log(`calendar ${year}: ${items.length} holiday items`);

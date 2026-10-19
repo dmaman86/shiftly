@@ -33,6 +33,7 @@ const EMPTY_SHIFT_COLUMNS = ["entry", "exit", "actions"] as const;
 type DayLabelCellProps = {
   dayLabel: string;
   holidayLabel?: string;
+  electionLabel?: string;
   specialFullDay: boolean;
   rowSpan: number;
 };
@@ -40,6 +41,7 @@ type DayLabelCellProps = {
 const DayLabelCell = ({
   dayLabel,
   holidayLabel,
+  electionLabel,
   specialFullDay,
   rowSpan,
 }: DayLabelCellProps) => (
@@ -64,20 +66,23 @@ const DayLabelCell = ({
       }}
     >
       {dayLabel}
-      {holidayLabel && (
-        <Chip
-          label={holidayLabel}
-          size="small"
-          color={specialFullDay ? "warning" : "info"}
-          sx={{
-            bgcolor: specialFullDay ? "dayBadge.special" : "dayBadge.regular",
-            color: "common.white",
-            height: 16,
-            fontSize: "0.6rem",
-            "& .MuiChip-label": { px: 0.5 },
-          }}
-        />
-      )}
+      {[holidayLabel, electionLabel]
+        .filter((label) => label !== undefined)
+        .map((label) => (
+          <Chip
+            key={label}
+            label={label}
+            size="small"
+            color={specialFullDay ? "warning" : "info"}
+            sx={{
+              bgcolor: specialFullDay ? "dayBadge.special" : "dayBadge.regular",
+              color: "common.white",
+              height: 16,
+              fontSize: "0.6rem",
+              "& .MuiChip-label": { px: 0.5 },
+            }}
+          />
+        ))}
     </Box>
   </TableCell>
 );
@@ -229,6 +234,13 @@ export const DayRow = ({
               <DayLabelCell
                 dayLabel={dayLabel}
                 holidayLabel={holidayLabel}
+                electionLabel={
+                  workDay.meta.knessetNumber !== undefined
+                    ? t("knesset_election_day", {
+                        number: workDay.meta.knessetNumber,
+                      })
+                    : undefined
+                }
                 specialFullDay={specialFullDay}
                 rowSpan={shiftCount}
               />

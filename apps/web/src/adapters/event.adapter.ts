@@ -10,6 +10,7 @@ interface HebcalItem {
   category: string;
   subcat?: string;
   yomtov?: boolean;
+  knessetNumber?: number;
 }
 
 interface HolidayTitleRule extends CalendarEvent {
@@ -190,12 +191,31 @@ const parseItems = (payload: unknown): HebcalItem[] => {
       );
     }
 
+    const category = readRequiredString(value, "category", index);
+    const subcat = readOptionalString(value, "subcat", index);
+    const knessetNumber = value.knessetNumber;
+    if (
+      category === "election" &&
+      subcat === "knesset" &&
+      (typeof knessetNumber !== "number" ||
+        !Number.isInteger(knessetNumber) ||
+        knessetNumber < 1)
+    ) {
+      throw new Error(
+        `Invalid calendar response: items[${index}].knessetNumber must be a positive integer`,
+      );
+    }
     return {
       date: readRequiredString(value, "date", index),
       title: readRequiredString(value, "title", index),
-      category: readRequiredString(value, "category", index),
-      subcat: readOptionalString(value, "subcat", index),
+      category,
+      subcat,
       yomtov: readOptionalBoolean(value, "yomtov", index),
+      ...(category === "election" &&
+      subcat === "knesset" &&
+      typeof knessetNumber === "number"
+        ? { knessetNumber }
+        : {}),
     };
   });
 };
@@ -214,6 +234,12 @@ const findTitleRule = (title: string): HolidayTitleRule | undefined =>
   });
 
 const classifyHoliday = (item: HebcalItem): CalendarEvent | undefined => {
+  if (item.category === "election" && item.subcat === "knesset") {
+    return {
+      kind: CalendarEventKind.KnessetElectionDay,
+      knessetNumber: item.knessetNumber,
+    };
+  }
   if (item.category !== "holiday") return undefined;
 
   const rule = findTitleRule(normalizeTitle(item.title));
@@ -238,7 +264,9 @@ const appendUniqueEvent = (
   if (
     !events.some(
       (current) =>
-        current.kind === event.kind && current.holidayKey === event.holidayKey,
+        current.kind === event.kind &&
+        current.holidayKey === event.holidayKey &&
+        current.knessetNumber === event.knessetNumber,
     )
   ) {
     events.push(event);
