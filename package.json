@@ -29,6 +29,7 @@
     "calendar:elections:sync": "node scripts/sync-knesset-calendars.ts",
     "calendar:elections:update": "node scripts/update-knesset-elections.ts",
     "calendar:elections:test": "node --test scripts/knesset-elections.test.ts",
+    "calendar:elections:parity": "node scripts/check-election-parity.ts",
     "docs:diagrams": "node scripts/sync-diagrams.ts",
     "docs:diagrams:check": "node scripts/sync-diagrams.ts --check",
     "test": "bun run domain:build && vitest",
