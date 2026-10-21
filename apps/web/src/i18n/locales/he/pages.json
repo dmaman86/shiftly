@@ -170,7 +170,8 @@
     "currency_axis": "תשלום מחושב (₪)",
     "show_values": "הצגת ערכים מדויקים",
     "month": "חודש",
-    "total": "סך הכול"
+    "total": "סך הכול",
+    "reference_unavailable": "תעריף לא זמין"
   },
   "calculation_help": {
     "intro": "להבנת החישוב:",

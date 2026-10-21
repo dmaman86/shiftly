@@ -17,8 +17,21 @@ export const PUBLISHED_ELECTIONS: readonly PublishedElection[] = (
   ) as { elections: PublishedElection[] }
 ).elections;
 
+export type PublishedTimelines = Record<
+  "per_diem.point_rate" | "meal_allowance.rates",
+  { validFrom: string; validTo: string | null; value: unknown }[]
+>;
+
+/** Frozen published rates, equal to the app's embedded baseline. */
+export const PUBLISHED_TIMELINES: PublishedTimelines = (
+  JSON.parse(
+    readFileSync(resolve("e2e/fixtures/reference-timelines.json"), "utf8"),
+  ) as { timelines: PublishedTimelines }
+).timelines;
+
 /** The build may embed the production API URL (VITE_API_URL): match any host. */
 export const ELECTIONS_ROUTE = "**/reference/elections?*";
+export const TIMELINES_ROUTE = "**/reference/timelines?*";
 
 /**
  * "Today" for every E2E test. The app defaults to the current month and caps
@@ -33,8 +46,8 @@ const ANALYTICS_HOSTS =
 const NAV_MENU_INTRO_KEY = "shiftly:nav-menu-intro-seen";
 
 /**
- * Makes a page deterministic: frozen clock, no analytics and election days
- * from a frozen fixture instead of the API. Holidays are computed in the
+ * Makes a page deterministic: frozen clock, no analytics, and election days
+ * and rate timelines from frozen fixtures instead of the API. Holidays are computed in the
  * browser, so `holidays` no longer changes what the app shows: it only feeds
  * the disconnected legacy calendar routes, which go away with them. The first-visit mobile menu is marked as seen
  * unless a test opts in, so it does not push content down in unrelated tests.
@@ -44,10 +57,12 @@ export const prepareApp = async (
   {
     holidays = [],
     elections = PUBLISHED_ELECTIONS,
+    timelines = PUBLISHED_TIMELINES,
     firstVisit = false,
   }: {
     holidays?: CalendarItem[];
     elections?: readonly PublishedElection[];
+    timelines?: PublishedTimelines;
     firstVisit?: boolean;
   } = {},
 ) => {
@@ -84,6 +99,13 @@ export const prepareApp = async (
       }),
     });
   });
+  await page.route(TIMELINES_ROUTE, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ timelines }),
+    }),
+  );
 };
 
 /** Pixels the document extends past the viewport width; 0 means no horizontal page scroll. */

@@ -10,6 +10,7 @@ import {
 } from "../helpers/profileRange";
 import { useProfileHistory } from "../hooks/useProfileHistory";
 import { ElectionDataNotice } from "@/features/calendar/ElectionDataNotice";
+import { ReferenceDataNotice } from "@/features/reference/ReferenceDataNotice";
 import { ProfileBarChart, type ProfileChartRow } from "./ProfileBarChart";
 import { ProfileRangeSelector } from "./ProfileRangeSelector";
 
@@ -61,9 +62,11 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
       label,
       values: metrics ? values(metrics) : null,
       unavailableLabel:
-        metrics && payment && !metrics.payment
-          ? t("missing_rate")
-          : t("no_records"),
+        snapshot.referenceIssues.length > 0
+          ? t("reference_unavailable")
+          : metrics && payment && !metrics.payment
+            ? t("missing_rate")
+            : t("no_records"),
     }));
 
   return (
@@ -93,6 +96,7 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
             retry={() => void history.refetch()}
             retrying={history.isRefetching}
           />
+          <ReferenceDataNotice />
           {!hasRecords && <Alert severity="info">{t("empty_history")}</Alert>}
           {months.some(({ snapshot }) => snapshot.usesDefaultConfig) && (
             <Alert severity="warning">{t("default_config")}</Alert>

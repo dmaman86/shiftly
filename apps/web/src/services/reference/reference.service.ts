@@ -52,6 +52,75 @@ const parseElections = (
   return payload.elections;
 };
 
+/** How apps/api publishes a rate timeline entry (GET /reference/timelines). */
+export interface PublishedTimelineEntry<V> {
+  /** YYYY-MM-DD, inclusive. */
+  validFrom: string;
+  /** YYYY-MM-DD, exclusive; null until further notice. */
+  validTo: string | null;
+  value: V;
+}
+
+export interface PublishedTimelines {
+  "per_diem.point_rate": PublishedTimelineEntry<{ amount: number }>[];
+  "meal_allowance.rates": PublishedTimelineEntry<{
+    small: number;
+    large: number;
+  }>[];
+}
+
+export const TIMELINE_KINDS = [
+  "per_diem.point_rate",
+  "meal_allowance.rates",
+] as const;
+
+/**
+ * "api": the API answered with a valid payload; authoritative even when it
+ * differs from the embedded baseline. "unavailable": the API could not be
+ * used (not configured, network, timeout, 5xx) or answered a 200 that breaks
+ * the contract ("invalid_response").
+ */
+export type TimelinesResult =
+  | { source: "api"; timelines: PublishedTimelines }
+  | { source: "unavailable"; reason: string };
+
+const isRate = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value) && value >= 0;
+
+const isDate = (value: unknown): value is string =>
+  typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
+
+const isEntry = (
+  value: unknown,
+  isValue: (value: unknown) => boolean,
+): boolean =>
+  isRecord(value) &&
+  isDate(value.validFrom) &&
+  (value.validTo === null || isDate(value.validTo)) &&
+  isValue(value.value);
+
+const VALUE_CHECKS: Record<
+  (typeof TIMELINE_KINDS)[number],
+  (value: unknown) => boolean
+> = {
+  "per_diem.point_rate": (value) => isRecord(value) && isRate(value.amount),
+  "meal_allowance.rates": (value) =>
+    isRecord(value) && isRate(value.small) && isRate(value.large),
+};
+
+/** The shape of the timelines; whether they form valid timelines is the domain's call. */
+export const isPublishedTimelines = (
+  value: unknown,
+): value is PublishedTimelines =>
+  isRecord(value) &&
+  TIMELINE_KINDS.every((kind) => {
+    const entries = value[kind];
+    return (
+      Array.isArray(entries) &&
+      entries.every((entry) => isEntry(entry, VALUE_CHECKS[kind]))
+    );
+  });
+
 // Read on every call, so the base URL is resolved from the build and tests
 // can stub it.
 const apiBaseUrl = (): string | undefined =>
@@ -88,5 +157,42 @@ export const referenceService = () => {
     return { source: "api", elections: parseElections(payload, year) };
   };
 
-  return { getElections };
+  const getTimelines = async (): Promise<TimelinesResult> => {
+    const baseUrl = apiBaseUrl();
+    if (!baseUrl) return { source: "unavailable", reason: "not_configured" };
+
+    let payload: unknown;
+    try {
+      const response = await axios.get<unknown>(
+        `${baseUrl}/reference/timelines`,
+        {
+          params: { kinds: TIMELINE_KINDS.join(",") },
+          timeout: REQUEST_TIMEOUT_MS,
+        },
+      );
+      payload = response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status === undefined) {
+          return {
+            source: "unavailable",
+            reason: error.code === "ECONNABORTED" ? "timeout" : "network",
+          };
+        }
+        if (status >= 500) {
+          return { source: "unavailable", reason: `http_${status}` };
+        }
+      }
+      // An ordinary 4xx means this client sent something wrong: surface it.
+      throw error;
+    }
+    // Rates gate every calculation, so a broken payload falls back visibly
+    // instead of taking the whole app down.
+    return isRecord(payload) && isPublishedTimelines(payload.timelines)
+      ? { source: "api", timelines: payload.timelines }
+      : { source: "unavailable", reason: "invalid_response" };
+  };
+
+  return { getElections, getTimelines };
 };

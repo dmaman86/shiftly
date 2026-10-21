@@ -9,6 +9,8 @@ import type { IncomeTaxRulesResult } from "./income-tax/income-tax-pipeline.ts";
 import type { IncomeTaxResearchResponse } from "./income-tax/income-tax-research.ts";
 import type { PublishedElectionsReader } from "./reference-data/published-elections.ts";
 import { publishedElectionsRouter } from "./reference-data/published-elections-router.ts";
+import type { PublishedTimelinesReader } from "./reference-data/published-timelines.ts";
+import { publishedTimelinesRouter } from "./reference-data/published-timelines-router.ts";
 import { yearRulesRouter } from "./shared/rules-router.ts";
 import type { SocialSecurityRulesResult } from "./social-security/social-security-pipeline.ts";
 
@@ -18,6 +20,8 @@ export type AppDeps = {
   readonly readiness: ReadinessCheck;
   /** Public reference data: published elections only. */
   readonly publishedElections: PublishedElectionsReader;
+  /** Public reference data: published rate timelines only. */
+  readonly publishedTimelines: PublishedTimelinesReader;
   readonly auth: {
     readonly verifier: AuthVerifier;
     readonly roles: RoleRepository;
@@ -55,8 +59,13 @@ export function createApp(deps: AppDeps): express.Express {
       .json({ status: ready ? "ready" : "unavailable" });
   });
 
-  // Public: no token. Guests need election days as much as signed-in users.
-  app.use("/reference", publishedElectionsRouter(deps.publishedElections));
+  // Public: no token. Guests need election days and rates as much as
+  // signed-in users.
+  app.use(
+    "/reference",
+    publishedElectionsRouter(deps.publishedElections),
+    publishedTimelinesRouter(deps.publishedTimelines),
+  );
 
   const { verifier, roles } = deps.auth;
 

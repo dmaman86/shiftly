@@ -4,6 +4,8 @@ export { referenceService } from "./reference/reference.service";
 export type {
   ElectionsResult,
   PublishedElection,
+  PublishedTimelines,
+  TimelinesResult,
 } from "./reference/reference.service";
 export { analyticsService, gtagService } from "./analytics";
 export type { SalaryFeedback } from "./analytics";

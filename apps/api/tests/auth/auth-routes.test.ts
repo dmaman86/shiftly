@@ -30,6 +30,12 @@ async function start() {
     allowedOrigins: [],
     readiness: { isReady: async () => true },
     publishedElections: { electionsIn: async () => [] },
+    publishedTimelines: {
+      timelines: async () => ({
+        "per_diem.point_rate": [],
+        "meal_allowance.rates": [],
+      }),
+    },
     auth: { verifier, roles },
     extractIncomeTaxRules: pipeline,
     extractSocialSecurityRules: pipeline,

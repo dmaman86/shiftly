@@ -1,2 +1,3 @@
 export * from "./domain.types";
-export { domain } from "./domain.instance";
+export { createDomainContext, domain } from "./domain.instance";
+export type { ReferenceIssue } from "./referenceIssues";

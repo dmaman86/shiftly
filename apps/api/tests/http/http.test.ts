@@ -15,6 +15,12 @@ async function start(ready = true) {
     allowedOrigins: [WEB_ORIGIN],
     readiness: { isReady: async () => ready },
     publishedElections: { electionsIn: async () => [] },
+    publishedTimelines: {
+      timelines: async () => ({
+        "per_diem.point_rate": [],
+        "meal_allowance.rates": [],
+      }),
+    },
     auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
     extractIncomeTaxRules: unused as AppDeps["extractIncomeTaxRules"],
     extractSocialSecurityRules: unused as AppDeps["extractSocialSecurityRules"],

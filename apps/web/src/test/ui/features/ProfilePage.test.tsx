@@ -77,6 +77,7 @@ const snapshot = (month: number, baseRate = 40): ProfileMonthSnapshot => {
     month,
     baseRate,
     usesDefaultConfig: false,
+    referenceIssues: [],
     breakdown: monthToPayBreakdownVM(map, 0),
   };
 };

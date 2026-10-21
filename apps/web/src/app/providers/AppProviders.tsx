@@ -55,24 +55,23 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
         <ThemeProvider theme={theme}>
           <AppSnackbarProvider>
             <AuthProvider>
-              <DomainProvider>
-                <LocalizationProvider
-                  dateAdapter={AdapterDateFns}
-                  adapterLocale={language === "he" ? he : dateFnsEnUS}
-                  localeText={
-                    language === "he"
-                      ? heIL.components.MuiLocalizationProvider.defaultProps
-                          .localeText
-                      : pickerEnUS.components.MuiLocalizationProvider
-                          .defaultProps.localeText
-                  }
-                >
-                  <CssBaseline />
-                  <QueryClientProvider client={queryClient}>
-                    {children}
-                  </QueryClientProvider>
-                </LocalizationProvider>
-              </DomainProvider>
+              <LocalizationProvider
+                dateAdapter={AdapterDateFns}
+                adapterLocale={language === "he" ? he : dateFnsEnUS}
+                localeText={
+                  language === "he"
+                    ? heIL.components.MuiLocalizationProvider.defaultProps
+                        .localeText
+                    : pickerEnUS.components.MuiLocalizationProvider.defaultProps
+                        .localeText
+                }
+              >
+                <CssBaseline />
+                <QueryClientProvider client={queryClient}>
+                  {/* Inside the query client: the domain loads the published rates. */}
+                  <DomainProvider>{children}</DomainProvider>
+                </QueryClientProvider>
+              </LocalizationProvider>
             </AuthProvider>
           </AppSnackbarProvider>
         </ThemeProvider>

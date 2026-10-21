@@ -28,6 +28,7 @@ const createSnapshot = (): ProfileMonthSnapshot => {
     month: 8,
     baseRate: 40,
     usesDefaultConfig: false,
+    referenceIssues: [],
     breakdown: monthToPayBreakdownVM(map, 3),
   };
 };
