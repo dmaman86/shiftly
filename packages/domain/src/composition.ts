@@ -10,15 +10,23 @@ import { PayMapPipeline } from "./types/domain.types.js";
 import type { AdditionPolicy } from "./calculator/additions/addition.classifier.js";
 import { DateService, ShiftService } from "./services/index.js";
 import { WorkDayInfoResolver } from "./resolve/workdayinfo.resolver.js";
+import { BASELINE_REFERENCES } from "./reference/baseline.js";
+import type { ReferenceResolver } from "./reference/reference-resolver.js";
 
 export const buildPayMapPipeline = (
-  options: { additionPolicy?: AdditionPolicy } = {},
+  options: {
+    additionPolicy?: AdditionPolicy;
+    /** Rates and other timeline values; the embedded baseline by default. */
+    referenceResolver?: ReferenceResolver;
+  } = {},
 ): PayMapPipeline => {
   const dateService = new DateService();
   const services = { dateService, shiftService: new ShiftService(dateService) };
 
   const resolvers = { workDayInfoResolver: new WorkDayInfoResolver() };
-  const rateCalculators = buildRateCalculators();
+  const rateCalculators = buildRateCalculators(
+    options.referenceResolver ?? BASELINE_REFERENCES,
+  );
 
   const calculators = buildCalculators();
 

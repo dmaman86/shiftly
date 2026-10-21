@@ -1,32 +1,25 @@
 import type { PerDiemCalculator } from "../../types/services.js";
 import type { PerDiemShiftInfo } from "../../types/types.js";
+import { BASELINE_REFERENCES } from "../../reference/baseline.js";
+import {
+  requireMonthValue,
+  type ReferenceResolver,
+} from "../../reference/reference-resolver.js";
 
 const TIER_C_MIN_HOURS = 12;
 const TIER_B_MIN_HOURS = 8;
 const TIER_A_MIN_HOURS = 4;
 
+/** Owns the per-diem tier rules; the rate comes from the reference timelines. */
 export class TimelinePerDiemCalculator implements PerDiemCalculator {
-  private readonly timeline = [
-    // Provisional historical dates: verify against the authoritative source.
-    { year: 2015, month: 11, rateA: 29.5 },
-    { year: 2021, month: 1, rateA: 31.6 },
-    // Verified effective dates.
-    { year: 2022, month: 10, rateA: 33.9 },
-    { year: 2024, month: 9, rateA: 36.3 },
-  ];
+  private readonly references: ReferenceResolver;
+
+  constructor(references: ReferenceResolver = BASELINE_REFERENCES) {
+    this.references = references;
+  }
 
   calculateRate(params: { year: number; month: number }): number {
-    const { year, month } = params;
-    const applicable = this.timeline
-      .filter(
-        (entry) =>
-          entry.year < year || (entry.year === year && entry.month <= month),
-      )
-      .sort((a, b) =>
-        a.year !== b.year ? b.year - a.year : b.month - a.month,
-      );
-
-    return applicable[0]?.rateA ?? 0;
+    return requireMonthValue(this.references, "perDiemPointRate", params);
   }
 
   calculateDay(params: { shifts: PerDiemShiftInfo[]; rate: number }) {

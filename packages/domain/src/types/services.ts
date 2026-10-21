@@ -85,6 +85,10 @@ export interface MealAllowanceCalculator {
 }
 
 export interface PerDiemCalculator {
+  /**
+   * Amount of one per-diem point for the month. Throws
+   * ReferenceValueUnavailableError when no rate applies (never zero).
+   */
   calculateRate(params: { year: number; month: number }): number;
   calculateDay(params: {
     shifts: PerDiemShiftInfo[];
