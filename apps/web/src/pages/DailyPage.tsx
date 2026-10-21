@@ -26,6 +26,7 @@ import { DomainContextType } from "@/app";
 import { CalculationHelpLinks } from "@/features/calculation-rules/CalculationHelpLinks";
 import { FeatureBoundary } from "@/layout";
 import { ShabbatCreditSyncAlert } from "@/features/monthly-pay/ShabbatCreditSyncAlert";
+import { ElectionDataNotice } from "@/features/calendar/ElectionDataNotice";
 
 export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
   const { t } = useTranslation("work-table");
@@ -33,6 +34,9 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
     workDays,
     isLoading: loading,
     error: queryError,
+    electionData,
+    retryElectionData,
+    isRetryingElectionData,
   } = useWorkDays(domain);
   const error = queryError?.message;
 
@@ -81,6 +85,12 @@ export const DailyPage = ({ domain }: { domain: DomainContextType }) => {
           <CardContent>
             <Stack spacing={3}>
               <ConfigPanel domain={domain} mode={"daily"} />
+
+              <ElectionDataNotice
+                state={electionData}
+                retry={retryElectionData}
+                retrying={isRetryingElectionData}
+              />
 
               <MonthlyContentBoundary loading={loading} minHeight={600}>
                 {error ? (

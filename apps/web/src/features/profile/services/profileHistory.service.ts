@@ -1,7 +1,7 @@
 import type { DomainContextType } from "@/app";
 import type { WorkDayInfo } from "@/app/types";
 import { monthlyConfigService, shiftService, workDayService } from "@/services";
-import { loadCalendarEventMap } from "@/hooks/useWorkDays";
+import { loadMonthCalendar } from "@/hooks/useWorkDays";
 import {
   calculateProfileMonth,
   type ProfileMonthSnapshot,
@@ -19,14 +19,7 @@ export const loadProfileHistory = async (
   domain: DomainContextType,
   loadWorkDays: (period: ProfileMonth) => Promise<WorkDayInfo[]> = async (
     period,
-  ) => {
-    const range = domain.services.dateService.getDatesRange(
-      period.year,
-      period.month,
-    );
-    const eventMap = await loadCalendarEventMap(range.startDate, range.endDate);
-    return domain.payMap.workDaysMonthBuilder.build({ ...period, eventMap });
-  },
+  ) => (await loadMonthCalendar(domain, period.year, period.month)).workDays,
   signal?: AbortSignal,
 ): Promise<ProfileMonthSnapshot[]> => {
   signal?.throwIfAborted();

@@ -1,0 +1,13 @@
+{
+  "description": "Deterministic stand-in for GET /reference/elections: what the public API published when this fixture was frozen. Tests never reach the real API.",
+  "frozenAt": "2026-10-21",
+  "elections": [
+    { "knessetNumber": 20, "date": "2015-03-17", "status": "occurred" },
+    { "knessetNumber": 21, "date": "2019-04-09", "status": "occurred" },
+    { "knessetNumber": 22, "date": "2019-09-17", "status": "occurred" },
+    { "knessetNumber": 23, "date": "2020-03-02", "status": "occurred" },
+    { "knessetNumber": 24, "date": "2021-03-23", "status": "occurred" },
+    { "knessetNumber": 25, "date": "2022-11-01", "status": "occurred" },
+    { "knessetNumber": 26, "date": "2026-10-27", "status": "planned" }
+  ]
+}

@@ -9,6 +9,7 @@ import {
   type ProfileMonth,
 } from "../helpers/profileRange";
 import { useProfileHistory } from "../hooks/useProfileHistory";
+import { ElectionDataNotice } from "@/features/calendar/ElectionDataNotice";
 import { ProfileBarChart, type ProfileChartRow } from "./ProfileBarChart";
 import { ProfileRangeSelector } from "./ProfileRangeSelector";
 
@@ -87,6 +88,11 @@ export const ProfileHistory = ({ now }: { now: ProfileMonth }) => {
         </Alert>
       ) : (
         <Stack spacing={3}>
+          <ElectionDataNotice
+            state={history.electionData}
+            retry={() => void history.refetch()}
+            retrying={history.isRefetching}
+          />
           {!hasRecords && <Alert severity="info">{t("empty_history")}</Alert>}
           {months.some(({ snapshot }) => snapshot.usesDefaultConfig) && (
             <Alert severity="warning">{t("default_config")}</Alert>

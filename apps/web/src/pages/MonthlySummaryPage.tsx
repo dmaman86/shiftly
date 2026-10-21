@@ -29,6 +29,7 @@ import { useAuth, useGlobalState, useWorkDays } from "@/hooks";
 import { FeatureBoundary } from "@/layout";
 import { CalculationHelpLinks } from "@/features/calculation-rules/CalculationHelpLinks";
 import { ShabbatCreditSyncAlert } from "@/features/monthly-pay/ShabbatCreditSyncAlert";
+import { ElectionDataNotice } from "@/features/calendar/ElectionDataNotice";
 
 export const MonthlySummaryPage = ({
   domain,
@@ -36,7 +37,14 @@ export const MonthlySummaryPage = ({
   domain: DomainContextType;
 }) => {
   const { t } = useTranslation("pages");
-  const { workDays, isLoading, error } = useWorkDays(domain);
+  const {
+    workDays,
+    isLoading,
+    error,
+    electionData,
+    retryElectionData,
+    isRetryingElectionData,
+  } = useWorkDays(domain);
 
   return (
     <Box component="section" sx={{ mt: 2 }}>
@@ -79,6 +87,12 @@ export const MonthlySummaryPage = ({
           <CardContent>
             <Stack spacing={3}>
               <ConfigPanel domain={domain} mode={"monthly"} />
+
+              <ElectionDataNotice
+                state={electionData}
+                retry={retryElectionData}
+                retrying={isRetryingElectionData}
+              />
 
               <MonthlyContentBoundary loading={isLoading} minHeight={300}>
                 {error ? (

@@ -93,20 +93,13 @@ test("retains accessible shift context in the mobile layout", async ({
 test("renders audited text colors above the normal-text contrast threshold", async ({
   page,
 }) => {
-  await prepareApp(page, {
-    holidays: [
-      { date: "2026-09-11", title: "Erev Rosh Hashana", category: "holiday" },
-      {
-        date: "2026-09-12",
-        title: "Rosh Hashana I",
-        category: "holiday",
-        yomtov: true,
-      },
-    ],
-  });
+  await prepareApp(page);
   await page.goto("en/daily");
   await page.locator('input[name="baseRate"]').fill("50");
-  await expect(page.locator(".MuiChip-label")).toHaveCount(2);
+  // September 2026 (the fixed "today") has both chip kinds: Erev Rosh
+  // Hashana, Rosh Hashana I-II, Erev Yom Kippur, Yom Kippur, Erev Sukkot and
+  // Sukkot, computed in the browser.
+  await expect(page.locator(".MuiChip-label")).toHaveCount(7);
   await expect(page.getByTestId("monthly-salary-total")).toBeVisible();
   const contrasts = await page.evaluate(() => {
     type Color = [number, number, number, number];
