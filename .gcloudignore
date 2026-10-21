@@ -1,0 +1,21 @@
+# Allowlist for `gcloud builds submit`: only what apps/api/Dockerfile needs is
+# uploaded. A directory must be re-included before files inside it.
+/*
+!/.dockerignore
+!/package.json
+!/bun.lock
+!/apps/
+/apps/*
+!/apps/api/
+/apps/api/*
+!/apps/api/Dockerfile
+!/apps/api/package.json
+!/apps/api/src/
+!/apps/web/
+/apps/web/*
+!/apps/web/package.json
+!/packages/
+/packages/*
+!/packages/domain/
+/packages/domain/*
+!/packages/domain/package.json
