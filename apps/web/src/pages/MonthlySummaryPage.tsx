@@ -30,6 +30,8 @@ import { FeatureBoundary } from "@/layout";
 import { CalculationHelpLinks } from "@/features/calculation-rules/CalculationHelpLinks";
 import { ShabbatCreditSyncAlert } from "@/features/monthly-pay/ShabbatCreditSyncAlert";
 import { ElectionDataNotice } from "@/features/calendar/ElectionDataNotice";
+import { ReferenceDataNotice } from "@/features/reference/ReferenceDataNotice";
+import { ReferenceIssueNotice } from "@/features/reference/ReferenceIssueNotice";
 
 export const MonthlySummaryPage = ({
   domain,
@@ -45,6 +47,9 @@ export const MonthlySummaryPage = ({
     retryElectionData,
     isRetryingElectionData,
   } = useWorkDays(domain);
+  const { year, month } = useGlobalState();
+  // A month whose rates are unavailable is not calculated at all.
+  const referenceIssues = domain.references.monthIssues(year, month);
 
   return (
     <Box component="section" sx={{ mt: 2 }}>
@@ -94,13 +99,22 @@ export const MonthlySummaryPage = ({
                 retrying={isRetryingElectionData}
               />
 
-              <MonthlyContentBoundary loading={isLoading} minHeight={300}>
-                {error ? (
-                  <Alert severity="error">{error.message}</Alert>
-                ) : (
-                  <MonthlySummaryContent domain={domain} workDays={workDays} />
-                )}
-              </MonthlyContentBoundary>
+              <ReferenceDataNotice />
+
+              {referenceIssues.length > 0 ? (
+                <ReferenceIssueNotice issues={referenceIssues} />
+              ) : (
+                <MonthlyContentBoundary loading={isLoading} minHeight={300}>
+                  {error ? (
+                    <Alert severity="error">{error.message}</Alert>
+                  ) : (
+                    <MonthlySummaryContent
+                      domain={domain}
+                      workDays={workDays}
+                    />
+                  )}
+                </MonthlyContentBoundary>
+              )}
             </Stack>
           </CardContent>
         </Card>

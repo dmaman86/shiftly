@@ -29,6 +29,7 @@ export const useProfileHistory = (range: ProfileRange) => {
         queryKey: [
           "profileHistory",
           userId,
+          domain.references.version,
           range.from.year,
           range.from.month,
           range.to.year,
@@ -38,6 +39,7 @@ export const useProfileHistory = (range: ProfileRange) => {
       });
     }
   }, [
+    domain.references.version,
     range.from.month,
     range.from.year,
     range.to.month,
@@ -51,6 +53,7 @@ export const useProfileHistory = (range: ProfileRange) => {
     queryKey: [
       "profileHistory",
       userId,
+      domain.references.version,
       range.from.year,
       range.from.month,
       range.to.year,

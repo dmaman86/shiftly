@@ -1,0 +1,18 @@
+{
+  "description": "Frozen published rate timelines for E2E. Equal to the embedded baseline, so golden scenarios keep their amounts; tests never reach the real API.",
+  "frozenAt": "2026-10-21",
+  "timelines": {
+    "per_diem.point_rate": [
+      { "validFrom": "2015-11-01", "validTo": "2021-01-01", "value": { "amount": 29.5 } },
+      { "validFrom": "2021-01-01", "validTo": "2022-10-01", "value": { "amount": 31.6 } },
+      { "validFrom": "2022-10-01", "validTo": "2024-09-01", "value": { "amount": 33.9 } },
+      { "validFrom": "2024-09-01", "validTo": null, "value": { "amount": 36.3 } }
+    ],
+    "meal_allowance.rates": [
+      { "validFrom": "2015-11-01", "validTo": "2021-07-01", "value": { "small": 11.8, "large": 17.1 } },
+      { "validFrom": "2021-07-01", "validTo": "2022-10-01", "value": { "small": 12.6, "large": 18.3 } },
+      { "validFrom": "2022-10-01", "validTo": "2024-09-01", "value": { "small": 13.5, "large": 19.7 } },
+      { "validFrom": "2024-09-01", "validTo": null, "value": { "small": 14.5, "large": 21.1 } }
+    ]
+  }
+}

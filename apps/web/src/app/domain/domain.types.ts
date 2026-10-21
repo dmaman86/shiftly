@@ -13,6 +13,7 @@ import {
 } from "@shiftly/domain";
 import type { MonthResolver } from "../months/month.types";
 import type { DayInfoPresenter } from "./workdayinfo.presenter";
+import type { ReferenceIssue } from "./referenceIssues";
 
 export type DomainContextType = {
   payMap: {
@@ -34,6 +35,13 @@ export type DomainContextType = {
   services: {
     dateService: DateService;
     shiftService: ShiftService;
+  };
+  /** The rates this domain calculates with. */
+  references: {
+    /** Changes only when the rate values do; part of cached calculation keys. */
+    version: string;
+    /** Rates the month needs that are unavailable; empty when it can be calculated. */
+    monthIssues: (year: number, month: number) => ReferenceIssue[];
   };
 };
 

@@ -158,9 +158,11 @@ jobs:
 
   deploy:
     name: Deploy to GitHub Pages
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: [checks, e2e]
+    # After the API is live and answering /health and /ready: a new web app
+    # must never call an API that does not have its endpoints yet.
+    needs: [checks, e2e, deploy-api]
 
     concurrency:
       group: pages
@@ -198,7 +200,7 @@ jobs:
     name: Deploy API to Cloud Run
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: [checks]
+    needs: [checks, e2e]
 
     concurrency:
       group: api-deploy

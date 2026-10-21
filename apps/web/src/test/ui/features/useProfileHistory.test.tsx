@@ -28,6 +28,7 @@ const snapshot: ProfileMonthSnapshot = {
   breakdown: null,
   baseRate: 0,
   usesDefaultConfig: false,
+  referenceIssues: [],
 };
 const harness = (ready = true) => {
   const client = new QueryClient({

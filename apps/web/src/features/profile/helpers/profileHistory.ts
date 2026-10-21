@@ -1,5 +1,5 @@
 import { allocateShabbatCredit } from "@shiftly/domain";
-import type { DomainContextType } from "@/app";
+import type { DomainContextType, ReferenceIssue } from "@/app";
 import type { PayBreakdownViewModel, WorkDayInfo } from "@/app/types";
 import { monthToPayBreakdownVM } from "@/adapters";
 import type { MonthlyConfigRecord } from "@/services/monthlyConfig/monthlyConfig.service";
@@ -14,9 +14,12 @@ import type { ProfileMonth } from "./profileRange";
 export type { ProfileMonth, ProfileRange } from "./profileRange";
 export { getProfileMonths } from "./profileRange";
 export type ProfileMonthSnapshot = ProfileMonth & {
+  /** null without records, or when a rate the month needs is unavailable. */
   breakdown: PayBreakdownViewModel | null;
   baseRate: number;
   usesDefaultConfig: boolean;
+  /** Rates the month needs that are unavailable; it is then not calculated. */
+  referenceIssues: ReferenceIssue[];
 };
 
 export const calculateProfileMonth = ({
@@ -42,7 +45,26 @@ export const calculateProfileMonth = ({
   const hasRecords =
     days.length > 0 || shifts.length > 0 || carriedOverHours > 0;
   if (!hasRecords) {
-    return { ...period, breakdown: null, baseRate, usesDefaultConfig: false };
+    return {
+      ...period,
+      breakdown: null,
+      baseRate,
+      usesDefaultConfig: false,
+      referenceIssues: [],
+    };
+  }
+  const referenceIssues = domain.references.monthIssues(
+    period.year,
+    period.month,
+  );
+  if (referenceIssues.length > 0) {
+    return {
+      ...period,
+      breakdown: null,
+      baseRate,
+      usesDefaultConfig: config === null,
+      referenceIssues,
+    };
   }
 
   const state = recordsToWorkTableDayState({
@@ -76,5 +98,6 @@ export const calculateProfileMonth = ({
     baseRate,
     usesDefaultConfig: config === null,
     breakdown: monthToPayBreakdownVM(monthPayMap, allocation.usedHours),
+    referenceIssues: [],
   };
 };

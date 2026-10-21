@@ -163,5 +163,19 @@
   "election_data": {
     "stale": "Election days are based on data saved on {{date}} because the server could not be reached. A recently announced or rescheduled election may be missing.",
     "missing": "Election days could not be loaded. Holidays are shown correctly, but the election-day premium may be missing until the data loads."
+  },
+  "reference_data": {
+    "stale": "Rates (per diem, meal allowance) are based on data saved on {{date}} because the server could not be reached. A recently published rate may be missing.",
+    "baseline": "Rates (per diem, meal allowance) could not be loaded, so the rates included in the app are used. A recently published rate may be missing.",
+    "error": "Rates (per diem, meal allowance) could not be loaded because of a request error. The rates included in the app are used."
+  },
+  "reference_issue": {
+    "message": "This month is not calculated because a rate it needs is unavailable: {{rates}}.",
+    "out_of_range": "The calculator supports months from November 2015.",
+    "not_covered": "No published rate covers this month yet.",
+    "keys": {
+      "perDiemPointRate": "per diem",
+      "mealAllowanceRates": "meal allowance"
+    }
   }
 }

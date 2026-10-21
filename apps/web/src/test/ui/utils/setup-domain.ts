@@ -30,6 +30,7 @@ vi.mock("@/app", () => ({
       dateService: pipelineInstance.services.dateService,
       shiftService: pipelineInstance.services.shiftService,
     },
+    references: { version: "baseline", monthIssues: () => [] },
   },
 }));
 
