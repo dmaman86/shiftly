@@ -1,25 +1,32 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { TimelineMealAllowanceCalculator } from "../../../src/calculator/mealallowance/timeline-meal-allowance.calculator.js";
-import type { MealAllowanceRates } from "../../../src/types/types.js";
+import { ReferenceValueUnavailableError } from "../../../src/reference/reference-resolver.js";
 
 describe("TimelineMealAllowanceCalculator rates", () => {
   let calculator: TimelineMealAllowanceCalculator;
-
-  const ratesBeforeTimeline: MealAllowanceRates = { small: 0, large: 0 };
 
   beforeEach(() => {
     calculator = new TimelineMealAllowanceCalculator();
   });
 
   describe("timeline boundaries", () => {
-    it("returns zero before the supported timeline", () => {
-      expect(calculator.calculateRates({ year: 1999, month: 12 })).toEqual(
-        ratesBeforeTimeline,
+    it("refuses months before the supported period instead of returning zero", () => {
+      expect(() =>
+        calculator.calculateRates({ year: 2015, month: 10 }),
+      ).toThrow(
+        new ReferenceValueUnavailableError(
+          "mealAllowanceRates",
+          "2015-10-01",
+          "out_of_range",
+        ),
       );
+      expect(() =>
+        calculator.calculateRates({ year: 1999, month: 12 }),
+      ).toThrow(ReferenceValueUnavailableError);
     });
 
     it("uses the provisional baseline rates before July 2021", () => {
-      expect(calculator.calculateRates({ year: 2000, month: 1 })).toEqual({
+      expect(calculator.calculateRates({ year: 2015, month: 11 })).toEqual({
         small: 11.8,
         large: 17.1,
       });

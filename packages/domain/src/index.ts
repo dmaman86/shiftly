@@ -39,7 +39,27 @@ export type {
 } from "./types/services.js";
 export type { HolidayKey } from "./constants/fields.constant.js";
 export { WorkDayStatus, WorkDayType } from "./constants/fields.constant.js";
-export { SYSTEM_START_YEAR } from "./constants/system.constant.js";
+export {
+  SYSTEM_START_DATE,
+  SYSTEM_START_YEAR,
+} from "./constants/system.constant.js";
+export type {
+  TimelineEntry,
+  TimelineResolution,
+  TimelineUnavailableReason,
+} from "./reference/timeline.js";
+export { InvalidTimelineError } from "./reference/timeline.js";
+export type {
+  ReferenceKey,
+  ReferenceResolver,
+  ReferenceTimelines,
+  ReferenceValue,
+} from "./reference/reference-resolver.js";
+export {
+  createReferenceResolver,
+  ReferenceValueUnavailableError,
+} from "./reference/reference-resolver.js";
+export { BASELINE_REFERENCE_TIMELINES } from "./reference/baseline.js";
 export { ExtraCalculator } from "./calculator/extra/extra.calculator.js";
 export { TimelineMealAllowanceCalculator } from "./calculator/mealallowance/timeline-meal-allowance.calculator.js";
 export { TimelinePerDiemCalculator } from "./calculator/perdiem/timeline-per-diem.calculator.js";

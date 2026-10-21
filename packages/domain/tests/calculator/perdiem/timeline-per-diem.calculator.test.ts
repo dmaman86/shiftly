@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { TimelinePerDiemCalculator } from "../../../src/calculator/perdiem/timeline-per-diem.calculator.js";
+import { ReferenceValueUnavailableError } from "../../../src/reference/reference-resolver.js";
 
 describe("TimelinePerDiemCalculator rates", () => {
   let calculator: TimelinePerDiemCalculator;
@@ -9,9 +10,17 @@ describe("TimelinePerDiemCalculator rates", () => {
   });
 
   describe("timeline boundaries", () => {
-    it("returns zero before the supported November 2015 period", () => {
-      expect(calculator.calculateRate({ year: 2015, month: 10 })).toBe(0);
-      expect(calculator.calculateRate({ year: 2014, month: 12 })).toBe(0);
+    it("refuses months before the supported November 2015 period instead of returning zero", () => {
+      expect(() => calculator.calculateRate({ year: 2015, month: 10 })).toThrow(
+        new ReferenceValueUnavailableError(
+          "perDiemPointRate",
+          "2015-10-01",
+          "out_of_range",
+        ),
+      );
+      expect(() => calculator.calculateRate({ year: 2014, month: 12 })).toThrow(
+        ReferenceValueUnavailableError,
+      );
     });
 
     it("uses the provisional 29.50 rate from November 2015", () => {

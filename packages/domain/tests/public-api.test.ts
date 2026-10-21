@@ -7,6 +7,13 @@ describe("domain public API", () => {
     expect(domain.allocateShabbatCredit).toBeTypeOf("function");
     expect(domain.DateService).toBeTypeOf("function");
   });
+  it("exposes timeline reference resolution and the embedded baseline", () => {
+    expect(domain.createReferenceResolver).toBeTypeOf("function");
+    expect(domain.ReferenceValueUnavailableError).toBeTypeOf("function");
+    expect(domain.InvalidTimelineError).toBeTypeOf("function");
+    expect(domain.BASELINE_REFERENCE_TIMELINES).toBeTypeOf("object");
+    expect(domain.SYSTEM_START_DATE).toBe("2015-11-01");
+  });
   it("does not expose implementation-only pipelines or removed symbols", () => {
     for (const name of [
       "Mode",
@@ -15,6 +22,8 @@ describe("domain public API", () => {
       "DefaultShiftMapBuilder",
       "buildCoreServices",
       "buildResolvers",
+      "MonthlyTimeline",
+      "requireMonthValue",
     ])
       expect(domain).not.toHaveProperty(name);
   });

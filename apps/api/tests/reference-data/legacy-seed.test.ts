@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
+  SYSTEM_START_DATE,
   TimelineMealAllowanceCalculator,
   TimelinePerDiemCalculator,
 } from "@shiftly/domain";
@@ -35,14 +36,19 @@ function seededOn(kind: ReferenceKind, date: string): unknown {
   return covering[0]?.value;
 }
 
-function* monthsBetween(fromYear: number, toYear: number) {
-  for (let year = fromYear; year <= toYear; year++) {
+/**
+ * Every month the domain calculates, up to toYear. The calculators refuse
+ * months before SYSTEM_START_DATE, so the seed is compared from there on.
+ */
+function* supportedMonthsUntil(toYear: number) {
+  for (
+    let year = Number(SYSTEM_START_DATE.slice(0, 4));
+    year <= toYear;
+    year++
+  ) {
     for (let month = 1; month <= 12; month++) {
-      yield {
-        year,
-        month,
-        date: `${year}-${String(month).padStart(2, "0")}-01`,
-      };
+      const date = `${year}-${String(month).padStart(2, "0")}-01`;
+      if (date >= SYSTEM_START_DATE) yield { year, month, date };
     }
   }
 }
@@ -50,19 +56,19 @@ function* monthsBetween(fromYear: number, toYear: number) {
 describe("legacySeedCandidates", () => {
   it("matches the per diem timeline every month", () => {
     const calculator = new TimelinePerDiemCalculator();
-    for (const { year, month, date } of monthsBetween(2000, 2030)) {
+    for (const { year, month, date } of supportedMonthsUntil(2030)) {
       const rate = calculator.calculateRate({ year, month });
-      const seeded = seededOn("per_diem.point_rate", date);
-      expect(seeded, date).toEqual(rate === 0 ? undefined : { amount: rate });
+      expect(seededOn("per_diem.point_rate", date), date).toEqual({
+        amount: rate,
+      });
     }
   });
 
   it("matches the meal allowance timeline every month", () => {
     const calculator = new TimelineMealAllowanceCalculator();
-    for (const { year, month, date } of monthsBetween(1999, 2030)) {
+    for (const { year, month, date } of supportedMonthsUntil(2030)) {
       const rates = calculator.calculateRates({ year, month });
-      const seeded = seededOn("meal_allowance.rates", date);
-      expect(seeded, date).toEqual(rates.large === 0 ? undefined : rates);
+      expect(seededOn("meal_allowance.rates", date), date).toEqual(rates);
     }
   });
 
