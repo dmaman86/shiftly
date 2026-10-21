@@ -10,6 +10,8 @@
     "dev": "node --watch src/server.ts",
     "start": "node src/server.ts",
     "seed:reference-data": "node src/seed-reference-data.ts",
+    "election:record": "node src/record-election.ts",
+    "election:activate": "node src/activate-election.ts",
     "typecheck": "tsc -p tsconfig.json --pretty false",
     "test": "vitest run --config ../../vitest.config.ts --project api"
   },
