@@ -5,6 +5,8 @@ import {
   type CurrentRevision,
   type NewCandidate,
   type ReferenceKind,
+  type RevisionAdministration,
+  type RevisionDetails,
   type RevisionRepository,
   type RevisionTrust,
 } from "./ports.ts";
@@ -19,6 +21,21 @@ type RevisionRow = {
   trust: RevisionTrust;
 };
 
+type RevisionDetailsRow = RevisionRow & {
+  status: RevisionDetails["status"];
+  origin: RevisionDetails["origin"];
+};
+
+const toActiveRevision = (row: RevisionRow): ActiveRevision => ({
+  id: row.id,
+  kind: row.kind,
+  subjectKey: row.subject_key,
+  validFrom: row.valid_from,
+  validTo: row.valid_to,
+  value: row.value,
+  trust: row.trust,
+});
+
 type CurrentRevisionRow = {
   id: string;
   subject_key: string | null;
@@ -32,7 +49,9 @@ type CurrentRevisionRow = {
  * with no policies, so this key is the only way in; it must never reach a
  * browser bundle.
  */
-export class SupabaseRevisionRepository implements RevisionRepository {
+export class SupabaseRevisionRepository
+  implements RevisionRepository, RevisionAdministration
+{
   private readonly client: SupabaseClient;
 
   constructor(options: {
@@ -101,17 +120,7 @@ export class SupabaseRevisionRepository implements RevisionRepository {
         `reading the active ${kind} failed: ${error.message}`,
       );
     }
-    return data
-      ? {
-          id: data.id,
-          kind: data.kind,
-          subjectKey: data.subject_key,
-          validFrom: data.valid_from,
-          validTo: data.valid_to,
-          value: data.value,
-          trust: data.trust,
-        }
-      : null;
+    return data ? toActiveRevision(data) : null;
   }
 
   async findStartingIn(
@@ -140,5 +149,58 @@ export class SupabaseRevisionRepository implements RevisionRepository {
       validFrom: row.valid_from,
       trust: row.trust,
     }));
+  }
+
+  async findActiveSubject(
+    kind: ReferenceKind,
+    subjectKey: string,
+  ): Promise<ActiveRevision | null> {
+    const { data, error } = await this.client
+      .from("reference_revisions")
+      .select("id, kind, subject_key, valid_from, valid_to, value, trust")
+      .eq("kind", kind)
+      .eq("subject_key", subjectKey)
+      .eq("status", "active")
+      .maybeSingle<RevisionRow>();
+    if (error) {
+      throw new ReferenceDataPersistenceError(
+        `reading the active ${subjectKey} failed: ${error.message}`,
+      );
+    }
+    return data ? toActiveRevision(data) : null;
+  }
+
+  async findRevision(id: string): Promise<RevisionDetails | null> {
+    const { data, error } = await this.client
+      .from("reference_revisions")
+      .select(
+        "id, kind, subject_key, status, valid_from, valid_to, value, origin, trust",
+      )
+      .eq("id", id)
+      .maybeSingle<RevisionDetailsRow>();
+    if (error) {
+      throw new ReferenceDataPersistenceError(
+        `reading revision ${id} failed: ${error.message}`,
+      );
+    }
+    return data
+      ? {
+          ...toActiveRevision(data),
+          status: data.status,
+          origin: data.origin,
+        }
+      : null;
+  }
+
+  async activate(id: string, reviewer: string): Promise<void> {
+    const { error } = await this.client.rpc("activate_reference_revision", {
+      p_revision_id: id,
+      p_reviewer: reviewer,
+    });
+    if (error) {
+      throw new ReferenceDataPersistenceError(
+        `activate_reference_revision failed: ${error.message}`,
+      );
+    }
   }
 }

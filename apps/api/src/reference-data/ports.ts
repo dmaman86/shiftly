@@ -132,6 +132,37 @@ export interface RevisionRepository {
   ): Promise<CurrentRevision[]>;
 }
 
+/** A stored revision as an administrator reviews it. */
+export type RevisionDetails = {
+  readonly id: string;
+  readonly kind: ReferenceKind;
+  readonly subjectKey: string | null;
+  readonly status: "pending_review" | "active" | "superseded" | "rejected";
+  readonly validFrom: string;
+  readonly validTo: string | null;
+  readonly value: unknown;
+  readonly origin: NewCandidate["origin"];
+  readonly trust: RevisionTrust;
+};
+
+/**
+ * Review operations for administrator commands. Kept apart from
+ * RevisionRepository: research stores candidates, only a person activates them.
+ */
+export interface RevisionAdministration {
+  /** The active revision of one subject (e.g. "knesset:26"), whatever its period. */
+  findActiveSubject(
+    kind: ReferenceKind,
+    subjectKey: string,
+  ): Promise<ActiveRevision | null>;
+  findRevision(id: string): Promise<RevisionDetails | null>;
+  /**
+   * Makes a pending revision active and supersedes what it replaces, in one
+   * transaction (activate_reference_revision). The reviewer is recorded.
+   */
+  activate(id: string, reviewer: string): Promise<void>;
+}
+
 /** The store rejected or could not complete a request. */
 export class ReferenceDataPersistenceError extends Error {
   constructor(message: string) {

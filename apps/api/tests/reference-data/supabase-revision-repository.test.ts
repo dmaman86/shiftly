@@ -201,4 +201,92 @@ describe("SupabaseRevisionRepository", () => {
       p_valid_to: "2026-10-28",
     });
   });
+
+  describe("administration", () => {
+    const ROW_26 = {
+      id: "rev-26",
+      kind: "calendar.knesset_election",
+      subject_key: "knesset:26",
+      valid_from: "2026-10-27",
+      valid_to: "2026-10-28",
+      value: { knessetNumber: 26, electionStatus: "planned" },
+      trust: "legacy_seed",
+    };
+
+    it("reads the active revision of a subject, whatever its period", async () => {
+      const { repository, request } = repositoryWith(json([ROW_26]));
+
+      expect(
+        await repository.findActiveSubject(
+          "calendar.knesset_election",
+          "knesset:26",
+        ),
+      ).toMatchObject({ id: "rev-26", subjectKey: "knesset:26" });
+      const { url } = request();
+      expect(url.searchParams.get("kind")).toBe("eq.calendar.knesset_election");
+      expect(url.searchParams.get("subject_key")).toBe("eq.knesset:26");
+      expect(url.searchParams.get("status")).toBe("eq.active");
+      expect(url.searchParams.has("valid_from")).toBe(false);
+    });
+
+    it("reads one revision with its status and origin", async () => {
+      const { repository, request } = repositoryWith(
+        json([{ ...ROW_26, status: "pending_review", origin: "manual" }]),
+      );
+
+      expect(await repository.findRevision("rev-26")).toEqual({
+        id: "rev-26",
+        kind: "calendar.knesset_election",
+        subjectKey: "knesset:26",
+        status: "pending_review",
+        validFrom: "2026-10-27",
+        validTo: "2026-10-28",
+        value: { knessetNumber: 26, electionStatus: "planned" },
+        origin: "manual",
+        trust: "legacy_seed",
+      });
+      expect(request().url.searchParams.get("id")).toBe("eq.rev-26");
+    });
+
+    it("returns null for an unknown revision", async () => {
+      const { repository } = repositoryWith(json([]));
+      expect(await repository.findRevision("rev-unknown")).toBeNull();
+    });
+
+    it("activates through the atomic RPC, recording the reviewer", async () => {
+      const { repository, request } = repositoryWith(
+        new Response(null, { status: 204 }),
+      );
+
+      await repository.activate("rev-26", "reviewer");
+
+      const sent = request();
+      expect(sent.url.pathname).toBe(
+        "/rest/v1/rpc/activate_reference_revision",
+      );
+      expect(sent.headers.get("apikey")).toBe(SECRET);
+      expect(sent.body).toEqual({
+        p_revision_id: "rev-26",
+        p_reviewer: "reviewer",
+      });
+    });
+
+    it("turns a refused activation into a persistence error", async () => {
+      const { repository } = repositoryWith(
+        json(
+          {
+            code: "P0001",
+            message: "reference revision rev-26 is active, not pending_review",
+          },
+          400,
+        ),
+      );
+
+      await expect(repository.activate("rev-26", "reviewer")).rejects.toThrow(
+        new ReferenceDataPersistenceError(
+          "activate_reference_revision failed: reference revision rev-26 is active, not pending_review",
+        ),
+      );
+    });
+  });
 });
