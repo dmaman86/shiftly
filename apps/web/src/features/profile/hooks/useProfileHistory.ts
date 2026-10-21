@@ -1,7 +1,13 @@
 import { useEffect } from "react";
 import { useIsMutating, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth, useDomain } from "@/hooks";
-import { loadCalendarEventMap } from "@/hooks/useWorkDays";
+import {
+  combineElectionData,
+  loadMonthCalendar,
+  monthCalendarQueryKey,
+  type ElectionDataState,
+  type MonthCalendar,
+} from "@/hooks/useWorkDays";
 import { loadProfileHistory } from "../services/profileHistory.service";
 import type { ProfileRange } from "../helpers/profileRange";
 import { useGuestDraftImportGate } from "@/features/guest-draft/guestDraftImportContext";
@@ -59,33 +65,33 @@ export const useProfileHistory = (range: ProfileRange) => {
     refetchOnWindowFocus: false,
     queryFn: async ({ signal }) => {
       if (!userId) throw new Error("An authenticated user is required");
-      return loadProfileHistory(
+      const electionStates: ElectionDataState[] = [];
+      const snapshots = await loadProfileHistory(
         userId,
         range,
         domain,
-        (period) =>
-          queryClient.query({
-            queryKey: ["workDays", period.year, period.month],
-            staleTime: Infinity,
-            queryFn: async () => {
-              const range = domain.services.dateService.getDatesRange(
-                period.year,
-                period.month,
-              );
-              const eventMap = await loadCalendarEventMap(
-                range.startDate,
-                range.endDate,
-              );
-              return domain.payMap.workDaysMonthBuilder.build({
-                ...period,
-                eventMap,
-              });
-            },
-          }),
+        async (period) => {
+          const calendar = await queryClient.query<MonthCalendar>({
+            queryKey: monthCalendarQueryKey(period.year, period.month),
+            queryFn: () => loadMonthCalendar(domain, period.year, period.month),
+            staleTime: (current) =>
+              current.state.data?.electionData.status === "fresh"
+                ? Infinity
+                : 0,
+          });
+          electionStates.push(calendar.electionData);
+          return calendar.workDays;
+        },
         signal,
       );
+      return { snapshots, electionData: combineElectionData(electionStates) };
     },
   });
 
-  return { ...query, waitingForWrites };
+  return {
+    ...query,
+    data: query.data?.snapshots,
+    electionData: query.data?.electionData,
+    waitingForWrites,
+  };
 };

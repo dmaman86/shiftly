@@ -1,6 +1,24 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import type { Page } from "@playwright/test";
 
 import type { CalendarItem } from "./scenario";
+
+export type PublishedElection = {
+  knessetNumber: number;
+  date: string;
+  status: "planned" | "confirmed" | "occurred";
+};
+
+/** Frozen published elections; tests never reach the real API. */
+export const PUBLISHED_ELECTIONS: readonly PublishedElection[] = (
+  JSON.parse(
+    readFileSync(resolve("e2e/fixtures/published-elections.json"), "utf8"),
+  ) as { elections: PublishedElection[] }
+).elections;
+
+/** The build may embed the production API URL (VITE_API_URL): match any host. */
+export const ELECTIONS_ROUTE = "**/reference/elections?*";
 
 /**
  * "Today" for every E2E test. The app defaults to the current month and caps
@@ -15,17 +33,23 @@ const ANALYTICS_HOSTS =
 const NAV_MENU_INTRO_KEY = "shiftly:nav-menu-intro-seen";
 
 /**
- * Makes a page deterministic: frozen clock, no analytics, and mocked calendar
- * sources (static files and the Hebcal fallback) so holiday classification
- * comes only from the scenario. The first-visit mobile menu is marked as seen
+ * Makes a page deterministic: frozen clock, no analytics and election days
+ * from a frozen fixture instead of the API. Holidays are computed in the
+ * browser, so `holidays` no longer changes what the app shows: it only feeds
+ * the disconnected legacy calendar routes, which go away with them. The first-visit mobile menu is marked as seen
  * unless a test opts in, so it does not push content down in unrelated tests.
  */
 export const prepareApp = async (
   page: Page,
   {
     holidays = [],
+    elections = PUBLISHED_ELECTIONS,
     firstVisit = false,
-  }: { holidays?: CalendarItem[]; firstVisit?: boolean } = {},
+  }: {
+    holidays?: CalendarItem[];
+    elections?: readonly PublishedElection[];
+    firstVisit?: boolean;
+  } = {},
 ) => {
   const fulfillHolidays: Parameters<Page["route"]>[1] = (route) =>
     route.fulfill({
@@ -44,6 +68,22 @@ export const prepareApp = async (
   await page.route(ANALYTICS_HOSTS, (route) => route.abort());
   await page.route("**/calendar/*.json", fulfillHolidays);
   await page.route("https://www.hebcal.com/hebcal/**", fulfillHolidays);
+  // Any other request to a deployed API fails loudly instead of leaking out.
+  // Registered first: Playwright tries the most recently added route first.
+  await page.route(/^https:\/\/[^/]+\.run\.app\//, (route) => route.abort());
+  await page.route(ELECTIONS_ROUTE, (route) => {
+    const year = Number(
+      new URL(route.request().url()).searchParams.get("year"),
+    );
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        year,
+        elections: elections.filter(({ date }) => date.startsWith(`${year}-`)),
+      }),
+    });
+  });
 };
 
 /** Pixels the document extends past the viewport width; 0 means no horizontal page scroll. */

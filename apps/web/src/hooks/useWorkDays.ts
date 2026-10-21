@@ -2,125 +2,161 @@ import { useQuery } from "@tanstack/react-query";
 
 import type { CalendarEventMap } from "@shiftly/domain";
 import { WorkDayType } from "@shiftly/domain";
-import { buildEventMap, replaceElectionDays } from "@/adapters";
-import { DomainContextType } from "@/app";
+import { replaceElectionDays } from "@/adapters";
+import { buildHolidayEventMap } from "@/adapters/holiday.adapter";
+import type { DomainContextType } from "@/app";
+import type { WorkDayInfo } from "@/app/types";
+import { analyticsService } from "@/services";
+import { israeliHolidaysBetween } from "@/services/calendar/israeliHolidays";
 import {
-  calendarService,
-  hebcalService,
-  analyticsService,
-  referenceService,
-} from "@/services";
-import { resolveErrorMessage } from "@/utils";
+  loadElectionDays,
+  type YearElectionDays,
+} from "@/services/reference/electionDays";
 import { useGlobalState } from "./useGlobalState";
 
-const staticCalendarApi = calendarService();
-const hebcalApi = hebcalService();
-const referenceApi = referenceService();
+/**
+ * How trustworthy the election days in a calendar are. "stale" uses the last
+ * answer the API gave (fetchedAt is the oldest one involved); "missing" means
+ * election days are unknown and the election premium may be absent.
+ */
+export type ElectionDataState =
+  | { status: "fresh" }
+  | { status: "stale"; fetchedAt: string }
+  | { status: "missing" };
 
-const trackCalendarError = (description: string, errorType: string) =>
-  analyticsService.track({
-    name: "exception",
-    params: { description, fatal: false, error_type: errorType },
-  });
+export interface CalendarData {
+  eventMap: CalendarEventMap;
+  electionData: ElectionDataState;
+}
+
+export interface MonthCalendar {
+  workDays: WorkDayInfo[];
+  electionData: ElectionDataState;
+}
 
 // A month range can cross into the next year (December includes Jan 1).
 const yearsOf = (startDate: string, endDate: string): number[] => [
   ...new Set([startDate, endDate].map((date) => Number(date.slice(0, 4)))),
 ];
 
-const loadStaticEventMap = async (
-  startDate: string,
-  endDate: string,
-): Promise<CalendarEventMap | undefined> => {
-  const years = yearsOf(startDate, endDate);
-  const results = await Promise.all(
-    years.map((year) => staticCalendarApi.getYear(year)),
-  );
-
-  const requestError = results.find((result) => result.error)?.error;
-  if (requestError) {
-    trackCalendarError(requestError, "static_calendar_error");
-    return undefined;
+const trackElectionDays = ({ status, year, ...rest }: YearElectionDays) => {
+  if (
+    status === "fresh" ||
+    ("reason" in rest && rest.reason === "not_configured")
+  ) {
+    return;
   }
-
-  // Hosts with an SPA fallback (e.g. the Vite dev server) answer a missing
-  // year with 200 + index.html, so an unparseable payload is also a miss.
-  try {
-    return Object.assign(
-      {},
-      ...results.map((result) => buildEventMap(result.data)),
-    );
-  } catch (err) {
-    trackCalendarError(resolveErrorMessage(err), "static_calendar_invalid");
-    return undefined;
-  }
+  analyticsService.track({
+    name: "exception",
+    params: {
+      description: `${year}: ${"reason" in rest ? rest.reason : status}`,
+      fatal: false,
+      error_type: `elections_${status}`,
+    },
+  });
 };
 
-const loadLegacyEventMap = async (
-  startDate: string,
-  endDate: string,
-): Promise<CalendarEventMap> => {
-  const staticEventMap = await loadStaticEventMap(startDate, endDate);
-  if (staticEventMap) return staticEventMap;
+const toElectionDataState = (days: YearElectionDays): ElectionDataState =>
+  days.status === "stale"
+    ? { status: "stale", fetchedAt: days.fetchedAt }
+    : { status: days.status };
 
-  const result = await hebcalApi.getData(startDate, endDate).call();
-
-  if (result.error) {
-    trackCalendarError(result.error, "hebcal_api_error");
-    throw new Error(result.error);
+/** The least trustworthy state wins; stale keeps the oldest fetch time. */
+export const combineElectionData = (
+  states: readonly ElectionDataState[],
+): ElectionDataState => {
+  if (states.some(({ status }) => status === "missing")) {
+    return { status: "missing" };
   }
-
-  return buildEventMap(result.data);
+  const staleAt = states
+    .flatMap((state) => (state.status === "stale" ? [state.fetchedAt] : []))
+    .sort();
+  return staleAt.length > 0
+    ? { status: "stale", fetchedAt: staleAt[0] }
+    : { status: "fresh" };
 };
 
 /**
- * Holidays come from the static calendar files, with Hebcal as a fallback for
- * years outside the generated range or when a static file cannot be used.
- * Election days come from the API when it answers; when it cannot be used,
- * the legacy election days stay in place.
+ * The calendar for whole years: holidays computed with jewish-date (no
+ * request, no year limit) plus whatever election days are known. Missing
+ * election days are left out; the caller reports them.
+ */
+export const buildCalendarEventMap = (
+  years: readonly number[],
+  electionDays: readonly YearElectionDays[],
+): CalendarEventMap =>
+  electionDays.reduce(
+    (map, days) =>
+      days.status === "missing"
+        ? map
+        : replaceElectionDays(map, days.year, days.elections),
+    buildHolidayEventMap(
+      israeliHolidaysBetween(
+        `${years[0]}-01-01`,
+        `${years[years.length - 1]}-12-31`,
+      ),
+    ),
+  );
+
+/**
+ * Election days come from the API, or from its last known answer; when
+ * neither exists they are reported missing, never treated as "no elections".
  */
 export const loadCalendarEventMap = async (
   startDate: string,
   endDate: string,
-): Promise<CalendarEventMap> => {
+): Promise<CalendarData> => {
   const years = yearsOf(startDate, endDate);
-  const [legacyEventMap, electionResults] = await Promise.all([
-    loadLegacyEventMap(startDate, endDate),
-    Promise.all(years.map((year) => referenceApi.getElections(year))),
-  ]);
+  const electionDays = await Promise.all(
+    years.map((year) => loadElectionDays(year)),
+  );
+  electionDays.forEach(trackElectionDays);
+  return {
+    eventMap: buildCalendarEventMap(years, electionDays),
+    electionData: combineElectionData(electionDays.map(toElectionDataState)),
+  };
+};
 
-  return years.reduce((eventMap, year, index) => {
-    const result = electionResults[index];
-    if (result.source === "api") {
-      return replaceElectionDays(eventMap, year, result.elections);
-    }
-    if (result.reason !== "not_configured") {
-      trackCalendarError(result.reason, "elections_api_unavailable");
-    }
-    return eventMap;
-  }, legacyEventMap);
+/** Shared by every reader of the ["workDays", year, month] query. */
+export const monthCalendarQueryKey = (year: number, month: number) =>
+  ["workDays", year, month] as const;
+
+export const loadMonthCalendar = async (
+  domain: DomainContextType,
+  year: number,
+  month: number,
+): Promise<MonthCalendar> => {
+  const { startDate, endDate } = domain.services.dateService.getDatesRange(
+    year,
+    month,
+  );
+  const { eventMap, electionData } = await loadCalendarEventMap(
+    startDate,
+    endDate,
+  );
+  return {
+    workDays: domain.payMap.workDaysMonthBuilder.build({
+      year,
+      month,
+      eventMap,
+    }),
+    electionData,
+  };
 };
 
 export const useWorkDays = (domain: DomainContextType) => {
   const { year, month } = useGlobalState();
-  const { dateService } = domain.services;
-
   const query = useQuery({
-    queryKey: ["workDays", year, month],
-    queryFn: async () => {
-      const { startDate, endDate } = dateService.getDatesRange(year, month);
-      const eventMap = await loadCalendarEventMap(startDate, endDate);
-      return domain.payMap.workDaysMonthBuilder.build({
-        year,
-        month,
-        eventMap,
-      });
-    },
-    // The holiday calendar for a given month never changes.
-    staleTime: Infinity,
+    queryKey: monthCalendarQueryKey(year, month),
+    queryFn: () => loadMonthCalendar(domain, year, month),
+    // Holidays never change; settled election days are kept for the session.
+    // Stale or missing election days are retried on the next use.
+    staleTime: (current) =>
+      current.state.data?.electionData.status === "fresh" ? Infinity : 0,
   });
 
-  const workDays = query.data ?? [];
+  const workDays = query.data?.workDays ?? [];
+  const electionData = query.data?.electionData;
 
   const getDayInfo = (date: string) =>
     workDays.find((d) => d.meta.date === date);
@@ -142,6 +178,10 @@ export const useWorkDays = (domain: DomainContextType) => {
 
   return {
     workDays,
+    electionData,
+    /** Asks the API again; holidays need no retry. */
+    retryElectionData: () => void query.refetch(),
+    isRetryingElectionData: query.isRefetching,
     isLoading: query.isLoading,
     error: query.error,
     getDayInfo,

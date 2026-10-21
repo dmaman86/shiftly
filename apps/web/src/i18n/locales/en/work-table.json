@@ -159,5 +159,9 @@
     "meal_small": "Small meal allowance (shift C)",
     "meal_large_short": "Large meal",
     "meal_small_short": "Small meal"
+  },
+  "election_data": {
+    "stale": "Election days are based on data saved on {{date}} because the server could not be reached. A recently announced or rescheduled election may be missing.",
+    "missing": "Election days could not be loaded. Holidays are shown correctly, but the election-day premium may be missing until the data loads."
   }
 }

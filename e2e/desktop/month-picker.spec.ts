@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { prepareApp } from "../support/app";
+import { ELECTIONS_ROUTE, prepareApp } from "../support/app";
 
 test("keeps the selector and page height stable while the next calendar loads", async ({
   page,
@@ -27,11 +27,16 @@ test("keeps the selector and page height stable while the next calendar loads", 
   const pending = new Promise<void>((resolve) => {
     release = resolve;
   });
-  await page.route("**/calendar/*.json", async (route) => {
+  // Holidays are computed in the browser; election days are the only part of
+  // the calendar that loads, so holding them back keeps the month loading.
+  await page.route(ELECTIONS_ROUTE, async (route) => {
     await pending;
+    const year = Number(
+      new URL(route.request().url()).searchParams.get("year"),
+    );
     await route.fulfill({
       contentType: "application/json",
-      body: JSON.stringify({ items: [] }),
+      body: JSON.stringify({ year, elections: [] }),
     });
   });
 
