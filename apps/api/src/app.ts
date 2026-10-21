@@ -7,6 +7,8 @@ import type { ReadinessCheck } from "./http/readiness.ts";
 import { requestLog } from "./http/request-log.ts";
 import type { IncomeTaxRulesResult } from "./income-tax/income-tax-pipeline.ts";
 import type { IncomeTaxResearchResponse } from "./income-tax/income-tax-research.ts";
+import type { PublishedElectionsReader } from "./reference-data/published-elections.ts";
+import { publishedElectionsRouter } from "./reference-data/published-elections-router.ts";
 import { yearRulesRouter } from "./shared/rules-router.ts";
 import type { SocialSecurityRulesResult } from "./social-security/social-security-pipeline.ts";
 
@@ -14,6 +16,8 @@ export type AppDeps = {
   /** Exact browser origins allowed by CORS. */
   readonly allowedOrigins: readonly string[];
   readonly readiness: ReadinessCheck;
+  /** Public reference data: published elections only. */
+  readonly publishedElections: PublishedElectionsReader;
   readonly auth: {
     readonly verifier: AuthVerifier;
     readonly roles: RoleRepository;
@@ -50,6 +54,9 @@ export function createApp(deps: AppDeps): express.Express {
       .status(ready ? 200 : 503)
       .json({ status: ready ? "ready" : "unavailable" });
   });
+
+  // Public: no token. Guests need election days as much as signed-in users.
+  app.use("/reference", publishedElectionsRouter(deps.publishedElections));
 
   const { verifier, roles } = deps.auth;
 

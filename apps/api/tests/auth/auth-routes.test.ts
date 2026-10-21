@@ -29,6 +29,7 @@ async function start() {
   const app = createApp({
     allowedOrigins: [],
     readiness: { isReady: async () => true },
+    publishedElections: { electionsIn: async () => [] },
     auth: { verifier, roles },
     extractIncomeTaxRules: pipeline,
     extractSocialSecurityRules: pipeline,

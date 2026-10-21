@@ -7,6 +7,8 @@ import { SupabaseRoleRepository } from "./auth/supabase-role-repository.ts";
 import { loadEnv } from "./config/env.ts";
 import { extractIncomeTaxRules } from "./income-tax/income-tax-pipeline.ts";
 import { researchAndStoreIncomeTax } from "./income-tax/income-tax-research.ts";
+import { CachedPublishedElectionsReader } from "./reference-data/cached-published-elections-reader.ts";
+import { SupabasePublishedElectionsReader } from "./reference-data/supabase-published-elections-reader.ts";
 import { SupabaseRevisionRepository } from "./reference-data/supabase-revision-repository.ts";
 import { WikipediaIncomeTaxSource } from "./income-tax/wikipedia-source.ts";
 import { GoogleGemmaExtractionProvider } from "./research/google-gemma-extraction-provider.ts";
@@ -73,6 +75,12 @@ const app = createApp({
     url: env.SUPABASE_URL,
     publishableKey: env.SUPABASE_PUBLISHABLE_KEY,
   }),
+  publishedElections: new CachedPublishedElectionsReader(
+    new SupabasePublishedElectionsReader({
+      url: env.SUPABASE_URL,
+      secretKey: env.SUPABASE_SECRET_KEY,
+    }),
+  ),
   auth: {
     verifier: new SupabaseAuthVerifier({
       url: env.SUPABASE_URL,

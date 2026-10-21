@@ -17,6 +17,7 @@ async function start(
   const app = createApp({
     allowedOrigins: [],
     readiness: { isReady: async () => true },
+    publishedElections: { electionsIn: async () => [] },
     auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
     extractIncomeTaxRules: extract as AppDeps["extractIncomeTaxRules"],
     extractSocialSecurityRules:

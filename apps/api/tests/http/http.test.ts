@@ -14,6 +14,7 @@ async function start(ready = true) {
   const app = createApp({
     allowedOrigins: [WEB_ORIGIN],
     readiness: { isReady: async () => ready },
+    publishedElections: { electionsIn: async () => [] },
     auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
     extractIncomeTaxRules: unused as AppDeps["extractIncomeTaxRules"],
     extractSocialSecurityRules: unused as AppDeps["extractSocialSecurityRules"],

@@ -1,6 +1,6 @@
 import type { TableHeader } from "@/app/types/table.types";
 
-export const SYSTEM_START_YEAR = 2015;
+export { SYSTEM_START_YEAR } from "@shiftly/domain";
 
 export const tableColumnWidths = {
   day: 96,
