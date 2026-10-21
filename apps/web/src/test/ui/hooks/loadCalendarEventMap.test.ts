@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import axios from "axios";
+import axios, { AxiosError, AxiosHeaders } from "axios";
 
 import { CalendarEventKind } from "@shiftly/domain";
 import { loadCalendarEventMap } from "@/hooks/useWorkDays";
@@ -104,5 +104,142 @@ describe("loadCalendarEventMap", () => {
         params: expect.objectContaining({ error_type: "hebcal_api_error" }),
       }),
     );
+  });
+});
+
+describe("loadCalendarEventMap election days", () => {
+  const API = "https://api.example";
+  const legacyCalendar = {
+    data: {
+      items: [
+        {
+          date: "2026-09-21",
+          title: "Yom Kippur",
+          category: "holiday",
+          yomtov: true,
+        },
+        {
+          date: "2026-10-27",
+          title: "Knesset Election Day",
+          category: "election",
+          subcat: "knesset",
+          knessetNumber: 26,
+        },
+      ],
+    },
+  };
+  const electionDay = (knessetNumber: number) => [
+    { kind: CalendarEventKind.KnessetElectionDay, knessetNumber },
+  ];
+
+  const mockRequests = (api: () => Promise<unknown>) =>
+    vi
+      .spyOn(axios, "get")
+      .mockImplementation(async (url: string) =>
+        url.startsWith(API) ? api() : legacyCalendar,
+      );
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(analyticsService, "track").mockImplementation(() => undefined);
+    vi.stubEnv("VITE_API_URL", API);
+  });
+
+  it("uses the API's election days when it answers", async () => {
+    mockRequests(async () => ({
+      data: {
+        year: 2026,
+        elections: [
+          { knessetNumber: 26, date: "2026-11-03", status: "confirmed" },
+        ],
+      },
+    }));
+
+    const eventMap = await loadCalendarEventMap("2026-10-01", "2026-11-01");
+
+    expect(eventMap["2026-10-27"]).toBeUndefined();
+    expect(eventMap["2026-11-03"]).toEqual(electionDay(26));
+    expect(eventMap["2026-09-21"]).toHaveLength(1);
+  });
+
+  it("trusts an empty answer instead of falling back", async () => {
+    mockRequests(async () => ({ data: { year: 2026, elections: [] } }));
+
+    const eventMap = await loadCalendarEventMap("2026-10-01", "2026-11-01");
+
+    expect(eventMap["2026-10-27"]).toBeUndefined();
+    expect(analyticsService.track).not.toHaveBeenCalled();
+  });
+
+  it("keeps the legacy election days when the API is unavailable", async () => {
+    mockRequests(async () => {
+      throw new AxiosError("Network Error", "ERR_NETWORK");
+    });
+
+    const eventMap = await loadCalendarEventMap("2026-10-01", "2026-11-01");
+
+    expect(eventMap["2026-10-27"]).toEqual(electionDay(26));
+    expect(analyticsService.track).toHaveBeenCalledWith(
+      expect.objectContaining({
+        params: expect.objectContaining({
+          error_type: "elections_api_unavailable",
+        }),
+      }),
+    );
+  });
+
+  it("keeps the legacy election days silently when no API is configured", async () => {
+    vi.stubEnv("VITE_API_URL", "");
+    mockRequests(async () => {
+      throw new Error("must not be called");
+    });
+
+    const eventMap = await loadCalendarEventMap("2026-10-01", "2026-11-01");
+
+    expect(eventMap["2026-10-27"]).toEqual(electionDay(26));
+    expect(analyticsService.track).not.toHaveBeenCalled();
+  });
+
+  it("fails instead of hiding a client error", async () => {
+    mockRequests(async () => {
+      throw new AxiosError(
+        "Request failed",
+        "ERR_BAD_REQUEST",
+        undefined,
+        undefined,
+        {
+          status: 400,
+          statusText: "",
+          headers: {},
+          config: { headers: new AxiosHeaders() },
+          data: {},
+        },
+      );
+    });
+
+    await expect(
+      loadCalendarEventMap("2026-10-01", "2026-11-01"),
+    ).rejects.toThrow("Request failed");
+  });
+
+  it("asks for each year a December range touches", async () => {
+    const get = mockRequests(async () => ({
+      data: { year: 2026, elections: [] },
+    }));
+    get.mockImplementation(
+      async (url: string, config?: { params?: { year: number } }) =>
+        url.startsWith(API)
+          ? { data: { year: config?.params?.year, elections: [] } }
+          : legacyCalendar,
+    );
+
+    await loadCalendarEventMap("2026-12-01", "2027-01-01");
+
+    const years = get.mock.calls
+      .filter(([url]) => url.startsWith(API))
+      .map(
+        ([, config]) => (config as { params: { year: number } }).params.year,
+      );
+    expect(years).toEqual([2026, 2027]);
   });
 });

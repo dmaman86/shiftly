@@ -1,5 +1,10 @@
 export { hebcalService } from "./hebcal/hebcal.service";
 export { calendarService } from "./calendar/calendar.service";
+export { referenceService } from "./reference/reference.service";
+export type {
+  ElectionsResult,
+  PublishedElection,
+} from "./reference/reference.service";
 export { analyticsService, gtagService } from "./analytics";
 export type { SalaryFeedback } from "./analytics";
 export { monthlyConfigService } from "./monthlyConfig/monthlyConfig.service";

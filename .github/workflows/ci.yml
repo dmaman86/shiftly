@@ -96,6 +96,9 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          # Public base URL of apps/api (no trailing slash): a repository
+          # variable, not a secret, since it ships in the browser bundle.
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
         run: bun run build
 
       - name: Upload build output
@@ -190,3 +193,61 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  deploy-api:
+    name: Deploy API to Cloud Run
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: [checks]
+
+    concurrency:
+      group: api-deploy
+      cancel-in-progress: false
+
+    # id-token lets the job exchange GitHub's OIDC token for short-lived Google
+    # credentials (Workload Identity Federation): no Google key is stored here.
+    permissions:
+      contents: read
+      id-token: write
+
+    env:
+      PROJECT_ID: shiftly-app-507108
+      REGION: asia-southeast1
+      SERVICE: shiftly-api
+      IMAGE: asia-southeast1-docker.pkg.dev/shiftly-app-507108/shiftly/api:${{ github.sha }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/684586062538/locations/global/workloadIdentityPools/github/providers/github-actions
+          service_account: shiftly-api-deployer@shiftly-app-507108.iam.gserviceaccount.com
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      # The root .dockerignore is an allowlist, so no .env file can reach the image.
+      - name: Build and push image
+        run: |
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          docker build -f apps/api/Dockerfile -t "$IMAGE" .
+          docker push "$IMAGE"
+
+      # Only the image changes: env vars, secrets, scaling limits and the
+      # runtime service account stay as configured on the service.
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --image="$IMAGE" \
+            --region="$REGION" \
+            --project="$PROJECT_ID" \
+            --quiet
+
+      - name: Check liveness and readiness
+        run: |
+          url=$(gcloud run services describe "$SERVICE" --region="$REGION" --project="$PROJECT_ID" --format='value(status.url)')
+          curl --fail --silent --show-error --retry 3 "$url/health"
+          curl --fail --silent --show-error --retry 3 "$url/ready"

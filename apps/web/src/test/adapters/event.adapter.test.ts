@@ -179,6 +179,7 @@ describe("buildEventMap", () => {
     ["Pesach I", CalendarEventKind.PaidHoliday, "pesach"],
     ["Pesach VII", CalendarEventKind.PaidHoliday, "pesach_7"],
     ["Yom HaAtzma'ut", CalendarEventKind.PaidHoliday, "yom_haatzmaut"],
+    ["Shavuot", CalendarEventKind.PaidHoliday, "shavuot"],
     ["Shavuot I", CalendarEventKind.PaidHoliday, "shavuot"],
     [
       "Erev Rosh Hashana",

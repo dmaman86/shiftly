@@ -16,6 +16,8 @@
   "scripts": {
     "dev": "bun run domain:build && vite apps/web --config apps/web/vite.config.ts",
     "dev:domain": "tsc -b packages/domain --watch",
+    "dev:api": "bun run --cwd apps/api dev",
+    "test:api": "vitest run --project api",
     "domain:build": "tsc -b packages/domain --stopBuildOnErrors --pretty false",
     "typecheck": "tsc -b --stopBuildOnErrors --pretty false",
     "build": "tsc -b --stopBuildOnErrors --pretty false && vite build apps/web --config apps/web/vite.config.ts",
@@ -27,6 +29,7 @@
     "calendar:elections:sync": "node scripts/sync-knesset-calendars.ts",
     "calendar:elections:update": "node scripts/update-knesset-elections.ts",
     "calendar:elections:test": "node --test scripts/knesset-elections.test.ts",
+    "calendar:elections:parity": "node scripts/check-election-parity.ts",
     "docs:diagrams": "node scripts/sync-diagrams.ts",
     "docs:diagrams:check": "node scripts/sync-diagrams.ts --check",
     "test": "bun run domain:build && vitest",

@@ -8,6 +8,7 @@ bun.lock
 # E2E fixtures are reference datasets compared against payroll results.
 apps/web/public/calendar/
 e2e/fixtures/
+apps/api/tests/fixtures/
 
 # Prose and generated diagrams: the bilingual docs embed the .mmd files
 # verbatim, so reformatting either side would break that sync.

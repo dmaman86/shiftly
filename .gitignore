@@ -14,6 +14,10 @@ dist-ssr
 supabase/.temp/
 supabase/functions/.env
 
+# API secrets and per-run extraction debug artifacts
+apps/api/.env
+apps/api/.artifacts/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
