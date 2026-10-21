@@ -10,11 +10,16 @@ export default defineConfig({
     projects: [
       "./packages/domain/vitest.config.ts",
       "./apps/web/vite.config.ts",
+      "./apps/api/vitest.config.ts",
     ],
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "json-summary", "html"],
-      include: ["packages/domain/src/**/*.ts", "apps/web/src/**/*.{ts,tsx}"],
+      include: [
+        "packages/domain/src/**/*.ts",
+        "apps/web/src/**/*.{ts,tsx}",
+        "apps/api/src/**/*.ts",
+      ],
       exclude: ["**/tests/**", "**/test/**", "**/*.config.ts", "**/*.d.ts"],
     },
   },

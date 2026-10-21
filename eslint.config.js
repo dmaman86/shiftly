@@ -110,6 +110,23 @@ export default defineConfig(
     },
   },
   {
+    files: ["apps/api/**/*.ts"],
+    languageOptions: { ecmaVersion: 2023, globals: globals.node },
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "(^|/)apps/web(/|$)",
+              message: "The API cannot depend on the web application.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     files: ["supabase/functions/**/*.ts"],
     languageOptions: {
       ecmaVersion: 2020,

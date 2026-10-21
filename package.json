@@ -16,6 +16,8 @@
   "scripts": {
     "dev": "bun run domain:build && vite apps/web --config apps/web/vite.config.ts",
     "dev:domain": "tsc -b packages/domain --watch",
+    "dev:api": "bun run --cwd apps/api dev",
+    "test:api": "vitest run --project api",
     "domain:build": "tsc -b packages/domain --stopBuildOnErrors --pretty false",
     "typecheck": "tsc -b --stopBuildOnErrors --pretty false",
     "build": "tsc -b --stopBuildOnErrors --pretty false && vite build apps/web --config apps/web/vite.config.ts",
