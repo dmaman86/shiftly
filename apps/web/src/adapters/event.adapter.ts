@@ -58,8 +58,10 @@ const HOLIDAY_TITLE_RULES: readonly HolidayTitleRule[] = [
     kind: CalendarEventKind.PaidHoliday,
     holidayKey: "yom_haatzmaut",
   },
+  // The Israeli calendar (i=on) titles the single day "Shavuot"; this prefix
+  // also matches the diaspora "Shavuot I".
   {
-    title: "Shavuot I",
+    title: "Shavuot",
     kind: CalendarEventKind.PaidHoliday,
     holidayKey: "shavuot",
   },
