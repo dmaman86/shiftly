@@ -1,4 +1,5 @@
 import axios from "axios";
+import { apiBaseUrl } from "@/services/api/client";
 
 /** How apps/api publishes an election day (GET /reference/elections). */
 export interface PublishedElection {
@@ -120,11 +121,6 @@ export const isPublishedTimelines = (
       entries.every((entry) => isEntry(entry, VALUE_CHECKS[kind]))
     );
   });
-
-// Read on every call, so the base URL is resolved from the build and tests
-// can stub it.
-const apiBaseUrl = (): string | undefined =>
-  import.meta.env.VITE_API_URL?.replace(/\/+$/, "") || undefined;
 
 export const referenceService = () => {
   const getElections = async (year: number): Promise<ElectionsResult> => {

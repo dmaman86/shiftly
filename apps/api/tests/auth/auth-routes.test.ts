@@ -7,6 +7,7 @@ import {
   ADMIN_TOKEN,
   FakeRoles,
   FakeVerifier,
+  NO_USER_DATA,
   USER_ID,
   USER_TOKEN,
 } from "./fakes.ts";
@@ -36,6 +37,7 @@ async function start() {
       }),
     },
     auth: { verifier, roles },
+    userData: NO_USER_DATA,
     extractIncomeTaxRules: pipeline,
     researchIncomeTax: pipeline,
   } as Parameters<typeof createApp>[0]);

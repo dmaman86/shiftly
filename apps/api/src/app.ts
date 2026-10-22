@@ -12,6 +12,8 @@ import { publishedElectionsRouter } from "./reference-data/published-elections-r
 import type { PublishedTimelinesReader } from "./reference-data/published-timelines.ts";
 import { publishedTimelinesRouter } from "./reference-data/published-timelines-router.ts";
 import { yearRulesRouter } from "./shared/rules-router.ts";
+import { handleUserDataErrors } from "./user-data/errors.ts";
+import type { UserDataClientFactory } from "./user-data/supabase-user-client.ts";
 
 export type AppDeps = {
   /** Exact browser origins allowed by CORS. */
@@ -24,6 +26,13 @@ export type AppDeps = {
   readonly auth: {
     readonly verifier: AuthVerifier;
     readonly roles: RoleRepository;
+  };
+  /**
+   * User-owned data, as the verified caller: a client per request with the
+   * caller's token, so RLS stays in force. No routes use it yet.
+   */
+  readonly userData: {
+    readonly clientFor: UserDataClientFactory;
   };
   readonly extractIncomeTaxRules: (
     year: number,
@@ -84,7 +93,7 @@ export function createApp(deps: AppDeps): express.Express {
       .status(404)
       .json({ error: { code: "not_found", message: "Route not found" } });
   });
-  app.use(handleBodyErrors, handleUnexpectedError);
+  app.use(handleBodyErrors, handleUserDataErrors, handleUnexpectedError);
   return app;
 }
 
