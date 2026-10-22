@@ -4,6 +4,11 @@ import type { ArchiveIndex } from "../../src/research/web-archive.ts";
 import type { DebugArtifactStore } from "../../src/shared/debug-artifacts.ts";
 import { RulesPipelineError } from "../../src/shared/errors.ts";
 import {
+  annualReportUrl,
+  RATE_HISTORY_URL,
+  THRESHOLD_HISTORY_URL,
+} from "../../src/social-security/contributions-history.ts";
+import {
   BTL_EMPLOYEE_RATES_URL,
   researchEmployeeContributions,
 } from "../../src/social-security/contributions-research.ts";
@@ -14,6 +19,10 @@ import {
   BTL_LIVE,
   CAPTURE_2015,
   CAPTURE_2025,
+  EMPLOYEE_TOTAL_HISTORY,
+  REPORT_2018,
+  REPORT_2019,
+  THRESHOLD_HISTORY,
   TODAY,
   btlDocument,
 } from "./btl-fixtures.ts";
@@ -23,25 +32,49 @@ const artifacts: DebugArtifactStore = {
   forDocument: async () => ({ write: async () => {} }),
 };
 
-const TEXTS: Record<string, string> = {
+const PAGES: Record<string, string> = {
   [BTL_EMPLOYEE_RATES_URL]: BTL_LIVE,
   [CAPTURE_2015.url]: BTL_2015,
   [CAPTURE_2025.url]: BTL_2025_FEBRUARY,
 };
 
-const fetcher: DocumentFetcher = {
-  async fetch(url) {
-    const text = TEXTS[url];
-    if (text === undefined) throw new Error(`unexpected fetch of ${url}`);
-    return btlDocument(url, text);
-  },
+const HISTORY: Record<string, string> = {
+  [THRESHOLD_HISTORY_URL]: THRESHOLD_HISTORY,
+  [RATE_HISTORY_URL]: EMPLOYEE_TOTAL_HISTORY,
 };
+
+const REPORTS: Record<string, string> = {
+  [annualReportUrl(2018)]: REPORT_2018,
+  [annualReportUrl(2019)]: REPORT_2019,
+};
+
+/** Serves the given texts; anything else is not found, like a missing report. */
+const fetcherOf = (texts: Record<string, string>): DocumentFetcher => ({
+  async fetch(url) {
+    const text = texts[url];
+    if (text === undefined) {
+      return btlDocument(url, "", {
+        httpStatus: 404,
+        accessibility: "not_found",
+        problem: "HTTP 404",
+        sha256: null,
+        format: null,
+      });
+    }
+    return url.endsWith(".pdf")
+      ? btlDocument(url, text, {
+          contentType: "application/pdf",
+          format: "pdf-text",
+        })
+      : btlDocument(url, text);
+  },
+});
 
 const archive: ArchiveIndex = {
   snapshots: async () => [CAPTURE_2015, CAPTURE_2025],
 };
 
-const blockedKolZchut: SocialSecuritySourceProvider = {
+const blockedKolZchut = (): SocialSecuritySourceProvider => ({
   employeeContributionsAt: vi.fn(async () => {
     throw new RulesPipelineError(
       "source_unavailable",
@@ -49,13 +82,19 @@ const blockedKolZchut: SocialSecuritySourceProvider = {
       { status: 403 },
     );
   }),
-};
+});
 
-const run = (kolZchut: SocialSecuritySourceProvider, index = archive) =>
+const run = (
+  options: {
+    texts?: Record<string, string>;
+    kolZchut?: SocialSecuritySourceProvider;
+    archive?: ArchiveIndex;
+  } = {},
+) =>
   researchEmployeeContributions({
-    fetcher,
-    archive: index,
-    kolZchut,
+    fetcher: fetcherOf(options.texts ?? PAGES),
+    archive: options.archive ?? archive,
+    kolZchut: options.kolZchut ?? blockedKolZchut(),
     artifacts,
     now: () => TODAY,
   });
@@ -76,21 +115,19 @@ const periodsOf = (
   ].sort();
 
 describe("researchEmployeeContributions", () => {
-  it("reads official captures and the live page; a blocked secondary leaves gaps missing", async () => {
-    const report = await run(blockedKolZchut);
+  it("reads captures and the live page; a blocked secondary leaves gaps missing", async () => {
+    const kolZchut = blockedKolZchut();
+    const report = await run({ kolZchut });
 
     expect(report.archive).toEqual({ status: "read", captures: 2 });
-    expect(report.observations.map((o) => [o.observedOn, o.live])).toEqual([
-      ["2015-12-27", false],
-      ["2025-02-05", false],
-      ["2026-10-22", true],
-    ]);
-    expect(report.yearsWithoutOfficialReading).toEqual([
-      2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024,
+    expect(report.readings.map((r) => [r.label, r.observedOn])).toEqual([
+      ["rates page 2015", "2015-12-27"],
+      ["rates page 2025", "2025-02-05"],
+      ["rates page 2026", "2026-10-22"],
     ]);
     // Blocked once, never retried: the remaining stretches stay missing.
     expect(report.secondary).toBe("blocked");
-    expect(blockedKolZchut.employeeContributionsAt).toHaveBeenCalledTimes(1);
+    expect(kolZchut.employeeContributionsAt).toHaveBeenCalledTimes(1);
 
     expect(periodsOf(report, "reducedRateBoundary")).toEqual([
       "2015-11-01→2016-01-01 5556 official_verified",
@@ -99,21 +136,61 @@ describe("researchEmployeeContributions", () => {
       "2025-03-01→2026-01-01 no_evidence",
       "2026-01-01→open 7703 official_verified",
     ]);
-    expect(periodsOf(report, "healthInsuranceStandardRate")).toEqual([
-      "2015-11-01→2016-01-01 0.05 official_verified",
-      "2016-01-01→2025-02-01 no_evidence",
-      "2025-02-01→open 0.0517 official_verified",
-    ]);
     expect(periodsOf(report, "nationalInsuranceStandardRate")).toEqual([
       "2015-11-01→open 0.07 official_verified",
     ]);
   });
 
+  it("fills the gaps from the official change-point tables and yearly reports", async () => {
+    const report = await run({ texts: { ...PAGES, ...HISTORY, ...REPORTS } });
+
+    expect(report.readings.map((r) => r.label)).toEqual([
+      "thresholds change-point table",
+      "employee totals change-point table",
+      "report 2018",
+      "report 2019",
+      "rates page 2015",
+      "rates page 2025",
+      "rates page 2026",
+    ]);
+    expect(periodsOf(report, "reducedRateBoundary")).toEqual([
+      "2015-11-01→2016-01-01 5556 official_verified",
+      "2016-01-01→2017-01-01 5678 official_verified",
+      "2017-01-01→2018-01-01 5804 official_verified",
+      "2018-01-01→2019-01-01 5944 official_verified",
+      "2019-01-01→2020-01-01 6164 official_verified",
+      "2020-01-01→2023-01-01 6331 official_verified",
+      "2023-01-01→2024-01-01 7122 official_verified",
+      "2024-01-01→2025-03-01 7522 official_verified",
+      "2025-03-01→2026-01-01 no_evidence",
+      "2026-01-01→open 7703 official_verified",
+    ]);
+    expect(periodsOf(report, "maxInsurableIncome")).toContain(
+      "2015-11-01→2018-01-01 43240 official_verified",
+    );
+    expect(periodsOf(report, "healthInsuranceReducedRate")).toContain(
+      "2017-01-01→2020-01-01 0.031 official_verified",
+    );
+    // National Insurance's reduced rate is never stated alone: the employee
+    // total minus health, reported but not stored.
+    expect(periodsOf(report, "nationalInsuranceReducedRate")).toContain(
+      "2017-01-01→2020-01-01 0.004 official_derived",
+    );
+    expect(periodsOf(report, "healthInsuranceStandardRate")).toContain(
+      "2025-01-01→2025-02-01 0.0516 official_derived",
+    );
+    expect(report.timelines.conflicts).toEqual([]);
+    expect(
+      report.candidates.some(
+        (candidate) => (candidate.trust as string) === "official_derived",
+      ),
+    ).toBe(false);
+  });
+
   it("fills official gaps from Kol Zchut as of each gap's end, never past what it states", async () => {
-    const report = await run(fakeKolZchutSource());
+    const report = await run({ kolZchut: fakeKolZchutSource() });
 
     expect(report.secondary).toBe("used");
-    // Kol Zchut, as of the end of 2020, states the 2020 boundary "for 2020".
     expect(periodsOf(report, "reducedRateBoundary")).toContain(
       "2020-01-01→2021-01-01 6331 secondary_verified",
     );
@@ -131,23 +208,25 @@ describe("researchEmployeeContributions", () => {
   });
 
   it("keeps working from the live page when the archive index is down", async () => {
-    const report = await run(blockedKolZchut, {
-      snapshots: async () => {
-        throw new Error("the archive index answered HTTP 503");
+    const report = await run({
+      archive: {
+        snapshots: async () => {
+          throw new Error("the archive index answered HTTP 503");
+        },
       },
     });
     expect(report.archive).toEqual({
       status: "unavailable",
       problem: "the archive index answered HTTP 503",
     });
-    expect(report.observations).toHaveLength(1);
+    expect(report.readings).toHaveLength(1);
     expect(periodsOf(report, "maxInsurableIncome")).toContain(
       "2026-01-01→open 51910 official_verified",
     );
   });
 
   it("creates only pending research candidates of the six kinds", async () => {
-    const report = await run(blockedKolZchut);
+    const report = await run({ texts: { ...PAGES, ...HISTORY, ...REPORTS } });
     expect(new Set(report.candidates.map((c) => c.kind))).toEqual(
       new Set([
         "social_security.reduced_rate_boundary",
