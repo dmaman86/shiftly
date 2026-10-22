@@ -13,7 +13,6 @@ import {
 
 const ADMIN_ROUTES = [
   "/admin/income-tax/2026/rules",
-  "/admin/social-security/2026/rules",
   "/admin/income-tax/2026/research",
 ];
 
@@ -38,7 +37,6 @@ async function start() {
     },
     auth: { verifier, roles },
     extractIncomeTaxRules: pipeline,
-    extractSocialSecurityRules: pipeline,
     researchIncomeTax: pipeline,
   } as Parameters<typeof createApp>[0]);
   server = app.listen(0, "127.0.0.1");
@@ -171,7 +169,7 @@ describe("admin routes", () => {
   it("ignores roles claimed by the client in headers or body", async () => {
     const request = await start();
     const response = await request(
-      ADMIN_ROUTES[2],
+      ADMIN_ROUTES[1],
       post(USER_TOKEN, {
         headers: {
           "x-role": "admin",
@@ -187,13 +185,13 @@ describe("admin routes", () => {
 
   it("applies a revoked role on the very next request", async () => {
     const request = await start();
-    expect((await request(ADMIN_ROUTES[2], post(ADMIN_TOKEN))).status).toBe(
+    expect((await request(ADMIN_ROUTES[1], post(ADMIN_TOKEN))).status).toBe(
       200,
     );
 
     roles.roles.delete(ADMIN_ID);
 
-    expect((await request(ADMIN_ROUTES[2], post(ADMIN_TOKEN))).status).toBe(
+    expect((await request(ADMIN_ROUTES[1], post(ADMIN_TOKEN))).status).toBe(
       403,
     );
     expect(pipeline).toHaveBeenCalledOnce();
@@ -202,7 +200,7 @@ describe("admin routes", () => {
   it("rejects an admin whose session the Auth server no longer accepts", async () => {
     verifier.revokedSessions.add(ADMIN_TOKEN);
     const request = await start();
-    const response = await request(ADMIN_ROUTES[2], post(ADMIN_TOKEN));
+    const response = await request(ADMIN_ROUTES[1], post(ADMIN_TOKEN));
     expect(response.status).toBe(401);
     expect(pipeline).not.toHaveBeenCalled();
   });
@@ -210,7 +208,7 @@ describe("admin routes", () => {
   it("fails closed with 503 when roles cannot be read", async () => {
     roles.unavailable = true;
     const request = await start();
-    const response = await request(ADMIN_ROUTES[2], post(ADMIN_TOKEN));
+    const response = await request(ADMIN_ROUTES[1], post(ADMIN_TOKEN));
     expect(response.status).toBe(503);
     expect(((await response.json()) as ErrorBody).error.code).toBe(
       "authorization_unavailable",
@@ -221,7 +219,7 @@ describe("admin routes", () => {
   it("fails closed with 503 when the session cannot be revalidated", async () => {
     verifier.revalidateUnavailable = true;
     const request = await start();
-    const response = await request(ADMIN_ROUTES[2], post(ADMIN_TOKEN));
+    const response = await request(ADMIN_ROUTES[1], post(ADMIN_TOKEN));
     expect(response.status).toBe(503);
     expect(pipeline).not.toHaveBeenCalled();
   });

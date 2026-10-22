@@ -12,7 +12,6 @@ import { publishedElectionsRouter } from "./reference-data/published-elections-r
 import type { PublishedTimelinesReader } from "./reference-data/published-timelines.ts";
 import { publishedTimelinesRouter } from "./reference-data/published-timelines-router.ts";
 import { yearRulesRouter } from "./shared/rules-router.ts";
-import type { SocialSecurityRulesResult } from "./social-security/social-security-pipeline.ts";
 
 export type AppDeps = {
   /** Exact browser origins allowed by CORS. */
@@ -29,9 +28,6 @@ export type AppDeps = {
   readonly extractIncomeTaxRules: (
     year: number,
   ) => Promise<IncomeTaxRulesResult>;
-  readonly extractSocialSecurityRules: (
-    year: number,
-  ) => Promise<SocialSecurityRulesResult>;
   /** Search-assisted research; stores validated values as pending review, never activates them. */
   readonly researchIncomeTax: (
     year: number,
@@ -80,7 +76,6 @@ export function createApp(deps: AppDeps): express.Express {
     requireAuth(verifier),
     requireAdmin(verifier, roles),
     yearRulesRouter("/income-tax", deps.extractIncomeTaxRules),
-    yearRulesRouter("/social-security", deps.extractSocialSecurityRules),
     yearRulesRouter("/income-tax", deps.researchIncomeTax, "research"),
   );
 

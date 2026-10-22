@@ -23,7 +23,6 @@ async function start(ready = true) {
     },
     auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
     extractIncomeTaxRules: unused as AppDeps["extractIncomeTaxRules"],
-    extractSocialSecurityRules: unused as AppDeps["extractSocialSecurityRules"],
     researchIncomeTax: unused as AppDeps["researchIncomeTax"],
   });
   server = app.listen(0, "127.0.0.1");

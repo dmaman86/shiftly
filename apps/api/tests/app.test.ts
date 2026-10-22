@@ -10,7 +10,6 @@ let server: Server | undefined;
 // The HTTP layer only forwards the pipeline result, so tests use minimal stand-ins.
 async function start(
   extract: (year: number) => Promise<unknown>,
-  extractSocialSecurity: (year: number) => Promise<unknown> = extract,
   research: (year: number) => Promise<unknown> = extract,
 ) {
   // Auth is covered in tests/auth; here every admin call is a verified admin.
@@ -26,8 +25,6 @@ async function start(
     },
     auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
     extractIncomeTaxRules: extract as AppDeps["extractIncomeTaxRules"],
-    extractSocialSecurityRules:
-      extractSocialSecurity as AppDeps["extractSocialSecurityRules"],
     researchIncomeTax: research as AppDeps["researchIncomeTax"],
   });
   server = app.listen(0, "127.0.0.1");
@@ -90,20 +87,18 @@ describe("api", () => {
     });
   });
 
-  it("routes each rules pipeline to its own path", async () => {
-    const incomeTax = vi.fn(async () => ({ pipeline: "income-tax" }));
-    const socialSecurity = vi.fn(async () => ({ pipeline: "social-security" }));
-    const request = await start(incomeTax, socialSecurity);
+  it("no longer serves the social-security rules route", async () => {
+    const extract = vi.fn(async () => ({ pipeline: "income-tax" }));
+    const request = await start(extract);
     const response = await request("/admin/social-security/2026/rules", post);
-    expect(await response.json()).toEqual({ pipeline: "social-security" });
-    expect(socialSecurity).toHaveBeenCalledWith(2026);
-    expect(incomeTax).not.toHaveBeenCalled();
+    expect(response.status).toBe(404);
+    expect(extract).not.toHaveBeenCalled();
   });
 
   it("serves income-tax research next to the existing rules route", async () => {
     const rules = vi.fn(async () => ({ pipeline: "rules" }));
     const research = vi.fn(async () => ({ pipeline: "research" }));
-    const request = await start(rules, rules, research);
+    const request = await start(rules, research);
     const response = await request("/admin/income-tax/2026/research", post);
     expect(await response.json()).toEqual({ pipeline: "research" });
     expect(research).toHaveBeenCalledWith(2026);

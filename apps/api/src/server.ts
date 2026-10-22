@@ -19,8 +19,6 @@ import { SupabaseReadinessCheck } from "./http/readiness.ts";
 import { HttpDocumentFetcher } from "./research/http-document-fetcher.ts";
 import { FileDebugArtifactStore } from "./shared/debug-artifacts.ts";
 import { GemmaExtractor } from "./shared/gemma-extractor.ts";
-import { KolZchutSocialSecuritySource } from "./social-security/kolzchut-source.ts";
-import { extractSocialSecurityRules } from "./social-security/social-security-pipeline.ts";
 
 // The first file that defines a variable wins, and shell variables are never
 // overridden. Paths are resolved from this file, so the cwd does not matter.
@@ -43,14 +41,6 @@ const incomeTaxDeps = {
   source: new WikipediaIncomeTaxSource(),
   extractor,
   artifacts: new FileDebugArtifactStore(join(env.ARTIFACTS_DIR, "income-tax")),
-};
-
-const socialSecurityDeps = {
-  source: new KolZchutSocialSecuritySource(),
-  extractor,
-  artifacts: new FileDebugArtifactStore(
-    join(env.ARTIFACTS_DIR, "social-security"),
-  ),
 };
 
 const researchDeps = {
@@ -100,8 +90,6 @@ const app = createApp({
     }),
   },
   extractIncomeTaxRules: (year) => extractIncomeTaxRules(year, incomeTaxDeps),
-  extractSocialSecurityRules: (year) =>
-    extractSocialSecurityRules(year, socialSecurityDeps),
   researchIncomeTax: (year) => researchAndStoreIncomeTax(year, researchDeps),
 });
 
