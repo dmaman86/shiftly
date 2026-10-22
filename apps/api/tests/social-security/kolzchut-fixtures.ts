@@ -78,23 +78,3 @@ export const fakeKolZchutSource = (wiki: FakeWiki = KOL_ZCHUT_WIKI) =>
       now: () => NOW,
     }),
   );
-
-/** What the model should read from the 2026 section. */
-export const answer2026 = {
-  status: "complete",
-  asOfYear: 2026,
-  reducedRateCeiling: 7703,
-  maxInsurableIncome: 51910,
-  reducedRate: { nationalInsurance: 0.0104, health: 0.0323, total: 0.0427 },
-  fullRate: { nationalInsurance: 0.07, health: 0.0517, total: 0.1217 },
-};
-
-/** What the model should read from the 2020 section. */
-export const answer2020 = {
-  status: "complete",
-  asOfYear: 2020,
-  reducedRateCeiling: 6331,
-  maxInsurableIncome: 44020,
-  reducedRate: { nationalInsurance: 0.004, health: 0.031, total: 0.035 },
-  fullRate: { nationalInsurance: 0.07, health: 0.05, total: 0.12 },
-};

@@ -9,7 +9,13 @@ export type ReferenceKind =
   | "income_tax.credit_point"
   | "per_diem.point_rate"
   | "meal_allowance.rates"
-  | "calendar.knesset_election";
+  | "calendar.knesset_election"
+  | "social_security.reduced_rate_boundary"
+  | "social_security.max_insurable_income"
+  | "national_insurance.employee_reduced_rate"
+  | "national_insurance.employee_standard_rate"
+  | "health_insurance.employee_reduced_rate"
+  | "health_insurance.employee_standard_rate";
 
 export type RevisionTrust =
   | "official_verified"

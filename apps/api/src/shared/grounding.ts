@@ -23,6 +23,23 @@ export function percentAppearsIn(text: string): (fraction: number) => boolean {
   };
 }
 
+/**
+ * Like percentAppearsIn, for tables headed "באחוזים" whose cells may drop the
+ * sign: 0.0517 matches "5.17%", "% 5.17" and a bare "5.17", never "5.175"
+ * or the "5" of "5.17".
+ */
+export function percentNumberAppearsIn(
+  text: string,
+): (fraction: number) => boolean {
+  const normalized = normalizeNumbers(text);
+  return (fraction) => {
+    const percent = String(Math.round(fraction * 1_000_000) / 10_000);
+    const [whole, decimals = ""] = percent.split(".");
+    const number = decimals ? `${whole}\\.${decimals}0*` : `${whole}(?:\\.0+)?`;
+    return new RegExp(`(?<![\\d.])${number}(?![\\d]|\\.\\d)`).test(normalized);
+  };
+}
+
 function normalizeNumbers(text: string): string {
   return text.replace(/(\d),(?=\d{3})/g, "$1");
 }
