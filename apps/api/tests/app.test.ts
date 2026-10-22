@@ -3,7 +3,12 @@ import type { Server } from "node:http";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createApp, type AppDeps } from "../src/app.ts";
 import { RulesPipelineError } from "../src/shared/errors.ts";
-import { ADMIN_TOKEN, FakeRoles, FakeVerifier } from "./auth/fakes.ts";
+import {
+  ADMIN_TOKEN,
+  FakeRoles,
+  FakeVerifier,
+  NO_USER_DATA,
+} from "./auth/fakes.ts";
 
 let server: Server | undefined;
 
@@ -24,6 +29,7 @@ async function start(
       }),
     },
     auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
+    userData: NO_USER_DATA,
     extractIncomeTaxRules: extract as AppDeps["extractIncomeTaxRules"],
     researchIncomeTax: research as AppDeps["researchIncomeTax"],
   });

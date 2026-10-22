@@ -6,6 +6,7 @@ import {
   type RoleRepository,
   type Verification,
 } from "../../src/auth/ports.ts";
+import type { AppDeps } from "../../src/app.ts";
 
 export const USER_ID = "11111111-1111-4111-8111-111111111111";
 export const ADMIN_ID = "22222222-2222-4222-8222-222222222222";
@@ -53,3 +54,10 @@ export class FakeRoles implements RoleRepository {
     return this.roles.get(userId) ?? [];
   }
 }
+
+/** For apps whose tests never reach user data: any use fails loudly. */
+export const NO_USER_DATA: AppDeps["userData"] = {
+  clientFor: () => {
+    throw new Error("this test does not expect user-data access");
+  },
+};

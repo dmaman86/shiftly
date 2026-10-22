@@ -46,13 +46,14 @@ const envSchema = z
     /** Off by default: research results are only returned, not stored. */
     REFERENCE_DATA_PERSISTENCE_ENABLED: z.stringbool().default(false),
     /**
-     * Required: every request except /health is authenticated with Supabase
-     * Auth. Same project URL as the frontend's VITE_SUPABASE_URL.
+     * Required: verifies Supabase Auth tokens and reads and writes data.
+     * Same project URL as the frontend's VITE_SUPABASE_URL.
      */
     SUPABASE_URL: z.url(),
     /**
      * Publishable key (sb_publishable_...), the same value as the frontend's
-     * VITE_SUPABASE_PUBLISHABLE_KEY. Used only to verify access tokens.
+     * VITE_SUPABASE_PUBLISHABLE_KEY. Verifies access tokens, and with the
+     * caller's own token reads and writes their data under RLS.
      */
     SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
     /**

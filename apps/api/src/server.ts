@@ -19,6 +19,7 @@ import { SupabaseReadinessCheck } from "./http/readiness.ts";
 import { HttpDocumentFetcher } from "./research/http-document-fetcher.ts";
 import { FileDebugArtifactStore } from "./shared/debug-artifacts.ts";
 import { GemmaExtractor } from "./shared/gemma-extractor.ts";
+import { supabaseUserClientFactory } from "./user-data/supabase-user-client.ts";
 
 // The first file that defines a variable wins, and shell variables are never
 // overridden. Paths are resolved from this file, so the cwd does not matter.
@@ -87,6 +88,12 @@ const app = createApp({
     roles: new SupabaseRoleRepository({
       url: env.SUPABASE_URL,
       secretKey: env.SUPABASE_SECRET_KEY,
+    }),
+  },
+  userData: {
+    clientFor: supabaseUserClientFactory({
+      url: env.SUPABASE_URL,
+      publishableKey: env.SUPABASE_PUBLISHABLE_KEY,
     }),
   },
   extractIncomeTaxRules: (year) => extractIncomeTaxRules(year, incomeTaxDeps),
