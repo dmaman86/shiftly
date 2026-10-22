@@ -60,26 +60,40 @@ if (!values.store) {
   if (outcome.status === "failed") process.exit(1);
 }
 
+function readingsOf(
+  report: ContributionsResearchReport,
+  evidence: readonly number[],
+): string {
+  const readings = new Set(
+    evidence.flatMap((index) =>
+      report.evidence[index].quotes.map(({ reading }) => reading),
+    ),
+  );
+  return [...readings]
+    .sort((a, b) => a - b)
+    .map((reading) => `#${reading}`)
+    .join(" ");
+}
+
 function formatReport(report: ContributionsResearchReport): string {
   const lines: string[] = [
     `Window: ${report.timelines.window.from} → ${report.timelines.window.until} (exclusive)`,
     `Archive index: ${report.archive.status === "read" ? `${report.archive.captures} captures` : `unavailable (${report.archive.problem})`}`,
-    `Years without an official reading: ${report.yearsWithoutOfficialReading.join(", ") || "none"}`,
     `Secondary source: ${report.secondary}`,
     "",
     "Readings:",
   ];
-  report.observations.forEach((observation, index) => {
-    const { sources, supportingSource } = observation.provenance;
+  report.readings.forEach((reading, index) => {
+    const { sources, supportingSource } = reading.provenance;
     lines.push(
-      `  #${index} ${observation.observedOn} ${observation.trust}${observation.live ? " (live)" : ""} ${sources[supportingSource].finalUrl}`,
+      `  #${index} ${reading.observedOn} ${reading.trust} ${reading.label} ${sources[supportingSource].finalUrl}`,
     );
   });
   for (const run of report.runs) {
     for (const attempt of run.result.attempts) {
       if (attempt.outcome === "validated") continue;
       lines.push(
-        `  not used (${run.purpose} ${run.year}${run.asOf ? ` as of ${run.asOf}` : ""}): ${attempt.outcome} ${attempt.requestedUrl} ${attempt.problems.join("; ")}`.trimEnd(),
+        `  not used (${run.label}): ${attempt.outcome} ${attempt.requestedUrl} ${attempt.problems.join("; ")}`.trimEnd(),
       );
     }
   }
@@ -90,7 +104,7 @@ function formatReport(report: ContributionsResearchReport): string {
         .filter((period) => period.parameter === parameter)
         .map((period) => ({
           from: period.validFrom,
-          text: `${period.validFrom} → ${period.validTo ?? "open"}  ${period.trust.padEnd(18)} ${period.value}  readings ${period.observations.map((index) => `#${index}`).join(" ")}`,
+          text: `${period.validFrom} → ${period.validTo ?? "open"}  ${period.trust.padEnd(18)} ${period.value}  readings ${readingsOf(report, period.evidence)}${period.trust === "official_derived" ? "  (not stored)" : ""}`,
         })),
       ...report.timelines.missing
         .filter((gap) => gap.parameter === parameter)

@@ -3,12 +3,16 @@ import type {
   RevisionFallbackReason,
 } from "../reference-data/ports.ts";
 import { candidateProvenance } from "../research/candidate-provenance.ts";
-import type { DocumentFetcher, ResearchProvider } from "../research/ports.ts";
+import type {
+  DocumentFetcher,
+  ExtractionProvider,
+  FetchedDocument,
+  ResearchProvider,
+} from "../research/ports.ts";
 import {
   researchReferenceData,
   type ResearchDeps,
   type ResearchResult,
-  type ResearchSpec,
 } from "../research/research-pipeline.ts";
 import {
   waybackCaptureDay,
@@ -20,12 +24,30 @@ import {
   CONTRIBUTIONS_TASK,
 } from "./contributions-extraction.ts";
 import {
+  ANNUAL_REPORT_EXTRACTION,
+  annualReportUrl,
+  EMPLOYEE_TOTAL_HISTORY_EXTRACTION,
+  RATE_HISTORY_URL,
+  THRESHOLD_HISTORY_EXTRACTION,
+  THRESHOLD_HISTORY_URL,
+  validateAnnualReportRates,
+  validateEmployeeTotalHistory,
+  validateThresholdHistory,
+} from "./contributions-history.ts";
+import {
   addMonths,
   buildContributionTimelines,
   contributionCandidates,
+  deriveEvidence,
+  employeeTotalSpans,
   monthOf,
+  observationEvidence,
+  reportEvidence,
+  thresholdEvidence,
+  type ContributionEvidence,
+  type ContributionReading,
   type ContributionTimelines,
-  type ResearchedObservation,
+  type EmployeeTotalSpan,
 } from "./contributions-timeline.ts";
 import { validateContributionsExtraction } from "./contributions-validation.ts";
 import type { ContributionClaims } from "./employee-contributions.ts";
@@ -53,11 +75,9 @@ export type ContributionsResearchDeps = {
 };
 
 export type ContributionsResearchRun = {
+  readonly label: string;
   readonly year: number;
-  readonly purpose: "official" | "secondary";
-  /** The day a secondary source was read as of; null for official runs. */
-  readonly asOf: string | null;
-  readonly result: ResearchResult<ContributionClaims>;
+  readonly result: ResearchResult<unknown>;
 };
 
 export type ContributionsResearchReport = {
@@ -65,11 +85,10 @@ export type ContributionsResearchReport = {
   readonly archive:
     | { readonly status: "read"; readonly captures: number }
     | { readonly status: "unavailable"; readonly problem: string };
-  /** Years with no official page or capture to read, or none that validated. */
-  readonly yearsWithoutOfficialReading: readonly number[];
   readonly secondary: "not_needed" | "used" | "blocked" | "not_found";
   readonly runs: readonly ContributionsResearchRun[];
-  readonly observations: readonly ResearchedObservation[];
+  readonly readings: readonly ContributionReading[];
+  readonly evidence: readonly ContributionEvidence[];
   readonly timelines: ContributionTimelines;
   /** Pending revisions this research would store; nothing is stored here. */
   readonly candidates: readonly NewCandidate[];
@@ -97,24 +116,31 @@ const NO_DISCOVERY: ResearchProvider = {
   },
 };
 
-const contributionsSpec = (
-  urls: readonly string[],
-): ResearchSpec<ContributionClaims> => ({
-  knownSources: () => urls,
-  discoverySubject:
-    "the employee National Insurance and health insurance rates (שיעורי דמי ביטוח לעובד שכיר)",
-  pageKeywords: [],
-  task: () => CONTRIBUTIONS_TASK,
-  validate: (raw, document) =>
-    validateContributionsExtraction(raw, document.text),
-});
+type Source<T> = {
+  readonly label: string;
+  readonly year: number;
+  readonly urls: readonly string[];
+  /** For PDFs: only pages that mention one of these are read. */
+  readonly pageKeywords?: readonly string[];
+  readonly extraction: ExtractionProvider;
+  readonly validate: (
+    raw: unknown,
+    document: FetchedDocument,
+    year: number,
+  ) => T;
+  readonly fetcher?: DocumentFetcher;
+};
 
 /**
- * Official first: for each year from 2015 on, the live page (current year)
- * and the year's latest archived captures of it, through the generic
- * research pipeline. Then, only for months no official reading covers, Kol
- * Zchut as it read at the end of each such stretch. Builds the timelines and
- * the pending revisions they support; stores and activates nothing.
+ * Official first, through the generic research pipeline:
+ * - the change-point tables of thresholds and employee totals;
+ * - the yearly reports' health insurance rates;
+ * - for each year from 2015 on, the live rates page (current year) and the
+ *   year's latest archived captures of it.
+ * Then, where official evidence leaves a month without a value, the employee
+ * total minus the other insurance's rate (reported, never stored), and Kol
+ * Zchut as it read at the end of each remaining stretch. Builds the timelines
+ * and the pending revisions they support; stores and activates nothing.
  */
 export async function researchEmployeeContributions(
   deps: ContributionsResearchDeps,
@@ -122,13 +148,107 @@ export async function researchEmployeeContributions(
   const clock = deps.now ?? (() => new Date());
   const now = clock();
   const today = now.toISOString().slice(0, 10);
+  const currentYear = now.getUTCFullYear();
   const window = { from: RESEARCH_START, until: addMonths(monthOf(today), 1) };
-  const pipeline = (fetcher: DocumentFetcher): ResearchDeps => ({
-    research: NO_DISCOVERY,
-    fetcher,
-    extraction: CONTRIBUTIONS_EXTRACTION,
-    artifacts: deps.artifacts,
-  });
+
+  const runs: ContributionsResearchRun[] = [];
+  const readings: ContributionReading[] = [];
+  const evidence: ContributionEvidence[] = [];
+  const totals: EmployeeTotalSpan[] = [];
+
+  async function read<T>(
+    source: Source<T>,
+    trust: ContributionReading["trust"],
+    observedOn: (result: ResearchResult<T>) => string,
+    fallbackReason: RevisionFallbackReason | null = null,
+  ): Promise<{ values: T; reading: number } | null> {
+    const pipeline: ResearchDeps = {
+      research: NO_DISCOVERY,
+      fetcher: source.fetcher ?? deps.fetcher,
+      extraction: source.extraction,
+      artifacts: deps.artifacts,
+    };
+    const result = await researchReferenceData(
+      source.year,
+      {
+        knownSources: () => source.urls,
+        discoverySubject:
+          "the employee National Insurance and health insurance rates (שיעורי דמי ביטוח לעובד שכיר)",
+        pageKeywords: source.pageKeywords ?? [],
+        task: () => CONTRIBUTIONS_TASK,
+        validate: source.validate,
+      },
+      pipeline,
+    );
+    runs.push({ label: source.label, year: source.year, result });
+    const provenance = candidateProvenance(result);
+    if (result.candidate === null || provenance === null) return null;
+    readings.push({
+      label: source.label,
+      observedOn: observedOn(result),
+      trust,
+      provenance: {
+        sources: provenance.sources,
+        supportingSource: provenance.supportingSource,
+        fallbackReason: trust === "official" ? null : fallbackReason,
+      },
+    });
+    return { values: result.candidate.values, reading: readings.length - 1 };
+  }
+  const retrievedOn = (result: ResearchResult<unknown>) =>
+    waybackCaptureDay(result.candidate!.source.finalUrl) ??
+    result.candidate!.source.retrievedAt.slice(0, 10);
+
+  const thresholds = await read(
+    {
+      label: "thresholds change-point table",
+      year: currentYear,
+      urls: [THRESHOLD_HISTORY_URL],
+      extraction: THRESHOLD_HISTORY_EXTRACTION,
+      validate: (raw, document) => validateThresholdHistory(raw, document.text),
+    },
+    "official",
+    retrievedOn,
+  );
+  if (thresholds) {
+    evidence.push(...thresholdEvidence(thresholds.values, thresholds.reading));
+  }
+
+  const employeeTotals = await read(
+    {
+      label: "employee totals change-point table",
+      year: currentYear,
+      urls: [RATE_HISTORY_URL],
+      extraction: EMPLOYEE_TOTAL_HISTORY_EXTRACTION,
+      validate: (raw, document) =>
+        validateEmployeeTotalHistory(raw, document.text),
+    },
+    "official",
+    retrievedOn,
+  );
+  if (employeeTotals) {
+    totals.push(
+      ...employeeTotalSpans(employeeTotals.values, employeeTotals.reading),
+    );
+  }
+
+  const firstYear = Number(RESEARCH_START.slice(0, 4));
+  for (let year = firstYear; year < currentYear; year++) {
+    const report = await read(
+      {
+        label: `report ${year}`,
+        year,
+        urls: [annualReportUrl(year)],
+        pageKeywords: ["ביטוח בריאות"],
+        extraction: ANNUAL_REPORT_EXTRACTION,
+        validate: (raw, document, reportYear) =>
+          validateAnnualReportRates(raw, document.text, reportYear),
+      },
+      "official",
+      retrievedOn,
+    );
+    if (report) evidence.push(...reportEvidence(report.values, report.reading));
+  }
 
   let archive: ContributionsResearchReport["archive"];
   let captures: Awaited<ReturnType<ArchiveIndex["snapshots"]>> = [];
@@ -142,15 +262,9 @@ export async function researchEmployeeContributions(
     };
   }
 
-  const runs: ContributionsResearchRun[] = [];
-  const observations: ResearchedObservation[] = [];
-  const yearsWithoutOfficialReading: number[] = [];
-  const currentYear = now.getUTCFullYear();
-  for (
-    let year = Number(RESEARCH_START.slice(0, 4));
-    year <= currentYear;
-    year++
-  ) {
+  const validateClaims = (raw: unknown, document: FetchedDocument) =>
+    validateContributionsExtraction(raw, document.text);
+  for (let year = firstYear; year <= currentYear; year++) {
     const urls = [
       ...(year === currentYear ? [BTL_EMPLOYEE_RATES_URL] : []),
       ...captures
@@ -159,96 +273,105 @@ export async function researchEmployeeContributions(
         .reverse()
         .map((capture) => capture.url),
     ];
-    if (urls.length === 0) {
-      yearsWithoutOfficialReading.push(year);
-      continue;
-    }
-    const result = await researchReferenceData(
-      year,
-      contributionsSpec(urls),
-      pipeline(deps.fetcher),
+    if (urls.length === 0) continue;
+    const page = await read<ContributionClaims>(
+      {
+        label: `rates page ${year}`,
+        year,
+        urls,
+        extraction: CONTRIBUTIONS_EXTRACTION,
+        validate: validateClaims,
+      },
+      "official",
+      retrievedOn,
     );
-    runs.push({ year, purpose: "official", asOf: null, result });
-    const observation = observationOf(result, "official", null, null);
-    if (observation) observations.push(observation);
-    else yearsWithoutOfficialReading.push(year);
+    if (page) {
+      const { finalUrl } =
+        readings[page.reading].provenance.sources[
+          readings[page.reading].provenance.supportingSource
+        ];
+      evidence.push(
+        ...observationEvidence(
+          {
+            observedOn: readings[page.reading].observedOn,
+            trust: "official",
+            live: waybackCaptureDay(finalUrl ?? "") === null,
+            claims: page.values,
+          },
+          page.reading,
+        ),
+      );
+    }
   }
 
-  const gaps = gapStretches(buildContributionTimelines(observations, window));
+  evidence.push(...deriveEvidence(evidence, totals));
+
+  const gaps = gapStretches(buildContributionTimelines(evidence, window));
   let secondary: ContributionsResearchReport["secondary"] =
     gaps.length === 0 ? "not_needed" : "not_found";
   for (const gap of gaps) {
     const asOf = [lastDayOf(gap.lastMonth), today].sort()[0];
-    const result = await researchReferenceData(
-      gap.year,
-      contributionsSpec([KOL_ZCHUT_ARTICLE_URL]),
-      pipeline(
-        new KolZchutDocumentFetcher(
+    const officialThatYear = readings.some(
+      (reading) =>
+        reading.trust === "official" &&
+        reading.label === `rates page ${gap.year}`,
+    );
+    const runsBefore = runs.length;
+    const section = await read<ContributionClaims>(
+      {
+        label: `Kol Zchut as of ${asOf}`,
+        year: gap.year,
+        urls: [KOL_ZCHUT_ARTICLE_URL],
+        extraction: CONTRIBUTIONS_EXTRACTION,
+        validate: validateClaims,
+        fetcher: new KolZchutDocumentFetcher(
           deps.kolZchut,
           new Date(`${asOf}T12:00:00.000Z`),
           clock,
         ),
-      ),
-    );
-    runs.push({ year: gap.year, purpose: "secondary", asOf, result });
-    const officialThatYear = observations.some(
-      (observation) =>
-        observation.trust === "official" &&
-        observation.observedOn.startsWith(`${gap.year}-`),
-    );
-    const observation = observationOf(
-      result,
+      },
       "secondary",
-      asOf,
+      () => asOf,
       officialThatYear
         ? "official_source_insufficient"
         : "official_source_not_found",
     );
-    if (observation) {
-      observations.push(observation);
+    if (section) {
+      evidence.push(
+        ...observationEvidence(
+          {
+            observedOn: asOf,
+            trust: "secondary",
+            live: false,
+            claims: section.values,
+          },
+          section.reading,
+        ),
+      );
       secondary = "used";
-    } else if (result.attempts.some(({ outcome }) => outcome === "blocked")) {
+    } else if (
+      runs
+        .slice(runsBefore)
+        .some(({ result }) =>
+          result.attempts.some(({ outcome }) => outcome === "blocked"),
+        )
+    ) {
       // Never retried with another client; the remaining stretches stay missing.
       secondary = "blocked";
       break;
     }
   }
 
-  const timelines = buildContributionTimelines(observations, window);
+  const timelines = buildContributionTimelines(evidence, window);
   return {
     researchedAt: now.toISOString(),
     archive,
-    yearsWithoutOfficialReading,
     secondary,
     runs,
-    observations,
+    readings,
+    evidence,
     timelines,
-    candidates: contributionCandidates(timelines, observations),
-  };
-}
-
-function observationOf(
-  result: ResearchResult<ContributionClaims>,
-  trust: ResearchedObservation["trust"],
-  asOf: string | null,
-  fallbackReason: RevisionFallbackReason | null,
-): ResearchedObservation | null {
-  const provenance = candidateProvenance(result);
-  if (result.candidate === null || provenance === null) return null;
-  const { source, values } = result.candidate;
-  return {
-    observedOn:
-      asOf ??
-      waybackCaptureDay(source.finalUrl) ??
-      source.retrievedAt.slice(0, 10),
-    trust,
-    live: trust === "official" && source.tier === 1,
-    claims: values,
-    provenance: {
-      sources: provenance.sources,
-      supportingSource: provenance.supportingSource,
-      fallbackReason: trust === "official" ? null : fallbackReason,
-    },
+    candidates: contributionCandidates(timelines, evidence, readings),
   };
 }
 

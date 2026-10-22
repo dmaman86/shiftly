@@ -3,7 +3,13 @@ import type { CandidateSource } from "../../src/reference-data/ports.ts";
 import {
   buildContributionTimelines,
   contributionCandidates,
-  type ResearchedObservation,
+  deriveEvidence,
+  observationEvidence,
+  reportEvidence,
+  thresholdEvidence,
+  type ContributionEvidence,
+  type ContributionReading,
+  type EmployeeTotalSpan,
 } from "../../src/social-security/contributions-timeline.ts";
 import type {
   ContributionClaim,
@@ -47,40 +53,66 @@ const source = (url: string): CandidateSource => ({
   role: "supporting",
 });
 
-const observation = (
-  observedOn: string,
-  patch: Partial<Record<ContributionParameter, ContributionClaim>> = {},
-  options: {
-    trust?: "official" | "secondary";
-    live?: boolean;
-    annual?: boolean;
-  } = {},
-): ResearchedObservation => ({
-  observedOn,
-  trust: options.trust ?? "official",
-  live: options.live ?? false,
-  claims: {
-    claims: { ...BASE, ...patch },
-    annualMaxUpdate: options.annual
-      ? "ההכנסה המרבית מתעדכנת בינואר כל שנה"
-      : null,
-  },
-  provenance: {
-    sources: [source(`https://example.gov.il/${observedOn}`)],
-    supportingSource: 0,
-    fallbackReason:
-      options.trust === "secondary" ? "official_source_not_found" : null,
-  },
-});
+/** Collects readings and their evidence as the research does. */
+function research() {
+  const readings: ContributionReading[] = [];
+  const evidence: ContributionEvidence[] = [];
+  const reading = (
+    label: string,
+    observedOn: string,
+    trust: "official" | "secondary" = "official",
+  ) => {
+    readings.push({
+      label,
+      observedOn,
+      trust,
+      provenance: {
+        sources: [source(`https://example.gov.il/${label}/${observedOn}`)],
+        supportingSource: 0,
+        fallbackReason:
+          trust === "secondary" ? "official_source_not_found" : null,
+      },
+    });
+    return readings.length - 1;
+  };
+  const observe = (
+    observedOn: string,
+    patch: Partial<Record<ContributionParameter, ContributionClaim>> = {},
+    options: {
+      trust?: "official" | "secondary";
+      live?: boolean;
+      annual?: boolean;
+    } = {},
+  ) => {
+    const trust = options.trust ?? "official";
+    evidence.push(
+      ...observationEvidence(
+        {
+          observedOn,
+          trust,
+          live: options.live ?? false,
+          claims: {
+            claims: { ...BASE, ...patch },
+            annualMaxUpdate: options.annual
+              ? "ההכנסה המרבית מתעדכנת בינואר כל שנה"
+              : null,
+          },
+        },
+        reading("page", observedOn, trust),
+      ),
+    );
+  };
+  return { readings, evidence, reading, observe };
+}
 
 const WINDOW = { from: "2025-01-01", until: "2025-07-01" };
 
 const rows = (
-  observations: ResearchedObservation[],
+  evidence: readonly ContributionEvidence[],
   parameter: ContributionParameter,
   window = WINDOW,
 ) => {
-  const timelines = buildContributionTimelines(observations, window);
+  const timelines = buildContributionTimelines(evidence, window);
   return [
     ...timelines.periods
       .filter((period) => period.parameter === parameter)
@@ -91,11 +123,11 @@ const rows = (
   ].sort((a, b) => String(a[0]).localeCompare(String(b[0])));
 };
 
-describe("buildContributionTimelines", () => {
-  it("covers from the stated date through the month the source was read", () => {
-    expect(
-      rows([observation("2025-03-10")], "healthInsuranceStandardRate"),
-    ).toEqual([
+describe("rates page evidence", () => {
+  it("covers from the stated date through the month the page was read", () => {
+    const { evidence, observe } = research();
+    observe("2025-03-10");
+    expect(rows(evidence, "healthInsuranceStandardRate")).toEqual([
       ["2025-01-01", "2025-02-01", "no_evidence"],
       ["2025-02-01", "2025-04-01", 0.0517, "official_verified"],
       ["2025-04-01", "2025-07-01", "no_evidence"],
@@ -103,17 +135,10 @@ describe("buildContributionTimelines", () => {
   });
 
   it("keeps a gap between two readings of the same value", () => {
-    expect(
-      rows(
-        [
-          observation("2025-01-20"),
-          observation("2025-05-02", {
-            reducedRateBoundary: claim(7522),
-          }),
-        ],
-        "reducedRateBoundary",
-      ),
-    ).toEqual([
+    const { evidence, observe } = research();
+    observe("2025-01-20");
+    observe("2025-05-02", { reducedRateBoundary: claim(7522) });
+    expect(rows(evidence, "reducedRateBoundary")).toEqual([
       ["2025-01-01", "2025-02-01", 7522, "official_verified"],
       ["2025-02-01", "2025-05-01", "no_evidence"],
       ["2025-05-01", "2025-06-01", 7522, "official_verified"],
@@ -121,58 +146,221 @@ describe("buildContributionTimelines", () => {
     ]);
   });
 
-  it("extends the maximum to December only when the source says it changes in January", () => {
+  it("extends the maximum to December only when the page says it changes in January", () => {
     const window = { from: "2025-01-01", until: "2026-07-01" };
-    expect(
-      rows(
-        [observation("2025-03-10", {}, { annual: true })],
-        "maxInsurableIncome",
-        window,
-      ),
-    ).toEqual([
+    const annual = research();
+    annual.observe("2025-03-10", {}, { annual: true });
+    expect(rows(annual.evidence, "maxInsurableIncome", window)).toEqual([
       ["2025-01-01", "2026-01-01", 50695, "official_verified"],
       ["2026-01-01", "2026-07-01", "no_evidence"],
     ]);
-    expect(
-      rows([observation("2025-03-10")], "maxInsurableIncome", window)[0],
-    ).toEqual(["2025-01-01", "2025-04-01", 50695, "official_verified"]);
+    const plain = research();
+    plain.observe("2025-03-10");
+    expect(rows(plain.evidence, "maxInsurableIncome", window)[0]).toEqual([
+      "2025-01-01",
+      "2025-04-01",
+      50695,
+      "official_verified",
+    ]);
   });
 
   it("stops a year-limited statement at the end of that year", () => {
-    const window = { from: "2020-01-01", until: "2022-01-01" };
+    const { evidence, observe } = research();
+    observe(
+      "2021-12-31",
+      { reducedRateBoundary: claim(6331, "2020-01-01", "2021-01-01") },
+      { trust: "secondary" },
+    );
     expect(
-      rows(
-        [
-          observation(
-            "2021-12-31",
-            { reducedRateBoundary: claim(6331, "2020-01-01", "2021-01-01") },
-            { trust: "secondary" },
-          ),
-        ],
-        "reducedRateBoundary",
-        window,
-      ),
+      rows(evidence, "reducedRateBoundary", {
+        from: "2020-01-01",
+        until: "2022-01-01",
+      }),
     ).toEqual([
       ["2020-01-01", "2021-01-01", 6331, "secondary_verified"],
       ["2021-01-01", "2022-01-01", "no_evidence"],
     ]);
   });
 
-  it("leaves months where official readings disagree missing, and reports them", () => {
+  it("leaves only the period the live page supports open-ended", () => {
+    const live = research();
+    live.observe("2025-06-15", {}, { live: true });
+    expect(
+      buildContributionTimelines(live.evidence, WINDOW).periods.find(
+        (period) => period.parameter === "nationalInsuranceStandardRate",
+      ),
+    ).toMatchObject({ validFrom: "2025-01-01", validTo: null });
+    const archived = research();
+    archived.observe("2025-06-15");
+    expect(
+      buildContributionTimelines(archived.evidence, WINDOW).periods,
+    ).not.toContainEqual(expect.objectContaining({ validTo: null }));
+  });
+});
+
+describe("historical evidence", () => {
+  it("holds each change-point row until the next one, and the newest row for its month only", () => {
+    const { evidence, reading } = research();
+    evidence.push(
+      ...thresholdEvidence(
+        {
+          rows: [
+            {
+              from: "2019-01-01",
+              reducedRateBoundary: 6164,
+              maxInsurableIncome: 43890,
+              quote: "01/01/2019 | 5,300 | 6,164 | 43,890 | 43,890 |",
+            },
+            {
+              from: "2018-01-01",
+              reducedRateBoundary: 5944,
+              maxInsurableIncome: 43370,
+              quote: "01/01/2018 | 5,300 | 5,944 | 43,370 | 43,370 |",
+            },
+            {
+              from: "2003-01-01",
+              reducedRateBoundary: 3482,
+              maxInsurableIncome: null,
+              quote: "01/01/2003 | 3,335.18 | 3,482 | אין מגבלה | אין מגבלה |",
+            },
+          ],
+        },
+        reading("thresholds", "2026-10-22"),
+      ),
+    );
+    const window = { from: "2017-11-01", until: "2019-06-01" };
+    expect(rows(evidence, "reducedRateBoundary", window)).toEqual([
+      ["2017-11-01", "2018-01-01", 3482, "official_verified"],
+      ["2018-01-01", "2019-01-01", 5944, "official_verified"],
+      ["2019-01-01", "2019-02-01", 6164, "official_verified"],
+      ["2019-02-01", "2019-06-01", "no_evidence"],
+    ]);
+    expect(rows(evidence, "maxInsurableIncome", window)[0]).toEqual([
+      "2017-11-01",
+      "2018-01-01",
+      "no_evidence",
+    ]);
+  });
+
+  it("covers a report's year, and the earlier year it says rates stayed as", () => {
+    const { evidence, reading } = research();
+    evidence.push(
+      ...reportEvidence(
+        {
+          year: 2018,
+          yearQuote: "בשנת 2018",
+          statedFrom: null,
+          sameAsYear: 2017,
+          sameAsQuote: "נותרו כבשנת 2017",
+          headerQuote: "שיעור רגיל שיעור מופחת",
+          healthReduced: 0.031,
+          healthStandard: 0.05,
+          quote: "דמי ביטוח בריאות 5.00 3.10",
+        },
+        reading("report", "2026-10-22"),
+      ),
+    );
+    expect(
+      rows(evidence, "healthInsuranceReducedRate", {
+        from: "2016-12-01",
+        until: "2019-02-01",
+      }),
+    ).toEqual([
+      ["2016-12-01", "2017-01-01", "no_evidence"],
+      ["2017-01-01", "2019-01-01", 0.031, "official_verified"],
+      ["2019-01-01", "2019-02-01", "no_evidence"],
+    ]);
+  });
+});
+
+describe("derived evidence", () => {
+  const total = (
+    part: "reduced" | "standard",
+    value: number,
+    from: string,
+    until: string,
+  ): EmployeeTotalSpan => ({
+    part,
+    value,
+    from,
+    until,
+    quote: {
+      reading: 0,
+      quote: `total ${value}`,
+      sourceReference: null,
+      effectiveFrom: from,
+      note: "total",
+    },
+  });
+
+  it("derives one insurance from the total and the other, only where both are official", () => {
+    const { evidence, observe } = research();
+    observe("2025-03-10");
+    const derived = deriveEvidence(evidence, [
+      total("standard", 0.1216, "2025-01-01", "2025-02-01"),
+    ]);
+    expect(derived).toEqual([
+      expect.objectContaining({
+        parameter: "healthInsuranceStandardRate",
+        value: 0.0516,
+        from: "2025-01-01",
+        until: "2025-02-01",
+        rank: "derived",
+      }),
+    ]);
+    expect(
+      rows([...evidence, ...derived], "healthInsuranceStandardRate").slice(
+        0,
+        2,
+      ),
+    ).toEqual([
+      ["2025-01-01", "2025-02-01", 0.0516, "official_derived"],
+      ["2025-02-01", "2025-04-01", 0.0517, "official_verified"],
+    ]);
+  });
+
+  it("prefers official values and reports a derived value that disagrees", () => {
+    const { evidence, observe } = research();
+    observe("2025-03-10");
+    const derived = deriveEvidence(evidence, [
+      total("reduced", 0.0428, "2025-01-01", "2025-04-01"),
+    ]);
     const timelines = buildContributionTimelines(
-      [
-        observation("2025-03-10"),
-        observation("2025-04-10", {
-          reducedRateBoundary: claim(7600, "2025-03-01"),
-        }),
-      ],
+      [...evidence, ...derived],
       WINDOW,
     );
     expect(
-      timelines.missing.filter(
-        (gap) => gap.parameter === "reducedRateBoundary",
+      timelines.periods.find(
+        (period) => period.parameter === "nationalInsuranceReducedRate",
       ),
-    ).toContainEqual({
+    ).toMatchObject({ value: 0.0104, trust: "official_verified" });
+    expect(timelines.conflicts).toContainEqual(
+      expect.objectContaining({
+        parameter: "nationalInsuranceReducedRate",
+        between: "derived_vs_official",
+        values: [0.0104, 0.0105],
+      }),
+    );
+  });
+
+  it("never derives from secondary evidence", () => {
+    const { evidence, observe } = research();
+    observe("2025-03-10", {}, { trust: "secondary" });
+    expect(
+      deriveEvidence(evidence, [
+        total("standard", 0.1216, "2025-01-01", "2025-02-01"),
+      ]),
+    ).toEqual([]);
+  });
+});
+
+describe("conflicts and fallback", () => {
+  it("leaves months where official evidence disagrees missing, and reports them", () => {
+    const { evidence, observe } = research();
+    observe("2025-03-10");
+    observe("2025-04-10", { reducedRateBoundary: claim(7600, "2025-03-01") });
+    const timelines = buildContributionTimelines(evidence, WINDOW);
+    expect(timelines.missing).toContainEqual({
       parameter: "reducedRateBoundary",
       validFrom: "2025-03-01",
       validTo: "2025-04-01",
@@ -189,21 +377,22 @@ describe("buildContributionTimelines", () => {
     ]);
   });
 
-  it("fills only official gaps with secondary readings, and reports disagreements", () => {
-    const official = observation("2025-02-10");
-    const secondary = observation(
+  it("fills only official gaps with secondary evidence, and reports disagreements", () => {
+    const { evidence, observe } = research();
+    observe("2025-02-10");
+    observe(
       "2025-04-30",
       { healthInsuranceStandardRate: claim(0.0516, "2025-01-01") },
       { trust: "secondary" },
     );
-    expect(rows([official, secondary], "healthInsuranceStandardRate")).toEqual([
+    expect(rows(evidence, "healthInsuranceStandardRate")).toEqual([
       ["2025-01-01", "2025-02-01", 0.0516, "secondary_verified"],
       ["2025-02-01", "2025-03-01", 0.0517, "official_verified"],
       ["2025-03-01", "2025-05-01", 0.0516, "secondary_verified"],
       ["2025-05-01", "2025-07-01", "no_evidence"],
     ]);
     expect(
-      buildContributionTimelines([official, secondary], WINDOW).conflicts,
+      buildContributionTimelines(evidence, WINDOW).conflicts,
     ).toContainEqual({
       parameter: "healthInsuranceStandardRate",
       validFrom: "2025-02-01",
@@ -212,38 +401,27 @@ describe("buildContributionTimelines", () => {
       values: [0.0516, 0.0517],
     });
   });
-
-  it("leaves only the period the live page supports open-ended", () => {
-    const timelines = buildContributionTimelines(
-      [observation("2025-06-15", {}, { live: true })],
-      WINDOW,
-    );
-    expect(
-      timelines.periods.find(
-        (period) => period.parameter === "nationalInsuranceStandardRate",
-      ),
-    ).toMatchObject({ validFrom: "2025-01-01", validTo: null });
-    expect(
-      buildContributionTimelines([observation("2025-06-15")], WINDOW).periods,
-    ).not.toContainEqual(expect.objectContaining({ validTo: null }));
-  });
 });
 
 describe("contributionCandidates", () => {
-  it("builds one pending research revision per covered period", () => {
-    const observations = [observation("2025-01-20"), observation("2025-02-10")];
+  it("builds one pending research revision per verified period", () => {
+    const { evidence, readings, observe } = research();
+    observe("2025-01-20");
+    observe("2025-02-10");
     const candidates = contributionCandidates(
-      buildContributionTimelines(observations, {
+      buildContributionTimelines(evidence, {
         from: "2025-01-01",
         until: "2025-03-01",
       }),
-      observations,
+      evidence,
+      readings,
     );
-    const health = candidates.filter(
-      (candidate) =>
-        candidate.kind === "health_insurance.employee_standard_rate",
-    );
-    expect(health).toEqual([
+    expect(
+      candidates.filter(
+        (candidate) =>
+          candidate.kind === "health_insurance.employee_standard_rate",
+      ),
+    ).toEqual([
       {
         kind: "health_insurance.employee_standard_rate",
         subjectKey: null,
@@ -253,7 +431,7 @@ describe("contributionCandidates", () => {
         origin: "research",
         trust: "official_verified",
         fallbackReason: null,
-        sources: [source("https://example.gov.il/2025-02-10")],
+        sources: [source("https://example.gov.il/page/2025-02-10")],
         evidence: [
           {
             evidenceType: "fetched_verified",
@@ -283,19 +461,53 @@ describe("contributionCandidates", () => {
   });
 
   it("keeps the fallback reason on secondary revisions", () => {
-    const observations = [
-      observation("2025-01-20", {}, { trust: "secondary" }),
-    ];
+    const { evidence, readings, observe } = research();
+    observe("2025-01-20", {}, { trust: "secondary" });
     const [first] = contributionCandidates(
-      buildContributionTimelines(observations, {
+      buildContributionTimelines(evidence, {
         from: "2025-01-01",
         until: "2025-02-01",
       }),
-      observations,
+      evidence,
+      readings,
     );
     expect(first).toMatchObject({
       trust: "secondary_verified",
       fallbackReason: "official_source_not_found",
     });
+  });
+
+  it("stores no derived period", () => {
+    const { evidence, readings, observe } = research();
+    observe("2025-03-10");
+    evidence.push(
+      ...deriveEvidence(evidence, [
+        {
+          part: "standard",
+          value: 0.1216,
+          from: "2025-01-01",
+          until: "2025-02-01",
+          quote: {
+            reading: 0,
+            quote: "total 0.1216",
+            sourceReference: null,
+            effectiveFrom: "2025-01-01",
+            note: "total",
+          },
+        },
+      ]),
+    );
+    const candidates = contributionCandidates(
+      buildContributionTimelines(evidence, WINDOW),
+      evidence,
+      readings,
+    );
+    expect(
+      candidates.filter(
+        (candidate) =>
+          candidate.kind === "health_insurance.employee_standard_rate" &&
+          candidate.validFrom === "2025-01-01",
+      ),
+    ).toEqual([]);
   });
 });
