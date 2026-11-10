@@ -19,6 +19,20 @@ describe("loadEnv", () => {
     );
   });
 
+  it("uses no dedicated user-data key unless one is set", () => {
+    expect(loadEnv(BASE).SUPABASE_USER_DATA_SECRET_KEY).toBeUndefined();
+    expect(
+      loadEnv({ ...BASE, SUPABASE_USER_DATA_SECRET_KEY: "sb_secret_user" })
+        .SUPABASE_USER_DATA_SECRET_KEY,
+    ).toBe("sb_secret_user");
+  });
+
+  it("rejects an empty dedicated user-data key", () => {
+    expect(() =>
+      loadEnv({ ...BASE, SUPABASE_USER_DATA_SECRET_KEY: "" }),
+    ).toThrow("SUPABASE_USER_DATA_SECRET_KEY");
+  });
+
   it("accepts persistence with the Supabase settings", () => {
     const env = loadEnv({
       ...BASE,

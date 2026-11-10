@@ -52,8 +52,7 @@ const envSchema = z
     SUPABASE_URL: z.url(),
     /**
      * Publishable key (sb_publishable_...), the same value as the frontend's
-     * VITE_SUPABASE_PUBLISHABLE_KEY. Verifies access tokens, and with the
-     * caller's own token reads and writes their data under RLS.
+     * VITE_SUPABASE_PUBLISHABLE_KEY. Used only to verify access tokens.
      */
     SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
     /**
@@ -61,6 +60,13 @@ const envSchema = z
      * reference data. Backend only: never prefix it with VITE_.
      */
     SUPABASE_SECRET_KEY: z.string().min(1),
+    /**
+     * Optional secret key used only for user-owned data, so it can be rotated
+     * or revoked without touching reference data and admin work. Another key
+     * of the same project: the same service_role privileges, a separate
+     * credential. Unset: SUPABASE_SECRET_KEY is used.
+     */
+    SUPABASE_USER_DATA_SECRET_KEY: z.string().min(1).optional(),
   })
   .refine(
     (env) =>

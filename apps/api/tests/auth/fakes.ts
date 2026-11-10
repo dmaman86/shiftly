@@ -57,7 +57,7 @@ export class FakeRoles implements RoleRepository {
 
 /** For apps whose tests never reach user data: any use fails loudly. */
 export const NO_USER_DATA: AppDeps["userData"] = {
-  clientFor: () => {
+  scopeFor: () => {
     throw new Error("this test does not expect user-data access");
   },
 };

@@ -19,7 +19,7 @@ import { SupabaseReadinessCheck } from "./http/readiness.ts";
 import { HttpDocumentFetcher } from "./research/http-document-fetcher.ts";
 import { FileDebugArtifactStore } from "./shared/debug-artifacts.ts";
 import { GemmaExtractor } from "./shared/gemma-extractor.ts";
-import { supabaseUserClientFactory } from "./user-data/supabase-user-client.ts";
+import { supabaseUserDataAccess } from "./user-data/user-scope.ts";
 
 // The first file that defines a variable wins, and shell variables are never
 // overridden. Paths are resolved from this file, so the cwd does not matter.
@@ -90,12 +90,10 @@ const app = createApp({
       secretKey: env.SUPABASE_SECRET_KEY,
     }),
   },
-  userData: {
-    clientFor: supabaseUserClientFactory({
-      url: env.SUPABASE_URL,
-      publishableKey: env.SUPABASE_PUBLISHABLE_KEY,
-    }),
-  },
+  userData: supabaseUserDataAccess({
+    url: env.SUPABASE_URL,
+    secretKey: env.SUPABASE_USER_DATA_SECRET_KEY ?? env.SUPABASE_SECRET_KEY,
+  }),
   extractIncomeTaxRules: (year) => extractIncomeTaxRules(year, incomeTaxDeps),
   researchIncomeTax: (year) => researchAndStoreIncomeTax(year, researchDeps),
 });
@@ -109,6 +107,8 @@ const server = app.listen(env.PORT, env.HOST, () => {
       port: env.PORT,
       allowedOrigins: env.CORS_ALLOWED_ORIGINS,
       referenceDataPersistence: env.REFERENCE_DATA_PERSISTENCE_ENABLED,
+      // Which key user data uses, never its value.
+      userDataKey: env.SUPABASE_USER_DATA_SECRET_KEY ? "dedicated" : "shared",
     }),
   );
 });

@@ -11,10 +11,12 @@ import {
 
 describe("userDataErrorFrom", () => {
   it.each<[number, string, UserDataErrorCode]>([
-    [401, "PGRST303", "unauthenticated"],
-    [401, "PGRST301", "unauthenticated"],
-    [401, "", "unauthenticated"],
-    [403, "42501", "not_found"],
+    // The backend's own key or grants refused: a server fault, never a 401
+    // that would make the browser refresh a valid session.
+    [401, "PGRST303", "internal_error"],
+    [401, "PGRST301", "internal_error"],
+    [401, "", "internal_error"],
+    [403, "42501", "internal_error"],
     [400, "22023", "invalid_request"],
     [400, "22P02", "invalid_request"],
     [400, "22007", "invalid_request"],
@@ -68,7 +70,6 @@ describe("handleUserDataErrors", () => {
   }
 
   it.each<[UserDataErrorCode, number]>([
-    ["unauthenticated", 401],
     ["not_found", 404],
     ["invalid_request", 400],
     ["conflict", 409],
@@ -86,11 +87,15 @@ describe("handleUserDataErrors", () => {
     expect(body.error.message).not.toContain("secret detail");
   });
 
-  it("asks for a Bearer token on 401", async () => {
+  it("never answers 401: authentication is the middleware's job", async () => {
     const response = await start(
-      new UserDataError("unauthenticated", "JWT expired", "PGRST303"),
+      userDataErrorFrom({
+        status: 401,
+        error: { code: "PGRST301", message: "JWT invalid" },
+      }),
     );
-    expect(response.headers.get("www-authenticate")).toBe("Bearer");
+    expect(response.status).toBe(500);
+    expect(response.headers.get("www-authenticate")).toBeNull();
   });
 
   it("logs the database code for operators", async () => {
