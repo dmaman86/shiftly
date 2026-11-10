@@ -7,7 +7,6 @@ import type {
   SourceTier,
 } from "../research/ports.ts";
 import { publisherOf, sourceTier } from "../research/source-policy.ts";
-import type { ElectionStatus } from "./legacy-seed.ts";
 import type {
   ActiveRevision,
   CandidateEvidence,
@@ -15,6 +14,9 @@ import type {
   NewCandidate,
   RevisionAdministration,
 } from "./ports.ts";
+
+/** Business status of a Knesset election, as published to the web app. */
+export type ElectionStatus = "planned" | "confirmed" | "occurred" | "cancelled";
 
 const KIND = "calendar.knesset_election";
 const DAY_MS = 24 * 60 * 60 * 1000;

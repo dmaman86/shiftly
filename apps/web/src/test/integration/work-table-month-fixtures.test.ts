@@ -3,11 +3,9 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { domain } from "@/app";
-import {
-  buildEventMap,
-  dayToPayBreakdownVM,
-  monthToPayBreakdownVM,
-} from "@/adapters";
+import { dayToPayBreakdownVM, monthToPayBreakdownVM } from "@/adapters";
+import { buildCalendarEventMap } from "@/hooks/useWorkDays";
+import type { PublishedElection } from "@/services";
 import { allocateShabbatCredit } from "@shiftly/domain";
 import type { WorkDayStatus } from "@shiftly/domain";
 import {
@@ -30,7 +28,6 @@ type MonthFixture = {
   baseRate: number;
   standardHours: number;
   timeZone: string;
-  holidays?: unknown[];
   statuses: Array<{ date: string; status: WorkDayStatus }>;
   shifts: ShiftRecord[];
 };
@@ -73,6 +70,10 @@ const loadFixture = <T>(file: string): T =>
     ),
   ) as T;
 
+const publishedElections = loadFixture<{ elections: PublishedElection[] }>(
+  "published-elections.json",
+).elections;
+
 const expectCloseTo = (
   actual: unknown,
   expected: unknown,
@@ -106,22 +107,24 @@ const expectSalary = (actual: number | undefined, expected: number) => {
 
 const calculateMonth = (input: MonthFixture) => {
   const { year, month, standardHours, baseRate } = input;
-  const calendar: { items: unknown[] } = input.holidays
-    ? { items: input.holidays }
-    : JSON.parse(
-        readFileSync(
-          resolve(
-            import.meta.dirname,
-            "../../../public/calendar",
-            `${year}.json`,
-          ),
-          "utf8",
+  // The calendar the app builds: computed holidays plus the published
+  // elections that the E2E suite serves for the same scenarios.
+  const eventMap = buildCalendarEventMap(
+    [year],
+    [
+      {
+        status: "fresh",
+        year,
+        elections: publishedElections.filter(({ date }) =>
+          date.startsWith(`${year}-`),
         ),
-      );
+      },
+    ],
+  );
   const workDays = domain.payMap.workDaysMonthBuilder.build({
     year,
     month,
-    eventMap: buildEventMap(calendar),
+    eventMap,
   });
 
   const state = recordsToWorkTableDayState({

@@ -1,5 +1,3 @@
-export { hebcalService } from "./hebcal/hebcal.service";
-export { calendarService } from "./calendar/calendar.service";
 export { referenceService } from "./reference/reference.service";
 export type {
   ElectionsResult,

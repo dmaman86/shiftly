@@ -1,12 +1,18 @@
 import { act, renderHook } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { buildEventMap } from "@/adapters";
 import { useFetch } from "@/hooks/useFetch";
+
+/** A boundary adapter: validates the raw payload and reshapes it. */
+const countItems = (payload: unknown): { count: number } => {
+  const items = (payload as { items?: unknown }).items;
+  if (!Array.isArray(items)) throw new Error("items must be an array");
+  return { count: items.length };
+};
 
 describe("useFetch", () => {
   it("passes the complete unknown payload to the boundary adapter", async () => {
     const payload = { items: [] };
-    const adapter = vi.fn(buildEventMap);
+    const adapter = vi.fn(countItems);
     const call = vi.fn().mockResolvedValue({ data: payload });
     const { result } = renderHook(() => useFetch());
 
@@ -16,7 +22,7 @@ describe("useFetch", () => {
     });
 
     expect(adapter).toHaveBeenCalledWith(payload);
-    expect(response!).toEqual({ data: {} });
+    expect(response!).toEqual({ data: { count: 0 } });
   });
 
   it("returns a validation error when the adapter rejects the payload", async () => {
@@ -25,11 +31,11 @@ describe("useFetch", () => {
 
     let response: Awaited<ReturnType<typeof result.current.callEndPoint>>;
     await act(async () => {
-      response = await result.current.callEndPoint({ call }, buildEventMap);
+      response = await result.current.callEndPoint({ call }, countItems);
     });
 
     expect(response!).toEqual({
-      error: "Invalid Hebcal response: items must be an array",
+      error: "items must be an array",
     });
   });
 
