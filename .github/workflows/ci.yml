@@ -108,6 +108,30 @@ jobs:
           path: dist
           if-no-files-found: error
 
+  db-tests:
+    name: Database Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      # Pinned so a CLI release cannot change the local stack under the tests.
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.121.0
+
+      # Only Postgres: applies every migration to an empty database, so a
+      # migration that cannot rebuild the schema from scratch fails here.
+      - name: Start local database
+        run: supabase db start
+
+      # pgTAP: privileges of browser roles, RLS ownership, guest import.
+      - name: Run database tests
+        run: supabase test db
+
   e2e:
     name: End-to-End Tests
     runs-on: ubuntu-latest
@@ -162,7 +186,7 @@ jobs:
     runs-on: ubuntu-latest
     # After the API is live and answering /health and /ready: a new web app
     # must never call an API that does not have its endpoints yet.
-    needs: [checks, e2e, deploy-api]
+    needs: [checks, e2e, db-tests, deploy-api]
 
     concurrency:
       group: pages
@@ -200,7 +224,7 @@ jobs:
     name: Deploy API to Cloud Run
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    needs: [checks, e2e]
+    needs: [checks, e2e, db-tests]
 
     concurrency:
       group: api-deploy

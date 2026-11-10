@@ -39,6 +39,7 @@
     "test:web": "bun run domain:build && vitest run --project web",
     "test:coverage": "bun run domain:build && vitest run --coverage",
     "test:ci": "bun run domain:build && vitest run",
+    "test:db": "supabase db start && supabase test db",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
