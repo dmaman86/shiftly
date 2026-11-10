@@ -66,7 +66,7 @@ const SUPABASE_DATA_PATH = /\/(rest|functions|storage|graphql)\/v1\//;
  * Temporary, like the lint allowlist: each entry goes away as its data moves
  * to apps/api, and the list must end empty.
  */
-const LEGACY_SUPABASE_DATA = ["/functions/v1/delete-account"];
+const LEGACY_SUPABASE_DATA: readonly string[] = [];
 
 const isLegacy = (request: Request) => {
   const { pathname } = new URL(request.url());

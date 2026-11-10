@@ -8,13 +8,14 @@ const authMocks = vi.hoisted(() => ({
   signOut: vi.fn(),
 }));
 
-const functionsMocks = vi.hoisted(() => ({
-  invoke: vi.fn(),
+const apiMocks = vi.hoisted(() => ({
+  request: vi.fn(),
 }));
 
 const hookMocks = vi.hoisted(() => ({
   authState: {
     user: null as {
+      id?: string;
       app_metadata?: Record<string, unknown>;
       created_at?: string;
       email?: string;
@@ -33,8 +34,11 @@ const hookMocks = vi.hoisted(() => ({
 vi.mock("@/services/supabase/supabase.client", () => ({
   supabase: {
     auth: authMocks,
-    functions: functionsMocks,
   },
+}));
+
+vi.mock("@/services/api/client", () => ({
+  apiClient: apiMocks,
 }));
 
 vi.mock("@/hooks", () => ({
@@ -86,6 +90,7 @@ describe("AccountProfileCard", () => {
 
   it("shows authenticated user profile data with account removal collapsed", () => {
     hookMocks.authState.user = {
+      id: "user-1",
       app_metadata: { provider: "google" },
       email: "worker@example.com",
       user_metadata: { full_name: "Shift Worker" },
@@ -105,11 +110,8 @@ describe("AccountProfileCard", () => {
 
   it("deletes the authenticated account after explicit confirmation", async () => {
     const user = userEvent.setup();
-    hookMocks.authState.user = { email: "worker@example.com" };
-    functionsMocks.invoke.mockResolvedValue({
-      data: { deleted: true },
-      error: null,
-    });
+    hookMocks.authState.user = { id: "user-1", email: "worker@example.com" };
+    apiMocks.request.mockResolvedValue({ data: null });
     authMocks.signOut.mockResolvedValue({ error: null });
 
     render(<AccountProfileCard defaultExpanded />);
@@ -125,8 +127,11 @@ describe("AccountProfileCard", () => {
     await user.type(screen.getByLabelText("Type DELETE to confirm"), "DELETE");
     await user.click(confirmButton);
 
-    expect(functionsMocks.invoke).toHaveBeenCalledWith("delete-account", {
+    expect(apiMocks.request).toHaveBeenCalledWith({
       method: "DELETE",
+      path: "/me/account",
+      authenticated: true,
+      expectedUserId: "user-1",
     });
     expect(authMocks.signOut).toHaveBeenCalledWith({ scope: "local" });
     expect(hookMocks.snackbar.success).toHaveBeenCalledWith(
@@ -137,14 +142,12 @@ describe("AccountProfileCard", () => {
   it("tracks the deletion with provider and account age, without identity", async () => {
     const user = userEvent.setup();
     hookMocks.authState.user = {
+      id: "user-1",
       app_metadata: { provider: "google" },
       created_at: new Date(Date.now() - 10 * DAY_MS - 1000).toISOString(),
       email: "worker@example.com",
     };
-    functionsMocks.invoke.mockResolvedValue({
-      data: { deleted: true },
-      error: null,
-    });
+    apiMocks.request.mockResolvedValue({ data: null });
     authMocks.signOut.mockResolvedValue({ error: null });
 
     render(<AccountProfileCard defaultExpanded />);
@@ -158,11 +161,8 @@ describe("AccountProfileCard", () => {
 
   it("tracks the deletion even when the local sign-out fails afterwards", async () => {
     const user = userEvent.setup();
-    hookMocks.authState.user = { email: "worker@example.com" };
-    functionsMocks.invoke.mockResolvedValue({
-      data: { deleted: true },
-      error: null,
-    });
+    hookMocks.authState.user = { id: "user-1", email: "worker@example.com" };
+    apiMocks.request.mockResolvedValue({ data: null });
     authMocks.signOut.mockResolvedValue({ error: { message: "offline" } });
 
     render(<AccountProfileCard defaultExpanded />);
@@ -177,11 +177,8 @@ describe("AccountProfileCard", () => {
 
   it("does not clear the local session when account deletion fails", async () => {
     const user = userEvent.setup();
-    hookMocks.authState.user = { email: "worker@example.com" };
-    functionsMocks.invoke.mockResolvedValue({
-      data: null,
-      error: { message: "Authentication is required" },
-    });
+    hookMocks.authState.user = { id: "user-1", email: "worker@example.com" };
+    apiMocks.request.mockResolvedValue({ error: "unauthenticated" });
 
     render(<AccountProfileCard defaultExpanded />);
 
@@ -191,9 +188,8 @@ describe("AccountProfileCard", () => {
     await user.click(screen.getByRole("button", { name: "Delete my account" }));
 
     expect(authMocks.signOut).not.toHaveBeenCalled();
-    expect(hookMocks.snackbar.error).toHaveBeenCalledWith(
-      "Authentication is required",
-    );
+    // The API's error code; translating these codes is left to the web cleanup.
+    expect(hookMocks.snackbar.error).toHaveBeenCalledWith("unauthenticated");
     expect(analyticsService.track).not.toHaveBeenCalled();
   });
 });

@@ -25,7 +25,6 @@ const SUPABASE_AUTH_FILES = [
 // Each entry is removed as its data moves to apps/api; never add one.
 const LEGACY_SUPABASE_DATA_FILES = [
   "apps/web/src/services/supabase/supabase.crud.ts",
-  "apps/web/src/services/account/account.service.ts",
 ];
 
 export default defineConfig(

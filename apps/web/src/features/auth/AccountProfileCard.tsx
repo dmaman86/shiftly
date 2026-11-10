@@ -92,7 +92,7 @@ export const AccountProfileCard = ({
     if (!canDeleteAccount) return;
 
     const result = await callDeleteAccount(
-      accountService().deleteCurrentAccount(),
+      accountService().deleteCurrentAccount(user.id),
     );
 
     if (result.error) {

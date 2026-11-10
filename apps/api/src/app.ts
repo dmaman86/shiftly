@@ -13,6 +13,7 @@ import type { PublishedTimelinesReader } from "./reference-data/published-timeli
 import { publishedTimelinesRouter } from "./reference-data/published-timelines-router.ts";
 import { yearRulesRouter } from "./shared/rules-router.ts";
 import { handleUserDataErrors } from "./user-data/errors.ts";
+import { accountRouter, type AccountDeleter } from "./user-data/account.ts";
 import { guestImportRouter } from "./user-data/guest-import-router.ts";
 import { monthlyConfigRouter } from "./user-data/monthly-config-router.ts";
 import { shiftsRouter } from "./user-data/shifts-router.ts";
@@ -36,6 +37,8 @@ export type AppDeps = {
    * caller of each request.
    */
   readonly userData: UserDataAccess;
+  /** Deletes the verified caller's account; never anyone else's. */
+  readonly accounts: AccountDeleter;
   readonly extractIncomeTaxRules: (
     year: number,
   ) => Promise<IncomeTaxRulesResult>;
@@ -92,6 +95,7 @@ export function createApp(deps: AppDeps): express.Express {
     workDaysRouter(deps.userData),
     shiftsRouter(deps.userData),
     guestImportRouter(deps.userData),
+    accountRouter(deps.auth.verifier, deps.accounts),
   );
 
   // Admin only. Extraction and research read public sources, call a paid

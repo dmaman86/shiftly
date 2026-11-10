@@ -20,6 +20,7 @@ import { HttpDocumentFetcher } from "./research/http-document-fetcher.ts";
 import { FileDebugArtifactStore } from "./shared/debug-artifacts.ts";
 import { GemmaExtractor } from "./shared/gemma-extractor.ts";
 import { supabaseUserDataAccess } from "./user-data/user-scope.ts";
+import { supabaseAccountDeleter } from "./user-data/account.ts";
 
 // The first file that defines a variable wins, and shell variables are never
 // overridden. Paths are resolved from this file, so the cwd does not matter.
@@ -90,6 +91,11 @@ const app = createApp({
       secretKey: env.SUPABASE_SECRET_KEY,
     }),
   },
+  // Auth admin: the main secret key, like the roles repository.
+  accounts: supabaseAccountDeleter({
+    url: env.SUPABASE_URL,
+    secretKey: env.SUPABASE_SECRET_KEY,
+  }),
   userData: supabaseUserDataAccess({
     url: env.SUPABASE_URL,
     secretKey: env.SUPABASE_USER_DATA_SECRET_KEY ?? env.SUPABASE_SECRET_KEY,

@@ -3,7 +3,7 @@ import type { Server } from "node:http";
 import { vi } from "vitest";
 import { createApp, type AppDeps } from "../../src/app.ts";
 import { supabaseUserDataAccess } from "../../src/user-data/user-scope.ts";
-import { FakeRoles, FakeVerifier } from "../auth/fakes.ts";
+import { FakeRoles, FakeVerifier, NO_ACCOUNTS } from "../auth/fakes.ts";
 
 export const USER_DATA_SECRET = "sb_secret_user_data_test";
 
@@ -27,6 +27,10 @@ export const startUserDataApp = async (
     status: 200,
     body: [],
   }),
+  {
+    verifier = new FakeVerifier(),
+    accounts = NO_ACCOUNTS,
+  }: { verifier?: FakeVerifier; accounts?: AppDeps["accounts"] } = {},
 ) => {
   const calls: SupabaseCall[] = [];
   const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
@@ -59,12 +63,13 @@ export const startUserDataApp = async (
         "meal_allowance.rates": [],
       }),
     },
-    auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
+    auth: { verifier, roles: new FakeRoles() },
     userData: supabaseUserDataAccess({
       url: "https://project.supabase.co",
       secretKey: USER_DATA_SECRET,
       fetch,
     }),
+    accounts,
     extractIncomeTaxRules: unused as AppDeps["extractIncomeTaxRules"],
     researchIncomeTax: unused as AppDeps["researchIncomeTax"],
   });
