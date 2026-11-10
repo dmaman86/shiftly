@@ -25,6 +25,7 @@ import { useAppSnackbar, useAuth, useFetch } from "@/hooks";
 import { accountService } from "@/services/account/account.service";
 import { analyticsService } from "@/services/analytics";
 import { supabase } from "@/services/supabase/supabase.client";
+import { resolveApiErrorMessage } from "@/utils";
 
 type Metadata = Record<string, unknown>;
 
@@ -96,7 +97,7 @@ export const AccountProfileCard = ({
     );
 
     if (result.error) {
-      snackbar.error(result.error);
+      snackbar.error(resolveApiErrorMessage(result.error));
       return;
     }
 

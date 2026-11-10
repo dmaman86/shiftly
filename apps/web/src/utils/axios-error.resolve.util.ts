@@ -1,5 +1,6 @@
 import axios from "axios";
 import i18n from "@/i18n";
+import { resolveApiErrorMessage } from "./api-error.resolve.util";
 
 export const resolveErrorCategory = (
   err: unknown,
@@ -22,7 +23,9 @@ export const resolveErrorMessage = (err: unknown): string => {
       : i18n.t("unexpected", { ns: "errors" });
   }
 
-  if (err instanceof Error && err.message.trim()) return err.message;
+  // Hooks rethrow API client errors as Error(code): show the message instead.
+  if (err instanceof Error && err.message.trim())
+    return resolveApiErrorMessage(err.message);
 
   return i18n.t("unexpected", { ns: "errors" });
 };

@@ -6,5 +6,14 @@
   "server": "The server could not complete the request. Please try again.",
   "shabbat_credit": "Shabbat credit could not be loaded or saved. The balance is not confirmed.",
   "apology": "We apologize for the inconvenience. Please try refreshing the page or returning to the main screen.",
-  "feature_load": "Could not load {{featureName}}."
+  "feature_load": "Could not load {{featureName}}.",
+  "api": {
+    "unauthenticated": "Your session has expired. Please sign in again.",
+    "session_changed": "You are now signed in with a different account. Reload the page to continue.",
+    "timeout": "The server took too long to respond. Please try again.",
+    "not_found": "This item no longer exists. Reload the page and try again.",
+    "invalid_request": "The data could not be saved because it is not valid. Reload the page and try again.",
+    "conflict": "The data was changed in the meantime. Reload the page and try again.",
+    "data_unavailable": "Your data is temporarily unavailable. Please try again in a moment."
+  }
 }

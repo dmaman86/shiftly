@@ -188,8 +188,9 @@ describe("AccountProfileCard", () => {
     await user.click(screen.getByRole("button", { name: "Delete my account" }));
 
     expect(authMocks.signOut).not.toHaveBeenCalled();
-    // The API's error code; translating these codes is left to the web cleanup.
-    expect(hookMocks.snackbar.error).toHaveBeenCalledWith("unauthenticated");
+    expect(hookMocks.snackbar.error).toHaveBeenCalledWith(
+      "Your session has expired. Please sign in again.",
+    );
     expect(analyticsService.track).not.toHaveBeenCalled();
   });
 });
