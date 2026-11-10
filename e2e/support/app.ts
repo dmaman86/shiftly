@@ -2,8 +2,6 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { Page } from "@playwright/test";
 
-import type { CalendarItem } from "./scenario";
-
 export type PublishedElection = {
   knessetNumber: number;
   date: string;
@@ -47,32 +45,22 @@ const NAV_MENU_INTRO_KEY = "shiftly:nav-menu-intro-seen";
 
 /**
  * Makes a page deterministic: frozen clock, no analytics, and election days
- * and rate timelines from frozen fixtures instead of the API. Holidays are computed in the
- * browser, so `holidays` no longer changes what the app shows: it only feeds
- * the disconnected legacy calendar routes, which go away with them. The first-visit mobile menu is marked as seen
+ * and rate timelines from frozen fixtures instead of the API. Holidays are
+ * computed in the browser. The first-visit mobile menu is marked as seen
  * unless a test opts in, so it does not push content down in unrelated tests.
  */
 export const prepareApp = async (
   page: Page,
   {
-    holidays = [],
     elections = PUBLISHED_ELECTIONS,
     timelines = PUBLISHED_TIMELINES,
     firstVisit = false,
   }: {
-    holidays?: CalendarItem[];
     elections?: readonly PublishedElection[];
     timelines?: PublishedTimelines;
     firstVisit?: boolean;
   } = {},
 ) => {
-  const fulfillHolidays: Parameters<Page["route"]>[1] = (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ items: holidays }),
-    });
-
   if (!firstVisit) {
     await page.addInitScript(
       (key) => window.localStorage.setItem(key, "1"),
@@ -81,8 +69,6 @@ export const prepareApp = async (
   }
   await page.clock.setFixedTime(FIXED_NOW);
   await page.route(ANALYTICS_HOSTS, (route) => route.abort());
-  await page.route("**/calendar/*.json", fulfillHolidays);
-  await page.route("https://www.hebcal.com/hebcal/**", fulfillHolidays);
   // Any other request to a deployed API fails loudly instead of leaking out.
   // Registered first: Playwright tries the most recently added route first.
   await page.route(/^https:\/\/[^/]+\.run\.app\//, (route) => route.abort());

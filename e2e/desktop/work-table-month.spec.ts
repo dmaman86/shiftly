@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
-import { prepareApp } from "../support/app";
+import { PUBLISHED_ELECTIONS, prepareApp } from "../support/app";
 import {
   formatHours,
   formatTableSalary,
@@ -96,7 +96,7 @@ for (const SCENARIO of SCENARIOS) {
     test(`fills and calculates the ${SCENARIO} work table (${language})`, async ({
       page,
     }) => {
-      await prepareApp(page, { holidays: input.holidays });
+      await prepareApp(page);
       await page.goto(`${language}/daily`);
 
       await page.getByRole("button", { name: labels.chooseDate }).click();
@@ -188,10 +188,8 @@ for (const SCENARIO of SCENARIOS) {
         expected.daily,
       )) {
         const prefix = `work-day-${date}`;
-        const election = input.holidays?.find(
-          (item) => item.category === "election" && item.date === date,
-        );
-        if (election?.category === "election") {
+        const election = PUBLISHED_ELECTIONS.find((item) => item.date === date);
+        if (election) {
           await expect(
             page
               .getByTestId(`work-day-row-${date}`)

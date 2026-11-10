@@ -43,7 +43,7 @@ This makes it possible to **recalculate past months accurately** using the same 
   - Regular workdays
   - Partial special days (e.g. Fridays, holiday eves)
   - Full special days (Shabbat, holidays)
-- **Static holiday calendars generated from Hebcal, plus Knesset election events**
+- **Holidays computed in the browser, plus Knesset election days published by the API**
   - Automatic resolution of Jewish holidays
   - Differentiation between full and partial special days
 - Sick days & vacation days
@@ -629,52 +629,22 @@ config:
 %% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
 %% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
 %% Profile history reads saved config, shifts and days without persisting recalculated results.
-%% Election maintenance verified against the working tree, 2026-10-19. Dashed arrows show scheduled operations and file I/O, not imports.
+%% Static calendars and their election maintenance removed 2026-11-10: holidays are computed in the browser and elections come from apps/api.
 flowchart TD
   subgraph group_data["Infrastructure and adapters"]
     node_0["supabase.crud<br/>[apps/web/src/services/supabase/supabase.crud.ts]"]
     node_1["supabase.client<br/>[apps/web/src/services/supabase/supabase.client.ts]"]
     node_2["shift.service<br/>[apps/web/src/services/shift/shift.service.ts]"]
-    node_3["hebcal.service<br/>[apps/web/src/services/hebcal/hebcal.service.ts]"]
     node_4["account.service<br/>[apps/web/src/services/account/account.service.ts]"]
     node_5["workDay.service<br/>[apps/web/src/services/workDay/workDay.service.ts]"]
-    node_6["calendar.service<br/>[apps/web/src/services/calendar/calendar.service.ts]"]
     node_7["analytics.service<br/>[apps/web/src/services/analytics/analytics.service.ts]"]
     node_8["guestDraft.service<br/>[apps/web/src/services/guestDraft/guestDraft.service.ts]"]
     node_9["monthlyConfig.service<br/>[apps/web/src/services/monthlyConfig/monthlyConfig.service.ts]"]
     node_10["guestDraft.storage<br/>[apps/web/src/services/guestDraft/guestDraft.storage.ts]"]
-    node_11["hebcal.request<br/>[apps/web/src/services/hebcal/hebcal.request.ts]"]
     node_12["gtag<br/>[apps/web/src/services/analytics/gtag.ts]"]
-    node_13["event.adapter<br/>[apps/web/src/adapters/event.adapter.ts]"]
     node_14["dayToPayBreakdownVM<br/>[apps/web/src/adapters/dayToPayBreakdownVM.ts]"]
     node_15["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
   end
-  subgraph calendar_maintenance["Calendar maintenance — outside application runtime"]
-    election_workflow["Weekly / manual review workflow<br/>[.github/workflows/knesset-elections.yml]"]
-    election_update["update-knesset-elections<br/>Validate current and next election<br/>[scripts/update-knesset-elections.ts]"]
-    wikipedia_client["MediaWiki query and infobox extraction<br/>[scripts/wikipedia-elections.ts]"]
-    calendar_tools["Registry validation and calendar merging<br/>[scripts/knesset-elections.ts]"]
-    calendar_generate["Hebcal calendar generation<br/>[scripts/generate-calendar.ts]"]
-    election_registry["Versioned Knesset election registry<br/>[scripts/data/knesset-elections.json]"]
-    calendar_files["Versioned yearly calendars<br/>Hebcal holidays + Knesset election items<br/>[apps/web/public/calendar/]"]
-    calendar_review["Create / update review PR<br/>No automatic merge; failures preserve published data"]
-  end
-  external_wikipedia{{"Hebrew Wikipedia / MediaWiki API"}}
-  external_hebcal{{"Hebcal API"}}
-  election_update --> wikipedia_client
-  election_update --> calendar_tools
-  wikipedia_client -->|"election validation"| calendar_tools
-  calendar_generate --> calendar_tools
-  calendar_generate --> node_11
-  election_workflow -.->|"runs"| election_update
-  election_workflow -.->|"proposes changed registry and calendars"| calendar_review
-  wikipedia_client -.->|"fetch wikitext and revision metadata"| external_wikipedia
-  calendar_generate -.->|"fetch holiday items"| external_hebcal
-  calendar_tools -.->|"read registry"| election_registry
-  election_update -.->|"write validated workspace changes"| election_registry
-  election_update -.->|"write affected workspace calendars"| calendar_files
-  calendar_generate -.->|"write merged calendars"| calendar_files
-  node_6 -.->|"load deployed static calendar"| calendar_files
   profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
   profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
   profile_loader --> profile_history
@@ -688,14 +658,12 @@ flowchart TD
   profile_metrics --> salary_rows
   profile_metrics --> salary_total
   external_domain{{"@shiftly/domain"}}
-  node_13 --> external_domain
   node_14 --> external_domain
   node_15 --> external_domain
   node_10 -->|"status enum"| external_domain
   profile_history -->|"allocate Shabbat credit"| external_domain
   node_0 -->|"depends on"| node_1
   node_2 -->|"depends on"| node_0
-  node_3 -->|"depends on"| node_11
   node_4 -->|"depends on"| node_1
   node_5 -->|"depends on"| node_0
   node_8 -->|"depends on"| node_1
@@ -704,31 +672,24 @@ flowchart TD
   node_10 -->|"depends on"| node_2
   node_10 -->|"depends on"| node_5
   node_1 -->|"imports"| external_supabase
-  node_3 -->|"imports"| external_http
-  node_6 -->|"imports"| external_http
   node_7 -->|"calls"| external_analytics
   node_12 -->|"calls"| external_analytics
   external_supabase{{"Supabase SDK"}}
-  external_http{{"HTTP client (axios)"}}
   external_analytics{{"Google Analytics (gtag)"}}
   click node_0 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.crud.ts"
   click node_1 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
   click node_2 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/shift/shift.service.ts"
-  click node_3 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/hebcal/hebcal.service.ts"
   click node_4 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/account/account.service.ts"
   click node_5 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/workDay/workDay.service.ts"
-  click node_6 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/calendar/calendar.service.ts"
   click node_7 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/analytics.service.ts"
   click node_8 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.service.ts"
   click node_9 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
   click node_10 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.storage.ts"
-  click node_11 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/hebcal/hebcal.request.ts"
   click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/gtag.ts"
-  click node_13 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/event.adapter.ts"
   click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreakdownVM.ts"
   click node_15 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
-  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14,node_15 toneRose
+  class node_0,node_1,node_2,node_4,node_5,node_7,node_8,node_9,node_10,node_12,node_14,node_15 toneRose
   class salary_rows,salary_total toneRose
   classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
   class profile_loader,profile_history,profile_metrics toneMint
@@ -737,14 +698,6 @@ flowchart TD
   click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
   click salary_rows "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/mappers/payRows.mapper.ts"
   click salary_total "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/helpers/helper.ts"
-  class election_workflow,election_update,wikipedia_client,calendar_tools,calendar_generate,election_registry,calendar_files,calendar_review toneRose
-  click election_workflow "https://github.com/dmaman86/shiftly/blob/main/.github/workflows/knesset-elections.yml"
-  click election_update "https://github.com/dmaman86/shiftly/blob/main/scripts/update-knesset-elections.ts"
-  click wikipedia_client "https://github.com/dmaman86/shiftly/blob/main/scripts/wikipedia-elections.ts"
-  click calendar_tools "https://github.com/dmaman86/shiftly/blob/main/scripts/knesset-elections.ts"
-  click calendar_generate "https://github.com/dmaman86/shiftly/blob/main/scripts/generate-calendar.ts"
-  click election_registry "https://github.com/dmaman86/shiftly/blob/main/scripts/data/knesset-elections.json"
-  click calendar_files "https://github.com/dmaman86/shiftly/tree/main/apps/web/public/calendar"
 ```
 
 <!-- /diagram:data -->
@@ -783,7 +736,7 @@ Pure calculation logic organized by concern:
 - **Meal allowance**: eligibility and rate calculation in one timeline-based
   calculator
 - **Fixed segments**: sick, vacation and earned Shabbat credit
-- **Holiday day-type classification**: Hebcal-based
+- **Holiday day-type classification**: Hebrew-calendar rules computed in the browser
 
 The base progression is accumulated across the continuous Regular timeline: the first configured `standardHours` interval is 100%, the next `midTierThreshold` hours are 125%, and the remaining hours are 150%. Midnight and special-time boundaries do not reset that progression. Evening/night additions are evaluated independently through a date-based policy. Evening qualification requires at least three qualifying regular hours within one shift on the same calendar date; separate shifts on that date do not combine their qualifying hours. Cross-day shifts are evaluated separately for each calendar date within the shift.
 
@@ -831,7 +784,7 @@ Under the owner-specified payroll rule, regular work overlapping **07:00–22:00
 
 For 2021-03-23, 06:37–14:32 with seven standard hours: actual work is `475/60`, election overlap is `452/60`, 100% is `7 + 452/60` and 125% is `55/60`. The UI shows 7.92 actual hours, 14.53 at 100% and 0.92 at 125%; internal calculations retain minute precision. This is the agreed implementation contract, not independently verified legal entitlement.
 
-Calendars in `apps/web/public/calendar/{year}.json` merge Hebcal holidays with `scripts/data/knesset-elections.json`; regeneration preserves elections. A weekly/manual [GitHub workflow](../../.github/workflows/knesset-elections.yml) reads explicit Hebrew Wikipedia infobox dates through MediaWiki, checks the next linked Knesset and opens/updates a review PR. It logs revision evidence, does not extrapolate dates or auto-merge, and preserves published data on errors. See [calendar maintenance](../../scripts/README.md) and [validation limitations](../../VALIDATION.md).
+Holidays are computed in the browser from Hebrew-calendar rules; there are no static calendar files. Knesset election days are reference data in the database: an admin records each election with its official evidence and activates it (`election:record`, `election:activate` in apps/api), and the app reads the published days from `GET /reference/elections`. When the API cannot be reached, the app keeps its last known answer or warns that election days are missing. See [scripts](../../scripts/README.md) and [validation limitations](../../VALIDATION.md).
 
 ### Reducers
 
@@ -892,7 +845,7 @@ Composition pipelines for wiring domain components:
 
 - **Axios** 1.18.1 (HTTP client)
 - **date-fns** 4.1.0 (date manipulation)
-- **Hebcal API** (holiday detection)
+- **jewish-date** 2.0.29 (Hebrew calendar for holiday computation)
 - **Supabase** 2.112.4 (Google OAuth + Postgres persistence)
 
 ### Testing
@@ -1112,7 +1065,7 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   ├── layout/                 # Application layout and error boundaries
 │   ├── pages/                  # Daily, monthly, calculation-rules and profile pages
 │   ├── store/                  # Zustand global state and breakdown calculations
-│   ├── services/               # Analytics, Hebcal and Supabase persistence clients
+│   ├── services/               # Analytics, apps/api and Supabase Auth clients
 │   ├── test/                   # Web app, store, service and UI test suites
 │   └── utils/                  # API result handling and shared helpers
 ├── packages/

@@ -4,9 +4,7 @@
 bun.lock
 **/deno.lock
 
-# Generated data: scripts/generate-calendar.ts writes the calendar, and the
-# E2E fixtures are reference datasets compared against payroll results.
-apps/web/public/calendar/
+# Reference datasets: the E2E fixtures are compared against payroll results.
 e2e/fixtures/
 apps/api/tests/fixtures/
 

@@ -1057,6 +1057,16 @@ Phase 1, step 1: `jewish-date@2.0.29`, `israeliHolidaysBetween`,
 Shavuot title fix in `event.adapter.ts`. The app was not switched and nothing
 was deleted.
 
+> **Status (2026-11-10): done.** Elections moved to the database instead of a
+> registry provider: the web app reads them from `GET /reference/elections`,
+> and admins record them with `election:record` / `election:activate`. Election
+> parity between the API and the static files was verified in production for
+> 2015–2027, and the golden month scenarios give the same salaries with the
+> computed calendar. `apps/web/public/calendar/`, the calendar and election
+> scripts, the weekly workflow, `scripts/data/knesset-elections.json`, the
+> legacy seed, `services/hebcal`, `services/calendar/calendar.service.ts` and
+> `event.adapter.ts` were deleted. The plan below is kept as written.
+
 ### Next step
 
 Phase 1, step 2: an election provider that reads
