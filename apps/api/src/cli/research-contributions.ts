@@ -1,8 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { adminRepository } from "./admin-repository.ts";
+import { loadArtifactsDir } from "../config/env.ts";
+import { loadLocalEnvFiles } from "../config/local-env.ts";
 import { storeCandidates } from "../services/store-candidates.ts";
 import { HttpDocumentFetcher } from "../research/http-document-fetcher.ts";
 import { WaybackArchiveIndex } from "../research/web-archive.ts";
@@ -28,9 +29,9 @@ const { values } = parseArgs({
   strict: true,
 });
 
-const artifactsDir =
-  process.env.ARTIFACTS_DIR ??
-  fileURLToPath(new URL("../../.artifacts", import.meta.url));
+// Before reading ARTIFACTS_DIR: the env files may set it.
+loadLocalEnvFiles();
+const artifactsDir = loadArtifactsDir();
 const report = await researchEmployeeContributions({
   fetcher: new HttpDocumentFetcher(),
   archive: new WaybackArchiveIndex(),

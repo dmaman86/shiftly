@@ -48,5 +48,27 @@ cli, server ──▶ app ──▶ middleware, routes ──▶ services ──
 | `bun run reference:activate`              | Publishes a reviewed reference-data revision     |
 | `bun run reference:research:contributions` | Researches social-security contribution rates  |
 
-The admin commands read the secret key from `apps/api/.env` or the root
-`.env.local`; it never reaches the web app.
+## Environment
+
+`config/local-env.ts` loads `apps/api/.env` first, then the repository's
+`.env.local`, for the server and the admin commands alike. The first file that
+defines a variable wins, and variables already set (the shell, Cloud Run) are
+never overridden. `config/env.ts` validates them; errors name the variables,
+never their values. Secrets are backend only: never give them a `VITE_` prefix.
+
+| Variable                             | Required                     | Default                | Purpose                                                                 |
+| ------------------------------------ | ---------------------------- | ---------------------- | ----------------------------------------------------------------------- |
+| `SUPABASE_URL`                       | Yes                          |                        | Supabase project URL; same as the web app's `VITE_SUPABASE_URL`         |
+| `SUPABASE_PUBLISHABLE_KEY`           | Server                       |                        | `sb_publishable_...`; only verifies access tokens                       |
+| `SUPABASE_SECRET_KEY`                | Yes                          |                        | `sb_secret_...`; bypasses RLS (roles, reference data, user data)        |
+| `GEMINI_API_KEY`                     | Server                       |                        | Google AI Studio key for the research pipelines                         |
+| `CORS_ALLOWED_ORIGINS`               | In production                | none                   | Browser origins, comma separated, no trailing slash                     |
+| `SUPABASE_USER_DATA_SECRET_KEY`      | No                           | `SUPABASE_SECRET_KEY`  | Separate key for user-owned data, so it can be rotated alone            |
+| `REFERENCE_DATA_PERSISTENCE_ENABLED` | No                           | `false`                | Store research results as pending revisions instead of only returning them |
+| `GEMINI_MODEL`                       | No                           | `gemma-4-31b-it`       | Model used by the research pipelines                                    |
+| `ARTIFACTS_DIR`                      | No                           | `apps/api/.artifacts`  | Debug artifacts of the research pipelines                               |
+| `HOST`, `PORT`                       | No                           | `127.0.0.1`, `3000`    | Listen address; the container sets `0.0.0.0:8080`                       |
+
+"Server" means `server.ts` requires it; the admin commands need only
+`SUPABASE_URL` and `SUPABASE_SECRET_KEY` (and `--store` for
+`reference:research:contributions`).

@@ -1,10 +1,9 @@
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { config as loadDotenv } from "dotenv";
 import { createApp } from "./app.ts";
 import { SupabaseAuthVerifier } from "./repositories/supabase-auth-verifier.ts";
 import { SupabaseRoleRepository } from "./repositories/supabase-role-repository.ts";
 import { loadEnv } from "./config/env.ts";
+import { loadLocalEnvFiles } from "./config/local-env.ts";
 import { extractIncomeTaxRules } from "./research/income-tax/income-tax-pipeline.ts";
 import { researchAndStoreIncomeTax } from "./research/income-tax/income-tax-research.ts";
 import { CachedPublishedElectionsReader } from "./repositories/cached-published-elections-reader.ts";
@@ -22,15 +21,7 @@ import { GemmaExtractor } from "./research/shared/gemma-extractor.ts";
 import { supabaseUserDataAccess } from "./repositories/user-scope.ts";
 import { supabaseAccountDeleter } from "./repositories/account-deleter.ts";
 
-// The first file that defines a variable wins, and shell variables are never
-// overridden. Paths are resolved from this file, so the cwd does not matter.
-loadDotenv({
-  path: [
-    fileURLToPath(new URL("../.env", import.meta.url)),
-    fileURLToPath(new URL("../../../.env.local", import.meta.url)),
-  ],
-  quiet: true,
-});
+loadLocalEnvFiles();
 
 const env = loadEnv();
 
