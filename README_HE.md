@@ -11,7 +11,7 @@
 [![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://dmaman86.github.io/shiftly/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Stack: TypeScript · React · Vite · Zustand · TanStack Query · MUI · Supabase · Vitest · Playwright
+Stack: TypeScript · React · Vite · Zustand · TanStack Query · MUI · Express · Supabase · Cloud Run · Vitest · Playwright · pgTAP
 
 </div>
 
@@ -36,7 +36,8 @@ Shiftly נולדה מבעיה אמיתית שנצפתה במשרד ממשלתי.
 - **מנוע חישוב עצמאי:** React צורכת את [חבילת TypeScript בשם `@shiftly/domain`](packages/domain/) דרך API ציבורי מפורש; למנוע אין תלות ב־React או ב־DOM.
 - **בדיקת תוצר הפריסה:** תהליך ה־[CI](.github/workflows/ci.yml) מריץ E2E מול תוצר הייצור `dist` שהורד, ופורס את אותו תוצר רק לאחר שהבדיקות ו־E2E עברו.
 - **כיסוי דפדפנים:** [פרויקטי Playwright](playwright.config.ts) בודקים Chromium במחשב, אמולציית Android ב־Chromium ואמולציית iPhone ב־WebKit.
-- **שמירת נתונים לפי משתמש:** [מיגרציית בסיס הנתונים](supabase/migrations/20260830000000_persistence_schema.sql) מפעילה Row Level Security ב־Supabase על הגדרות חודשיות, ימי עבודה ומשמרות, עם מדיניות בעלות המבוססת על `auth.uid()`.
+- **גישה לנתונים דרך השרת:** הדפדפן משתמש ב־Supabase להתחברות בלבד. [`apps/api`](apps/api/) (Express ב־Cloud Run) מאמת את אסימון הגישה וניגש לנתוני המשתמש דרך `UserScope`, שמצמיד כל שאילתה למשתמש המאומת; כתיבות שחייבות להיות אטומיות רצות כפונקציות Postgres שרק השרת רשאי להפעיל. Row Level Security נשאר פעיל כשכבת הגנה נוספת.
+- **בדיקות בסיס נתונים:** [חבילות pgTAP](supabase/tests/) רצות ב־CI מול סכמה שנבנית מחדש מהמיגרציות, ונכשלות אם תפקיד דפדפן מקבל הרשאה שאסור לו.
 
 ## פרופיל אישי
 
@@ -44,11 +45,11 @@ Shiftly נולדה מבעיה אמיתית שנצפתה במשרד ממשלתי.
 
 בורר משותף מחיל על כל הגרפים את **3, 6 או 12 החודשים האחרונים**, את **השנה הנוכחית**, או **טווח חודשים מותאם אישית** הכולל את שני קצות הטווח. ברירת המחדל היא שישה חודשים; הטווח הנתמך מתחיל בנובמבר 2015 ומסתיים בחודש הנוכחי.
 
-ההיסטוריה מבוססת על נתוני החשבון השמורים, ללא שינויי כמויות זמניים בסיכום השכר. התשלום הוא אומדן ברוטו מחושב, לא שכר נטו ולא אישור לתשלום שהתקבל. כללי החישוב נשארים ציבוריים ב־`/:lang/calculation-rules`; אורחים שפותחים את הפרופיל מופנים לשם.
+ההיסטוריה מבוססת על נתוני החשבון השמורים, ללא שינויי כמויות זמניים בסיכום השכר. התשלום הוא אומדן ברוטו מחושב, לא שכר נטו ולא אישור לתשלום שהתקבל. כללי החישוב נשארים ציבוריים ב־`/:lang/calculation-rules`. אורחים שפותחים את הפרופיל רואים כרטיס התחברות ותצוגה מקדימה נעולה של הגרפים.
 
 ## התחלה מהירה
 
-דרישות: Node.js 24 ו־Bun 1.3.14. התקינו באמצעות Bun כדי לקשר את חבילות
+דרישות: Node.js 24 (הקובץ `.nvmrc` קובע את גרסת התיקון) ו־Bun 1.3.14. התקינו באמצעות Bun כדי לקשר את חבילות
 ה־workspace; המאגר משתמש בפרוטוקול התלויות `workspace:*` של Bun.
 
 <div dir="ltr">
@@ -64,7 +65,10 @@ bun run dev
 
 </div>
 
-פתחו את `http://localhost:5173/shiftly`.
+פתחו את `http://localhost:5173/shiftly`. מצב אורח לא דורש דבר נוסף. התחברות
+ושמירת נתונים דורשות גם את ה־API (`bun run dev:api`) ואת הגדרותיו; ראו
+[apps/api/README.md](apps/api/README.md) ואת
+[מדריך ההתקנה](docs/reference/README_HE.md).
 
 ## תיעוד
 
@@ -73,6 +77,7 @@ bun run dev
 - [אימות חישובי השכר באנגלית](VALIDATION.md)
 - [אימות חישובי השכר בעברית](VALIDATION_HE.md)
 - [מנוע השכר העצמאי](packages/domain/README.md)
+- [ה־API בצד השרת](apps/api/README.md)
 - [תיעוד הארכיטקטורה](docs/architecture/)
 - [תרשימי הארכיטקטורה הנוכחית](docs/architecture/generated/)
 - [היסטוריית הארכיטקטורה לפי tag](docs/architecture/history/)
@@ -87,12 +92,13 @@ bun run lint
 bun run test:ci
 bun run build
 bun run test:e2e
+bun run test:db   # pgTAP; needs the Supabase CLI and Docker
 ```
 
 </div>
 
 אפליקציית הווב נמצאת ב־`apps/web` וצורכת את `@shiftly/domain` מתוך
-`packages/domain`. בעת עריכת המנוע, הריצו `bun run dev:domain` בחלון נוסף כדי
+`packages/domain`; השרת נמצא ב־`apps/api`. בעת עריכת המנוע, הריצו `bun run dev:domain` בחלון נוסף כדי
 לעדכן את החבילה המהודרת בזמן ש־Vite פועל.
 
 ## רישיון

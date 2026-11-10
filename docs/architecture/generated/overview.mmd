@@ -9,53 +9,68 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
-%% Selected layer dependencies, including type imports; not a strict layered architecture.
-%% Solid arrows point from consumers to dependencies; dashed arrows show runtime behavior.
+%% Source: v1.1.0 (release candidate; source HEAD). Selected layer dependencies, including type imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
+%% Solid arrows point from consumers to dependencies; dashed arrows show runtime calls across process boundaries.
+%% The browser uses Supabase for authentication only; every data read and write goes through apps/api.
 flowchart TD
-  subgraph group_data["Infrastructure and data"]
-    layer_data["Application services and adapters"]
+  subgraph web["apps/web — React SPA on GitHub Pages"]
+    layer_ui["Presentation<br/>Daily, monthly, calculation rules, public profile"]
+    layer_app["Application and state<br/>Providers, hooks, Zustand editor state, TanStack Query"]
+    layer_data["Services and adapters<br/>apiClient, reference caches, computed holidays, guest draft"]
   end
-  subgraph group_ui["Presentation"]
-    layer_ui["React presentation<br/>Daily, monthly, rules and protected profile"]
+  subgraph domain_pkg["packages/domain"]
+    layer_domain["@shiftly/domain — standalone payroll engine<br/>Calculation pipelines, ReferenceResolver"]
   end
-  subgraph group_app["Application"]
-    layer_app["Application composition and hooks<br/>Zustand editor state; read-only profile history"]
+  subgraph api["apps/api — Express 5 on Cloud Run (Node 24)"]
+    api_http["middleware + routes<br/>/reference, /me, /admin"]
+    api_core["services + ports<br/>Framework-free rules"]
+    api_repos["repositories<br/>UserScope, Supabase adapters"]
+    api_research["research pipelines + cli<br/>Admin only"]
   end
-  subgraph group_domain["Payroll logic"]
-    layer_domain["@shiftly/domain — standalone payroll engine"]
+  subgraph supabase["Supabase"]
+    sb_auth{{"Supabase Auth<br/>Google OAuth, JWT"}}
+    sb_db[("Postgres<br/>User data, reference data, RLS")]
   end
-  layer_data -->|"depends on"| layer_domain
-  layer_data -->|"depends on"| layer_app
-  layer_ui -->|"depends on"| layer_app
-  layer_ui -->|"depends on"| layer_data
-  layer_app -->|"depends on"| layer_domain
-  layer_app -->|"depends on"| layer_ui
-  layer_app -->|"depends on"| layer_data
-  layer_ui -->|"depends on"| layer_domain
-  layer_data -->|"depends on"| layer_ui
-  external_supabase{{"Supabase SDK"}}
-  external_query{{"TanStack Query — server state and mutations"}}
-  layer_app --> external_query
-  layer_ui --> external_query
-  layer_data --> external_supabase
-  layer_app -->|"uses"| external_supabase
-  profile["Profile analytics<br/>Actual vs payable; base vs overtime; payment composition"]
-  layer_ui -.->|"authenticated route"| profile
-  profile -.->|"saved months, bounded reads, current engine"| layer_app
-  click profile "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/ProfilePage.tsx"
-  e2e["Playwright E2E"]
+  external_ga{{"Google Analytics"}}
+  external_gemini{{"Google AI (Gemma)"}}
+  layer_ui --> layer_app
+  layer_ui --> layer_data
+  layer_app --> layer_data
+  layer_app --> layer_domain
+  layer_data --> layer_domain
+  layer_ui --> layer_domain
+  api_http --> api_core
+  api_http --> api_repos
+  api_core -.->|"mirrors timeline validation<br/>contract test, no runtime import"| layer_domain
+  api_repos -->|"implements ports"| api_core
+  api_research --> api_repos
+  layer_data -.->|"sign-in, session tokens only"| sb_auth
+  layer_data -.->|"HTTPS + bearer token<br/>expectedUserId guard"| api_http
+  layer_data -.->|"page views, events"| external_ga
+  api_http -.->|"verify token, revalidate session"| sb_auth
+  api_repos -.->|"service_role, scoped to the verified user"| sb_db
+  api_research -.->|"extraction and research"| external_gemini
+  e2e["Playwright E2E<br/>Hermetic: API and Auth from fixtures, data requests aborted"]
   e2e -.->|"exercises UI"| layer_ui
-  click e2e "https://github.com/dmaman86/shiftly/blob/main/playwright.config.ts"
-  click layer_data "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
-  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
-  class layer_data toneRose
-  click layer_ui "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/App.tsx"
-  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
-  class layer_ui toneBlue
-  click layer_app "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/store/globalStore.ts"
-  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
-  class layer_app toneMint
+  pgtap["pgTAP<br/>Grants, RLS, backend-only RPCs"]
+  pgtap -.->|"tests"| sb_db
+  click layer_ui "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AppRoutes.tsx"
+  click layer_app "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/AppProviders.tsx"
+  click layer_data "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/api/client.ts"
   click layer_domain "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/composition.ts"
+  click api_http "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/app.ts"
+  click api_core "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/services"
+  click api_repos "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/repositories/user-scope.ts"
+  click api_research "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/research"
+  click e2e "https://github.com/dmaman86/shiftly/blob/main/playwright.config.ts"
+  click pgtap "https://github.com/dmaman86/shiftly/tree/main/supabase/tests"
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
   classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
-  class layer_domain toneAmber
+  classDef toneViolet fill:#ede9fe,stroke:#7c3aed,stroke-width:1.5px,color:#2e1065
+  class layer_ui toneBlue
+  class layer_app toneMint
+  class layer_data,api_repos toneRose
+  class layer_domain,api_core toneAmber
+  class api_http,api_research toneViolet

@@ -55,8 +55,9 @@ This makes it possible to **recalculate past months accurately** using the same 
 - Monthly totals recomputed from the current daily pay maps after adding, updating, or removing shifts
 - Fully reactive UI
 - Landscape, right-to-left PDF export with weekly separators, independent meal-allowance columns, per-page metadata, and the application copyright footer
-- Optional Google sign-in with cross-device data persistence
-- Authenticated profile with an account card and three historical charts, sharing preset or custom monthly ranges
+- Knesset election day premium (100% for regular work between 07:00 and 22:00)
+- Optional Google sign-in with cross-device data persistence through the Shiftly API
+- Profile page: signed-in users get an account card and three historical charts with preset or custom monthly ranges; guests see a locked preview
 
 ---
 
@@ -64,7 +65,7 @@ This makes it possible to **recalculate past months accurately** using the same 
 
 The salary calculators work **without an account** — calculation data stays in memory. The personal profile and persisted history require authentication.
 
-Signing in with a **Google account** (via Supabase Auth) additionally persists your data to Supabase, tied to your account, so it carries over across sessions and devices:
+Signing in with a **Google account** (via Supabase Auth) additionally persists your data, tied to your account, so it carries over across sessions and devices. The browser uses Supabase for sign-in only; every read and write goes through `apps/api`:
 
 - **Monthly configuration** — year, month, standard hours, hourly rate
 - **Day status** — sick / vacation marks per day
@@ -77,7 +78,9 @@ Signing in with a **Google account** (via Supabase Auth) additionally persists y
 | `work_days`       | Per-(user, date) status (`sick` / `vacation`) — a missing row means `normal`         |
 | `shifts`          | Per-user saved shifts, with the date denormalized onto each row for direct querying  |
 
-All three tables are protected by Postgres Row Level Security: each user can only read or write their own rows. The schema lives in `supabase/migrations/`.
+The browser does not query these tables. `apps/api` verifies the access token on every request and reads or writes them only for that user, through `UserScope`; saving a shift and importing a guest month run as backend-only Postgres functions. Row Level Security and its ownership policies stay enabled as a backstop. The schema lives in `supabase/migrations/`, and pgTAP tests in `supabase/tests/` check its privileges.
+
+Every user-data request names the account it was issued for. If another account signs in before it is sent, the request is dropped instead of reaching the new account's data.
 
 Authenticated work-table data is loaded with TanStack Query using a cache key scoped to the user, year, and month. Editing remains unavailable until that initial snapshot is ready, and a failed load presents an explicit retry action. Changing accounts resets the editable state before loading the next account's data.
 
@@ -138,56 +141,71 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
-%% Selected layer dependencies, including type imports; not a strict layered architecture.
-%% Solid arrows point from consumers to dependencies; dashed arrows show runtime behavior.
+%% Source: v1.1.0 (release candidate; source HEAD). Selected layer dependencies, including type imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
+%% Solid arrows point from consumers to dependencies; dashed arrows show runtime calls across process boundaries.
+%% The browser uses Supabase for authentication only; every data read and write goes through apps/api.
 flowchart TD
-  subgraph group_data["Infrastructure and data"]
-    layer_data["Application services and adapters"]
+  subgraph web["apps/web — React SPA on GitHub Pages"]
+    layer_ui["Presentation<br/>Daily, monthly, calculation rules, public profile"]
+    layer_app["Application and state<br/>Providers, hooks, Zustand editor state, TanStack Query"]
+    layer_data["Services and adapters<br/>apiClient, reference caches, computed holidays, guest draft"]
   end
-  subgraph group_ui["Presentation"]
-    layer_ui["React presentation<br/>Daily, monthly, rules and protected profile"]
+  subgraph domain_pkg["packages/domain"]
+    layer_domain["@shiftly/domain — standalone payroll engine<br/>Calculation pipelines, ReferenceResolver"]
   end
-  subgraph group_app["Application"]
-    layer_app["Application composition and hooks<br/>Zustand editor state; read-only profile history"]
+  subgraph api["apps/api — Express 5 on Cloud Run (Node 24)"]
+    api_http["middleware + routes<br/>/reference, /me, /admin"]
+    api_core["services + ports<br/>Framework-free rules"]
+    api_repos["repositories<br/>UserScope, Supabase adapters"]
+    api_research["research pipelines + cli<br/>Admin only"]
   end
-  subgraph group_domain["Payroll logic"]
-    layer_domain["@shiftly/domain — standalone payroll engine"]
+  subgraph supabase["Supabase"]
+    sb_auth{{"Supabase Auth<br/>Google OAuth, JWT"}}
+    sb_db[("Postgres<br/>User data, reference data, RLS")]
   end
-  layer_data -->|"depends on"| layer_domain
-  layer_data -->|"depends on"| layer_app
-  layer_ui -->|"depends on"| layer_app
-  layer_ui -->|"depends on"| layer_data
-  layer_app -->|"depends on"| layer_domain
-  layer_app -->|"depends on"| layer_ui
-  layer_app -->|"depends on"| layer_data
-  layer_ui -->|"depends on"| layer_domain
-  layer_data -->|"depends on"| layer_ui
-  external_supabase{{"Supabase SDK"}}
-  external_query{{"TanStack Query — server state and mutations"}}
-  layer_app --> external_query
-  layer_ui --> external_query
-  layer_data --> external_supabase
-  layer_app -->|"uses"| external_supabase
-  profile["Profile analytics<br/>Actual vs payable; base vs overtime; payment composition"]
-  layer_ui -.->|"authenticated route"| profile
-  profile -.->|"saved months, bounded reads, current engine"| layer_app
-  click profile "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/ProfilePage.tsx"
-  e2e["Playwright E2E"]
+  external_ga{{"Google Analytics"}}
+  external_gemini{{"Google AI (Gemma)"}}
+  layer_ui --> layer_app
+  layer_ui --> layer_data
+  layer_app --> layer_data
+  layer_app --> layer_domain
+  layer_data --> layer_domain
+  layer_ui --> layer_domain
+  api_http --> api_core
+  api_http --> api_repos
+  api_core -.->|"mirrors timeline validation<br/>contract test, no runtime import"| layer_domain
+  api_repos -->|"implements ports"| api_core
+  api_research --> api_repos
+  layer_data -.->|"sign-in, session tokens only"| sb_auth
+  layer_data -.->|"HTTPS + bearer token<br/>expectedUserId guard"| api_http
+  layer_data -.->|"page views, events"| external_ga
+  api_http -.->|"verify token, revalidate session"| sb_auth
+  api_repos -.->|"service_role, scoped to the verified user"| sb_db
+  api_research -.->|"extraction and research"| external_gemini
+  e2e["Playwright E2E<br/>Hermetic: API and Auth from fixtures, data requests aborted"]
   e2e -.->|"exercises UI"| layer_ui
-  click e2e "https://github.com/dmaman86/shiftly/blob/main/playwright.config.ts"
-  click layer_data "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
-  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
-  class layer_data toneRose
-  click layer_ui "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/App.tsx"
-  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
-  class layer_ui toneBlue
-  click layer_app "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/store/globalStore.ts"
-  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
-  class layer_app toneMint
+  pgtap["pgTAP<br/>Grants, RLS, backend-only RPCs"]
+  pgtap -.->|"tests"| sb_db
+  click layer_ui "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AppRoutes.tsx"
+  click layer_app "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/AppProviders.tsx"
+  click layer_data "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/api/client.ts"
   click layer_domain "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/composition.ts"
+  click api_http "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/app.ts"
+  click api_core "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/services"
+  click api_repos "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/repositories/user-scope.ts"
+  click api_research "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/research"
+  click e2e "https://github.com/dmaman86/shiftly/blob/main/playwright.config.ts"
+  click pgtap "https://github.com/dmaman86/shiftly/tree/main/supabase/tests"
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
   classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
-  class layer_domain toneAmber
+  classDef toneViolet fill:#ede9fe,stroke:#7c3aed,stroke-width:1.5px,color:#2e1065
+  class layer_ui toneBlue
+  class layer_app toneMint
+  class layer_data,api_repos toneRose
+  class layer_domain,api_core toneAmber
+  class api_http,api_research toneViolet
 ```
 
 <!-- /diagram:overview -->
@@ -214,9 +232,10 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Source: v1.1.0 (release candidate; source HEAD). Module dependencies include type imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
 %% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
-%% Election additions verified against the working tree, 2026-10-19. Dashed arrows show injected runtime calls.
+%% Dashed arrows show injected runtime calls. Rates come from a ReferenceResolver: the web app builds one from the API's timelines, or uses the embedded baseline.
+%% apps/api cannot import this package at runtime: it mirrors MonthlyTimeline's checks, and a contract test runs the same cases through both.
 flowchart TD
   subgraph group_domain["Payroll logic"]
     node_0["composition<br/>[packages/domain/src/composition.ts]"]
@@ -245,8 +264,18 @@ flowchart TD
     regular_day["RegularByDayCalculator<br/>Consolidated day timeline<br/>[packages/domain/src/calculator/regular/regularByDay.calculator.ts]"]
     calendar_types["CalendarEventKind / WorkDayMeta<br/>knessetNumber; calendarKnessetNumbers<br/>[packages/domain/src/types/types.ts]"]
     shabbat_credit["allocateShabbatCredit — exported credit allocation API<br/>[packages/domain/src/calculator/shabbat-credit.calculator.ts]"]
+    reference_resolver["createReferenceResolver — rate by month, unavailable is explicit<br/>[packages/domain/src/reference/reference-resolver.ts]"]
+    monthly_timeline["MonthlyTimeline<br/>[packages/domain/src/reference/timeline.ts]"]
+    baseline["BASELINE_REFERENCES — embedded fallback timelines<br/>[packages/domain/src/reference/baseline.ts]"]
+    system_start["SYSTEM_START_DATE<br/>[packages/domain/src/constants/system.constant.ts]"]
   end
   node_0 --> rate_pipeline
+  node_0 --> baseline
+  node_0 -->|"resolver type"| reference_resolver
+  rate_pipeline --> reference_resolver
+  baseline --> reference_resolver
+  reference_resolver --> monthly_timeline
+  reference_resolver --> system_start
   node_0 --> day_from_shifts
   node_0 -->|"policy type"| addition_classifier
   node_19 --> addition_classifier
@@ -316,6 +345,11 @@ flowchart TD
   click election_hours "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/election-hours.calculator.ts"
   click regular_day "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/regular/regularByDay.calculator.ts"
   click calendar_types "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/types/types.ts"
+  click reference_resolver "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reference/reference-resolver.ts"
+  click monthly_timeline "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reference/timeline.ts"
+  click baseline "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reference/baseline.ts"
+  click system_start "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/constants/system.constant.ts"
+  class reference_resolver,monthly_timeline,baseline,system_start toneAmber
 ```
 
 <!-- /diagram:domain -->
@@ -363,97 +397,116 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: working tree, 2026-10-05. Base commit: 8e1d6e54901a14284fda7e14f41140f524c8757d.
-%% Selected module dependencies, including lazy page imports; arrows point from consumers to dependencies.
-%% ProfilePage is public: it resolves auth loading and initialization error, then renders the account or guest view.
-%% Guests never mount ProfileHistory, so useProfileHistory only runs for an authenticated user.
+%% Source: v1.1.0 (release candidate; source HEAD). Module dependencies include lazy page imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
+%% Selected module dependencies; arrows point from consumers to dependencies.
+%% ProfilePage is public: guests get GuestProfileCard and LockedProfileHistory, so useProfileHistory only runs for a signed-in user.
+%% Reference and election notices surface degraded data (API unreachable, stale cache) instead of silently computing without it.
 flowchart TD
   subgraph group_ui["Presentation"]
-    node_0["App<br/>[apps/web/src/app/App.tsx]"]
-    node_1["AppRoutes<br/>[apps/web/src/app/routes/AppRoutes.tsx]"]
-    node_2["DailyPage<br/>[apps/web/src/pages/DailyPage.tsx]"]
-    node_3["MonthlySummaryPage<br/>[apps/web/src/pages/MonthlySummaryPage.tsx]"]
-    node_4["CalculationRulesPage<br/>[apps/web/src/pages/CalculationRulesPage.tsx]"]
-    node_5["WorkTable<br/>[apps/web/src/features/work-table/components/month/WorkTable.tsx]"]
-    node_6["GuestModeNotice<br/>[apps/web/src/features/auth/GuestModeNotice.tsx]"]
-    node_7["GoogleSignInButton<br/>[apps/web/src/features/auth/GoogleSignInButton.tsx]"]
-    node_8["GuestDraftConflictDialog<br/>[apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx]"]
-    node_9["MonthlySalarySummary<br/>[apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx]"]
+    app["App<br/>[apps/web/src/app/App.tsx]"]
+    routes["AppRoutes — /:lang/daily, monthly, calculation-rules, profile<br/>[apps/web/src/app/routes/AppRoutes.tsx]"]
+    layout["Layout<br/>[apps/web/src/layout/Layout.tsx]"]
+    view_switcher["ViewSwitcher — desktop and mobile navigation<br/>[apps/web/src/layout/view-switcher/components/ViewSwitcher.tsx]"]
+    daily["DailyPage<br/>[apps/web/src/pages/DailyPage.tsx]"]
+    monthly["MonthlySummaryPage<br/>[apps/web/src/pages/MonthlySummaryPage.tsx]"]
+    rules["CalculationRulesPage<br/>[apps/web/src/pages/CalculationRulesPage.tsx]"]
     profile_page["ProfilePage — account or guest view<br/>[apps/web/src/pages/ProfilePage.tsx]"]
-    account_card["AccountProfileCard<br/>[apps/web/src/features/auth/AccountProfileCard.tsx]"]
+    work_table["WorkTable<br/>[apps/web/src/features/work-table/components/month/WorkTable.tsx]"]
+    salary_summary["MonthlySalarySummary<br/>[apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx]"]
+    config_panel["ConfigPanel<br/>[apps/web/src/features/config/ConfigPanel.tsx]"]
+    monthly_boundary["MonthlyContentBoundary — scoped period replacement<br/>[apps/web/src/features/monthly-data/MonthlyContentBoundary.tsx]"]
+    reference_notice["ReferenceDataNotice / ReferenceIssueNotice<br/>[apps/web/src/features/reference/ReferenceDataNotice.tsx]"]
+    election_notice["ElectionDataNotice — election days missing or stale<br/>[apps/web/src/features/calendar/ElectionDataNotice.tsx]"]
+    auth_controls["AuthControls<br/>[apps/web/src/features/auth/AuthControls.tsx]"]
+    sign_in["GoogleSignInButton<br/>[apps/web/src/features/auth/GoogleSignInButton.tsx]"]
+    guest_notice["GuestModeNotice<br/>[apps/web/src/features/auth/GuestModeNotice.tsx]"]
+    account_card["AccountProfileCard — delete account<br/>[apps/web/src/features/auth/AccountProfileCard.tsx]"]
     guest_card["GuestProfileCard<br/>[apps/web/src/features/auth/GuestProfileCard.tsx]"]
     profile_history["ProfileHistory — persisted charts<br/>[apps/web/src/features/profile/components/ProfileHistory.tsx]"]
     locked_history["LockedProfileHistory — disabled range, locked charts<br/>[apps/web/src/features/profile/components/LockedProfileHistory.tsx]"]
-    profile_chart["ProfileBarChart<br/>[apps/web/src/features/profile/components/ProfileBarChart.tsx]"]
-    range_selector["ProfileRangeSelector<br/>[apps/web/src/features/profile/components/ProfileRangeSelector.tsx]"]
-    monthly_boundary["MonthlyContentBoundary — scoped period replacement<br/>[apps/web/src/features/monthly-data/MonthlyContentBoundary.tsx]"]
+    conflict_dialog["GuestDraftConflictDialog<br/>[apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx]"]
   end
   subgraph group_app["Application and state"]
-    node_10["useDayController<br/>[apps/web/src/features/work-table/hooks/day/useDayController.ts]"]
+    use_work_days["useWorkDays<br/>[apps/web/src/hooks/useWorkDays.ts]"]
+    use_reference_status["useReferenceStatus<br/>[apps/web/src/hooks/useReferenceStatus.ts]"]
     profile_query["useProfileHistory<br/>[apps/web/src/features/profile/hooks/useProfileHistory.ts]"]
-    profile_metrics["profileMetrics<br/>[apps/web/src/features/profile/helpers/profileMetrics.ts]"]
-    config_status["monthlyConfigStatusContext<br/>[apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts]"]
+    guest_import["GuestDraftImportProvider<br/>[apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx]"]
   end
-  subgraph group_data["Infrastructure and adapters"]
-    node_11["dayToPayBreadownVM<br/>[apps/web/src/adapters/dayToPayBreadownVM.ts]"]
-    node_12["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
+  subgraph group_data["Services"]
+    account_service["account.service — DELETE /me/account<br/>[apps/web/src/services/account/account.service.ts]"]
+    api_error["resolveApiErrorMessage — API codes to i18n messages<br/>[apps/web/src/utils/api-error.resolve.util.ts]"]
   end
-  node_0 -->|"depends on"| node_1
-  node_1 --> profile_page
+  app --> routes
+  app --> layout
+  layout --> view_switcher
+  routes -->|"lazy"| daily
+  routes -->|"lazy"| monthly
+  routes -->|"lazy"| rules
+  routes -->|"lazy"| profile_page
+  daily --> work_table
+  daily --> salary_summary
+  daily --> config_panel
+  daily --> monthly_boundary
+  daily --> reference_notice
+  daily --> election_notice
+  daily --> auth_controls
+  monthly --> salary_summary
+  monthly --> config_panel
+  monthly --> monthly_boundary
+  monthly --> reference_notice
+  monthly --> election_notice
+  monthly --> auth_controls
+  rules --> auth_controls
+  work_table --> guest_notice
+  guest_notice --> sign_in
+  auth_controls --> sign_in
   profile_page -->|"user"| account_card
   profile_page -->|"user"| profile_history
   profile_page -->|"guest"| guest_card
   profile_page -->|"guest"| locked_history
-  guest_card --> node_7
-  profile_history --> profile_chart
-  profile_history --> range_selector
+  guest_card --> sign_in
   profile_history --> profile_query
-  profile_history --> profile_metrics
-  locked_history --> range_selector
-  node_2 --> monthly_boundary
-  node_3 --> monthly_boundary
-  monthly_boundary --> config_status
-  node_1 -->|"depends on"| node_2
-  node_1 -->|"depends on"| node_3
-  node_1 -->|"depends on"| node_4
-  node_2 -->|"depends on"| node_5
-  node_2 -->|"depends on"| node_9
-  node_3 -->|"depends on"| node_9
-  node_5 -->|"depends on"| node_6
-  node_6 -->|"depends on"| node_7
-  node_10 -->|"depends on"| node_11
-  click node_0 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/App.tsx"
-  click node_1 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AppRoutes.tsx"
-  click node_2 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/DailyPage.tsx"
-  click node_3 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/MonthlySummaryPage.tsx"
-  click node_4 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/CalculationRulesPage.tsx"
-  click node_5 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/components/month/WorkTable.tsx"
-  click node_6 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GuestModeNotice.tsx"
-  click node_7 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GoogleSignInButton.tsx"
-  click node_8 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx"
-  click node_9 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx"
-  click node_10 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/day/useDayController.ts"
-  click node_11 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreadownVM.ts"
-  click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
-  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
-  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9 toneBlue
-  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
-  class node_10 toneMint
-  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
-  class node_11,node_12 toneRose
-  class profile_page,account_card,guest_card,profile_history,locked_history,profile_chart,range_selector,monthly_boundary toneBlue
-  class profile_query,profile_metrics,config_status toneMint
+  profile_history --> reference_notice
+  profile_history --> election_notice
+  election_notice --> use_work_days
+  reference_notice --> use_reference_status
+  guest_import --> conflict_dialog
+  account_card --> account_service
+  account_card --> api_error
+  click app "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/App.tsx"
+  click routes "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/routes/AppRoutes.tsx"
+  click layout "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/layout/Layout.tsx"
+  click view_switcher "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/layout/view-switcher/components/ViewSwitcher.tsx"
+  click daily "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/DailyPage.tsx"
+  click monthly "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/MonthlySummaryPage.tsx"
+  click rules "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/CalculationRulesPage.tsx"
   click profile_page "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/pages/ProfilePage.tsx"
+  click work_table "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/components/month/WorkTable.tsx"
+  click salary_summary "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/components/MonthlySalarySummary.tsx"
+  click config_panel "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/config/ConfigPanel.tsx"
+  click monthly_boundary "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyContentBoundary.tsx"
+  click reference_notice "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/reference/ReferenceDataNotice.tsx"
+  click election_notice "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/calendar/ElectionDataNotice.tsx"
+  click auth_controls "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/AuthControls.tsx"
+  click sign_in "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GoogleSignInButton.tsx"
+  click guest_notice "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GuestModeNotice.tsx"
   click account_card "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/AccountProfileCard.tsx"
   click guest_card "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/auth/GuestProfileCard.tsx"
   click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/components/ProfileHistory.tsx"
   click locked_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/components/LockedProfileHistory.tsx"
-  click profile_chart "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/components/ProfileBarChart.tsx"
-  click range_selector "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/components/ProfileRangeSelector.tsx"
-  click monthly_boundary "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyContentBoundary.tsx"
+  click conflict_dialog "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftConflictDialog.tsx"
+  click use_work_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useWorkDays.ts"
+  click use_reference_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useReferenceStatus.ts"
   click profile_query "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/hooks/useProfileHistory.ts"
-  click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
-  click config_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts"
+  click guest_import "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx"
+  click account_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/account/account.service.ts"
+  click api_error "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/utils/api-error.resolve.util.ts"
+  classDef toneBlue fill:#dbeafe,stroke:#2563eb,stroke-width:1.5px,color:#172554
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class app,routes,layout,view_switcher,daily,monthly,rules,profile_page,work_table,salary_summary,config_panel,monthly_boundary,reference_notice,election_notice,auth_controls,sign_in,guest_notice,account_card,guest_card,profile_history,locked_history,conflict_dialog toneBlue
+  class use_work_days,use_reference_status,profile_query,guest_import toneMint
+  class account_service,api_error toneRose
 ```
 
 <!-- /diagram:presentation -->
@@ -494,103 +547,132 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
-%% Selected module dependencies, including type imports; not an exhaustive import graph.
-%% Arrows point from consumers to dependencies. Profile reads do not hydrate editor state.
+%% Source: v1.1.0 (release candidate; source HEAD). Module dependencies include type imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
+%% Selected module dependencies; arrows point from consumers to dependencies. Profile reads do not hydrate editor state.
+%% DomainProvider builds the payroll engine from the API's reference timelines, falling back to the embedded baseline.
+%% Every user-data service call carries the owner it was issued for (expectedUserId); a session switch cancels it.
 flowchart TD
   subgraph group_app["Application and state"]
-    node_0["AppProviders<br/>[apps/web/src/app/providers/AppProviders.tsx]"]
-    node_1["AuthProvider<br/>[apps/web/src/app/providers/auth/AuthProvider.tsx]"]
-    node_2["DomainProvider<br/>[apps/web/src/app/providers/domain/DomainProvider.tsx]"]
-    node_3["domain.instance<br/>[apps/web/src/app/domain/domain.instance.ts]"]
-    node_4["MonthlyDataProvider<br/>[apps/web/src/features/monthly-data/MonthlyDataProvider.tsx]"]
-    node_5["GuestDraftImportProvider<br/>[apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx]"]
-    node_6["useGuestDraftCapture<br/>[apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts]"]
-    node_7["useWorkTableMonthSession<br/>[apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts]"]
-    node_8["WorkTableDayStateProvider<br/>[apps/web/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx]"]
-    node_9["globalStore<br/>[apps/web/src/store/globalStore.ts]"]
-    node_10["useAuth<br/>[apps/web/src/hooks/useAuth.ts]"]
-    node_11["useDomain<br/>[apps/web/src/hooks/useDomain.ts]"]
-    node_12["useGlobalState<br/>[apps/web/src/hooks/useGlobalState.ts]"]
-    node_13["month.resolver<br/>[apps/web/src/app/months/month.resolver.ts]"]
-    node_14["workdayinfo.presenter<br/>[apps/web/src/app/domain/workdayinfo.presenter.ts]"]
-    profile_query["useProfileHistory<br/>[apps/web/src/features/profile/hooks/useProfileHistory.ts]"]
-    profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
-    profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
-    profile_metrics["profileMetrics<br/>[apps/web/src/features/profile/helpers/profileMetrics.ts]"]
-    profile_range["profileRange<br/>[apps/web/src/features/profile/helpers/profileRange.ts]"]
+    providers["AppProviders<br/>[apps/web/src/app/providers/AppProviders.tsx]"]
+    auth_provider["AuthProvider — Supabase Auth session<br/>[apps/web/src/app/providers/auth/AuthProvider.tsx]"]
+    domain_provider["DomainProvider<br/>[apps/web/src/app/providers/domain/DomainProvider.tsx]"]
+    use_timelines["useReferenceTimelines — API, cache or baseline<br/>[apps/web/src/app/providers/domain/useReferenceTimelines.ts]"]
+    reference_status["referenceStatusContext<br/>[apps/web/src/app/providers/domain/referenceStatusContext.ts]"]
+    domain_instance["domain.instance — engine with a ReferenceResolver<br/>[apps/web/src/app/domain/domain.instance.ts]"]
+    reference_issues["referenceIssues — months without reference values<br/>[apps/web/src/app/domain/referenceIssues.ts]"]
+    month_resolver["month.resolver<br/>[apps/web/src/app/months/month.resolver.ts]"]
+    snackbar["AppSnackbarProvider<br/>[apps/web/src/app/providers/snackbar/AppSnackbarProvider.tsx]"]
+    monthly_data["MonthlyDataProvider — monthly config load and save<br/>[apps/web/src/features/monthly-data/MonthlyDataProvider.tsx]"]
     config_status["monthlyConfigStatusContext<br/>[apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts]"]
     config_actions["monthlyConfigActionsContext<br/>[apps/web/src/features/monthly-data/monthlyConfigActionsContext.ts]"]
+    guest_import["GuestDraftImportProvider — owner-bound confirmation<br/>[apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx]"]
     import_gate["guestDraftImportContext<br/>[apps/web/src/features/guest-draft/guestDraftImportContext.ts]"]
-    work_days["useWorkDays / loadCalendarEventMap<br/>[apps/web/src/hooks/useWorkDays.ts]"]
+    month_session["useWorkTableMonthSession — days and shifts<br/>[apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts]"]
+    shift_upserts["useDebouncedShiftUpserts<br/>[apps/web/src/features/work-table/hooks/month/useDebouncedShiftUpserts.ts]"]
+    draft_capture["useGuestDraftCapture<br/>[apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts]"]
+    work_days["useWorkDays — holidays + election days<br/>[apps/web/src/hooks/useWorkDays.ts]"]
+    profile_query["useProfileHistory<br/>[apps/web/src/features/profile/hooks/useProfileHistory.ts]"]
+    profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
+    profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
+    global_store["globalStore — Zustand<br/>[apps/web/src/store/globalStore.ts]"]
+    use_auth["useAuth<br/>[apps/web/src/hooks/useAuth.ts]"]
+    use_domain["useDomain<br/>[apps/web/src/hooks/useDomain.ts]"]
   end
-  profile_query --> profile_loader
-  profile_query --> profile_range
-  profile_loader --> profile_history
-  profile_loader --> profile_range
-  profile_query --> node_10
-  profile_query --> node_11
-  profile_query --> work_days
-  profile_query --> import_gate
-  profile_history -->|"month type"| profile_range
-  profile_history --> node_9
-  profile_loader --> work_days
-  profile_metrics -->|"snapshot type"| profile_history
-  node_4 --> config_status
-  node_4 --> config_actions
-  node_4 --> import_gate
-  node_5 --> import_gate
-  node_7 --> import_gate
+  subgraph group_data["Services"]
+    monthly_config_service["monthlyConfig.service<br/>[apps/web/src/services/monthlyConfig/monthlyConfig.service.ts]"]
+    shift_service["shift.service<br/>[apps/web/src/services/shift/shift.service.ts]"]
+    work_day_service["workDay.service<br/>[apps/web/src/services/workDay/workDay.service.ts]"]
+    guest_draft_service["guestDraft.service<br/>[apps/web/src/services/guestDraft/guestDraft.service.ts]"]
+    reference_timelines["referenceTimelines<br/>[apps/web/src/services/reference/referenceTimelines.ts]"]
+    election_days["electionDays<br/>[apps/web/src/services/reference/electionDays.ts]"]
+    israeli_holidays["israeliHolidays — computed with jewish-date<br/>[apps/web/src/services/calendar/israeliHolidays.ts]"]
+  end
   external_query{{"TanStack Query — queries and mutations"}}
-  node_0 --> external_query
-  node_4 --> external_query
-  node_7 --> external_query
+  external_supabase{{"Supabase Auth SDK"}}
+  external_domain{{"@shiftly/domain"}}
+  providers --> auth_provider
+  providers --> domain_provider
+  providers --> snackbar
+  auth_provider -->|"session only"| external_supabase
+  domain_provider --> use_timelines
+  domain_provider --> domain_instance
+  domain_provider --> reference_status
+  use_timelines --> reference_timelines
+  use_timelines --> reference_status
+  domain_instance --> month_resolver
+  domain_instance --> reference_issues
+  domain_instance --> external_domain
+  use_domain --> domain_provider
+  monthly_data --> config_status
+  monthly_data --> config_actions
+  monthly_data --> import_gate
+  monthly_data --> monthly_config_service
+  monthly_data --> global_store
+  monthly_data --> use_auth
+  guest_import --> import_gate
+  guest_import --> guest_draft_service
+  guest_import --> shift_service
+  guest_import --> work_day_service
+  guest_import --> use_auth
+  month_session --> shift_service
+  month_session --> work_day_service
+  month_session --> shift_upserts
+  month_session --> draft_capture
+  month_session --> import_gate
+  month_session --> global_store
+  month_session --> use_auth
+  work_days --> election_days
+  work_days --> israeli_holidays
+  work_days -->|"calendar event types"| external_domain
+  profile_query --> profile_loader
+  profile_query --> work_days
+  profile_query --> use_auth
+  profile_query --> use_domain
+  profile_query --> import_gate
+  profile_loader --> monthly_config_service
+  profile_loader --> shift_service
+  profile_loader --> work_day_service
+  profile_loader --> profile_history
+  profile_history --> global_store
+  providers --> external_query
+  monthly_data --> external_query
+  month_session --> external_query
   profile_query -->|"wait for writes; cancel stale reads"| external_query
-  node_0 -->|"depends on"| node_1
-  node_0 -->|"depends on"| node_2
-  node_2 -->|"depends on"| node_3
-  node_3 -->|"depends on"| node_13
-  node_3 -->|"depends on"| node_14
-  node_4 -->|"depends on"| node_10
-  node_4 -->|"depends on"| node_12
-  node_4 -->|"depends on"| node_9
-  node_5 -->|"depends on"| node_10
-  node_5 -->|"depends on"| node_11
-  node_5 -->|"depends on"| node_12
-  node_7 -->|"depends on"| node_10
-  node_7 -->|"depends on"| node_12
-  node_7 -->|"depends on"| node_9
-  node_7 -->|"depends on"| node_6
-  node_12 -->|"depends on"| node_9
-  node_1 -->|"imports"| external_supabase
-  external_supabase{{"Supabase SDK"}}
-  click node_0 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/AppProviders.tsx"
-  click node_1 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/auth/AuthProvider.tsx"
-  click node_2 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/DomainProvider.tsx"
-  click node_3 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/domain.instance.ts"
-  click node_4 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyDataProvider.tsx"
-  click node_5 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx"
-  click node_6 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts"
-  click node_7 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
-  click node_8 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
-  click node_9 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/store/globalStore.ts"
-  click node_10 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useAuth.ts"
-  click node_11 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useDomain.ts"
-  click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useGlobalState.ts"
-  click node_13 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/months/month.resolver.ts"
-  click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/workdayinfo.presenter.ts"
-  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
-  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14 toneMint
-  class profile_query,profile_loader,profile_history,profile_metrics,profile_range,config_status,config_actions,import_gate,work_days toneMint
-  click profile_loader "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/services/profileHistory.service.ts"
-  click profile_query "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/hooks/useProfileHistory.ts"
-  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileHistory.ts"
-  click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
-  click profile_range "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileRange.ts"
+  click providers "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/AppProviders.tsx"
+  click auth_provider "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/auth/AuthProvider.tsx"
+  click domain_provider "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/DomainProvider.tsx"
+  click use_timelines "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/useReferenceTimelines.ts"
+  click reference_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/referenceStatusContext.ts"
+  click domain_instance "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/domain.instance.ts"
+  click reference_issues "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/referenceIssues.ts"
+  click month_resolver "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/months/month.resolver.ts"
+  click snackbar "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/snackbar/AppSnackbarProvider.tsx"
+  click monthly_data "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyDataProvider.tsx"
   click config_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts"
   click config_actions "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigActionsContext.ts"
+  click guest_import "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx"
   click import_gate "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/guestDraftImportContext.ts"
+  click month_session "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
+  click shift_upserts "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useDebouncedShiftUpserts.ts"
+  click draft_capture "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts"
   click work_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useWorkDays.ts"
+  click profile_query "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/hooks/useProfileHistory.ts"
+  click profile_loader "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/services/profileHistory.service.ts"
+  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileHistory.ts"
+  click global_store "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/store/globalStore.ts"
+  click use_auth "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useAuth.ts"
+  click use_domain "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useDomain.ts"
+  click monthly_config_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
+  click shift_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/shift/shift.service.ts"
+  click work_day_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/workDay/workDay.service.ts"
+  click guest_draft_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.service.ts"
+  click reference_timelines "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/referenceTimelines.ts"
+  click israeli_holidays "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/calendar/israeliHolidays.ts"
+  click election_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/electionDays.ts"
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class providers,auth_provider,domain_provider,use_timelines,reference_status,domain_instance,reference_issues,month_resolver,snackbar,monthly_data,config_status,config_actions,guest_import,import_gate,month_session,shift_upserts,draft_capture,work_days,profile_query,profile_loader,profile_history,global_store,use_auth,use_domain toneMint
+  class monthly_config_service,shift_service,work_day_service,guest_draft_service,reference_timelines,election_days,israeli_holidays toneRose
 ```
 
 <!-- /diagram:application -->
@@ -600,7 +682,7 @@ flowchart TD
 #### State Management
 - **Zustand** handles global period configuration and daily pay maps
 - **React Context** owns authentication, dependency injection, UI integration boundaries, and the current work-table editing session
-- **TanStack Query** coordinates authenticated work-table reads and writes to Supabase
+- **TanStack Query** coordinates authenticated work-table reads and writes through apps/api
 - Daily pay maps are updated by date key, and the monthly breakdown is derived deterministically from the current maps
 
 Global Zustand state:
@@ -626,78 +708,89 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
-%% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
-%% Profile history reads saved config, shifts and days without persisting recalculated results.
-%% Static calendars and their election maintenance removed 2026-11-10: holidays are computed in the browser and elections come from apps/api.
+%% Source: v1.1.0 (release candidate; source HEAD). Module dependencies include type imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
+%% Web data access. Solid arrows point from consumers to dependencies; dashed arrows are HTTP calls and browser storage.
+%% supabase.client is used for authentication only (lint-enforced); user data and reference data come from apps/api.
+%% apiClient attaches the session token on request, refreshes once on 401 and drops a call whose owner is no longer signed in.
 flowchart TD
-  subgraph group_data["Infrastructure and adapters"]
-    node_0["supabase.crud<br/>[apps/web/src/services/supabase/supabase.crud.ts]"]
-    node_1["supabase.client<br/>[apps/web/src/services/supabase/supabase.client.ts]"]
-    node_2["shift.service<br/>[apps/web/src/services/shift/shift.service.ts]"]
-    node_4["account.service<br/>[apps/web/src/services/account/account.service.ts]"]
-    node_5["workDay.service<br/>[apps/web/src/services/workDay/workDay.service.ts]"]
-    node_7["analytics.service<br/>[apps/web/src/services/analytics/analytics.service.ts]"]
-    node_8["guestDraft.service<br/>[apps/web/src/services/guestDraft/guestDraft.service.ts]"]
-    node_9["monthlyConfig.service<br/>[apps/web/src/services/monthlyConfig/monthlyConfig.service.ts]"]
-    node_10["guestDraft.storage<br/>[apps/web/src/services/guestDraft/guestDraft.storage.ts]"]
-    node_12["gtag<br/>[apps/web/src/services/analytics/gtag.ts]"]
-    node_14["dayToPayBreakdownVM<br/>[apps/web/src/adapters/dayToPayBreakdownVM.ts]"]
-    node_15["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
+  subgraph group_data["Services and adapters (apps/web)"]
+    api_client["apiClient — axios, bearer token, single refresh,<br/>expectedUserId guard, typed error codes<br/>[apps/web/src/services/api/client.ts]"]
+    supabase_client["supabase.client — Auth only<br/>[apps/web/src/services/supabase/supabase.client.ts]"]
+    monthly_config_service["monthlyConfig.service — /me/months/:y/:m/config, shabbat-credit<br/>[apps/web/src/services/monthlyConfig/monthlyConfig.service.ts]"]
+    work_day_service["workDay.service — /me/months/:y/:m/work-days, /me/work-days/:date<br/>[apps/web/src/services/workDay/workDay.service.ts]"]
+    shift_service["shift.service — /me/months/:y/:m/shifts, /me/shifts/:id<br/>[apps/web/src/services/shift/shift.service.ts]"]
+    guest_draft_service["guestDraft.service — /me/months/:y/:m/guest-import<br/>[apps/web/src/services/guestDraft/guestDraft.service.ts]"]
+    guest_draft_storage["guestDraft.storage — signed-out draft<br/>[apps/web/src/services/guestDraft/guestDraft.storage.ts]"]
+    account_service["account.service — DELETE /me/account<br/>[apps/web/src/services/account/account.service.ts]"]
+    reference_service["reference.service — /reference/elections, /reference/timelines<br/>[apps/web/src/services/reference/reference.service.ts]"]
+    reference_timelines["referenceTimelines<br/>[apps/web/src/services/reference/referenceTimelines.ts]"]
+    timeline_cache["timelineCache — last known timelines<br/>[apps/web/src/services/reference/timelineCache.ts]"]
+    election_days["electionDays<br/>[apps/web/src/services/reference/electionDays.ts]"]
+    election_cache["electionCache — last known election days<br/>[apps/web/src/services/reference/electionCache.ts]"]
+    israeli_holidays["israeliHolidays — computed with jewish-date<br/>[apps/web/src/services/calendar/israeliHolidays.ts]"]
+    analytics["analytics.service / gtag<br/>[apps/web/src/services/analytics/analytics.service.ts]"]
+    holiday_adapter["holiday.adapter<br/>[apps/web/src/adapters/holiday.adapter.ts]"]
+    election_adapter["election.adapter<br/>[apps/web/src/adapters/election.adapter.ts]"]
+    timelines_adapter["referenceTimelines.adapter<br/>[apps/web/src/adapters/referenceTimelines.adapter.ts]"]
+    pay_vm["dayToPayBreakdownVM / monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
+    api_error["resolveApiErrorMessage — API client codes to messages<br/>[apps/web/src/utils/api-error.resolve.util.ts]"]
   end
-  profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
-  profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
-  profile_loader --> profile_history
-  profile_metrics["profileMetrics<br/>[apps/web/src/features/profile/helpers/profileMetrics.ts]"]
-  salary_rows["payRows.mapper<br/>[apps/web/src/features/salary-summary/mappers/payRows.mapper.ts]"]
-  salary_total["calculateTotal<br/>[apps/web/src/features/salary-summary/helpers/helper.ts]"]
-  profile_loader -->|"read saved months"| node_9
-  profile_loader -->|"read shifts"| node_2
-  profile_loader -->|"read days"| node_5
-  profile_history --> node_15
-  profile_metrics --> salary_rows
-  profile_metrics --> salary_total
   external_domain{{"@shiftly/domain"}}
-  node_14 --> external_domain
-  node_15 --> external_domain
-  node_10 -->|"status enum"| external_domain
-  profile_history -->|"allocate Shabbat credit"| external_domain
-  node_0 -->|"depends on"| node_1
-  node_2 -->|"depends on"| node_0
-  node_4 -->|"depends on"| node_1
-  node_5 -->|"depends on"| node_0
-  node_8 -->|"depends on"| node_1
-  node_8 -->|"depends on"| node_10
-  node_9 -->|"depends on"| node_0
-  node_10 -->|"depends on"| node_2
-  node_10 -->|"depends on"| node_5
-  node_1 -->|"imports"| external_supabase
-  node_7 -->|"calls"| external_analytics
-  node_12 -->|"calls"| external_analytics
-  external_supabase{{"Supabase SDK"}}
+  local_storage[("localStorage")]
+  api{{"apps/api"}}
+  sb_auth{{"Supabase Auth"}}
   external_analytics{{"Google Analytics (gtag)"}}
-  click node_0 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.crud.ts"
-  click node_1 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
-  click node_2 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/shift/shift.service.ts"
-  click node_4 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/account/account.service.ts"
-  click node_5 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/workDay/workDay.service.ts"
-  click node_7 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/analytics.service.ts"
-  click node_8 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.service.ts"
-  click node_9 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
-  click node_10 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.storage.ts"
-  click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/gtag.ts"
-  click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreakdownVM.ts"
-  click node_15 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
+  monthly_config_service --> api_client
+  work_day_service --> api_client
+  shift_service --> api_client
+  guest_draft_service --> api_client
+  guest_draft_service -->|"draft type"| guest_draft_storage
+  account_service --> api_client
+  reference_service --> api_client
+  api_client -->|"session token, user id"| supabase_client
+  reference_timelines --> reference_service
+  reference_timelines --> timeline_cache
+  reference_timelines --> timelines_adapter
+  election_days --> reference_service
+  election_days --> election_cache
+  timeline_cache --> reference_service
+  election_cache --> reference_service
+  holiday_adapter --> israeli_holidays
+  election_adapter --> reference_service
+  timelines_adapter --> external_domain
+  holiday_adapter --> external_domain
+  election_adapter --> external_domain
+  pay_vm --> external_domain
+  shift_service -->|"shift types"| external_domain
+  work_day_service -->|"status enum"| external_domain
+  api_client -.->|"HTTPS"| api
+  supabase_client -.->|"OAuth, session refresh"| sb_auth
+  guest_draft_storage -.-> local_storage
+  timeline_cache -.-> local_storage
+  election_cache -.-> local_storage
+  analytics -.-> external_analytics
+  click api_client "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/api/client.ts"
+  click supabase_client "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
+  click monthly_config_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
+  click work_day_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/workDay/workDay.service.ts"
+  click shift_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/shift/shift.service.ts"
+  click guest_draft_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.service.ts"
+  click guest_draft_storage "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.storage.ts"
+  click account_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/account/account.service.ts"
+  click reference_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/reference.service.ts"
+  click reference_timelines "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/referenceTimelines.ts"
+  click timeline_cache "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/timelineCache.ts"
+  click election_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/electionDays.ts"
+  click election_cache "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/electionCache.ts"
+  click israeli_holidays "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/calendar/israeliHolidays.ts"
+  click analytics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/analytics.service.ts"
+  click holiday_adapter "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/holiday.adapter.ts"
+  click election_adapter "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/election.adapter.ts"
+  click timelines_adapter "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/referenceTimelines.adapter.ts"
+  click pay_vm "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
+  click api_error "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/utils/api-error.resolve.util.ts"
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
-  class node_0,node_1,node_2,node_4,node_5,node_7,node_8,node_9,node_10,node_12,node_14,node_15 toneRose
-  class salary_rows,salary_total toneRose
-  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
-  class profile_loader,profile_history,profile_metrics toneMint
-  click profile_loader "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/services/profileHistory.service.ts"
-  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileHistory.ts"
-  click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
-  click salary_rows "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/mappers/payRows.mapper.ts"
-  click salary_total "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/helpers/helper.ts"
+  class api_client,supabase_client,monthly_config_service,work_day_service,shift_service,guest_draft_service,guest_draft_storage,account_service,reference_service,reference_timelines,timeline_cache,election_days,election_cache,israeli_holidays,analytics,holiday_adapter,election_adapter,timelines_adapter,pay_vm,api_error toneRose
 ```
 
 <!-- /diagram:data -->
@@ -707,6 +800,144 @@ flowchart TD
 #### Adapters
 Convert domain objects into UI-friendly view models.
 This ensures the domain never depends on presentation concerns.
+
+### Backend API
+<details>
+<summary>Backend API</summary>
+
+<!-- diagram:api -->
+
+```mermaid
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+%% Source: v1.1.0 (release candidate; source HEAD). Module dependencies include type imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
+%% apps/api on Cloud Run. Solid arrows point from consumers to dependencies; dashed arrows are calls to external systems.
+%% services/ and ports/ never import Express, Supabase or adapters (ESLint-enforced); repositories/ implement the ports.
+%% User-owned tables and api_* functions are reached only through UserScope, which pins every query to the verified caller.
+flowchart TD
+  subgraph entry["Entry points"]
+    server["server.ts — reads config, builds adapters, listens<br/>[apps/api/src/server.ts]"]
+    app["app.ts — middleware order and route mounting<br/>[apps/api/src/app.ts]"]
+    config["config — env files and validation<br/>[apps/api/src/config/env.ts]"]
+    cli["cli — election:record, election:activate,<br/>reference:activate, research<br/>[apps/api/src/cli/]"]
+  end
+  subgraph http["middleware/ and routes/"]
+    middleware["cors, json-body (no compressed bodies), request-log<br/>[apps/api/src/middleware/]"]
+    auth_mw["requireAuth, requireFreshSession, requireAdmin<br/>[apps/api/src/middleware/auth.ts]"]
+    reference_routes["GET /reference/elections, /reference/timelines<br/>Public, cached<br/>[apps/api/src/routes/published-elections-router.ts]"]
+    me_routes["/me — config, work-days, shifts,<br/>guest-import, account<br/>[apps/api/src/routes/]"]
+    admin_routes["/admin/income-tax/:year<br/>Admin only<br/>[apps/api/src/routes/rules-router.ts]"]
+  end
+  subgraph core["services/ and ports/ — framework-free"]
+    month_period["month-period — month and date bounds<br/>[apps/api/src/services/month-period.ts]"]
+    published["published-elections / published-timelines<br/>Validate what is published<br/>[apps/api/src/services/published-timelines.ts]"]
+    activation["election-record, election-activation,<br/>timeline-activation, store-candidates<br/>[apps/api/src/services/]"]
+    ports["ports — AuthVerifier, RoleRepository,<br/>RevisionRepository<br/>[apps/api/src/ports/]"]
+    errors["UserDataError + HTTP mapping<br/>[apps/api/src/errors/user-data-errors.ts]"]
+  end
+  subgraph adapters["repositories/ — Supabase adapters"]
+    user_scope["UserScope — select/delete pinned to user_id,<br/>rpc only api_* with p_user_id<br/>[apps/api/src/repositories/user-scope.ts]"]
+    user_repos["monthly-config, work-days, shifts,<br/>guest-import repositories<br/>[apps/api/src/repositories/]"]
+    auth_adapters["supabase-auth-verifier, supabase-role-repository<br/>[apps/api/src/repositories/supabase-auth-verifier.ts]"]
+    account_deleter["account-deleter — Auth admin API<br/>[apps/api/src/repositories/account-deleter.ts]"]
+    reference_readers["cached + supabase published readers,<br/>revision repository<br/>[apps/api/src/repositories/]"]
+  end
+  research["research/ — income tax, social security,<br/>evidence, source policy<br/>[apps/api/src/research/]"]
+  sb_auth{{"Supabase Auth"}}
+  sb_db[("Supabase Postgres")]
+  gemini{{"Google AI (Gemma)"}}
+  sources{{"Public sources<br/>Wikipedia, Kol Zchut, BTL, Wayback"}}
+  server --> config
+  server --> app
+  server -->|"builds"| user_scope
+  server -->|"builds"| auth_adapters
+  server -->|"builds"| account_deleter
+  server -->|"builds"| reference_readers
+  cli --> config
+  cli --> activation
+  cli --> reference_readers
+  cli --> research
+  app --> middleware
+  app --> auth_mw
+  app --> reference_routes
+  app --> me_routes
+  app --> admin_routes
+  app --> errors
+  auth_mw --> ports
+  reference_routes --> published
+  me_routes --> auth_mw
+  me_routes --> month_period
+  me_routes --> user_repos
+  me_routes --> user_scope
+  me_routes --> account_deleter
+  admin_routes --> research
+  research -->|"store candidates, coverage"| activation
+  research --> ports
+  month_period --> errors
+  activation --> ports
+  activation --> research
+  user_repos --> month_period
+  user_scope --> ports
+  user_scope --> errors
+  auth_adapters -->|"implements"| ports
+  reference_readers -->|"implements"| ports
+  reference_readers --> published
+  account_deleter --> errors
+  auth_adapters -.->|"verify token, revalidate session, roles"| sb_auth
+  account_deleter -.->|"admin.deleteUser; rows cascade"| sb_auth
+  user_scope -.->|"service_role"| sb_db
+  reference_readers -.->|"published revisions"| sb_db
+  research -.-> gemini
+  research -.-> sources
+  click server "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/server.ts"
+  click app "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/app.ts"
+  click config "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/config/env.ts"
+  click cli "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/cli"
+  click middleware "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/middleware"
+  click auth_mw "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/middleware/auth.ts"
+  click reference_routes "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/routes/published-elections-router.ts"
+  click me_routes "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/routes"
+  click admin_routes "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/routes/rules-router.ts"
+  click month_period "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/services/month-period.ts"
+  click published "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/services/published-timelines.ts"
+  click activation "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/services"
+  click ports "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/ports"
+  click errors "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/errors/user-data-errors.ts"
+  click user_scope "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/repositories/user-scope.ts"
+  click user_repos "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/repositories"
+  click auth_adapters "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/repositories/supabase-auth-verifier.ts"
+  click account_deleter "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/repositories/account-deleter.ts"
+  click reference_readers "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/repositories"
+  click research "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/research"
+  classDef toneViolet fill:#ede9fe,stroke:#7c3aed,stroke-width:1.5px,color:#2e1065
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class server,app,config,cli toneMint
+  class middleware,auth_mw,reference_routes,me_routes,admin_routes toneViolet
+  class month_period,published,activation,ports,errors toneAmber
+  class user_scope,user_repos,auth_adapters,account_deleter,reference_readers toneRose
+  class research toneViolet
+```
+
+<!-- /diagram:api -->
+
+</details>
+
+`apps/api` runs on Cloud Run. The browser signs in with Supabase Auth and sends
+its access token; the API verifies it, and reaches user data only through
+`UserScope`, which pins every query to the verified caller. See
+[apps/api/README.md](../../apps/api/README.md) for the layout and the
+dependency rule.
 
 ---
 ## Domain Concepts
@@ -846,13 +1077,22 @@ Composition pipelines for wiring domain components:
 - **Axios** 1.18.1 (HTTP client)
 - **date-fns** 4.1.0 (date manipulation)
 - **jewish-date** 2.0.29 (Hebrew calendar for holiday computation)
-- **Supabase** 2.112.4 (Google OAuth + Postgres persistence)
+- **Supabase** 2.112.4 (Google OAuth in the browser; Postgres through `apps/api`)
+
+### Backend (`apps/api`)
+
+- **Node.js** 24 (type stripping, no build step) on **Google Cloud Run**
+- **Express** 5.3
+- **Zod** 4 (request and environment validation)
+- **Supabase** 2.112.4 with the secret key, behind `UserScope`
+- **Google Gen AI** 2.27 (admin-only reference-data research)
 
 ### Testing
 
 - **Vitest** 4
 - **Testing Library** (React, Jest-DOM, User Event)
-- **Playwright** 1.63 (Chromium end-to-end tests)
+- **Playwright** 1.63 (Chromium and WebKit end-to-end tests)
+- **pgTAP** (database privileges, Row Level Security and backend-only functions)
 
 ---
 
@@ -874,7 +1114,12 @@ bun run test:coverage
 
 # Run tests in CI mode (single run)
 bun run test:ci
+
+# Database tests (pgTAP); needs the Supabase CLI and Docker
+bun run test:db
 ```
+
+`bun run test` covers the web app, `@shiftly/domain` and `apps/api`.
 
 ### End-to-End Tests
 
@@ -984,33 +1229,45 @@ bun run dev
 
 Visit `http://localhost:5173/shiftly` in your browser.
 
-### Supabase Setup (optional)
+### Sign-in and Persistence Setup (optional)
 
 Guest mode works with no setup at all — nothing is persisted, no account required.
 
-To enable Google sign-in and cross-device data persistence, create a `.env.local` file with your Supabase project's credentials:
+Signing in and saving data needs a Supabase project and the Shiftly API.
 
-```bash
-VITE_SUPABASE_URL=
-VITE_SUPABASE_PUBLISHABLE_KEY=
-```
+1. **Web app.** Create `.env.local` in the repository root:
 
-Google sign-in always returns to the app root (`<origin>/shiftly/`) and then restores the page the user started from. Under **Authentication → URL Configuration → Redirect URLs**, allow that root for every origin you use, for example:
+   ```bash
+   VITE_SUPABASE_URL=
+   VITE_SUPABASE_PUBLISHABLE_KEY=
+   VITE_API_URL=http://localhost:3000
+   ```
 
-```text
-https://dmaman86.github.io/shiftly/**
-http://localhost:5173/shiftly/**
-```
+2. **API.** Create `apps/api/.env` with the variables listed in
+   [apps/api/README.md](../../apps/api/README.md#environment), then run
+   `bun run dev:api`. The secret key stays in the API: never give it a `VITE_`
+   prefix.
 
-Then run the SQL files under `supabase/migrations/`, in order, in your Supabase project's SQL Editor to create the `monthly_configs`, `work_days`, and `shifts` tables with their Row Level Security policies.
+3. **Redirects.** Google sign-in always returns to the app root
+   (`<origin>/shiftly/`) and then restores the page the user started from.
+   Under **Authentication → URL Configuration → Redirect URLs**, allow that
+   root for every origin you use, for example:
 
-Account deletion requires the `delete-account` Supabase Edge Function because deleting from `auth.users` requires a server-side secret key. Deploy it after linking the project:
+   ```text
+   https://dmaman86.github.io/shiftly/**
+   http://localhost:5173/shiftly/**
+   ```
 
-```bash
-supabase functions deploy delete-account
-```
+4. **Database.** Apply the migrations in `supabase/migrations/` with
+   `supabase db push` (or run them in order in the SQL Editor). They create the
+   `monthly_configs`, `work_days` and `shifts` tables, their Row Level Security
+   policies and the backend-only functions the API calls.
 
-The function validates the signed-in user's JWT and deletes that same user from Supabase Auth. The table foreign keys use `on delete cascade`, so the user's `monthly_configs`, `work_days`, and `shifts` rows are removed by the database.
+Account deletion goes through the API (`DELETE /me/account`): it revalidates the
+session with Supabase Auth, then deletes the user with the secret key. The table
+foreign keys use `on delete cascade`, so the user's rows go with them. The
+`supabase/functions/delete-account` Edge Function that did this before is no
+longer called and is being retired.
 
 ---
 
@@ -1022,11 +1279,18 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │   ├── assets/                 # README screenshots
 │   └── workflows/              # CI, pull-request checks, deployment
 ├── docs/
-│   └── architecture/           # Generated conceptual diagrams and tag history
+│   └── architecture/           # Current diagrams and per-tag history
 ├── e2e/                         # Playwright end-to-end tests and fixtures
 ├── playwright.config.ts         # Playwright configuration
-├── scripts/
-│   └── architecture/           # Mermaid architecture generators
+├── scripts/                     # Diagram sync and reference-timeline diagnostics
+├── apps/api/src/                # Backend on Cloud Run (see apps/api/README.md)
+│   ├── middleware/             # CORS, JSON body, request log, authentication
+│   ├── routes/                 # /reference, /me and /admin routers
+│   ├── services/               # Framework-free rules
+│   ├── ports/                  # Interfaces the services depend on
+│   ├── repositories/           # Supabase adapters, including UserScope
+│   ├── research/               # Admin reference-data research pipelines
+│   └── cli/                    # Admin commands
 ├── apps/web/src/
 │   ├── adapters/               # External data and domain-to-view adapters
 │   ├── app/                    # Application composition root
@@ -1073,8 +1337,9 @@ The function validates the signed-in user's JWT and deletes that same user from 
 │       ├── src/                 # Framework-independent payroll engine and public index.ts
 │       └── tests/               # Domain tests, independent from React
 └── supabase/
-    ├── functions/               # Authenticated Edge Functions
-    └── migrations/              # Postgres schema and Row Level Security policies
+    ├── functions/               # Legacy delete-account Edge Function (being retired)
+    ├── migrations/              # Schema, Row Level Security and backend-only functions
+    └── tests/                   # pgTAP database tests
 ```
 
 ---

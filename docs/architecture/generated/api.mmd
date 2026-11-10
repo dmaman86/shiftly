@@ -1,0 +1,119 @@
+---
+config:
+  theme: base
+  themeVariables:
+    background: "#1e1e2e"
+    primaryColor: "#313244"
+    primaryTextColor: "#cdd6f4"
+    primaryBorderColor: "#89b4fa"
+    lineColor: "#334155"
+    edgeLabelBackground: "#ffffff"
+---
+%% Source: v1.1.0 (release candidate; source HEAD). Module dependencies include type imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
+%% apps/api on Cloud Run. Solid arrows point from consumers to dependencies; dashed arrows are calls to external systems.
+%% services/ and ports/ never import Express, Supabase or adapters (ESLint-enforced); repositories/ implement the ports.
+%% User-owned tables and api_* functions are reached only through UserScope, which pins every query to the verified caller.
+flowchart TD
+  subgraph entry["Entry points"]
+    server["server.ts — reads config, builds adapters, listens<br/>[apps/api/src/server.ts]"]
+    app["app.ts — middleware order and route mounting<br/>[apps/api/src/app.ts]"]
+    config["config — env files and validation<br/>[apps/api/src/config/env.ts]"]
+    cli["cli — election:record, election:activate,<br/>reference:activate, research<br/>[apps/api/src/cli/]"]
+  end
+  subgraph http["middleware/ and routes/"]
+    middleware["cors, json-body (no compressed bodies), request-log<br/>[apps/api/src/middleware/]"]
+    auth_mw["requireAuth, requireFreshSession, requireAdmin<br/>[apps/api/src/middleware/auth.ts]"]
+    reference_routes["GET /reference/elections, /reference/timelines<br/>Public, cached<br/>[apps/api/src/routes/published-elections-router.ts]"]
+    me_routes["/me — config, work-days, shifts,<br/>guest-import, account<br/>[apps/api/src/routes/]"]
+    admin_routes["/admin/income-tax/:year<br/>Admin only<br/>[apps/api/src/routes/rules-router.ts]"]
+  end
+  subgraph core["services/ and ports/ — framework-free"]
+    month_period["month-period — month and date bounds<br/>[apps/api/src/services/month-period.ts]"]
+    published["published-elections / published-timelines<br/>Validate what is published<br/>[apps/api/src/services/published-timelines.ts]"]
+    activation["election-record, election-activation,<br/>timeline-activation, store-candidates<br/>[apps/api/src/services/]"]
+    ports["ports — AuthVerifier, RoleRepository,<br/>RevisionRepository<br/>[apps/api/src/ports/]"]
+    errors["UserDataError + HTTP mapping<br/>[apps/api/src/errors/user-data-errors.ts]"]
+  end
+  subgraph adapters["repositories/ — Supabase adapters"]
+    user_scope["UserScope — select/delete pinned to user_id,<br/>rpc only api_* with p_user_id<br/>[apps/api/src/repositories/user-scope.ts]"]
+    user_repos["monthly-config, work-days, shifts,<br/>guest-import repositories<br/>[apps/api/src/repositories/]"]
+    auth_adapters["supabase-auth-verifier, supabase-role-repository<br/>[apps/api/src/repositories/supabase-auth-verifier.ts]"]
+    account_deleter["account-deleter — Auth admin API<br/>[apps/api/src/repositories/account-deleter.ts]"]
+    reference_readers["cached + supabase published readers,<br/>revision repository<br/>[apps/api/src/repositories/]"]
+  end
+  research["research/ — income tax, social security,<br/>evidence, source policy<br/>[apps/api/src/research/]"]
+  sb_auth{{"Supabase Auth"}}
+  sb_db[("Supabase Postgres")]
+  gemini{{"Google AI (Gemma)"}}
+  sources{{"Public sources<br/>Wikipedia, Kol Zchut, BTL, Wayback"}}
+  server --> config
+  server --> app
+  server -->|"builds"| user_scope
+  server -->|"builds"| auth_adapters
+  server -->|"builds"| account_deleter
+  server -->|"builds"| reference_readers
+  cli --> config
+  cli --> activation
+  cli --> reference_readers
+  cli --> research
+  app --> middleware
+  app --> auth_mw
+  app --> reference_routes
+  app --> me_routes
+  app --> admin_routes
+  app --> errors
+  auth_mw --> ports
+  reference_routes --> published
+  me_routes --> auth_mw
+  me_routes --> month_period
+  me_routes --> user_repos
+  me_routes --> user_scope
+  me_routes --> account_deleter
+  admin_routes --> research
+  research -->|"store candidates, coverage"| activation
+  research --> ports
+  month_period --> errors
+  activation --> ports
+  activation --> research
+  user_repos --> month_period
+  user_scope --> ports
+  user_scope --> errors
+  auth_adapters -->|"implements"| ports
+  reference_readers -->|"implements"| ports
+  reference_readers --> published
+  account_deleter --> errors
+  auth_adapters -.->|"verify token, revalidate session, roles"| sb_auth
+  account_deleter -.->|"admin.deleteUser; rows cascade"| sb_auth
+  user_scope -.->|"service_role"| sb_db
+  reference_readers -.->|"published revisions"| sb_db
+  research -.-> gemini
+  research -.-> sources
+  click server "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/server.ts"
+  click app "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/app.ts"
+  click config "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/config/env.ts"
+  click cli "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/cli"
+  click middleware "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/middleware"
+  click auth_mw "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/middleware/auth.ts"
+  click reference_routes "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/routes/published-elections-router.ts"
+  click me_routes "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/routes"
+  click admin_routes "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/routes/rules-router.ts"
+  click month_period "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/services/month-period.ts"
+  click published "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/services/published-timelines.ts"
+  click activation "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/services"
+  click ports "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/ports"
+  click errors "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/errors/user-data-errors.ts"
+  click user_scope "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/repositories/user-scope.ts"
+  click user_repos "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/repositories"
+  click auth_adapters "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/repositories/supabase-auth-verifier.ts"
+  click account_deleter "https://github.com/dmaman86/shiftly/blob/main/apps/api/src/repositories/account-deleter.ts"
+  click reference_readers "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/repositories"
+  click research "https://github.com/dmaman86/shiftly/tree/main/apps/api/src/research"
+  classDef toneViolet fill:#ede9fe,stroke:#7c3aed,stroke-width:1.5px,color:#2e1065
+  classDef toneAmber fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  class server,app,config,cli toneMint
+  class middleware,auth_mw,reference_routes,me_routes,admin_routes toneViolet
+  class month_period,published,activation,ports,errors toneAmber
+  class user_scope,user_repos,auth_adapters,account_deleter,reference_readers toneRose
+  class research toneViolet

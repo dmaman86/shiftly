@@ -12,6 +12,23 @@ import { buildPayMapPipeline } from "@shiftly/domain";
 const engine = buildPayMapPipeline();
 ```
 
+The per-diem point rate and the meal-allowance rates come from a
+`ReferenceResolver`, month by month. Without one, the engine uses the embedded
+baseline (`BASELINE_REFERENCE_TIMELINES`). The web app builds a resolver from the
+timelines `apps/api` publishes, and falls back to the baseline when they cannot
+be loaded:
+
+```ts
+import { buildPayMapPipeline, createReferenceResolver } from "@shiftly/domain";
+
+const engine = buildPayMapPipeline({
+  referenceResolver: createReferenceResolver(timelines),
+});
+```
+
+A month without a value is reported as unavailable instead of silently using
+another month's rate.
+
 Consume the package root, not its internal source paths. The factory provides
 shift/day/month calculations, reducers, timeline classification, calendar
 classification and historical rate policies. Web adapters own month selection,
