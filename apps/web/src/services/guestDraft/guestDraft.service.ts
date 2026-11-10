@@ -1,31 +1,40 @@
 import type { EndpointCall } from "@/app/types/api.types";
-import { supabase } from "@/services/supabase/supabase.client";
-import { fromSupabaseResult } from "@/utils";
+import { apiClient } from "@/services/api/client";
 import type { GuestDraft } from "./guestDraft.storage";
 
 export const guestDraftService = () => {
-  // A single RPC so replacing the month is atomic (see the
-  // import_guest_month migration). Shift ids are omitted on purpose: the
+  // A single request so replacing the month is atomic (see the
+  // api_import_guest_month migration). Shift ids are omitted on purpose: the
   // server generates them and never trusts client-supplied ids.
-  const importMonth = (draft: GuestDraft): EndpointCall<null> => ({
-    call: async () =>
-      fromSupabaseResult<null>(
-        await supabase.rpc("import_guest_month", {
-          p_year: draft.year,
-          p_month: draft.month,
-          p_standard_hours: draft.config.standardHours,
-          p_base_rate: draft.config.baseRate,
-          p_days: draft.days,
-          p_shifts: draft.shifts.map(
+  //
+  // `ownerId` is the account the import was checked and confirmed for: it is
+  // never sent, and if another account has signed in since, nothing is sent
+  // (see ApiRequest.expectedUserId), so a month confirmed for one account
+  // never replaces another's.
+  const importMonth = (
+    ownerId: string,
+    draft: GuestDraft,
+  ): EndpointCall<null> => ({
+    call: () =>
+      apiClient.request<null>({
+        method: "POST",
+        path: `/me/months/${draft.year}/${draft.month}/guest-import`,
+        body: {
+          standardHours: draft.config.standardHours,
+          baseRate: draft.config.baseRate,
+          days: draft.days.map(({ date, status }) => ({ date, status })),
+          shifts: draft.shifts.map(
             ({ date, start_time, end_time, is_duty }) => ({
               date,
-              start_time,
-              end_time,
-              is_duty,
+              startTime: start_time,
+              endTime: end_time,
+              isDuty: is_duty,
             }),
           ),
-        }),
-      ),
+        },
+        authenticated: true,
+        expectedUserId: ownerId,
+      }),
   });
 
   return { importMonth };

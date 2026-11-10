@@ -31,14 +31,25 @@ type GuestDraftImportState =
       draft: GuestDraft;
       dialog: GuestDraftDialogMode | null;
     }
-  | { status: "confirming"; draft: GuestDraft; savedShiftCount: number }
+  | {
+      status: "confirming";
+      draft: GuestDraft;
+      /** The account whose saved month was checked and would be replaced. */
+      ownerId: string;
+      savedShiftCount: number;
+    }
   | {
       status: "importing";
       draft: GuestDraft;
       outcome: ImportOutcome;
       dialog: GuestDraftDialogMode | null;
     }
-  | { status: "error"; draft: GuestDraft; failed: FailedStep };
+  | {
+      status: "error";
+      draft: GuestDraft;
+      ownerId: string;
+      failed: FailedStep;
+    };
 
 type GuestDraftImportProviderProps = {
   // Consumed once per page load, outside React (see App), so StrictMode
@@ -71,12 +82,12 @@ export const GuestDraftImportProvider = ({
   const userId = user?.id;
 
   const fail = useCallback(
-    (draft: GuestDraft, failed: FailedStep, error: string) => {
+    (draft: GuestDraft, ownerId: string, failed: FailedStep, error: string) => {
       console.error("Guest draft import failed", error);
       // Put the draft back so a reload retries instead of losing it.
       guestDraftStorage.save(draft);
       guestDraftStorage.markPendingImport();
-      setState({ status: "error", draft, failed });
+      setState({ status: "error", draft, ownerId, failed });
     },
     [],
   );
@@ -84,14 +95,17 @@ export const GuestDraftImportProvider = ({
   const runImport = useCallback(
     async (
       draft: GuestDraft,
+      ownerId: string,
       outcome: ImportOutcome,
       dialog: GuestDraftDialogMode | null = null,
     ) => {
       setState({ status: "importing", draft, outcome, dialog });
-      const result = await callEndPoint(guestDraftService().importMonth(draft));
+      const result = await callEndPoint(
+        guestDraftService().importMonth(ownerId, draft),
+      );
 
       if (result.error !== undefined) {
-        fail(draft, { step: "importing", outcome }, result.error);
+        fail(draft, ownerId, { step: "importing", outcome }, result.error);
         return;
       }
 
@@ -124,7 +138,7 @@ export const GuestDraftImportProvider = ({
       const error = shiftsResult.error ?? daysResult.error;
 
       if (error !== undefined) {
-        fail(draft, { step: "checking" }, error);
+        fail(draft, ownerId, { step: "checking" }, error);
         return;
       }
 
@@ -133,11 +147,11 @@ export const GuestDraftImportProvider = ({
 
       // A saved monthly config alone is not user work worth protecting.
       if (savedShiftCount === 0 && savedDayCount === 0) {
-        await runImport(draft, "imported", dialog);
+        await runImport(draft, ownerId, "imported", dialog);
         return;
       }
 
-      setState({ status: "confirming", draft, savedShiftCount });
+      setState({ status: "confirming", draft, ownerId, savedShiftCount });
     },
     [callEndPoint, fail, runImport],
   );
@@ -189,7 +203,7 @@ export const GuestDraftImportProvider = ({
 
   const handleReplace = () => {
     if (state.status !== "confirming") return;
-    void runImport(state.draft, "replaced", {
+    void runImport(state.draft, state.ownerId, "replaced", {
       type: "conflict",
       savedShiftCount: state.savedShiftCount,
     });
@@ -198,9 +212,18 @@ export const GuestDraftImportProvider = ({
   const handleRetry = () => {
     if (state.status !== "error" || !userId) return;
     const errorDialog: GuestDraftDialogMode = { type: "error" };
+    // A check is simply redone for whoever is signed in now. An import retries
+    // for the account it was confirmed for: the API client refuses to send it
+    // if that account is no longer the one signed in.
     if (state.failed.step === "checking")
       void runCheck(state.draft, userId, errorDialog);
-    else void runImport(state.draft, state.failed.outcome, errorDialog);
+    else
+      void runImport(
+        state.draft,
+        state.ownerId,
+        state.failed.outcome,
+        errorDialog,
+      );
   };
 
   const handleDiscard = () => {
