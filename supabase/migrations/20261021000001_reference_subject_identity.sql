@@ -419,7 +419,13 @@ begin
      and subject_key is null
      and status = 'active'
      and origin = 'seed';
-  if v_count <> 7 then
+  -- A database built from these migrations alone (local and CI tests) has no
+  -- legacy seeds: there is nothing to convert. Any other count than the seven
+  -- known ones still stops the migration instead of converting a set it does
+  -- not recognise.
+  if v_count = 0 then
+    return;
+  elsif v_count <> 7 then
     raise exception 'expected 7 active legacy Knesset election seeds, found %', v_count;
   end if;
 
