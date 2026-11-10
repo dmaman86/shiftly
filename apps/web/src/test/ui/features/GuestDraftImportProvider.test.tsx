@@ -30,16 +30,6 @@ vi.mock("@/hooks", () => ({
   useAuth: () => mocks.authState,
   useAppSnackbar: () => mocks.snackbar,
   useGlobalState: () => ({ selectMonth: mocks.selectMonth }),
-  useDomain: () => ({
-    services: {
-      dateService: {
-        getDatesRange: () => ({
-          startDate: "2026-08-01",
-          endDate: "2026-09-01",
-        }),
-      },
-    },
-  }),
   useFetch: () => ({
     loading: false,
     callEndPoint: (endpoint: { call: () => Promise<unknown> }) =>

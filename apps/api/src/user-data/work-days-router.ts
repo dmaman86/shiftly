@@ -1,0 +1,46 @@
+import { Router } from "express";
+import { z } from "zod";
+import { authOf } from "../auth/middleware.ts";
+import {
+  calendarDate,
+  parseMonthPeriod,
+  parseOrThrow,
+} from "./month-period.ts";
+import type { UserDataAccess } from "./user-scope.ts";
+import {
+  WORK_DAY_STATUSES,
+  workDaysRepository,
+} from "./work-days-repository.ts";
+
+const dateParams = z.object({ date: calendarDate });
+
+/** Strict: a body with anything else, a user id included, is rejected. */
+const statusBody = z.strictObject({ status: z.enum(WORK_DAY_STATUSES) });
+
+/**
+ * The caller's day statuses, under /me after requireAuth. The owner is always
+ * the verified token's user. Errors are UserDataErrors, answered by
+ * handleUserDataErrors.
+ */
+export const workDaysRouter = (access: UserDataAccess): Router => {
+  const router = Router();
+  const repositoryFor = (res: Parameters<typeof authOf>[0]) =>
+    workDaysRepository(access.scopeFor(authOf(res)));
+
+  // GET /me/months/:year/:month/work-days → { workDays } (normal days omitted)
+  router.get("/months/:year/:month/work-days", async (req, res) => {
+    const period = parseMonthPeriod(req.params);
+    const workDays = await repositoryFor(res).inMonth(period);
+    res.json({ workDays });
+  });
+
+  // PUT /me/work-days/:date { status } → 204 ("normal" clears the day)
+  router.put("/work-days/:date", async (req, res) => {
+    const { date } = parseOrThrow(dateParams, req.params);
+    const { status } = parseOrThrow(statusBody, req.body);
+    await repositoryFor(res).setStatus(date, status);
+    res.status(204).end();
+  });
+
+  return router;
+};

@@ -1,6 +1,7 @@
 import { Shift } from "@shiftly/domain";
 import { DateService } from "@shiftly/domain";
-import { supabaseCrud } from "@/services/supabase/supabase.crud";
+import type { ApiResponse, EndpointCall } from "@/app/types/api.types";
+import { apiClient } from "@/services/api/client";
 
 export interface ShiftRecord {
   id: string;
@@ -10,34 +11,93 @@ export interface ShiftRecord {
   is_duty: boolean;
 }
 
+/** How apps/api returns a shift (GET /me/months/:y/:m/shifts). */
+type ShiftDto = {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  isDuty: boolean;
+};
+
+const isShiftDto = (value: unknown): value is ShiftDto => {
+  if (typeof value !== "object" || value === null) return false;
+  const shift = value as Record<string, unknown>;
+  return (
+    typeof shift.id === "string" &&
+    typeof shift.date === "string" &&
+    typeof shift.startTime === "string" &&
+    typeof shift.endTime === "string" &&
+    typeof shift.isDuty === "boolean"
+  );
+};
+
+const toShiftRecord = (shift: ShiftDto): ShiftRecord => ({
+  id: shift.id,
+  date: shift.date,
+  start_time: shift.startTime,
+  end_time: shift.endTime,
+  is_duty: shift.isDuty,
+});
+
+// The API takes the user from the session token alone. `ownerId` is the
+// account a call was made for: it is never sent, and if another account has
+// signed in since, the call is not sent at all (see ApiRequest.expectedUserId).
 export const shiftService = () => {
   const dateService = new DateService();
-  const fetchForMonth = (userId: string, startDate: string, endDate: string) =>
-    supabaseCrud.select<ShiftRecord>("shifts", {
-      select: "id, date, start_time, end_time, is_duty",
-      filters: [
-        { column: "user_id", operator: "eq", value: userId },
-        { column: "date", operator: "gte", value: startDate },
-        { column: "date", operator: "lt", value: endDate },
-      ],
-    });
 
-  const upsert = (userId: string, date: string, shift: Shift) =>
-    supabaseCrud.upsert("shifts", {
-      id: shift.id,
-      user_id: userId,
-      date,
-      start_time: dateService.toPersistedDateTime(shift.start.date),
-      end_time: dateService.toPersistedDateTime(shift.end.date),
-      is_duty: shift.isDuty,
-      updated_at: new Date().toISOString(),
-    });
+  const fetchForMonth = (
+    ownerId: string,
+    year: number,
+    month: number,
+  ): EndpointCall<ShiftRecord[]> => ({
+    call: async (): Promise<ApiResponse<ShiftRecord[]>> => {
+      const result = await apiClient.request<{ shifts: unknown }>({
+        method: "GET",
+        path: `/me/months/${year}/${month}/shifts`,
+        authenticated: true,
+        expectedUserId: ownerId,
+      });
+      if (result.error !== undefined) return { error: result.error };
+      const shifts = result.data?.shifts;
+      if (!Array.isArray(shifts) || !shifts.every(isShiftDto)) {
+        return { error: "invalid_response" };
+      }
+      return { data: shifts.map(toShiftRecord) };
+    },
+  });
 
-  const remove = (userId: string, shiftId: string) =>
-    supabaseCrud.remove("shifts", [
-      { column: "user_id", operator: "eq", value: userId },
-      { column: "id", operator: "eq", value: shiftId },
-    ]);
+  // The id is generated in the browser. The API answers not_found when it
+  // belongs to another account, and never overwrites that shift.
+  const upsert = (
+    ownerId: string,
+    date: string,
+    shift: Shift,
+  ): EndpointCall<null> => ({
+    call: () =>
+      apiClient.request<null>({
+        method: "PUT",
+        path: `/me/shifts/${shift.id}`,
+        body: {
+          date,
+          startTime: dateService.toPersistedDateTime(shift.start.date),
+          endTime: dateService.toPersistedDateTime(shift.end.date),
+          isDuty: shift.isDuty,
+        },
+        authenticated: true,
+        expectedUserId: ownerId,
+      }),
+  });
+
+  const remove = (ownerId: string, shiftId: string): EndpointCall<null> => ({
+    call: () =>
+      apiClient.request<null>({
+        method: "DELETE",
+        path: `/me/shifts/${shiftId}`,
+        authenticated: true,
+        expectedUserId: ownerId,
+      }),
+  });
 
   return { fetchForMonth, upsert, remove };
 };

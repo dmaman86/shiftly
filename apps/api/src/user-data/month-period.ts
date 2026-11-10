@@ -37,3 +37,17 @@ export const parseOrThrow = <T>(schema: z.ZodType<T>, raw: unknown): T => {
 /** :year and :month route params. */
 export const parseMonthPeriod = (params: unknown): MonthPeriod =>
   parseOrThrow(monthPeriodParams, params);
+
+const pad = (value: number) => String(value).padStart(2, "0");
+
+/** The month as dates: from its first day (inclusive) to the next month's (exclusive). */
+export const monthRange = ({ year, month }: MonthPeriod) => ({
+  start: `${year}-${pad(month)}-01`,
+  end: month === 12 ? `${year + 1}-01-01` : `${year}-${pad(month + 1)}-01`,
+});
+
+/** A calendar day (YYYY-MM-DD) that exists, within the supported years. */
+export const calendarDate = z.iso.date().refine((value) => {
+  const year = Number(value.slice(0, 4));
+  return year >= FIRST_YEAR && year <= LAST_YEAR;
+}, `Year must be ${FIRST_YEAR}–${LAST_YEAR}`);

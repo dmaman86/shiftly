@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const fromMock = vi.hoisted(() => vi.fn());
+const requestMock = vi.hoisted(() => vi.fn());
 
-vi.mock("@/services/supabase/supabase.client", () => ({
-  supabase: { from: fromMock },
+vi.mock("@/services/api/client", () => ({
+  apiClient: { request: requestMock },
 }));
 
 import { WorkDayStatus } from "@shiftly/domain";
@@ -11,78 +11,63 @@ import { workDayService } from "@/services/workDay/workDay.service";
 
 describe("workDayService", () => {
   beforeEach(() => {
-    fromMock.mockReset();
+    requestMock.mockReset();
   });
 
-  it("fetches persisted day statuses for a date range", async () => {
-    const lt = vi.fn().mockResolvedValue({
-      data: [{ date: "2026-08-10", status: "sick" }],
-      error: null,
+  it("fetches the signed-in user's marked days of a month from the API", async () => {
+    requestMock.mockResolvedValue({
+      data: { workDays: [{ date: "2026-08-10", status: "sick" }] },
     });
-    const gte = vi.fn().mockReturnValue({ lt });
-    const eq = vi.fn().mockReturnValue({ gte });
-    const select = vi.fn().mockReturnValue({ eq });
-    fromMock.mockReturnValue({ select });
 
     const result = await workDayService()
-      .fetchForMonth("user-1", "2026-08-01", "2026-09-01")
+      .fetchForMonth("user-1", 2026, 8)
       .call();
 
-    expect(fromMock).toHaveBeenCalledWith("work_days");
-    expect(select).toHaveBeenCalledWith("date, status");
-    expect(eq).toHaveBeenCalledWith("user_id", "user-1");
-    expect(gte).toHaveBeenCalledWith("date", "2026-08-01");
-    expect(lt).toHaveBeenCalledWith("date", "2026-09-01");
+    expect(requestMock).toHaveBeenCalledWith({
+      method: "GET",
+      path: "/me/months/2026/8/work-days",
+      authenticated: true,
+      expectedUserId: "user-1",
+    });
     expect(result).toEqual({ data: [{ date: "2026-08-10", status: "sick" }] });
   });
 
-  it("deletes the row when reverting a day to normal", async () => {
-    const eqDate = vi.fn().mockResolvedValue({ data: null, error: null });
-    const eqUser = vi.fn().mockReturnValue({ eq: eqDate });
-    const del = vi.fn().mockReturnValue({ eq: eqUser });
-    fromMock.mockReturnValue({ delete: del });
-
-    const result = await workDayService()
-      .setStatus("user-1", "2026-08-10", WorkDayStatus.normal)
-      .call();
-
-    expect(fromMock).toHaveBeenCalledWith("work_days");
-    expect(eqUser).toHaveBeenCalledWith("user_id", "user-1");
-    expect(eqDate).toHaveBeenCalledWith("date", "2026-08-10");
-    expect(result).toEqual({ data: null });
+  it("passes the API error through", async () => {
+    requestMock.mockResolvedValue({ error: "data_unavailable" });
+    expect(
+      await workDayService().fetchForMonth("user-1", 2026, 8).call(),
+    ).toEqual({ error: "data_unavailable" });
   });
 
-  it("upserts the status when marking a day sick or vacation", async () => {
-    const upsert = vi.fn().mockResolvedValue({ data: null, error: null });
-    fromMock.mockReturnValue({ upsert });
-
-    const result = await workDayService()
-      .setStatus("user-1", "2026-08-10", WorkDayStatus.sick)
-      .call();
-
-    expect(upsert).toHaveBeenCalledWith(
-      expect.objectContaining({
-        user_id: "user-1",
-        date: "2026-08-10",
-        status: WorkDayStatus.sick,
-      }),
-      { onConflict: "user_id,date" },
-    );
-    expect(result).toEqual({ data: null });
+  it.each([
+    [{}],
+    [{ workDays: [{ date: "2026-08-10", status: "holiday" }] }],
+    [{ workDays: [{ date: 10, status: "sick" }] }],
+    [null],
+  ])("rejects an unexpected answer %j", async (data) => {
+    requestMock.mockResolvedValue({ data });
+    expect(
+      await workDayService().fetchForMonth("user-1", 2026, 8).call(),
+    ).toEqual({ error: "invalid_response" });
   });
 
-  it("returns an error when the fetch fails", async () => {
-    const lt = vi
-      .fn()
-      .mockResolvedValue({ data: null, error: { message: "boom" } });
-    fromMock.mockReturnValue({
-      select: () => ({ eq: () => ({ gte: () => ({ lt }) }) }),
-    });
+  it.each([WorkDayStatus.sick, WorkDayStatus.vacation, WorkDayStatus.normal])(
+    "saves %s for a day; the owner only guards the session",
+    async (status) => {
+      requestMock.mockResolvedValue({ data: null });
 
-    const result = await workDayService()
-      .fetchForMonth("user-1", "2026-08-01", "2026-09-01")
-      .call();
+      const result = await workDayService()
+        .setStatus("user-1", "2026-08-10", status)
+        .call();
 
-    expect(result).toEqual({ error: "boom" });
-  });
+      expect(requestMock).toHaveBeenCalledWith({
+        method: "PUT",
+        path: "/me/work-days/2026-08-10",
+        body: { status },
+        authenticated: true,
+        expectedUserId: "user-1",
+      });
+      expect(result).toEqual({ data: null });
+    },
+  );
 });
