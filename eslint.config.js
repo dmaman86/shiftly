@@ -192,6 +192,29 @@ export default defineConfig(
     },
   },
   {
+    // User-owned tables and backend-only functions are reached only through
+    // UserScope, which pins every query to the verified caller.
+    files: ["apps/api/**/*.ts"],
+    ignores: ["apps/api/src/user-data/user-scope.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "CallExpression[callee.property.name='from'] > Literal.arguments:first-child[value=/^(monthly_configs|work_days|shifts)$/]",
+          message:
+            "Use UserScope (src/user-data/user-scope.ts): user-owned tables must be scoped to the verified caller.",
+        },
+        {
+          selector:
+            "CallExpression[callee.property.name='rpc'][callee.object.name=/client|supabase/i] > Literal.arguments:first-child[value=/^api_/], CallExpression[callee.property.name='rpc'][callee.object.property.name=/client|supabase/i] > Literal.arguments:first-child[value=/^api_/]",
+          message:
+            "Call api_* functions through UserScope.rpc, which sets p_user_id from the verified caller.",
+        },
+      ],
+    },
+  },
+  {
     files: ["supabase/functions/**/*.ts"],
     languageOptions: {
       ecmaVersion: 2020,

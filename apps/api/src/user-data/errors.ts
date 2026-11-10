@@ -1,7 +1,6 @@
 import type { ErrorRequestHandler } from "express";
 
 export type UserDataErrorCode =
-  | "unauthenticated"
   | "not_found"
   | "invalid_request"
   | "conflict"
@@ -12,7 +11,6 @@ const RESPONSES: Record<
   UserDataErrorCode,
   { readonly status: number; readonly message: string }
 > = {
-  unauthenticated: { status: 401, message: "Authentication required" },
   not_found: { status: 404, message: "Not found" },
   invalid_request: { status: 400, message: "Invalid request" },
   conflict: { status: 409, message: "Conflicts with existing data" },
@@ -46,14 +44,20 @@ export type PostgrestFailure = {
   readonly error: { readonly code?: string; readonly message: string };
 };
 
-/** PostgREST rejected the JWT: missing, invalid or expired. */
-const JWT_REJECTED = new Set(["PGRST301", "PGRST302", "PGRST303"]);
+/**
+ * The backend's own credential or privileges were refused: a missing or
+ * rotated secret key, or a grant gone. Never the caller's session, which
+ * does not reach the database, so it must not become a 401 that would send
+ * the browser to refresh a session that is fine.
+ */
+const BACKEND_REJECTED = new Set(["42501", "PGRST301", "PGRST302", "PGRST303"]);
+const BACKEND_REJECTED_STATUSES = new Set([401, 403]);
 
 /** Bad values that reached the database: the request was wrong, not the server. */
 const INVALID_INPUT = new Set([
   "22007", // invalid_datetime_format
   "22008", // datetime_field_overflow
-  "22023", // invalid_parameter_value, raised by import_guest_month
+  "22023", // invalid_parameter_value, raised by the import functions
   "22P02", // invalid_text_representation
   "23502", // not_null_violation
   "23514", // check_violation
@@ -63,10 +67,10 @@ const INVALID_INPUT = new Set([
 const UNAVAILABLE_STATUSES = new Set([0, 502, 503, 504]);
 
 /**
- * Maps a PostgREST failure to the API's error. 42501 (RLS or privilege
- * denied) becomes not_found: every write already carries the caller's own
- * user_id, so the only way to hit it is another user's row, and answering 404
- * does not reveal that the row exists.
+ * Maps a PostgREST failure of the backend's user-data client to the API's
+ * error. not_found never comes from here: a repository decides it, because
+ * the secret key sees every row and only the repository knows that a row
+ * missing from the caller's scope is "not yours or not there".
  */
 export function userDataErrorFrom(failure: PostgrestFailure): UserDataError {
   const { status, error } = failure;
@@ -74,10 +78,12 @@ export function userDataErrorFrom(failure: PostgrestFailure): UserDataError {
   const as = (code: UserDataErrorCode) =>
     new UserDataError(code, error.message, sourceCode);
 
-  if (status === 401 || (sourceCode && JWT_REJECTED.has(sourceCode))) {
-    return as("unauthenticated");
+  if (
+    BACKEND_REJECTED_STATUSES.has(status) ||
+    (sourceCode && BACKEND_REJECTED.has(sourceCode))
+  ) {
+    return as("internal_error");
   }
-  if (sourceCode === "42501") return as("not_found");
   if (sourceCode && INVALID_INPUT.has(sourceCode)) return as("invalid_request");
   if (sourceCode === "23505") return as("conflict");
   // supabase-js reports a network failure as status 0; PGRST000-003 are the
@@ -109,6 +115,5 @@ export const handleUserDataErrors: ErrorRequestHandler = (
       message: error.message,
     }),
   );
-  if (error.code === "unauthenticated") res.set("WWW-Authenticate", "Bearer");
   res.status(status).json({ error: { code: error.code, message } });
 };

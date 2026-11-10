@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { CanceledError, type AxiosAdapter } from "axios";
 import type { ApiResponse } from "@/app/types/api.types";
 import { supabase } from "@/services/supabase/supabase.client";
 
@@ -27,6 +27,21 @@ export const supabaseSessionTokens: SessionTokens = {
   },
 };
 
+/** How one request authenticates; set by request() only. */
+type RequestAuth = {
+  readonly authenticated: boolean;
+  /** Set on the single retry after a 401: it is never retried again. */
+  readonly retried?: boolean;
+  /** The refreshed token the retry must carry. */
+  readonly token?: string;
+};
+
+declare module "axios" {
+  interface AxiosRequestConfig {
+    shiftlyAuth?: RequestAuth;
+  }
+}
+
 export type ApiRequest = {
   method: "GET" | "POST" | "PUT" | "DELETE";
   /** Starts with "/", relative to the API base URL. */
@@ -34,7 +49,8 @@ export type ApiRequest = {
   body?: unknown;
   /**
    * true: sends the caller's token (user data). false: a public endpoint,
-   * called without any token.
+   * called without any token. The API authorizes every request on its own;
+   * this flag only decides what the browser sends.
    */
   authenticated: boolean;
   signal?: AbortSignal;
@@ -54,9 +70,18 @@ export type ApiClientError =
 
 const REQUEST_TIMEOUT_MS = 10_000;
 
+/** No session, or the session could not be refreshed. */
+class UnauthenticatedError extends Error {
+  constructor() {
+    super("unauthenticated");
+    this.name = "UnauthenticatedError";
+  }
+}
+
 type ApiErrorBody = { error?: { code?: unknown } };
 
 const failureOf = (error: unknown): string => {
+  if (error instanceof UnauthenticatedError) return "unauthenticated";
   if (axios.isCancel(error)) return "aborted";
   if (!axios.isAxiosError(error)) throw error;
   const status = error.response?.status;
@@ -67,60 +92,84 @@ const failureOf = (error: unknown): string => {
   return typeof code === "string" ? code : `http_${status}`;
 };
 
-const isUnauthorized = (error: unknown) =>
-  axios.isAxiosError(error) && error.response?.status === 401;
-
 /**
- * The single way the web app calls apps/api. Authenticated requests carry the
- * Supabase access token as a Bearer header; on a 401 the session is refreshed
- * once and the request retried once, and a second 401 is final. Never sends
- * cookies: the API authenticates with the Bearer token only.
+ * The single way the web app calls apps/api. A dedicated axios instance, so
+ * its interceptors never touch other axios users (the public reference
+ * calls). Authenticated requests carry the Supabase access token as a Bearer
+ * header; on a 401 the session is refreshed once, shared by every request
+ * that failed meanwhile, and each request is retried at most once with the
+ * refreshed token. Never sends cookies: the API authenticates with the Bearer
+ * token only.
  */
-export const createApiClient = (tokens: SessionTokens) => {
+export const createApiClient = (
+  tokens: SessionTokens,
+  /** Test seam: replaces the HTTP transport, keeping the interceptors. */
+  options: { adapter?: AxiosAdapter } = {},
+) => {
+  const http = axios.create({
+    timeout: REQUEST_TIMEOUT_MS,
+    withCredentials: false,
+    ...(options.adapter ? { adapter: options.adapter } : {}),
+  });
+
+  let refreshing: Promise<string | null> | null = null;
+  const refreshOnce = () =>
+    (refreshing ??= tokens
+      .refreshed()
+      .catch(() => null)
+      .finally(() => {
+        refreshing = null;
+      }));
+
+  http.interceptors.request.use(async (config) => {
+    const auth = config.shiftlyAuth;
+    // Public or unmarked: never a token.
+    if (!auth?.authenticated) {
+      config.headers.delete("Authorization");
+      return config;
+    }
+    const token = auth.token ?? (await tokens.current());
+    // Signed out: rejected before anything is sent.
+    if (!token) throw new UnauthenticatedError();
+    config.headers.set("Authorization", `Bearer ${token}`);
+    return config;
+  });
+
+  http.interceptors.response.use(undefined, async (error: unknown) => {
+    if (!axios.isAxiosError(error) || error.response?.status !== 401) {
+      throw error;
+    }
+    const config = error.config;
+    const auth = config?.shiftlyAuth;
+    // Public endpoints and retries are final: no refresh, no loop.
+    if (!config || !auth?.authenticated || auth.retried) throw error;
+
+    const token = await refreshOnce();
+    if (!token) throw new UnauthenticatedError();
+    // Cancelled while the session was refreshing: never resent.
+    if (config.signal?.aborted) throw new CanceledError();
+    return http.request({
+      ...config,
+      shiftlyAuth: { authenticated: true, retried: true, token },
+    });
+  });
+
+  // Callers keep receiving ApiResponse<T>, never exceptions.
   const request = async <T>(options: ApiRequest): Promise<ApiResponse<T>> => {
     const baseUrl = apiBaseUrl();
     if (!baseUrl) return { error: "api_not_configured" };
-
-    const send = (token: string | null) =>
-      axios.request<T>({
-        url: `${baseUrl}${options.path}`,
+    try {
+      const response = await http.request<T>({
+        baseURL: baseUrl,
+        url: options.path,
         method: options.method,
         data: options.body,
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-        timeout: REQUEST_TIMEOUT_MS,
         signal: options.signal,
-        withCredentials: false,
+        shiftlyAuth: { authenticated: options.authenticated },
       });
-
-    // 204 and other empty bodies arrive as "": callers get null instead.
-    const dataOf = (response: { status: number; data: T }): ApiResponse<T> => ({
-      data: (response.status === 204 ? null : response.data) as T,
-    });
-
-    if (!options.authenticated) {
-      try {
-        return dataOf(await send(null));
-      } catch (error) {
-        return { error: failureOf(error) };
-      }
-    }
-
-    // Signed out: nothing to send, so the request is never made.
-    const token = await tokens.current();
-    if (!token) return { error: "unauthenticated" };
-
-    try {
-      return dataOf(await send(token));
+      // 204 and other empty bodies arrive as "": callers get null instead.
+      return { data: (response.status === 204 ? null : response.data) as T };
     } catch (error) {
-      if (!isUnauthorized(error)) return { error: failureOf(error) };
-    }
-
-    const refreshed = await tokens.refreshed();
-    if (!refreshed) return { error: "unauthenticated" };
-    try {
-      return dataOf(await send(refreshed));
-    } catch (error) {
-      // A second 401 is final: no further refresh, no loop.
       return { error: failureOf(error) };
     }
   };

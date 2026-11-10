@@ -13,7 +13,7 @@ import type { PublishedTimelinesReader } from "./reference-data/published-timeli
 import { publishedTimelinesRouter } from "./reference-data/published-timelines-router.ts";
 import { yearRulesRouter } from "./shared/rules-router.ts";
 import { handleUserDataErrors } from "./user-data/errors.ts";
-import type { UserDataClientFactory } from "./user-data/supabase-user-client.ts";
+import type { UserDataAccess } from "./user-data/user-scope.ts";
 
 export type AppDeps = {
   /** Exact browser origins allowed by CORS. */
@@ -28,12 +28,10 @@ export type AppDeps = {
     readonly roles: RoleRepository;
   };
   /**
-   * User-owned data, as the verified caller: a client per request with the
-   * caller's token, so RLS stays in force. No routes use it yet.
+   * User-owned data through a backend-only client, scoped to the verified
+   * caller of each request. No routes use it yet.
    */
-  readonly userData: {
-    readonly clientFor: UserDataClientFactory;
-  };
+  readonly userData: UserDataAccess;
   readonly extractIncomeTaxRules: (
     year: number,
   ) => Promise<IncomeTaxRulesResult>;
