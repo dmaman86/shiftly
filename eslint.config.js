@@ -21,12 +21,6 @@ const SUPABASE_AUTH_FILES = [
   "apps/web/src/features/auth/OAuthCallbackHandler.tsx",
 ];
 
-// Temporary: application data still read and written directly in Supabase.
-// Each entry is removed as its data moves to apps/api; never add one.
-const LEGACY_SUPABASE_DATA_FILES = [
-  "apps/web/src/services/supabase/supabase.crud.ts",
-];
-
 export default defineConfig(
   {
     ignores: ["**/dist/**", "coverage", "playwright-report", "test-results"],
@@ -133,14 +127,14 @@ export default defineConfig(
   },
   {
     files: ["apps/web/src/**/*.{ts,tsx}"],
-    ignores: [...SUPABASE_AUTH_FILES, ...LEGACY_SUPABASE_DATA_FILES],
+    ignores: SUPABASE_AUTH_FILES,
     rules: {
       "@typescript-eslint/no-restricted-imports": [
         "error",
         {
           patterns: [
             {
-              regex: "(^|/)supabase\\.(client|crud)$",
+              regex: "(^|/)supabase\\.client$",
               message: SUPABASE_BOUNDARY_MESSAGE,
             },
             {
@@ -157,7 +151,6 @@ export default defineConfig(
   {
     // The Auth files hold the client too: only its auth API may be used.
     files: ["apps/web/src/**/*.{ts,tsx}"],
-    ignores: LEGACY_SUPABASE_DATA_FILES,
     rules: {
       "no-restricted-syntax": [
         "error",

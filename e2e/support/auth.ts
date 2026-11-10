@@ -1,4 +1,4 @@
-import type { Page, Request, Route } from "@playwright/test";
+import type { Page, Request } from "@playwright/test";
 
 import { FIXED_NOW } from "./app";
 
@@ -62,21 +62,9 @@ export const signIn = async (page: Page) => {
 const SUPABASE_DATA_PATH = /\/(rest|functions|storage|graphql)\/v1\//;
 
 /**
- * Application data the web app still reads and writes directly in Supabase.
- * Temporary, like the lint allowlist: each entry goes away as its data moves
- * to apps/api, and the list must end empty.
- */
-const LEGACY_SUPABASE_DATA: readonly string[] = [];
-
-const isLegacy = (request: Request) => {
-  const { pathname } = new URL(request.url());
-  return LEGACY_SUPABASE_DATA.some((path) => pathname.endsWith(path));
-};
-
-/**
- * Records every request for application data in Supabase. Legacy paths are
- * answered empty (writes are accepted and dropped); anything else is aborted
- * and reported, so new direct data access fails the test.
+ * Records every request for application data made directly to Supabase and
+ * aborts it: the web app reads and writes its data through apps/api only,
+ * so any such request is a regression the test must report.
  */
 export const watchSupabaseData = async (page: Page) => {
   const requests: Request[] = [];
@@ -86,30 +74,9 @@ export const watchSupabaseData = async (page: Page) => {
     }
   });
 
-  const fulfillLegacy = (route: Route) => {
-    const request = route.request();
-    if (request.method() !== "GET") {
-      return route.fulfill({ status: request.method() === "POST" ? 201 : 204 });
-    }
-    return route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: "[]",
-    });
-  };
-
-  await page.route(SUPABASE_DATA_PATH, (route) =>
-    isLegacy(route.request()) ? fulfillLegacy(route) : route.abort(),
-  );
+  await page.route(SUPABASE_DATA_PATH, (route) => route.abort());
 
   return {
-    /** Paths outside the legacy list: must stay empty. */
-    unexpected: () =>
-      requests
-        .filter((request) => !isLegacy(request))
-        .map(
-          (request) => `${request.method()} ${new URL(request.url()).pathname}`,
-        ),
     /** Every application-data request made directly to Supabase. */
     all: () =>
       requests.map(
