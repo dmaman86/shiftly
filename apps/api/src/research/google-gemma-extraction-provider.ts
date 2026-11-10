@@ -1,5 +1,5 @@
-import type { ExtractionTask } from "../shared/extraction-task.ts";
-import type { ExtractionResult, Extractor } from "../shared/gemma-extractor.ts";
+import type { ExtractionTask } from "./shared/extraction-task.ts";
+import type { ExtractionResult, Extractor } from "./shared/gemma-extractor.ts";
 import type { ExtractionProvider, FetchedDocument } from "./ports.ts";
 
 /**

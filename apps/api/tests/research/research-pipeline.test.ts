@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { INCOME_TAX_RESEARCH } from "../../src/income-tax/income-tax-research.ts";
+import { INCOME_TAX_RESEARCH } from "../../src/research/income-tax/income-tax-research.ts";
 import type {
   DiscoveredSource,
   FetchedDocument,
@@ -9,9 +9,9 @@ import {
   MAX_EXTRACTIONS,
   researchReferenceData,
 } from "../../src/research/research-pipeline.ts";
-import type { DebugArtifactStore } from "../../src/shared/debug-artifacts.ts";
-import { RulesPipelineError } from "../../src/shared/errors.ts";
-import type { ExtractionResult } from "../../src/shared/gemma-extractor.ts";
+import type { DebugArtifactStore } from "../../src/research/shared/debug-artifacts.ts";
+import { RulesPipelineError } from "../../src/research/shared/errors.ts";
+import type { ExtractionResult } from "../../src/research/shared/gemma-extractor.ts";
 import {
   ANSWER_2026,
   BOOKLET_2026_TEXT,

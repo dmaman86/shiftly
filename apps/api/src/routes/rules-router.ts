@@ -3,7 +3,7 @@ import { z } from "zod";
 import {
   RulesPipelineError,
   type RulesPipelineErrorCode,
-} from "../shared/errors.ts";
+} from "../research/shared/errors.ts";
 
 const yearSchema = z.coerce.number().int().min(2000).max(2100);
 

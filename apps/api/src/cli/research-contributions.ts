@@ -6,13 +6,13 @@ import { adminRepository } from "./admin-repository.ts";
 import { storeCandidates } from "../services/store-candidates.ts";
 import { HttpDocumentFetcher } from "../research/http-document-fetcher.ts";
 import { WaybackArchiveIndex } from "../research/web-archive.ts";
-import { FileDebugArtifactStore } from "../shared/debug-artifacts.ts";
+import { FileDebugArtifactStore } from "../research/shared/debug-artifacts.ts";
 import {
   researchEmployeeContributions,
   type ContributionsResearchReport,
-} from "../social-security/contributions-research.ts";
-import { CONTRIBUTION_PARAMETERS } from "../social-security/employee-contributions.ts";
-import { KolZchutSocialSecuritySource } from "../social-security/kolzchut-source.ts";
+} from "../research/social-security/contributions-research.ts";
+import { CONTRIBUTION_PARAMETERS } from "../research/social-security/employee-contributions.ts";
+import { KolZchutSocialSecuritySource } from "../research/social-security/kolzchut-source.ts";
 
 /**
  * Researches the employee National Insurance and health insurance parameters
