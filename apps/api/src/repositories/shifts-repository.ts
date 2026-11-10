@@ -1,5 +1,5 @@
-import { UserDataError } from "./errors.ts";
-import { monthRange, type MonthPeriod } from "./month-period.ts";
+import { UserDataError } from "../user-data/errors.ts";
+import { monthRange, type MonthPeriod } from "../user-data/month-period.ts";
 import { dataOrThrow, type UserScope } from "./user-scope.ts";
 
 /** One shift, as the API returns and receives it. */

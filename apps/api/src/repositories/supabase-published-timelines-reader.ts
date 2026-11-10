@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { ReferenceDataPersistenceError } from "./ports.ts";
+import { ReferenceDataPersistenceError } from "../reference-data/ports.ts";
 import {
   InvalidPublishedTimelineError,
   monthlyTimelineProblem,
@@ -8,7 +8,7 @@ import {
   type PublishedTimelineKind,
   type PublishedTimelines,
   type PublishedTimelinesReader,
-} from "./published-timelines.ts";
+} from "../reference-data/published-timelines.ts";
 
 const rate = z.number().finite().nonnegative();
 

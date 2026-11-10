@@ -6,8 +6,8 @@ import {
   parseMonthPeriod,
   parseOrThrow,
 } from "../user-data/month-period.ts";
-import { shiftsRepository } from "../user-data/shifts-repository.ts";
-import type { UserDataAccess } from "../user-data/user-scope.ts";
+import { shiftsRepository } from "../repositories/shifts-repository.ts";
+import type { UserDataAccess } from "../repositories/user-scope.ts";
 
 const idParams = z.object({ id: z.uuid() });
 

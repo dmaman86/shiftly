@@ -3,7 +3,7 @@ import { meHandler, requireAdmin, requireAuth } from "./middleware/auth.ts";
 import type { AuthVerifier, RoleRepository } from "./auth/ports.ts";
 import { corsAllowlist } from "./middleware/cors.ts";
 import { handleBodyErrors, jsonBody } from "./middleware/json-body.ts";
-import type { ReadinessCheck } from "./http/readiness.ts";
+import type { ReadinessCheck } from "./repositories/supabase-readiness.ts";
 import { requestLog } from "./middleware/request-log.ts";
 import type { IncomeTaxRulesResult } from "./income-tax/income-tax-pipeline.ts";
 import type { IncomeTaxResearchResponse } from "./income-tax/income-tax-research.ts";
@@ -13,12 +13,13 @@ import type { PublishedTimelinesReader } from "./reference-data/published-timeli
 import { publishedTimelinesRouter } from "./routes/published-timelines-router.ts";
 import { yearRulesRouter } from "./routes/rules-router.ts";
 import { handleUserDataErrors } from "./user-data/errors.ts";
-import { accountRouter, type AccountDeleter } from "./user-data/account.ts";
+import type { AccountDeleter } from "./repositories/account-deleter.ts";
+import { accountRouter } from "./routes/account-router.ts";
 import { guestImportRouter } from "./routes/guest-import-router.ts";
 import { monthlyConfigRouter } from "./routes/monthly-config-router.ts";
 import { shiftsRouter } from "./routes/shifts-router.ts";
 import { workDaysRouter } from "./routes/work-days-router.ts";
-import type { UserDataAccess } from "./user-data/user-scope.ts";
+import type { UserDataAccess } from "./repositories/user-scope.ts";
 
 export type AppDeps = {
   /** Exact browser origins allowed by CORS. */

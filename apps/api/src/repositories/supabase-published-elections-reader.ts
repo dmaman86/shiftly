@@ -1,10 +1,10 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { ReferenceDataPersistenceError } from "./ports.ts";
+import { ReferenceDataPersistenceError } from "../reference-data/ports.ts";
 import type {
   PublishedElection,
   PublishedElectionsReader,
-} from "./published-elections.ts";
+} from "../reference-data/published-elections.ts";
 
 const electionRowSchema = z.object({
   valid_from: z.iso.date(),

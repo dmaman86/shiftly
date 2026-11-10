@@ -4,7 +4,7 @@ import {
   dataOrThrow,
   supabaseUserDataAccess,
   type OwnedRow,
-} from "../../src/user-data/user-scope.ts";
+} from "../../src/repositories/user-scope.ts";
 import { ADMIN_ID, ADMIN_TOKEN, USER_ID, USER_TOKEN } from "../auth/fakes.ts";
 
 const SECRET = "sb_secret_user_data_test";

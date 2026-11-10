@@ -3,7 +3,7 @@ import { brotliCompressSync, gzipSync } from "node:zlib";
 import type { Server } from "node:http";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createApp, type AppDeps } from "../../src/app.ts";
-import { SupabaseReadinessCheck } from "../../src/http/readiness.ts";
+import { SupabaseReadinessCheck } from "../../src/repositories/supabase-readiness.ts";
 import {
   FakeRoles,
   FakeVerifier,

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { authOf } from "../middleware/auth.ts";
-import { guestImportRepository } from "../user-data/guest-import-repository.ts";
+import { guestImportRepository } from "../repositories/guest-import-repository.ts";
 import {
   calendarDate,
   monthRange,
@@ -9,7 +9,7 @@ import {
   parseOrThrow,
   type MonthPeriod,
 } from "../user-data/month-period.ts";
-import type { UserDataAccess } from "../user-data/user-scope.ts";
+import type { UserDataAccess } from "../repositories/user-scope.ts";
 
 /** Same limits as api_import_guest_month and the browser's draft storage. */
 const MAX_DAYS = 31;

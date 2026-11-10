@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { AuthUnavailableError } from "../../src/auth/ports.ts";
-import { SupabaseRoleRepository } from "../../src/auth/supabase-role-repository.ts";
+import { SupabaseRoleRepository } from "../../src/repositories/supabase-role-repository.ts";
 import { ADMIN_ID } from "./fakes.ts";
 
 const SECRET = "sb_secret_test";

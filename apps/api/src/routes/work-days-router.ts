@@ -6,11 +6,11 @@ import {
   parseMonthPeriod,
   parseOrThrow,
 } from "../user-data/month-period.ts";
-import type { UserDataAccess } from "../user-data/user-scope.ts";
+import type { UserDataAccess } from "../repositories/user-scope.ts";
 import {
   WORK_DAY_STATUSES,
   workDaysRepository,
-} from "../user-data/work-days-repository.ts";
+} from "../repositories/work-days-repository.ts";
 
 const dateParams = z.object({ date: calendarDate });
 

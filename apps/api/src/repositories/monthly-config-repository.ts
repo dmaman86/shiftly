@@ -1,4 +1,4 @@
-import type { MonthPeriod } from "./month-period.ts";
+import type { MonthPeriod } from "../user-data/month-period.ts";
 import { dataOrThrow, type UserScope } from "./user-scope.ts";
 
 /** One month's settings, as the API returns them. */

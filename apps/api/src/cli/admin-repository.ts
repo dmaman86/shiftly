@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { config as loadDotenv } from "dotenv";
 import { z } from "zod";
-import { SupabaseRevisionRepository } from "../reference-data/supabase-revision-repository.ts";
+import { SupabaseRevisionRepository } from "../repositories/supabase-revision-repository.ts";
 
 const AdminEnv = z.object({
   SUPABASE_URL: z.url(),

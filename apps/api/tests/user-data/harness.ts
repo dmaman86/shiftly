@@ -2,7 +2,7 @@ import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import { vi } from "vitest";
 import { createApp, type AppDeps } from "../../src/app.ts";
-import { supabaseUserDataAccess } from "../../src/user-data/user-scope.ts";
+import { supabaseUserDataAccess } from "../../src/repositories/user-scope.ts";
 import { FakeRoles, FakeVerifier, NO_ACCOUNTS } from "../auth/fakes.ts";
 
 export const USER_DATA_SECRET = "sb_secret_user_data_test";

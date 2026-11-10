@@ -9,7 +9,7 @@ import {
   type RevisionDetails,
   type RevisionRepository,
   type RevisionTrust,
-} from "./ports.ts";
+} from "../reference-data/ports.ts";
 
 type RevisionRow = {
   id: string;

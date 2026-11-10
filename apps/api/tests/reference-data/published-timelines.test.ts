@@ -2,7 +2,7 @@ import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import express from "express";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { CachedPublishedTimelinesReader } from "../../src/reference-data/cached-published-timelines-reader.ts";
+import { CachedPublishedTimelinesReader } from "../../src/repositories/cached-published-timelines-reader.ts";
 import { ReferenceDataPersistenceError } from "../../src/reference-data/ports.ts";
 import {
   InvalidPublishedTimelineError,
@@ -14,7 +14,7 @@ import { publishedTimelinesRouter } from "../../src/routes/published-timelines-r
 import {
   SupabasePublishedTimelinesReader,
   toPublishedTimelines,
-} from "../../src/reference-data/supabase-published-timelines-reader.ts";
+} from "../../src/repositories/supabase-published-timelines-reader.ts";
 
 const row = (
   kind: string,

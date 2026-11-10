@@ -2,7 +2,7 @@ import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import { SYSTEM_START_YEAR } from "@shiftly/domain";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { CachedPublishedElectionsReader } from "../../src/reference-data/cached-published-elections-reader.ts";
+import { CachedPublishedElectionsReader } from "../../src/repositories/cached-published-elections-reader.ts";
 import { ReferenceDataPersistenceError } from "../../src/reference-data/ports.ts";
 import {
   FIRST_SUPPORTED_YEAR,
@@ -14,7 +14,7 @@ import { publishedElectionsRouter } from "../../src/routes/published-elections-r
 import {
   SupabasePublishedElectionsReader,
   toPublishedElections,
-} from "../../src/reference-data/supabase-published-elections-reader.ts";
+} from "../../src/repositories/supabase-published-elections-reader.ts";
 import express from "express";
 
 const ELECTION_26: PublishedElection = {
