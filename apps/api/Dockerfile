@@ -12,7 +12,9 @@ COPY apps/web/package.json apps/web/
 COPY packages/domain/package.json packages/domain/
 RUN bun install --frozen-lockfile --production --filter @shiftly/api --ignore-scripts
 
-FROM node:24-slim
+# Pinned, not node:24-slim: a floating tag makes the deployed Node version
+# depend on when the image was built. Bump it with each Node security release.
+FROM node:24.22.2-slim
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
     PORT=8080 \

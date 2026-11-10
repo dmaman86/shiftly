@@ -1,4 +1,5 @@
 import type { AddressInfo } from "node:net";
+import { brotliCompressSync, gzipSync } from "node:zlib";
 import type { Server } from "node:http";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createApp, type AppDeps } from "../../src/app.ts";
@@ -139,6 +140,31 @@ describe("request bodies", () => {
     });
     expect(response.status).toBe(413);
   });
+
+  it.each([
+    ["br", brotliCompressSync],
+    ["gzip", gzipSync],
+  ])(
+    "refuses a %s-compressed body with 415, without decompressing it",
+    async (encoding, compress) => {
+      const request = await start();
+      const response = await request("/me", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "content-encoding": encoding,
+        },
+        body: compress(Buffer.from(JSON.stringify({ ok: true }))),
+      });
+      expect(response.status).toBe(415);
+      expect(await response.json()).toEqual({
+        error: {
+          code: "unsupported_encoding",
+          message: "Compressed request bodies are not accepted",
+        },
+      });
+    },
+  );
 });
 
 describe("request log", () => {
