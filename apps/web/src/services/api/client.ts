@@ -7,33 +7,48 @@ import { supabase } from "@/services/supabase/supabase.client";
 export const apiBaseUrl = (): string | undefined =>
   import.meta.env.VITE_API_URL?.replace(/\/+$/, "") || undefined;
 
+/** An access token and the user it was issued to. */
+export type SessionToken = {
+  readonly accessToken: string;
+  readonly userId: string;
+};
+
 /**
- * Where the client gets the caller's Supabase access token. Supabase Auth
- * owns the session; this client only reads it.
+ * Where the client gets the caller's Supabase session. Supabase Auth owns
+ * the session; this client only reads it.
  */
 export interface SessionTokens {
-  /** The current session's token; null when signed out. */
-  current(): Promise<string | null>;
-  /** Refreshes the session once and returns the new token; null on failure. */
-  refreshed(): Promise<string | null>;
+  /** The current session; null when signed out. */
+  current(): Promise<SessionToken | null>;
+  /** Refreshes the session once and returns it; null on failure. */
+  refreshed(): Promise<SessionToken | null>;
 }
+
+const sessionTokenOf = (
+  session: { access_token: string; user: { id: string } } | null,
+): SessionToken | null =>
+  session
+    ? { accessToken: session.access_token, userId: session.user.id }
+    : null;
 
 export const supabaseSessionTokens: SessionTokens = {
   current: async () =>
-    (await supabase.auth.getSession()).data.session?.access_token ?? null,
+    sessionTokenOf((await supabase.auth.getSession()).data.session),
   refreshed: async () => {
     const { data, error } = await supabase.auth.refreshSession();
-    return error ? null : (data.session?.access_token ?? null);
+    return error ? null : sessionTokenOf(data.session);
   },
 };
 
 /** How one request authenticates; set by request() only. */
 type RequestAuth = {
   readonly authenticated: boolean;
+  /** The user the request belongs to; any other session never sends it. */
+  readonly expectedUserId?: string;
   /** Set on the single retry after a 401: it is never retried again. */
   readonly retried?: boolean;
-  /** The refreshed token the retry must carry. */
-  readonly token?: string;
+  /** The refreshed session the retry must carry. */
+  readonly session?: SessionToken;
 };
 
 declare module "axios" {
@@ -53,6 +68,13 @@ export type ApiRequest = {
    * this flag only decides what the browser sends.
    */
   authenticated: boolean;
+  /**
+   * The signed-in user this request was made for, when it matters which
+   * account it reaches (a pending write). If the session now belongs to
+   * someone else, nothing is sent. Never sent to the API, which takes the
+   * user from the token alone.
+   */
+  expectedUserId?: string;
   signal?: AbortSignal;
 };
 
@@ -63,6 +85,7 @@ export type ApiRequest = {
 export type ApiClientError =
   | "api_not_configured"
   | "unauthenticated"
+  | "session_changed"
   | "network"
   | "timeout"
   | "aborted"
@@ -78,10 +101,19 @@ class UnauthenticatedError extends Error {
   }
 }
 
+/** The session belongs to another user than the request was made for. */
+class SessionChangedError extends Error {
+  constructor() {
+    super("session_changed");
+    this.name = "SessionChangedError";
+  }
+}
+
 type ApiErrorBody = { error?: { code?: unknown } };
 
 const failureOf = (error: unknown): string => {
   if (error instanceof UnauthenticatedError) return "unauthenticated";
+  if (error instanceof SessionChangedError) return "session_changed";
   if (axios.isCancel(error)) return "aborted";
   if (!axios.isAxiosError(error)) throw error;
   const status = error.response?.status;
@@ -112,7 +144,7 @@ export const createApiClient = (
     ...(options.adapter ? { adapter: options.adapter } : {}),
   });
 
-  let refreshing: Promise<string | null> | null = null;
+  let refreshing: Promise<SessionToken | null> | null = null;
   const refreshOnce = () =>
     (refreshing ??= tokens
       .refreshed()
@@ -128,10 +160,15 @@ export const createApiClient = (
       config.headers.delete("Authorization");
       return config;
     }
-    const token = auth.token ?? (await tokens.current());
+    const session = auth.session ?? (await tokens.current());
     // Signed out: rejected before anything is sent.
-    if (!token) throw new UnauthenticatedError();
-    config.headers.set("Authorization", `Bearer ${token}`);
+    if (!session) throw new UnauthenticatedError();
+    // Another account signed in since the request was made: sending it would
+    // act on that account.
+    if (auth.expectedUserId && session.userId !== auth.expectedUserId) {
+      throw new SessionChangedError();
+    }
+    config.headers.set("Authorization", `Bearer ${session.accessToken}`);
     return config;
   });
 
@@ -144,13 +181,14 @@ export const createApiClient = (
     // Public endpoints and retries are final: no refresh, no loop.
     if (!config || !auth?.authenticated || auth.retried) throw error;
 
-    const token = await refreshOnce();
-    if (!token) throw new UnauthenticatedError();
+    const session = await refreshOnce();
+    if (!session) throw new UnauthenticatedError();
     // Cancelled while the session was refreshing: never resent.
     if (config.signal?.aborted) throw new CanceledError();
+    // The request interceptor checks the refreshed session's user too.
     return http.request({
       ...config,
-      shiftlyAuth: { authenticated: true, retried: true, token },
+      shiftlyAuth: { ...auth, retried: true, session },
     });
   });
 
@@ -165,7 +203,10 @@ export const createApiClient = (
         method: options.method,
         data: options.body,
         signal: options.signal,
-        shiftlyAuth: { authenticated: options.authenticated },
+        shiftlyAuth: {
+          authenticated: options.authenticated,
+          expectedUserId: options.expectedUserId,
+        },
       });
       // 204 and other empty bodies arrive as "": callers get null instead.
       return { data: (response.status === 204 ? null : response.data) as T };

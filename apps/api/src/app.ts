@@ -13,6 +13,7 @@ import type { PublishedTimelinesReader } from "./reference-data/published-timeli
 import { publishedTimelinesRouter } from "./reference-data/published-timelines-router.ts";
 import { yearRulesRouter } from "./shared/rules-router.ts";
 import { handleUserDataErrors } from "./user-data/errors.ts";
+import { monthlyConfigRouter } from "./user-data/monthly-config-router.ts";
 import type { UserDataAccess } from "./user-data/user-scope.ts";
 
 export type AppDeps = {
@@ -29,7 +30,7 @@ export type AppDeps = {
   };
   /**
    * User-owned data through a backend-only client, scoped to the verified
-   * caller of each request. No routes use it yet.
+   * caller of each request.
    */
   readonly userData: UserDataAccess;
   readonly extractIncomeTaxRules: (
@@ -74,6 +75,18 @@ export function createApp(deps: AppDeps): express.Express {
 
   // Any authenticated user: their own effective roles, for UI visibility.
   app.get("/me", requireAuth(verifier), meHandler(roles));
+
+  // The caller's own data. Private: never cached, by the browser or a proxy,
+  // whatever the outcome.
+  app.use(
+    "/me",
+    (_req, res, next) => {
+      res.set("Cache-Control", "no-store");
+      next();
+    },
+    requireAuth(verifier),
+    monthlyConfigRouter(deps.userData),
+  );
 
   // Admin only. Extraction and research read public sources, call a paid
   // model and write reference data, so every /admin route needs a verified
