@@ -9,100 +9,129 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
-%% Selected module dependencies, including type imports; not an exhaustive import graph.
-%% Arrows point from consumers to dependencies. Profile reads do not hydrate editor state.
+%% Source: v1.1.0 (release candidate; source HEAD). Module dependencies include type imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
+%% Selected module dependencies; arrows point from consumers to dependencies. Profile reads do not hydrate editor state.
+%% DomainProvider builds the payroll engine from the API's reference timelines, falling back to the embedded baseline.
+%% Every user-data service call carries the owner it was issued for (expectedUserId); a session switch cancels it.
 flowchart TD
   subgraph group_app["Application and state"]
-    node_0["AppProviders<br/>[apps/web/src/app/providers/AppProviders.tsx]"]
-    node_1["AuthProvider<br/>[apps/web/src/app/providers/auth/AuthProvider.tsx]"]
-    node_2["DomainProvider<br/>[apps/web/src/app/providers/domain/DomainProvider.tsx]"]
-    node_3["domain.instance<br/>[apps/web/src/app/domain/domain.instance.ts]"]
-    node_4["MonthlyDataProvider<br/>[apps/web/src/features/monthly-data/MonthlyDataProvider.tsx]"]
-    node_5["GuestDraftImportProvider<br/>[apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx]"]
-    node_6["useGuestDraftCapture<br/>[apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts]"]
-    node_7["useWorkTableMonthSession<br/>[apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts]"]
-    node_8["WorkTableDayStateProvider<br/>[apps/web/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx]"]
-    node_9["globalStore<br/>[apps/web/src/store/globalStore.ts]"]
-    node_10["useAuth<br/>[apps/web/src/hooks/useAuth.ts]"]
-    node_11["useDomain<br/>[apps/web/src/hooks/useDomain.ts]"]
-    node_12["useGlobalState<br/>[apps/web/src/hooks/useGlobalState.ts]"]
-    node_13["month.resolver<br/>[apps/web/src/app/months/month.resolver.ts]"]
-    node_14["workdayinfo.presenter<br/>[apps/web/src/app/domain/workdayinfo.presenter.ts]"]
-    profile_query["useProfileHistory<br/>[apps/web/src/features/profile/hooks/useProfileHistory.ts]"]
-    profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
-    profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
-    profile_metrics["profileMetrics<br/>[apps/web/src/features/profile/helpers/profileMetrics.ts]"]
-    profile_range["profileRange<br/>[apps/web/src/features/profile/helpers/profileRange.ts]"]
+    providers["AppProviders<br/>[apps/web/src/app/providers/AppProviders.tsx]"]
+    auth_provider["AuthProvider — Supabase Auth session<br/>[apps/web/src/app/providers/auth/AuthProvider.tsx]"]
+    domain_provider["DomainProvider<br/>[apps/web/src/app/providers/domain/DomainProvider.tsx]"]
+    use_timelines["useReferenceTimelines — API, cache or baseline<br/>[apps/web/src/app/providers/domain/useReferenceTimelines.ts]"]
+    reference_status["referenceStatusContext<br/>[apps/web/src/app/providers/domain/referenceStatusContext.ts]"]
+    domain_instance["domain.instance — engine with a ReferenceResolver<br/>[apps/web/src/app/domain/domain.instance.ts]"]
+    reference_issues["referenceIssues — months without reference values<br/>[apps/web/src/app/domain/referenceIssues.ts]"]
+    month_resolver["month.resolver<br/>[apps/web/src/app/months/month.resolver.ts]"]
+    snackbar["AppSnackbarProvider<br/>[apps/web/src/app/providers/snackbar/AppSnackbarProvider.tsx]"]
+    monthly_data["MonthlyDataProvider — monthly config load and save<br/>[apps/web/src/features/monthly-data/MonthlyDataProvider.tsx]"]
     config_status["monthlyConfigStatusContext<br/>[apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts]"]
     config_actions["monthlyConfigActionsContext<br/>[apps/web/src/features/monthly-data/monthlyConfigActionsContext.ts]"]
+    guest_import["GuestDraftImportProvider — owner-bound confirmation<br/>[apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx]"]
     import_gate["guestDraftImportContext<br/>[apps/web/src/features/guest-draft/guestDraftImportContext.ts]"]
-    work_days["useWorkDays / loadCalendarEventMap<br/>[apps/web/src/hooks/useWorkDays.ts]"]
+    month_session["useWorkTableMonthSession — days and shifts<br/>[apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts]"]
+    shift_upserts["useDebouncedShiftUpserts<br/>[apps/web/src/features/work-table/hooks/month/useDebouncedShiftUpserts.ts]"]
+    draft_capture["useGuestDraftCapture<br/>[apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts]"]
+    work_days["useWorkDays — holidays + election days<br/>[apps/web/src/hooks/useWorkDays.ts]"]
+    profile_query["useProfileHistory<br/>[apps/web/src/features/profile/hooks/useProfileHistory.ts]"]
+    profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
+    profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
+    global_store["globalStore — Zustand<br/>[apps/web/src/store/globalStore.ts]"]
+    use_auth["useAuth<br/>[apps/web/src/hooks/useAuth.ts]"]
+    use_domain["useDomain<br/>[apps/web/src/hooks/useDomain.ts]"]
   end
-  profile_query --> profile_loader
-  profile_query --> profile_range
-  profile_loader --> profile_history
-  profile_loader --> profile_range
-  profile_query --> node_10
-  profile_query --> node_11
-  profile_query --> work_days
-  profile_query --> import_gate
-  profile_history -->|"month type"| profile_range
-  profile_history --> node_9
-  profile_loader --> work_days
-  profile_metrics -->|"snapshot type"| profile_history
-  node_4 --> config_status
-  node_4 --> config_actions
-  node_4 --> import_gate
-  node_5 --> import_gate
-  node_7 --> import_gate
+  subgraph group_data["Services"]
+    monthly_config_service["monthlyConfig.service<br/>[apps/web/src/services/monthlyConfig/monthlyConfig.service.ts]"]
+    shift_service["shift.service<br/>[apps/web/src/services/shift/shift.service.ts]"]
+    work_day_service["workDay.service<br/>[apps/web/src/services/workDay/workDay.service.ts]"]
+    guest_draft_service["guestDraft.service<br/>[apps/web/src/services/guestDraft/guestDraft.service.ts]"]
+    reference_timelines["referenceTimelines<br/>[apps/web/src/services/reference/referenceTimelines.ts]"]
+    election_days["electionDays<br/>[apps/web/src/services/reference/electionDays.ts]"]
+    israeli_holidays["israeliHolidays — computed with jewish-date<br/>[apps/web/src/services/calendar/israeliHolidays.ts]"]
+  end
   external_query{{"TanStack Query — queries and mutations"}}
-  node_0 --> external_query
-  node_4 --> external_query
-  node_7 --> external_query
+  external_supabase{{"Supabase Auth SDK"}}
+  external_domain{{"@shiftly/domain"}}
+  providers --> auth_provider
+  providers --> domain_provider
+  providers --> snackbar
+  auth_provider -->|"session only"| external_supabase
+  domain_provider --> use_timelines
+  domain_provider --> domain_instance
+  domain_provider --> reference_status
+  use_timelines --> reference_timelines
+  use_timelines --> reference_status
+  domain_instance --> month_resolver
+  domain_instance --> reference_issues
+  domain_instance --> external_domain
+  use_domain --> domain_provider
+  monthly_data --> config_status
+  monthly_data --> config_actions
+  monthly_data --> import_gate
+  monthly_data --> monthly_config_service
+  monthly_data --> global_store
+  monthly_data --> use_auth
+  guest_import --> import_gate
+  guest_import --> guest_draft_service
+  guest_import --> shift_service
+  guest_import --> work_day_service
+  guest_import --> use_auth
+  month_session --> shift_service
+  month_session --> work_day_service
+  month_session --> shift_upserts
+  month_session --> draft_capture
+  month_session --> import_gate
+  month_session --> global_store
+  month_session --> use_auth
+  work_days --> election_days
+  work_days --> israeli_holidays
+  work_days -->|"calendar event types"| external_domain
+  profile_query --> profile_loader
+  profile_query --> work_days
+  profile_query --> use_auth
+  profile_query --> use_domain
+  profile_query --> import_gate
+  profile_loader --> monthly_config_service
+  profile_loader --> shift_service
+  profile_loader --> work_day_service
+  profile_loader --> profile_history
+  profile_history --> global_store
+  providers --> external_query
+  monthly_data --> external_query
+  month_session --> external_query
   profile_query -->|"wait for writes; cancel stale reads"| external_query
-  node_0 -->|"depends on"| node_1
-  node_0 -->|"depends on"| node_2
-  node_2 -->|"depends on"| node_3
-  node_3 -->|"depends on"| node_13
-  node_3 -->|"depends on"| node_14
-  node_4 -->|"depends on"| node_10
-  node_4 -->|"depends on"| node_12
-  node_4 -->|"depends on"| node_9
-  node_5 -->|"depends on"| node_10
-  node_5 -->|"depends on"| node_11
-  node_5 -->|"depends on"| node_12
-  node_7 -->|"depends on"| node_10
-  node_7 -->|"depends on"| node_12
-  node_7 -->|"depends on"| node_9
-  node_7 -->|"depends on"| node_6
-  node_12 -->|"depends on"| node_9
-  node_1 -->|"imports"| external_supabase
-  external_supabase{{"Supabase SDK"}}
-  click node_0 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/AppProviders.tsx"
-  click node_1 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/auth/AuthProvider.tsx"
-  click node_2 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/DomainProvider.tsx"
-  click node_3 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/domain.instance.ts"
-  click node_4 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyDataProvider.tsx"
-  click node_5 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx"
-  click node_6 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts"
-  click node_7 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
-  click node_8 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/context/workTableDayState/WorkTableDayStateProvider.tsx"
-  click node_9 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/store/globalStore.ts"
-  click node_10 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useAuth.ts"
-  click node_11 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useDomain.ts"
-  click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useGlobalState.ts"
-  click node_13 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/months/month.resolver.ts"
-  click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/workdayinfo.presenter.ts"
-  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
-  class node_0,node_1,node_2,node_3,node_4,node_5,node_6,node_7,node_8,node_9,node_10,node_11,node_12,node_13,node_14 toneMint
-  class profile_query,profile_loader,profile_history,profile_metrics,profile_range,config_status,config_actions,import_gate,work_days toneMint
-  click profile_loader "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/services/profileHistory.service.ts"
-  click profile_query "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/hooks/useProfileHistory.ts"
-  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileHistory.ts"
-  click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
-  click profile_range "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileRange.ts"
+  click providers "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/AppProviders.tsx"
+  click auth_provider "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/auth/AuthProvider.tsx"
+  click domain_provider "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/DomainProvider.tsx"
+  click use_timelines "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/useReferenceTimelines.ts"
+  click reference_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/domain/referenceStatusContext.ts"
+  click domain_instance "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/domain.instance.ts"
+  click reference_issues "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/domain/referenceIssues.ts"
+  click month_resolver "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/months/month.resolver.ts"
+  click snackbar "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/app/providers/snackbar/AppSnackbarProvider.tsx"
+  click monthly_data "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/MonthlyDataProvider.tsx"
   click config_status "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigStatusContext.ts"
   click config_actions "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/monthly-data/monthlyConfigActionsContext.ts"
+  click guest_import "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/GuestDraftImportProvider.tsx"
   click import_gate "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/guest-draft/guestDraftImportContext.ts"
+  click month_session "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useWorkTableMonthSession.ts"
+  click shift_upserts "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useDebouncedShiftUpserts.ts"
+  click draft_capture "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/work-table/hooks/month/useGuestDraftCapture.ts"
   click work_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useWorkDays.ts"
+  click profile_query "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/hooks/useProfileHistory.ts"
+  click profile_loader "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/services/profileHistory.service.ts"
+  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileHistory.ts"
+  click global_store "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/store/globalStore.ts"
+  click use_auth "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useAuth.ts"
+  click use_domain "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/hooks/useDomain.ts"
+  click monthly_config_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
+  click shift_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/shift/shift.service.ts"
+  click work_day_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/workDay/workDay.service.ts"
+  click guest_draft_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.service.ts"
+  click reference_timelines "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/referenceTimelines.ts"
+  click israeli_holidays "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/calendar/israeliHolidays.ts"
+  click election_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/electionDays.ts"
+  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
+  classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
+  class providers,auth_provider,domain_provider,use_timelines,reference_status,domain_instance,reference_issues,month_resolver,snackbar,monthly_data,config_status,config_actions,guest_import,import_gate,month_session,shift_upserts,draft_capture,work_days,profile_query,profile_loader,profile_history,global_store,use_auth,use_domain toneMint
+  class monthly_config_service,shift_service,work_day_service,guest_draft_service,reference_timelines,election_days,israeli_holidays toneRose

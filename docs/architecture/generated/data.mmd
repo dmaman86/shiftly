@@ -9,75 +9,86 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
-%% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
-%% Profile history reads saved config, shifts and days without persisting recalculated results.
-%% Static calendars and their election maintenance removed 2026-11-10: holidays are computed in the browser and elections come from apps/api.
+%% Source: v1.1.0 (release candidate; source HEAD). Module dependencies include type imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
+%% Web data access. Solid arrows point from consumers to dependencies; dashed arrows are HTTP calls and browser storage.
+%% supabase.client is used for authentication only (lint-enforced); user data and reference data come from apps/api.
+%% apiClient attaches the session token on request, refreshes once on 401 and drops a call whose owner is no longer signed in.
 flowchart TD
-  subgraph group_data["Infrastructure and adapters"]
-    node_0["supabase.crud<br/>[apps/web/src/services/supabase/supabase.crud.ts]"]
-    node_1["supabase.client<br/>[apps/web/src/services/supabase/supabase.client.ts]"]
-    node_2["shift.service<br/>[apps/web/src/services/shift/shift.service.ts]"]
-    node_4["account.service<br/>[apps/web/src/services/account/account.service.ts]"]
-    node_5["workDay.service<br/>[apps/web/src/services/workDay/workDay.service.ts]"]
-    node_7["analytics.service<br/>[apps/web/src/services/analytics/analytics.service.ts]"]
-    node_8["guestDraft.service<br/>[apps/web/src/services/guestDraft/guestDraft.service.ts]"]
-    node_9["monthlyConfig.service<br/>[apps/web/src/services/monthlyConfig/monthlyConfig.service.ts]"]
-    node_10["guestDraft.storage<br/>[apps/web/src/services/guestDraft/guestDraft.storage.ts]"]
-    node_12["gtag<br/>[apps/web/src/services/analytics/gtag.ts]"]
-    node_14["dayToPayBreakdownVM<br/>[apps/web/src/adapters/dayToPayBreakdownVM.ts]"]
-    node_15["monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
+  subgraph group_data["Services and adapters (apps/web)"]
+    api_client["apiClient — axios, bearer token, single refresh,<br/>expectedUserId guard, typed error codes<br/>[apps/web/src/services/api/client.ts]"]
+    supabase_client["supabase.client — Auth only<br/>[apps/web/src/services/supabase/supabase.client.ts]"]
+    monthly_config_service["monthlyConfig.service — /me/months/:y/:m/config, shabbat-credit<br/>[apps/web/src/services/monthlyConfig/monthlyConfig.service.ts]"]
+    work_day_service["workDay.service — /me/months/:y/:m/work-days, /me/work-days/:date<br/>[apps/web/src/services/workDay/workDay.service.ts]"]
+    shift_service["shift.service — /me/months/:y/:m/shifts, /me/shifts/:id<br/>[apps/web/src/services/shift/shift.service.ts]"]
+    guest_draft_service["guestDraft.service — /me/months/:y/:m/guest-import<br/>[apps/web/src/services/guestDraft/guestDraft.service.ts]"]
+    guest_draft_storage["guestDraft.storage — signed-out draft<br/>[apps/web/src/services/guestDraft/guestDraft.storage.ts]"]
+    account_service["account.service — DELETE /me/account<br/>[apps/web/src/services/account/account.service.ts]"]
+    reference_service["reference.service — /reference/elections, /reference/timelines<br/>[apps/web/src/services/reference/reference.service.ts]"]
+    reference_timelines["referenceTimelines<br/>[apps/web/src/services/reference/referenceTimelines.ts]"]
+    timeline_cache["timelineCache — last known timelines<br/>[apps/web/src/services/reference/timelineCache.ts]"]
+    election_days["electionDays<br/>[apps/web/src/services/reference/electionDays.ts]"]
+    election_cache["electionCache — last known election days<br/>[apps/web/src/services/reference/electionCache.ts]"]
+    israeli_holidays["israeliHolidays — computed with jewish-date<br/>[apps/web/src/services/calendar/israeliHolidays.ts]"]
+    analytics["analytics.service / gtag<br/>[apps/web/src/services/analytics/analytics.service.ts]"]
+    holiday_adapter["holiday.adapter<br/>[apps/web/src/adapters/holiday.adapter.ts]"]
+    election_adapter["election.adapter<br/>[apps/web/src/adapters/election.adapter.ts]"]
+    timelines_adapter["referenceTimelines.adapter<br/>[apps/web/src/adapters/referenceTimelines.adapter.ts]"]
+    pay_vm["dayToPayBreakdownVM / monthToPayBreakdownVM<br/>[apps/web/src/adapters/monthToPayBreakdownVM.ts]"]
+    api_error["resolveApiErrorMessage — API client codes to messages<br/>[apps/web/src/utils/api-error.resolve.util.ts]"]
   end
-  profile_history["profileHistory — pure calculation<br/>[apps/web/src/features/profile/helpers/profileHistory.ts]"]
-  profile_loader["profileHistory.service — read-only loading<br/>[apps/web/src/features/profile/services/profileHistory.service.ts]"]
-  profile_loader --> profile_history
-  profile_metrics["profileMetrics<br/>[apps/web/src/features/profile/helpers/profileMetrics.ts]"]
-  salary_rows["payRows.mapper<br/>[apps/web/src/features/salary-summary/mappers/payRows.mapper.ts]"]
-  salary_total["calculateTotal<br/>[apps/web/src/features/salary-summary/helpers/helper.ts]"]
-  profile_loader -->|"read saved months"| node_9
-  profile_loader -->|"read shifts"| node_2
-  profile_loader -->|"read days"| node_5
-  profile_history --> node_15
-  profile_metrics --> salary_rows
-  profile_metrics --> salary_total
   external_domain{{"@shiftly/domain"}}
-  node_14 --> external_domain
-  node_15 --> external_domain
-  node_10 -->|"status enum"| external_domain
-  profile_history -->|"allocate Shabbat credit"| external_domain
-  node_0 -->|"depends on"| node_1
-  node_2 -->|"depends on"| node_0
-  node_4 -->|"depends on"| node_1
-  node_5 -->|"depends on"| node_0
-  node_8 -->|"depends on"| node_1
-  node_8 -->|"depends on"| node_10
-  node_9 -->|"depends on"| node_0
-  node_10 -->|"depends on"| node_2
-  node_10 -->|"depends on"| node_5
-  node_1 -->|"imports"| external_supabase
-  node_7 -->|"calls"| external_analytics
-  node_12 -->|"calls"| external_analytics
-  external_supabase{{"Supabase SDK"}}
+  local_storage[("localStorage")]
+  api{{"apps/api"}}
+  sb_auth{{"Supabase Auth"}}
   external_analytics{{"Google Analytics (gtag)"}}
-  click node_0 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.crud.ts"
-  click node_1 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
-  click node_2 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/shift/shift.service.ts"
-  click node_4 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/account/account.service.ts"
-  click node_5 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/workDay/workDay.service.ts"
-  click node_7 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/analytics.service.ts"
-  click node_8 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.service.ts"
-  click node_9 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
-  click node_10 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.storage.ts"
-  click node_12 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/gtag.ts"
-  click node_14 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/dayToPayBreakdownVM.ts"
-  click node_15 "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
+  monthly_config_service --> api_client
+  work_day_service --> api_client
+  shift_service --> api_client
+  guest_draft_service --> api_client
+  guest_draft_service -->|"draft type"| guest_draft_storage
+  account_service --> api_client
+  reference_service --> api_client
+  api_client -->|"session token, user id"| supabase_client
+  reference_timelines --> reference_service
+  reference_timelines --> timeline_cache
+  reference_timelines --> timelines_adapter
+  election_days --> reference_service
+  election_days --> election_cache
+  timeline_cache --> reference_service
+  election_cache --> reference_service
+  holiday_adapter --> israeli_holidays
+  election_adapter --> reference_service
+  timelines_adapter --> external_domain
+  holiday_adapter --> external_domain
+  election_adapter --> external_domain
+  pay_vm --> external_domain
+  shift_service -->|"shift types"| external_domain
+  work_day_service -->|"status enum"| external_domain
+  api_client -.->|"HTTPS"| api
+  supabase_client -.->|"OAuth, session refresh"| sb_auth
+  guest_draft_storage -.-> local_storage
+  timeline_cache -.-> local_storage
+  election_cache -.-> local_storage
+  analytics -.-> external_analytics
+  click api_client "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/api/client.ts"
+  click supabase_client "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/supabase/supabase.client.ts"
+  click monthly_config_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/monthlyConfig/monthlyConfig.service.ts"
+  click work_day_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/workDay/workDay.service.ts"
+  click shift_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/shift/shift.service.ts"
+  click guest_draft_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.service.ts"
+  click guest_draft_storage "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/guestDraft/guestDraft.storage.ts"
+  click account_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/account/account.service.ts"
+  click reference_service "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/reference.service.ts"
+  click reference_timelines "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/referenceTimelines.ts"
+  click timeline_cache "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/timelineCache.ts"
+  click election_days "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/electionDays.ts"
+  click election_cache "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/reference/electionCache.ts"
+  click israeli_holidays "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/calendar/israeliHolidays.ts"
+  click analytics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/services/analytics/analytics.service.ts"
+  click holiday_adapter "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/holiday.adapter.ts"
+  click election_adapter "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/election.adapter.ts"
+  click timelines_adapter "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/referenceTimelines.adapter.ts"
+  click pay_vm "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/adapters/monthToPayBreakdownVM.ts"
+  click api_error "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/utils/api-error.resolve.util.ts"
   classDef toneRose fill:#ffe4e6,stroke:#e11d48,stroke-width:1.5px,color:#881337
-  class node_0,node_1,node_2,node_4,node_5,node_7,node_8,node_9,node_10,node_12,node_14,node_15 toneRose
-  class salary_rows,salary_total toneRose
-  classDef toneMint fill:#dcfce7,stroke:#16a34a,stroke-width:1.5px,color:#14532d
-  class profile_loader,profile_history,profile_metrics toneMint
-  click profile_loader "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/services/profileHistory.service.ts"
-  click profile_history "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileHistory.ts"
-  click profile_metrics "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/profile/helpers/profileMetrics.ts"
-  click salary_rows "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/mappers/payRows.mapper.ts"
-  click salary_total "https://github.com/dmaman86/shiftly/blob/main/apps/web/src/features/salary-summary/helpers/helper.ts"
+  class api_client,supabase_client,monthly_config_service,work_day_service,shift_service,guest_draft_service,guest_draft_storage,account_service,reference_service,reference_timelines,timeline_cache,election_days,election_cache,israeli_holidays,analytics,holiday_adapter,election_adapter,timelines_adapter,pay_vm,api_error toneRose

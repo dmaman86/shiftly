@@ -9,9 +9,10 @@ config:
     lineColor: "#334155"
     edgeLabelBackground: "#ffffff"
 ---
-%% Source: working tree, 2026-10-04. Base commit: c1832fe463538407b0906ec7e62c2f0d7542bcd6.
+%% Source: v1.1.0 (release candidate; source HEAD). Module dependencies include type imports. Commit: 581f74ea896bfef47de8892d99903c263df9c7c5.
 %% Selected module dependencies, including type imports; arrows point from consumers to dependencies.
-%% Election additions verified against the working tree, 2026-10-19. Dashed arrows show injected runtime calls.
+%% Dashed arrows show injected runtime calls. Rates come from a ReferenceResolver: the web app builds one from the API's timelines, or uses the embedded baseline.
+%% apps/api cannot import this package at runtime: it mirrors MonthlyTimeline's checks, and a contract test runs the same cases through both.
 flowchart TD
   subgraph group_domain["Payroll logic"]
     node_0["composition<br/>[packages/domain/src/composition.ts]"]
@@ -40,8 +41,18 @@ flowchart TD
     regular_day["RegularByDayCalculator<br/>Consolidated day timeline<br/>[packages/domain/src/calculator/regular/regularByDay.calculator.ts]"]
     calendar_types["CalendarEventKind / WorkDayMeta<br/>knessetNumber; calendarKnessetNumbers<br/>[packages/domain/src/types/types.ts]"]
     shabbat_credit["allocateShabbatCredit — exported credit allocation API<br/>[packages/domain/src/calculator/shabbat-credit.calculator.ts]"]
+    reference_resolver["createReferenceResolver — rate by month, unavailable is explicit<br/>[packages/domain/src/reference/reference-resolver.ts]"]
+    monthly_timeline["MonthlyTimeline<br/>[packages/domain/src/reference/timeline.ts]"]
+    baseline["BASELINE_REFERENCES — embedded fallback timelines<br/>[packages/domain/src/reference/baseline.ts]"]
+    system_start["SYSTEM_START_DATE<br/>[packages/domain/src/constants/system.constant.ts]"]
   end
   node_0 --> rate_pipeline
+  node_0 --> baseline
+  node_0 -->|"resolver type"| reference_resolver
+  rate_pipeline --> reference_resolver
+  baseline --> reference_resolver
+  reference_resolver --> monthly_timeline
+  reference_resolver --> system_start
   node_0 --> day_from_shifts
   node_0 -->|"policy type"| addition_classifier
   node_19 --> addition_classifier
@@ -111,3 +122,8 @@ flowchart TD
   click election_hours "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/election-hours.calculator.ts"
   click regular_day "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/calculator/regular/regularByDay.calculator.ts"
   click calendar_types "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/types/types.ts"
+  click reference_resolver "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reference/reference-resolver.ts"
+  click monthly_timeline "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reference/timeline.ts"
+  click baseline "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/reference/baseline.ts"
+  click system_start "https://github.com/dmaman86/shiftly/blob/main/packages/domain/src/constants/system.constant.ts"
+  class reference_resolver,monthly_timeline,baseline,system_start toneAmber

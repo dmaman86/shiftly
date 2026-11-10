@@ -7,7 +7,7 @@ Workers think in shifts. Payslips are computed in weighted segments. Shiftly bri
 [![Live Demo](https://img.shields.io/badge/Live-Demo-green)](https://dmaman86.github.io/shiftly/)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-Stack: TypeScript · React · Vite · Zustand · TanStack Query · MUI · Supabase · Vitest · Playwright
+Stack: TypeScript · React · Vite · Zustand · TanStack Query · MUI · Express · Supabase · Cloud Run · Vitest · Playwright · pgTAP
 
 **[Live demo](https://dmaman86.github.io/shiftly/) · [עברית](README_HE.md) · [Full technical reference](docs/reference/README.md)**
 
@@ -30,7 +30,8 @@ See [payroll validation](VALIDATION.md) ([עברית](VALIDATION_HE.md)) for the
 - **Independent calculation engine:** React consumes the TypeScript [`@shiftly/domain` package](packages/domain/) through an explicit public API; the engine has no React or DOM dependency.
 - **Tested deployment artifact:** [CI](.github/workflows/ci.yml) runs E2E against the downloaded production `dist` artifact and deploys that same artifact only after checks and E2E pass.
 - **Browser coverage:** [Playwright projects](playwright.config.ts) exercise desktop Chromium, Android emulation (Chromium) and iPhone emulation (WebKit).
-- **User-scoped persistence:** the [database migration](supabase/migrations/20260830000000_persistence_schema.sql) enables Supabase Row Level Security on monthly settings, work days and shifts, with ownership policies based on `auth.uid()`.
+- **Backend-owned data access:** the browser uses Supabase for sign-in only. [`apps/api`](apps/api/) (Express on Cloud Run) verifies the access token and reaches user data through `UserScope`, which pins every query to the verified user; writes that must be atomic run as backend-only Postgres functions. Row Level Security stays on as a backstop.
+- **Database tests:** [pgTAP suites](supabase/tests/) run in CI against a schema rebuilt from the migrations, and fail if a browser role gains a privilege it should not have.
 
 ## Personal profile
 
@@ -38,11 +39,11 @@ Signed-in users can open `/:lang/profile` for their account card and three month
 
 A shared selector applies the last **3, 6 or 12 months**, **this year**, or an inclusive **custom month range** to all charts. The default is six months; supported dates run from November 2015 through the current month.
 
-History uses saved account data, not unsaved salary-summary quantity edits. Payment is a calculated gross estimate, not net pay or confirmation of payment received. Calculation rules remain public at `/:lang/calculation-rules`; guests opening the profile are redirected there.
+History uses saved account data, not unsaved salary-summary quantity edits. Payment is a calculated gross estimate, not net pay or confirmation of payment received. Calculation rules remain public at `/:lang/calculation-rules`. Guests opening the profile see a sign-in card and a locked preview of the charts.
 
 ## Quick start
 
-Requirements: Node.js 24 and Bun 1.3.14. Install with Bun to link the workspace
+Requirements: Node.js 24 (`.nvmrc` pins the patch release) and Bun 1.3.14. Install with Bun to link the workspace
 packages; this repository uses Bun's `workspace:*` dependency protocol.
 
 ```bash
@@ -54,7 +55,10 @@ bun install
 bun run dev
 ```
 
-Open `http://localhost:5173/shiftly`.
+Open `http://localhost:5173/shiftly`. Guest mode needs nothing else. Signing in
+and saving data also needs the API (`bun run dev:api`) and its settings; see
+[apps/api/README.md](apps/api/README.md) and the
+[setup guide](docs/reference/README.md#getting-started).
 
 ## Documentation
 
@@ -63,6 +67,7 @@ Open `http://localhost:5173/shiftly`.
 - [Payroll validation](VALIDATION.md)
 - [Payroll validation in Hebrew](VALIDATION_HE.md)
 - [Independent payroll engine](packages/domain/README.md)
+- [Backend API](apps/api/README.md)
 - [Architecture documentation](docs/architecture/)
 - [Current architecture diagrams](docs/architecture/generated/)
 - [Architecture history by tag](docs/architecture/history/)
@@ -75,9 +80,11 @@ bun run lint
 bun run test:ci
 bun run build
 bun run test:e2e
+bun run test:db   # pgTAP; needs the Supabase CLI and Docker
 ```
 
-The web lives in `apps/web` and consumes `@shiftly/domain` from `packages/domain`.
+The web lives in `apps/web` and consumes `@shiftly/domain` from `packages/domain`;
+the backend lives in `apps/api`.
 Run `bun run dev:domain` in a second terminal when editing engine sources so the
 compiled package updates while Vite is running.
 
