@@ -20,6 +20,7 @@ const mocks = vi.hoisted(() => ({
   },
   track: vi.fn(),
   importMonth: vi.fn(),
+  importOwner: vi.fn(),
   fetchShifts: vi.fn(),
   fetchDays: vi.fn(),
 }));
@@ -42,7 +43,10 @@ vi.mock("@/services", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/services")>()),
   analyticsService: { track: mocks.track },
   guestDraftService: () => ({
-    importMonth: () => ({ call: mocks.importMonth }),
+    importMonth: (ownerId: string) => {
+      mocks.importOwner(ownerId);
+      return { call: mocks.importMonth };
+    },
   }),
   shiftService: () => ({ fetchForMonth: () => ({ call: mocks.fetchShifts }) }),
   workDayService: () => ({ fetchForMonth: () => ({ call: mocks.fetchDays }) }),
@@ -225,10 +229,35 @@ describe("GuestDraftImportProvider", () => {
       expect(screen.getByTestId("gate")).toHaveTextContent("ready"),
     );
     expect(mocks.importMonth).toHaveBeenCalledTimes(1);
+    expect(mocks.importOwner).toHaveBeenCalledWith("user-1");
     expect(mocks.track).toHaveBeenCalledWith({
       name: "guest_draft_import_resolved",
       params: { outcome: "replaced", shift_count: 1 },
     });
+  });
+
+  it("replaces only for the account whose saved month was checked", async () => {
+    savedMonth(3);
+    const user = userEvent.setup();
+
+    const { rerender } = renderProvider();
+    const replace = await screen.findByRole("button", {
+      name: "Replace with guest data",
+    });
+
+    // Another account signs in while the conflict dialog is open.
+    mocks.authState.user = { id: "user-2" };
+    rerender(
+      <GuestDraftImportProvider initialDraft={draft}>
+        <GateProbe />
+      </GuestDraftImportProvider>,
+    );
+    await user.click(replace);
+
+    // The import is still addressed to user-1; the API client refuses to
+    // send it while user-2 holds the session.
+    await waitFor(() => expect(mocks.importOwner).toHaveBeenCalledTimes(1));
+    expect(mocks.importOwner).toHaveBeenCalledWith("user-1");
   });
 
   it("keeps the draft after a failed import and lets the user retry", async () => {

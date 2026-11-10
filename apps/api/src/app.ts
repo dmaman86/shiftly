@@ -13,6 +13,7 @@ import type { PublishedTimelinesReader } from "./reference-data/published-timeli
 import { publishedTimelinesRouter } from "./reference-data/published-timelines-router.ts";
 import { yearRulesRouter } from "./shared/rules-router.ts";
 import { handleUserDataErrors } from "./user-data/errors.ts";
+import { guestImportRouter } from "./user-data/guest-import-router.ts";
 import { monthlyConfigRouter } from "./user-data/monthly-config-router.ts";
 import { shiftsRouter } from "./user-data/shifts-router.ts";
 import { workDaysRouter } from "./user-data/work-days-router.ts";
@@ -90,6 +91,7 @@ export function createApp(deps: AppDeps): express.Express {
     monthlyConfigRouter(deps.userData),
     workDaysRouter(deps.userData),
     shiftsRouter(deps.userData),
+    guestImportRouter(deps.userData),
   );
 
   // Admin only. Extraction and research read public sources, call a paid
