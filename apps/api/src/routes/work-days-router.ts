@@ -5,7 +5,7 @@ import {
   calendarDate,
   parseMonthPeriod,
   parseOrThrow,
-} from "../user-data/month-period.ts";
+} from "../services/month-period.ts";
 import type { UserDataAccess } from "../repositories/user-scope.ts";
 import {
   WORK_DAY_STATUSES,

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { UserDataError } from "../../src/user-data/errors.ts";
+import { UserDataError } from "../../src/errors/user-data-errors.ts";
 import {
   dataOrThrow,
   supabaseUserDataAccess,

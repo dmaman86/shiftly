@@ -3,7 +3,7 @@ import {
   AuthUnavailableError,
   type AppRole,
   type RoleRepository,
-} from "../auth/ports.ts";
+} from "../ports/auth.ts";
 
 const KNOWN_ROLES: ReadonlySet<string> = new Set<AppRole>(["admin"]);
 

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   ReferenceDataPersistenceError,
   type NewCandidate,
-} from "../../src/reference-data/ports.ts";
+} from "../../src/ports/reference-data.ts";
 import { SupabaseRevisionRepository } from "../../src/repositories/supabase-revision-repository.ts";
 
 const URL_ = "https://project.supabase.co";

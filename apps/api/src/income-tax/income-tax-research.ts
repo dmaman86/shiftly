@@ -2,16 +2,16 @@ import {
   uncoveredKinds,
   yearCoverage,
   type KindCoverage,
-} from "../reference-data/coverage.ts";
+} from "../services/coverage.ts";
 import type {
   NewCandidate,
   ReferenceKind,
   RevisionRepository,
-} from "../reference-data/ports.ts";
+} from "../ports/reference-data.ts";
 import {
   storeCandidates,
   type PersistenceOutcome,
-} from "../reference-data/store-candidates.ts";
+} from "../services/store-candidates.ts";
 import { candidateProvenance } from "../research/candidate-provenance.ts";
 import {
   researchReferenceData,

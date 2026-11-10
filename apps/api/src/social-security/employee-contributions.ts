@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { ReferenceKind } from "../reference-data/ports.ts";
+import type { ReferenceKind } from "../ports/reference-data.ts";
 
 /**
  * What an employee's salary pays to National Insurance and health insurance

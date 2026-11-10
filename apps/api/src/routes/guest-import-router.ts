@@ -8,7 +8,7 @@ import {
   parseMonthPeriod,
   parseOrThrow,
   type MonthPeriod,
-} from "../user-data/month-period.ts";
+} from "../services/month-period.ts";
 import type { UserDataAccess } from "../repositories/user-scope.ts";
 
 /** Same limits as api_import_guest_month and the browser's draft storage. */

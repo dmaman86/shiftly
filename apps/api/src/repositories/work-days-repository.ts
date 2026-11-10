@@ -1,4 +1,4 @@
-import { monthRange, type MonthPeriod } from "../user-data/month-period.ts";
+import { monthRange, type MonthPeriod } from "../services/month-period.ts";
 import { dataOrThrow, type UserScope } from "./user-scope.ts";
 
 export const WORK_DAY_STATUSES = ["normal", "vacation", "sick"] as const;

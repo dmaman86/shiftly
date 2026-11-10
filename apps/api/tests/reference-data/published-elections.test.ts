@@ -3,13 +3,13 @@ import type { Server } from "node:http";
 import { SYSTEM_START_YEAR } from "@shiftly/domain";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CachedPublishedElectionsReader } from "../../src/repositories/cached-published-elections-reader.ts";
-import { ReferenceDataPersistenceError } from "../../src/reference-data/ports.ts";
+import { ReferenceDataPersistenceError } from "../../src/ports/reference-data.ts";
 import {
   FIRST_SUPPORTED_YEAR,
   supportedYears,
   type PublishedElection,
   type PublishedElectionsReader,
-} from "../../src/reference-data/published-elections.ts";
+} from "../../src/services/published-elections.ts";
 import { publishedElectionsRouter } from "../../src/routes/published-elections-router.ts";
 import {
   SupabasePublishedElectionsReader,

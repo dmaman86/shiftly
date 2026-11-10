@@ -1,7 +1,7 @@
 import type {
   NewCandidate,
   RevisionFallbackReason,
-} from "../reference-data/ports.ts";
+} from "../ports/reference-data.ts";
 import { candidateProvenance } from "../research/candidate-provenance.ts";
 import type {
   DocumentFetcher,

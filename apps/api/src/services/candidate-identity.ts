@@ -1,4 +1,4 @@
-import type { NewCandidate, ReferenceKind } from "./ports.ts";
+import type { NewCandidate, ReferenceKind } from "../ports/reference-data.ts";
 
 /**
  * Which kinds identify their revisions by subject, and the subject format.

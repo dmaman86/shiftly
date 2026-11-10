@@ -13,7 +13,7 @@ import type {
   CandidateSource,
   NewCandidate,
   RevisionAdministration,
-} from "./ports.ts";
+} from "../ports/reference-data.ts";
 
 /** Business status of a Knesset election, as published to the web app. */
 export type ElectionStatus = "planned" | "confirmed" | "occurred" | "cancelled";

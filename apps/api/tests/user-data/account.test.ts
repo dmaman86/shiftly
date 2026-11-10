@@ -3,7 +3,7 @@ import {
   supabaseAccountDeleter,
   type AccountDeleter,
 } from "../../src/repositories/account-deleter.ts";
-import { UserDataError } from "../../src/user-data/errors.ts";
+import { UserDataError } from "../../src/errors/user-data-errors.ts";
 import {
   ADMIN_ID,
   ADMIN_TOKEN,

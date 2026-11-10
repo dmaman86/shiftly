@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { ReferenceDataPersistenceError } from "../reference-data/ports.ts";
+import { ReferenceDataPersistenceError } from "../ports/reference-data.ts";
 import {
   supportedYears,
   type PublishedElectionsReader,
-} from "../reference-data/published-elections.ts";
+} from "../services/published-elections.ts";
 
 /**
  * Fresh for five minutes, then served stale while revalidating for up to an

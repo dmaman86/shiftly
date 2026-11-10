@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { adminRepository } from "./admin-repository.ts";
-import { storeCandidates } from "../reference-data/store-candidates.ts";
+import { storeCandidates } from "../services/store-candidates.ts";
 import { HttpDocumentFetcher } from "../research/http-document-fetcher.ts";
 import { WaybackArchiveIndex } from "../research/web-archive.ts";
 import { FileDebugArtifactStore } from "../shared/debug-artifacts.ts";

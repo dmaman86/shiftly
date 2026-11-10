@@ -2,7 +2,7 @@ import type {
   CurrentRevision,
   ReferenceKind,
   RevisionRepository,
-} from "./ports.ts";
+} from "../ports/reference-data.ts";
 
 /**
  * - covered: an active or pending revision starts in the year, so research

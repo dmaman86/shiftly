@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CandidateSource } from "../../src/reference-data/ports.ts";
+import type { CandidateSource } from "../../src/ports/reference-data.ts";
 import {
   buildContributionTimelines,
   contributionCandidates,

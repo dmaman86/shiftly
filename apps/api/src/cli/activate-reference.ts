@@ -1,7 +1,7 @@
 import { parseArgs } from "node:util";
 import { z } from "zod";
 import { adminRepository } from "./admin-repository.ts";
-import { checkTimelineActivation } from "../reference-data/timeline-activation.ts";
+import { checkTimelineActivation } from "../services/timeline-activation.ts";
 
 /**
  * Activates one pending timeline revision (a value with a period and no

@@ -1,4 +1,4 @@
-import type { MonthPeriod } from "../user-data/month-period.ts";
+import type { MonthPeriod } from "../services/month-period.ts";
 import { dataOrThrow, type UserScope } from "./user-scope.ts";
 
 /** The month a guest filled in before signing in. */

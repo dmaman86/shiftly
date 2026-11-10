@@ -1,7 +1,7 @@
 import { parseArgs } from "node:util";
 import { z } from "zod";
 import { adminRepository } from "./admin-repository.ts";
-import { checkElectionActivation } from "../reference-data/election-activation.ts";
+import { checkElectionActivation } from "../services/election-activation.ts";
 
 /**
  * Activates one pending Knesset election revision after review. The revision

@@ -3,7 +3,7 @@ import type {
   CandidateSource,
   NewCandidate,
   RevisionFallbackReason,
-} from "../reference-data/ports.ts";
+} from "../ports/reference-data.ts";
 import type {
   AnnualReportRates,
   EmployeeTotalHistory,

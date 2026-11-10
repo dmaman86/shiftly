@@ -1,4 +1,4 @@
-import type { RevisionDetails } from "./ports.ts";
+import type { RevisionDetails } from "../ports/reference-data.ts";
 
 export type ActivatableElection = RevisionDetails & {
   readonly subjectKey: string;

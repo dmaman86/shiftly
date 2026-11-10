@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserDataError } from "./errors.ts";
+import { UserDataError } from "../errors/user-data-errors.ts";
 
 /**
  * Same bounds as the guest import function: the app starts in 2015, and a

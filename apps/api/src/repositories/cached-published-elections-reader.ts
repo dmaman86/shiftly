@@ -1,7 +1,7 @@
 import type {
   PublishedElection,
   PublishedElectionsReader,
-} from "../reference-data/published-elections.ts";
+} from "../services/published-elections.ts";
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
 

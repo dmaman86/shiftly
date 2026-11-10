@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { ReferenceDataPersistenceError } from "../reference-data/ports.ts";
+import { ReferenceDataPersistenceError } from "../ports/reference-data.ts";
 import {
   InvalidPublishedTimelineError,
   parseTimelineKinds,
   PUBLISHED_TIMELINE_KINDS,
   type PublishedTimelinesReader,
-} from "../reference-data/published-timelines.ts";
+} from "../services/published-timelines.ts";
 
 /** Same freshness as election days; rates change rarely and are announced ahead. */
 const PUBLIC_CACHE = "public, max-age=300, stale-while-revalidate=3600";

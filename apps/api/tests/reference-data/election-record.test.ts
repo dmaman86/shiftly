@@ -3,8 +3,8 @@ import {
   israelDate,
   planElectionRecord,
   type ElectionRecordRequest,
-} from "../../src/reference-data/election-record.ts";
-import type { ActiveRevision } from "../../src/reference-data/ports.ts";
+} from "../../src/services/election-record.ts";
+import type { ActiveRevision } from "../../src/ports/reference-data.ts";
 import type {
   Accessibility,
   FetchedDocument,

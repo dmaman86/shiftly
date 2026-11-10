@@ -1,7 +1,7 @@
 import type {
   PublishedTimelines,
   PublishedTimelinesReader,
-} from "../reference-data/published-timelines.ts";
+} from "../services/published-timelines.ts";
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
 

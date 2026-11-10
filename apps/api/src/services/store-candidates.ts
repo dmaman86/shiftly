@@ -3,7 +3,7 @@ import type {
   NewCandidate,
   ReferenceKind,
   RevisionRepository,
-} from "./ports.ts";
+} from "../ports/reference-data.ts";
 
 export type StoredRevision = {
   readonly kind: ReferenceKind;

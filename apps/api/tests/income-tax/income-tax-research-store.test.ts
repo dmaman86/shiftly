@@ -5,7 +5,7 @@ import type {
   NewCandidate,
   ReferenceKind,
   RevisionRepository,
-} from "../../src/reference-data/ports.ts";
+} from "../../src/ports/reference-data.ts";
 import type {
   FetchedDocument,
   ResearchDiscoveryResult,

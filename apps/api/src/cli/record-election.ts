@@ -1,11 +1,8 @@
 import { parseArgs } from "node:util";
 import { z } from "zod";
 import { adminRepository } from "./admin-repository.ts";
-import {
-  israelDate,
-  planElectionRecord,
-} from "../reference-data/election-record.ts";
-import { storeCandidates } from "../reference-data/store-candidates.ts";
+import { israelDate, planElectionRecord } from "../services/election-record.ts";
+import { storeCandidates } from "../services/store-candidates.ts";
 import { HttpDocumentFetcher } from "../research/http-document-fetcher.ts";
 
 /**

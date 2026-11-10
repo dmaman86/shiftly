@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { AuthUnavailableError } from "../../src/auth/ports.ts";
+import { AuthUnavailableError } from "../../src/ports/auth.ts";
 import { SupabaseRoleRepository } from "../../src/repositories/supabase-role-repository.ts";
 import { ADMIN_ID } from "./fakes.ts";
 

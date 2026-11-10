@@ -3,7 +3,7 @@ import {
   isAuthRetryableFetchError,
   type AuthError,
 } from "@supabase/supabase-js";
-import { UserDataError } from "../user-data/errors.ts";
+import { UserDataError } from "../errors/user-data-errors.ts";
 
 /** Deletes a user and, by cascade, every row they own. */
 export interface AccountDeleter {

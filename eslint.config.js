@@ -183,7 +183,7 @@ export default defineConfig(
     // User-owned tables and backend-only functions are reached only through
     // UserScope, which pins every query to the verified caller.
     files: ["apps/api/**/*.ts"],
-    ignores: ["apps/api/src/user-data/user-scope.ts"],
+    ignores: ["apps/api/src/repositories/user-scope.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -191,7 +191,7 @@ export default defineConfig(
           selector:
             "CallExpression[callee.property.name='from'] > Literal.arguments:first-child[value=/^(monthly_configs|work_days|shifts)$/]",
           message:
-            "Use UserScope (src/user-data/user-scope.ts): user-owned tables must be scoped to the verified caller.",
+            "Use UserScope (src/repositories/user-scope.ts): user-owned tables must be scoped to the verified caller.",
         },
         {
           selector:

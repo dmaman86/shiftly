@@ -3,13 +3,13 @@ import type { Server } from "node:http";
 import express from "express";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { CachedPublishedTimelinesReader } from "../../src/repositories/cached-published-timelines-reader.ts";
-import { ReferenceDataPersistenceError } from "../../src/reference-data/ports.ts";
+import { ReferenceDataPersistenceError } from "../../src/ports/reference-data.ts";
 import {
   InvalidPublishedTimelineError,
   parseTimelineKinds,
   type PublishedTimelines,
   type PublishedTimelinesReader,
-} from "../../src/reference-data/published-timelines.ts";
+} from "../../src/services/published-timelines.ts";
 import { publishedTimelinesRouter } from "../../src/routes/published-timelines-router.ts";
 import {
   SupabasePublishedTimelinesReader,

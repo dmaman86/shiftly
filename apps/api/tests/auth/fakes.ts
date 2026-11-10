@@ -5,7 +5,7 @@ import {
   type AuthenticatedUser,
   type RoleRepository,
   type Verification,
-} from "../../src/auth/ports.ts";
+} from "../../src/ports/auth.ts";
 import type { AppDeps } from "../../src/app.ts";
 
 export const USER_ID = "11111111-1111-4111-8111-111111111111";

@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { config as loadDotenv } from "dotenv";
 import { createApp } from "./app.ts";
-import { SupabaseAuthVerifier } from "./auth/supabase-auth-verifier.ts";
+import { SupabaseAuthVerifier } from "./repositories/supabase-auth-verifier.ts";
 import { SupabaseRoleRepository } from "./repositories/supabase-role-repository.ts";
 import { loadEnv } from "./config/env.ts";
 import { extractIncomeTaxRules } from "./income-tax/income-tax-pipeline.ts";

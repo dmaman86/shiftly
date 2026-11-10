@@ -9,7 +9,7 @@ import {
   type AuthVerifier,
   type AuthenticatedUser,
   type Verification,
-} from "./ports.ts";
+} from "../ports/auth.ts";
 
 type AuthClient = Pick<SupabaseClient["auth"], "getClaims" | "getUser">;
 

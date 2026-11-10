@@ -1,9 +1,9 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import type { AuthenticatedUser } from "../auth/ports.ts";
+import type { AuthenticatedUser } from "../ports/auth.ts";
 import {
   userDataErrorFrom,
   type PostgrestFailure,
-} from "../user-data/errors.ts";
+} from "../errors/user-data-errors.ts";
 
 /** Tables where every row belongs to one user through user_id. */
 export type UserOwnedTable = "monthly_configs" | "work_days" | "shifts";

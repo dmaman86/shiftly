@@ -5,7 +5,7 @@ import {
   calendarDate,
   parseMonthPeriod,
   parseOrThrow,
-} from "../user-data/month-period.ts";
+} from "../services/month-period.ts";
 import { shiftsRepository } from "../repositories/shifts-repository.ts";
 import type { UserDataAccess } from "../repositories/user-scope.ts";
 

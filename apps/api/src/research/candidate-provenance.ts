@@ -2,7 +2,7 @@ import type {
   CandidateSource,
   RevisionFallbackReason,
   RevisionTrust,
-} from "../reference-data/ports.ts";
+} from "../ports/reference-data.ts";
 import type {
   FallbackReason,
   ResearchResult,

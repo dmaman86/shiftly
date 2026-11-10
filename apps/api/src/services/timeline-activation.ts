@@ -1,4 +1,4 @@
-import type { RevisionDetails } from "./ports.ts";
+import type { RevisionDetails } from "../ports/reference-data.ts";
 
 /**
  * Whether the reference command may activate this revision. It only promotes

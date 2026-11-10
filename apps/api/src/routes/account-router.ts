@@ -1,5 +1,5 @@
 import { Router } from "express";
-import type { AuthVerifier } from "../auth/ports.ts";
+import type { AuthVerifier } from "../ports/auth.ts";
 import { authOf, requireFreshSession } from "../middleware/auth.ts";
 import type { AccountDeleter } from "../repositories/account-deleter.ts";
 

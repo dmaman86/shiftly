@@ -2,7 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { authOf } from "../middleware/auth.ts";
 import { monthlyConfigRepository } from "../repositories/monthly-config-repository.ts";
-import { parseMonthPeriod, parseOrThrow } from "../user-data/month-period.ts";
+import { parseMonthPeriod, parseOrThrow } from "../services/month-period.ts";
 import type { UserDataAccess } from "../repositories/user-scope.ts";
 
 /** Non-negative like the app's number inputs; finite so NaN never reaches SQL. */
