@@ -180,10 +180,38 @@ export default defineConfig(
     },
   },
   {
+    // The core does not know about HTTP or Supabase (see apps/api/README.md).
+    // This block replaces the one above for these files, so it repeats it.
+    files: ["apps/api/src/services/**/*.ts", "apps/api/src/ports/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: "(^|/)apps/web(/|$)",
+              message: "The API cannot depend on the web application.",
+            },
+            {
+              regex: "^(express|@supabase/.*)$",
+              message:
+                "Services and ports stay framework-free: depend on a port and implement it in src/repositories.",
+            },
+            {
+              regex: "(^|/)(repositories|routes|middleware|cli)/",
+              message:
+                "Services and ports cannot import adapters or HTTP code; the dependency points the other way.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // User-owned tables and backend-only functions are reached only through
     // UserScope, which pins every query to the verified caller.
     files: ["apps/api/**/*.ts"],
-    ignores: ["apps/api/src/user-data/user-scope.ts"],
+    ignores: ["apps/api/src/repositories/user-scope.ts"],
     rules: {
       "no-restricted-syntax": [
         "error",
@@ -191,7 +219,7 @@ export default defineConfig(
           selector:
             "CallExpression[callee.property.name='from'] > Literal.arguments:first-child[value=/^(monthly_configs|work_days|shifts)$/]",
           message:
-            "Use UserScope (src/user-data/user-scope.ts): user-owned tables must be scoped to the verified caller.",
+            "Use UserScope (src/repositories/user-scope.ts): user-owned tables must be scoped to the verified caller.",
         },
         {
           selector:

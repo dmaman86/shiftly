@@ -1,36 +1,27 @@
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { config as loadDotenv } from "dotenv";
 import { createApp } from "./app.ts";
-import { SupabaseAuthVerifier } from "./auth/supabase-auth-verifier.ts";
-import { SupabaseRoleRepository } from "./auth/supabase-role-repository.ts";
+import { SupabaseAuthVerifier } from "./repositories/supabase-auth-verifier.ts";
+import { SupabaseRoleRepository } from "./repositories/supabase-role-repository.ts";
 import { loadEnv } from "./config/env.ts";
-import { extractIncomeTaxRules } from "./income-tax/income-tax-pipeline.ts";
-import { researchAndStoreIncomeTax } from "./income-tax/income-tax-research.ts";
-import { CachedPublishedElectionsReader } from "./reference-data/cached-published-elections-reader.ts";
-import { SupabasePublishedElectionsReader } from "./reference-data/supabase-published-elections-reader.ts";
-import { CachedPublishedTimelinesReader } from "./reference-data/cached-published-timelines-reader.ts";
-import { SupabasePublishedTimelinesReader } from "./reference-data/supabase-published-timelines-reader.ts";
-import { SupabaseRevisionRepository } from "./reference-data/supabase-revision-repository.ts";
-import { WikipediaIncomeTaxSource } from "./income-tax/wikipedia-source.ts";
+import { loadLocalEnvFiles } from "./config/local-env.ts";
+import { extractIncomeTaxRules } from "./research/income-tax/income-tax-pipeline.ts";
+import { researchAndStoreIncomeTax } from "./research/income-tax/income-tax-research.ts";
+import { CachedPublishedElectionsReader } from "./repositories/cached-published-elections-reader.ts";
+import { SupabasePublishedElectionsReader } from "./repositories/supabase-published-elections-reader.ts";
+import { CachedPublishedTimelinesReader } from "./repositories/cached-published-timelines-reader.ts";
+import { SupabasePublishedTimelinesReader } from "./repositories/supabase-published-timelines-reader.ts";
+import { SupabaseRevisionRepository } from "./repositories/supabase-revision-repository.ts";
+import { WikipediaIncomeTaxSource } from "./research/income-tax/wikipedia-source.ts";
 import { GoogleGemmaExtractionProvider } from "./research/google-gemma-extraction-provider.ts";
 import { GoogleGemmaResearchProvider } from "./research/google-gemma-research-provider.ts";
-import { SupabaseReadinessCheck } from "./http/readiness.ts";
+import { SupabaseReadinessCheck } from "./repositories/supabase-readiness.ts";
 import { HttpDocumentFetcher } from "./research/http-document-fetcher.ts";
-import { FileDebugArtifactStore } from "./shared/debug-artifacts.ts";
-import { GemmaExtractor } from "./shared/gemma-extractor.ts";
-import { supabaseUserDataAccess } from "./user-data/user-scope.ts";
-import { supabaseAccountDeleter } from "./user-data/account.ts";
+import { FileDebugArtifactStore } from "./research/shared/debug-artifacts.ts";
+import { GemmaExtractor } from "./research/shared/gemma-extractor.ts";
+import { supabaseUserDataAccess } from "./repositories/user-scope.ts";
+import { supabaseAccountDeleter } from "./repositories/account-deleter.ts";
 
-// The first file that defines a variable wins, and shell variables are never
-// overridden. Paths are resolved from this file, so the cwd does not matter.
-loadDotenv({
-  path: [
-    fileURLToPath(new URL("../.env", import.meta.url)),
-    fileURLToPath(new URL("../../../.env.local", import.meta.url)),
-  ],
-  quiet: true,
-});
+loadLocalEnvFiles();
 
 const env = loadEnv();
 

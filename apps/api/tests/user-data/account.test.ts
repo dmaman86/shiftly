@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   supabaseAccountDeleter,
   type AccountDeleter,
-} from "../../src/user-data/account.ts";
-import { UserDataError } from "../../src/user-data/errors.ts";
+} from "../../src/repositories/account-deleter.ts";
+import { UserDataError } from "../../src/errors/user-data-errors.ts";
 import {
   ADMIN_ID,
   ADMIN_TOKEN,

@@ -4,8 +4,8 @@ import {
   AuthRetryableFetchError,
 } from "@supabase/supabase-js";
 import { describe, expect, it, vi } from "vitest";
-import { AuthUnavailableError } from "../../src/auth/ports.ts";
-import { SupabaseAuthVerifier } from "../../src/auth/supabase-auth-verifier.ts";
+import { AuthUnavailableError } from "../../src/ports/auth.ts";
+import { SupabaseAuthVerifier } from "../../src/repositories/supabase-auth-verifier.ts";
 import { USER_ID } from "./fakes.ts";
 
 const TOKEN = "header.payload.signature";

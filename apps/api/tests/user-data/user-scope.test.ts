@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { UserDataError } from "../../src/user-data/errors.ts";
+import { UserDataError } from "../../src/errors/user-data-errors.ts";
 import {
   dataOrThrow,
   supabaseUserDataAccess,
   type OwnedRow,
-} from "../../src/user-data/user-scope.ts";
+} from "../../src/repositories/user-scope.ts";
 import { ADMIN_ID, ADMIN_TOKEN, USER_ID, USER_TOKEN } from "../auth/fakes.ts";
 
 const SECRET = "sb_secret_user_data_test";

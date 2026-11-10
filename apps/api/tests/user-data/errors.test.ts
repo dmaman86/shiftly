@@ -7,7 +7,7 @@ import {
   UserDataError,
   userDataErrorFrom,
   type UserDataErrorCode,
-} from "../../src/user-data/errors.ts";
+} from "../../src/errors/user-data-errors.ts";
 
 describe("userDataErrorFrom", () => {
   it.each<[number, string, UserDataErrorCode]>([

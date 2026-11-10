@@ -27,6 +27,8 @@ const originList = z
     ),
   );
 
+const artifactsDir = z.string().default(apiRoot(".artifacts"));
+
 const envSchema = z
   .object({
     NODE_ENV: z.string().default("development"),
@@ -42,7 +44,7 @@ const envSchema = z
     GEMINI_API_KEY: z.string().min(1),
     GEMINI_MODEL: z.string().min(1).default("gemma-4-31b-it"),
     /** Each rules pipeline writes to its own subfolder. */
-    ARTIFACTS_DIR: z.string().default(apiRoot(".artifacts")),
+    ARTIFACTS_DIR: artifactsDir,
     /** Off by default: research results are only returned, not stored. */
     REFERENCE_DATA_PERSISTENCE_ENABLED: z.stringbool().default(false),
     /**
@@ -74,11 +76,18 @@ const envSchema = z
     { path: ["CORS_ALLOWED_ORIGINS"], message: "required in production" },
   );
 
-export type Env = z.infer<typeof envSchema>;
+/** What the admin commands need: the reference-data store, with the secret key. */
+const adminEnvSchema = z.object({
+  SUPABASE_URL: z.url(),
+  SUPABASE_SECRET_KEY: z.string().min(1),
+});
 
-/** Fails fast at boot; error output lists variable names, never their values. */
-export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
-  const parsed = envSchema.safeParse(source);
+export type Env = z.infer<typeof envSchema>;
+export type AdminEnv = z.infer<typeof adminEnvSchema>;
+
+/** The error lists variable names, never their values. */
+const parseEnv = <T>(schema: z.ZodType<T>, source: NodeJS.ProcessEnv): T => {
+  const parsed = schema.safeParse(source);
   if (!parsed.success) {
     const names = parsed.error.issues.map((issue) => issue.path.join("."));
     throw new Error(
@@ -86,4 +95,19 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
     );
   }
   return parsed.data;
+};
+
+/** The server's settings. Fails fast at boot. */
+export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
+  return parseEnv(envSchema, source);
 }
+
+/** The admin commands' settings: only what they use, nothing the server needs. */
+export const loadAdminEnv = (
+  source: NodeJS.ProcessEnv = process.env,
+): AdminEnv => parseEnv(adminEnvSchema, source);
+
+/** Where debug artifacts go; the same default the server uses. */
+export const loadArtifactsDir = (
+  source: NodeJS.ProcessEnv = process.env,
+): string => artifactsDir.parse(source.ARTIFACTS_DIR);

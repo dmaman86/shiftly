@@ -1,10 +1,10 @@
 import type {
   DebugArtifactStore,
   DebugArtifactWriter,
-} from "../shared/debug-artifacts.ts";
-import { RulesPipelineError } from "../shared/errors.ts";
-import type { ExtractionTask } from "../shared/extraction-task.ts";
-import { isLlmTrace, type LlmTrace } from "../shared/gemma-extractor.ts";
+} from "./shared/debug-artifacts.ts";
+import { RulesPipelineError } from "./shared/errors.ts";
+import type { ExtractionTask } from "./shared/extraction-task.ts";
+import { isLlmTrace, type LlmTrace } from "./shared/gemma-extractor.ts";
 import type {
   Accessibility,
   DiscoveredSource,

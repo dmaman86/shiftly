@@ -1,5 +1,13 @@
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { loadEnv } from "../../src/config/env.ts";
+import {
+  loadAdminEnv,
+  loadArtifactsDir,
+  loadEnv,
+} from "../../src/config/env.ts";
+import { LOCAL_ENV_FILES } from "../../src/config/local-env.ts";
+
+const API_ROOT = join(import.meta.dirname, "../..");
 
 const BASE = {
   GEMINI_API_KEY: "test-key",
@@ -91,5 +99,49 @@ describe("loadEnv", () => {
       CORS_ALLOWED_ORIGINS: "https://user.github.io",
     });
     expect(env.CORS_ALLOWED_ORIGINS).toEqual(["https://user.github.io"]);
+  });
+});
+
+describe("loadAdminEnv", () => {
+  it("needs only the Supabase URL and secret key, not the server's settings", () => {
+    expect(
+      loadAdminEnv({
+        SUPABASE_URL: "https://project.supabase.co",
+        SUPABASE_SECRET_KEY: "sb_secret_test",
+      }),
+    ).toEqual({
+      SUPABASE_URL: "https://project.supabase.co",
+      SUPABASE_SECRET_KEY: "sb_secret_test",
+    });
+  });
+
+  it("names what is missing and never prints values", () => {
+    expect(() =>
+      loadAdminEnv({ SUPABASE_URL: "sb_secret_do_not_print" }),
+    ).toThrow(
+      "Invalid or missing environment variables: SUPABASE_URL, SUPABASE_SECRET_KEY",
+    );
+  });
+});
+
+describe("loadArtifactsDir", () => {
+  it("defaults to apps/api/.artifacts, like the server", () => {
+    expect(loadArtifactsDir({})).toBe(join(API_ROOT, ".artifacts"));
+    expect(loadArtifactsDir({})).toBe(loadEnv(BASE).ARTIFACTS_DIR);
+  });
+
+  it("uses ARTIFACTS_DIR when set", () => {
+    expect(loadArtifactsDir({ ARTIFACTS_DIR: "/tmp/artifacts" })).toBe(
+      "/tmp/artifacts",
+    );
+  });
+});
+
+describe("LOCAL_ENV_FILES", () => {
+  it("reads apps/api/.env first, then the repository's .env.local", () => {
+    expect(LOCAL_ENV_FILES).toEqual([
+      join(API_ROOT, ".env"),
+      join(API_ROOT, "../..", ".env.local"),
+    ]);
   });
 });

@@ -114,6 +114,9 @@ showed no label. Fixed together with the first implementation step.
 
 ## 2. Proposed module and folder structure
 
+> **Status (2026-11-10):** the API layout that shipped is layered, not the
+> `reference-data/domain` tree below: see [apps/api/README.md](../apps/api/README.md).
+
 ```
 packages/domain/src/
   reference/                          # NEW: calculation-facing contract only

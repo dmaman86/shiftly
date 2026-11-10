@@ -1,10 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import { candidateIdentityProblem } from "../../src/reference-data/candidate-identity.ts";
+import { candidateIdentityProblem } from "../../src/services/candidate-identity.ts";
 import type {
   NewCandidate,
   RevisionRepository,
-} from "../../src/reference-data/ports.ts";
-import { storeCandidates } from "../../src/reference-data/store-candidates.ts";
+} from "../../src/ports/reference-data.ts";
+import { storeCandidates } from "../../src/services/store-candidates.ts";
 
 const ELECTION: NewCandidate = {
   kind: "calendar.knesset_election",

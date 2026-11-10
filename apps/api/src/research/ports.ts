@@ -1,5 +1,5 @@
-import type { ExtractionTask } from "../shared/extraction-task.ts";
-import type { ExtractionResult } from "../shared/gemma-extractor.ts";
+import type { ExtractionTask } from "./shared/extraction-task.ts";
+import type { ExtractionResult } from "./shared/gemma-extractor.ts";
 
 /**
  * The research boundary: the model decides what to investigate, the backend

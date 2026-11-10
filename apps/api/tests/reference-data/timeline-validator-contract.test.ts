@@ -4,7 +4,7 @@ import {
   type TimelineEntry,
 } from "@shiftly/domain";
 import { describe, expect, it } from "vitest";
-import { monthlyTimelineProblem } from "../../src/reference-data/published-timelines.ts";
+import { monthlyTimelineProblem } from "../../src/services/published-timelines.ts";
 
 /**
  * The API validates published timelines with a mirror of the domain's

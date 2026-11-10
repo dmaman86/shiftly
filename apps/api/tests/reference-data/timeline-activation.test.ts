@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { RevisionDetails } from "../../src/reference-data/ports.ts";
-import { checkTimelineActivation } from "../../src/reference-data/timeline-activation.ts";
+import type { RevisionDetails } from "../../src/ports/reference-data.ts";
+import { checkTimelineActivation } from "../../src/services/timeline-activation.ts";
 
 const PENDING: RevisionDetails = {
   id: "rev-1",

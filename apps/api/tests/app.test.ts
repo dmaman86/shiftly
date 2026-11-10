@@ -2,7 +2,7 @@ import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createApp, type AppDeps } from "../src/app.ts";
-import { RulesPipelineError } from "../src/shared/errors.ts";
+import { RulesPipelineError } from "../src/research/shared/errors.ts";
 import {
   ADMIN_TOKEN,
   FakeRoles,
