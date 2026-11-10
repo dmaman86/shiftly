@@ -3,16 +3,16 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { adminRepository } from "./admin-repository.ts";
-import { storeCandidates } from "./reference-data/store-candidates.ts";
-import { HttpDocumentFetcher } from "./research/http-document-fetcher.ts";
-import { WaybackArchiveIndex } from "./research/web-archive.ts";
-import { FileDebugArtifactStore } from "./shared/debug-artifacts.ts";
+import { storeCandidates } from "../reference-data/store-candidates.ts";
+import { HttpDocumentFetcher } from "../research/http-document-fetcher.ts";
+import { WaybackArchiveIndex } from "../research/web-archive.ts";
+import { FileDebugArtifactStore } from "../shared/debug-artifacts.ts";
 import {
   researchEmployeeContributions,
   type ContributionsResearchReport,
-} from "./social-security/contributions-research.ts";
-import { CONTRIBUTION_PARAMETERS } from "./social-security/employee-contributions.ts";
-import { KolZchutSocialSecuritySource } from "./social-security/kolzchut-source.ts";
+} from "../social-security/contributions-research.ts";
+import { CONTRIBUTION_PARAMETERS } from "../social-security/employee-contributions.ts";
+import { KolZchutSocialSecuritySource } from "../social-security/kolzchut-source.ts";
 
 /**
  * Researches the employee National Insurance and health insurance parameters
@@ -30,7 +30,7 @@ const { values } = parseArgs({
 
 const artifactsDir =
   process.env.ARTIFACTS_DIR ??
-  fileURLToPath(new URL("../.artifacts", import.meta.url));
+  fileURLToPath(new URL("../../.artifacts", import.meta.url));
 const report = await researchEmployeeContributions({
   fetcher: new HttpDocumentFetcher(),
   archive: new WaybackArchiveIndex(),

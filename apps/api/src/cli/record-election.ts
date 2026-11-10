@@ -4,9 +4,9 @@ import { adminRepository } from "./admin-repository.ts";
 import {
   israelDate,
   planElectionRecord,
-} from "./reference-data/election-record.ts";
-import { storeCandidates } from "./reference-data/store-candidates.ts";
-import { HttpDocumentFetcher } from "./research/http-document-fetcher.ts";
+} from "../reference-data/election-record.ts";
+import { storeCandidates } from "../reference-data/store-candidates.ts";
+import { HttpDocumentFetcher } from "../research/http-document-fetcher.ts";
 
 /**
  * Records one Knesset election from a source an administrator names.

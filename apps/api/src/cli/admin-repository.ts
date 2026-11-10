@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { config as loadDotenv } from "dotenv";
 import { z } from "zod";
-import { SupabaseRevisionRepository } from "./reference-data/supabase-revision-repository.ts";
+import { SupabaseRevisionRepository } from "../reference-data/supabase-revision-repository.ts";
 
 const AdminEnv = z.object({
   SUPABASE_URL: z.url(),
@@ -16,8 +16,8 @@ export function adminRepository(): SupabaseRevisionRepository {
   // Same lookup as server.ts: the first file that defines a variable wins.
   loadDotenv({
     path: [
-      fileURLToPath(new URL("../.env", import.meta.url)),
-      fileURLToPath(new URL("../../../.env.local", import.meta.url)),
+      fileURLToPath(new URL("../../.env", import.meta.url)),
+      fileURLToPath(new URL("../../../../.env.local", import.meta.url)),
     ],
     quiet: true,
   });
