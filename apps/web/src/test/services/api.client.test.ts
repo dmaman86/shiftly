@@ -58,12 +58,26 @@ const transport = (reply: (sent: Sent, index: number) => Reply) => {
   return { adapter, sent };
 };
 
+const USER = "user-1";
+
+/** Sessions of `userId` (or `refreshedUserId` after a refresh) with the given tokens. */
 const tokensOf = (
   current: string | null,
   refreshed: () => Promise<string | null> = async () => null,
+  {
+    userId = USER,
+    refreshedUserId = userId,
+  }: { userId?: string; refreshedUserId?: string } = {},
 ) => ({
-  current: vi.fn<SessionTokens["current"]>(async () => current),
-  refreshed: vi.fn<SessionTokens["refreshed"]>(refreshed),
+  current: vi.fn<SessionTokens["current"]>(async () =>
+    current === null ? null : { accessToken: current, userId },
+  ),
+  refreshed: vi.fn<SessionTokens["refreshed"]>(async () => {
+    const token = await refreshed();
+    return token === null
+      ? null
+      : { accessToken: token, userId: refreshedUserId };
+  }),
 });
 
 const unauthenticated = {
@@ -293,6 +307,62 @@ describe("apiClient", () => {
 
       expect(result).toEqual({ error: "not_found" });
       expect(tokens.refreshed).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("the expected user", () => {
+    it("lets a request through when the session belongs to that user", async () => {
+      const { adapter, sent } = transport(() => ({ status: 204 }));
+
+      const result = await createApiClient(tokensOf("token-1"), {
+        adapter,
+      }).request({
+        method: "PUT",
+        path: "/me/months/2026/9/config",
+        body: { standardHours: 6.67, baseRate: 50 },
+        authenticated: true,
+        expectedUserId: USER,
+      });
+
+      expect(result).toEqual({ data: null });
+      expect(sent[0].authorization).toBe("Bearer token-1");
+      // The expected user is a browser-side guard only: never sent.
+      expect(JSON.stringify(sent[0])).not.toContain(USER);
+    });
+
+    it("never sends a request made for another account than the signed-in one", async () => {
+      const { adapter } = transport(() => ({ status: 204 }));
+
+      const result = await createApiClient(
+        tokensOf("token-2", undefined, { userId: "user-2" }),
+        { adapter },
+      ).request({
+        method: "PUT",
+        path: "/me/months/2026/9/config",
+        body: { standardHours: 6.67, baseRate: 50 },
+        authenticated: true,
+        expectedUserId: USER,
+      });
+
+      expect(result).toEqual({ error: "session_changed" });
+      expect(adapter).not.toHaveBeenCalled();
+    });
+
+    it("does not retry when the refreshed session belongs to someone else", async () => {
+      const { adapter } = transport(acceptingOnly("fresh"));
+      const tokens = tokensOf("expired", async () => "fresh", {
+        refreshedUserId: "user-2",
+      });
+
+      const result = await createApiClient(tokens, { adapter }).request({
+        method: "GET",
+        path: SHIFTS,
+        authenticated: true,
+        expectedUserId: USER,
+      });
+
+      expect(result).toEqual({ error: "session_changed" });
+      expect(adapter).toHaveBeenCalledOnce();
     });
   });
 

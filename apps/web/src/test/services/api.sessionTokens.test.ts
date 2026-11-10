@@ -22,10 +22,13 @@ describe("supabaseSessionTokens", () => {
 
   it("reads the current access token from the Supabase session", async () => {
     getSessionMock.mockResolvedValue({
-      data: { session: { access_token: "token-1" } },
+      data: { session: { access_token: "token-1", user: { id: "user-1" } } },
       error: null,
     });
-    expect(await supabaseSessionTokens.current()).toBe("token-1");
+    expect(await supabaseSessionTokens.current()).toEqual({
+      accessToken: "token-1",
+      userId: "user-1",
+    });
   });
 
   it("has no token when signed out", async () => {
@@ -35,10 +38,13 @@ describe("supabaseSessionTokens", () => {
 
   it("returns the refreshed token", async () => {
     refreshSessionMock.mockResolvedValue({
-      data: { session: { access_token: "token-2" } },
+      data: { session: { access_token: "token-2", user: { id: "user-1" } } },
       error: null,
     });
-    expect(await supabaseSessionTokens.refreshed()).toBe("token-2");
+    expect(await supabaseSessionTokens.refreshed()).toEqual({
+      accessToken: "token-2",
+      userId: "user-1",
+    });
     expect(refreshSessionMock).toHaveBeenCalledOnce();
   });
 

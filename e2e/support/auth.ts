@@ -67,7 +67,6 @@ const SUPABASE_DATA_PATH = /\/(rest|functions|storage|graphql)\/v1\//;
  * to apps/api, and the list must end empty.
  */
 const LEGACY_SUPABASE_DATA = [
-  "/rest/v1/monthly_configs",
   "/rest/v1/work_days",
   "/rest/v1/shifts",
   "/rest/v1/rpc/import_guest_month",
@@ -79,23 +78,12 @@ const isLegacy = (request: Request) => {
   return LEGACY_SUPABASE_DATA.some((path) => pathname.endsWith(path));
 };
 
-export type MonthlyConfigRow = {
-  year: number;
-  month: number;
-  standard_hours: number;
-  base_rate: number;
-  unused_shabbat_credit_hours: number;
-};
-
 /**
  * Records every request for application data in Supabase. Legacy paths are
- * answered from the given rows (writes are accepted and dropped); anything
- * else is aborted and reported, so new direct data access fails the test.
+ * answered empty (writes are accepted and dropped); anything else is aborted
+ * and reported, so new direct data access fails the test.
  */
-export const watchSupabaseData = async (
-  page: Page,
-  { monthlyConfigs = [] }: { monthlyConfigs?: MonthlyConfigRow[] } = {},
-) => {
+export const watchSupabaseData = async (page: Page) => {
   const requests: Request[] = [];
   page.on("request", (request) => {
     if (SUPABASE_DATA_PATH.test(new URL(request.url()).pathname)) {
@@ -108,18 +96,10 @@ export const watchSupabaseData = async (
     if (request.method() !== "GET") {
       return route.fulfill({ status: request.method() === "POST" ? 201 : 204 });
     }
-    const url = new URL(request.url());
-    const rows = url.pathname.endsWith("/monthly_configs")
-      ? monthlyConfigs.filter(
-          (row) =>
-            url.searchParams.get("year") === `eq.${row.year}` &&
-            url.searchParams.get("month") === `eq.${row.month}`,
-        )
-      : [];
     return route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify(rows),
+      body: "[]",
     });
   };
 
@@ -140,5 +120,69 @@ export const watchSupabaseData = async (
       requests.map(
         (request) => `${request.method()} ${new URL(request.url()).pathname}`,
       ),
+  };
+};
+
+/** A month's settings as apps/api returns them. */
+export type MonthlyConfig = {
+  year: number;
+  month: number;
+  standardHours: number;
+  baseRate: number;
+  unusedShabbatCreditHours: number;
+};
+
+/** The build may embed the production API URL (VITE_API_URL): match any host. */
+const MONTH_DATA_ROUTE = /\/me\/months\/(\d+)\/(\d+)\/(config|shabbat-credit)$/;
+
+/**
+ * Answers the signed-in user's data endpoints of apps/api: reads from the
+ * given months, writes accepted and dropped. A request without the E2E
+ * session's token gets the API's 401, as it would in production.
+ */
+export const serveUserData = async (
+  page: Page,
+  { monthlyConfigs = [] }: { monthlyConfigs?: MonthlyConfig[] } = {},
+) => {
+  const requests: string[] = [];
+
+  await page.route(MONTH_DATA_ROUTE, (route) => {
+    const request = route.request();
+    const { pathname } = new URL(request.url());
+    requests.push(`${request.method()} ${pathname}`);
+    if (request.headers()["authorization"] !== `Bearer ${E2E_ACCESS_TOKEN}`) {
+      return route.fulfill({
+        status: 401,
+        contentType: "application/json",
+        body: JSON.stringify({
+          error: { code: "unauthenticated", message: "Sign in required" },
+        }),
+      });
+    }
+    if (request.method() !== "GET") return route.fulfill({ status: 204 });
+
+    const [, year, month] = MONTH_DATA_ROUTE.exec(pathname) ?? [];
+    const saved = monthlyConfigs.find(
+      (config) =>
+        config.year === Number(year) && config.month === Number(month),
+    );
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        config: saved
+          ? {
+              standardHours: saved.standardHours,
+              baseRate: saved.baseRate,
+              unusedShabbatCreditHours: saved.unusedShabbatCreditHours,
+            }
+          : null,
+      }),
+    });
+  });
+
+  return {
+    /** Every request to the user-data endpoints, as "METHOD /path". */
+    all: () => [...requests],
   };
 };
