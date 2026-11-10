@@ -11,7 +11,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=24.0.0 <25"
+    "node": ">=24.22.1 <25"
   },
   "scripts": {
     "dev": "bun run domain:build && vite apps/web --config apps/web/vite.config.ts",
