@@ -1,16 +1,16 @@
 import { Router } from "express";
 import { z } from "zod";
-import { authOf } from "../auth/middleware.ts";
+import { authOf } from "../middleware/auth.ts";
 import {
   calendarDate,
   parseMonthPeriod,
   parseOrThrow,
-} from "./month-period.ts";
-import type { UserDataAccess } from "./user-scope.ts";
+} from "../user-data/month-period.ts";
+import type { UserDataAccess } from "../user-data/user-scope.ts";
 import {
   WORK_DAY_STATUSES,
   workDaysRepository,
-} from "./work-days-repository.ts";
+} from "../user-data/work-days-repository.ts";
 
 const dateParams = z.object({ date: calendarDate });
 

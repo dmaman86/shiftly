@@ -5,7 +5,7 @@ import {
   type AuthenticatedUser,
   type EffectiveRole,
   type RoleRepository,
-} from "./ports.ts";
+} from "../auth/ports.ts";
 
 const BEARER = /^Bearer ([^\s]+)$/;
 

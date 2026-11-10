@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { z } from "zod";
-import { authOf } from "../auth/middleware.ts";
-import { monthlyConfigRepository } from "./monthly-config-repository.ts";
-import { parseMonthPeriod, parseOrThrow } from "./month-period.ts";
-import type { UserDataAccess } from "./user-scope.ts";
+import { authOf } from "../middleware/auth.ts";
+import { monthlyConfigRepository } from "../user-data/monthly-config-repository.ts";
+import { parseMonthPeriod, parseOrThrow } from "../user-data/month-period.ts";
+import type { UserDataAccess } from "../user-data/user-scope.ts";
 
 /** Non-negative like the app's number inputs; finite so NaN never reaches SQL. */
 const amount = z.number().finite().nonnegative();

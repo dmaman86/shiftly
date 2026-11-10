@@ -4,7 +4,7 @@ import {
   type AuthError,
 } from "@supabase/supabase-js";
 import { Router } from "express";
-import { authOf, requireFreshSession } from "../auth/middleware.ts";
+import { authOf, requireFreshSession } from "../middleware/auth.ts";
 import type { AuthVerifier } from "../auth/ports.ts";
 import { UserDataError } from "./errors.ts";
 

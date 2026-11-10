@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { z } from "zod";
-import { authOf } from "../auth/middleware.ts";
+import { authOf } from "../middleware/auth.ts";
 import {
   calendarDate,
   parseMonthPeriod,
   parseOrThrow,
-} from "./month-period.ts";
-import { shiftsRepository } from "./shifts-repository.ts";
-import type { UserDataAccess } from "./user-scope.ts";
+} from "../user-data/month-period.ts";
+import { shiftsRepository } from "../user-data/shifts-repository.ts";
+import type { UserDataAccess } from "../user-data/user-scope.ts";
 
 const idParams = z.object({ id: z.uuid() });
 

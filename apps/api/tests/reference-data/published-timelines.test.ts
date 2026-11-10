@@ -10,7 +10,7 @@ import {
   type PublishedTimelines,
   type PublishedTimelinesReader,
 } from "../../src/reference-data/published-timelines.ts";
-import { publishedTimelinesRouter } from "../../src/reference-data/published-timelines-router.ts";
+import { publishedTimelinesRouter } from "../../src/routes/published-timelines-router.ts";
 import {
   SupabasePublishedTimelinesReader,
   toPublishedTimelines,

@@ -10,7 +10,7 @@ import {
   type PublishedElection,
   type PublishedElectionsReader,
 } from "../../src/reference-data/published-elections.ts";
-import { publishedElectionsRouter } from "../../src/reference-data/published-elections-router.ts";
+import { publishedElectionsRouter } from "../../src/routes/published-elections-router.ts";
 import {
   SupabasePublishedElectionsReader,
   toPublishedElections,

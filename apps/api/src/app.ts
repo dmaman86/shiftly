@@ -1,23 +1,23 @@
 import express, { type ErrorRequestHandler } from "express";
-import { meHandler, requireAdmin, requireAuth } from "./auth/middleware.ts";
+import { meHandler, requireAdmin, requireAuth } from "./middleware/auth.ts";
 import type { AuthVerifier, RoleRepository } from "./auth/ports.ts";
-import { corsAllowlist } from "./http/cors.ts";
-import { handleBodyErrors, jsonBody } from "./http/json-body.ts";
+import { corsAllowlist } from "./middleware/cors.ts";
+import { handleBodyErrors, jsonBody } from "./middleware/json-body.ts";
 import type { ReadinessCheck } from "./http/readiness.ts";
-import { requestLog } from "./http/request-log.ts";
+import { requestLog } from "./middleware/request-log.ts";
 import type { IncomeTaxRulesResult } from "./income-tax/income-tax-pipeline.ts";
 import type { IncomeTaxResearchResponse } from "./income-tax/income-tax-research.ts";
 import type { PublishedElectionsReader } from "./reference-data/published-elections.ts";
-import { publishedElectionsRouter } from "./reference-data/published-elections-router.ts";
+import { publishedElectionsRouter } from "./routes/published-elections-router.ts";
 import type { PublishedTimelinesReader } from "./reference-data/published-timelines.ts";
-import { publishedTimelinesRouter } from "./reference-data/published-timelines-router.ts";
-import { yearRulesRouter } from "./shared/rules-router.ts";
+import { publishedTimelinesRouter } from "./routes/published-timelines-router.ts";
+import { yearRulesRouter } from "./routes/rules-router.ts";
 import { handleUserDataErrors } from "./user-data/errors.ts";
 import { accountRouter, type AccountDeleter } from "./user-data/account.ts";
-import { guestImportRouter } from "./user-data/guest-import-router.ts";
-import { monthlyConfigRouter } from "./user-data/monthly-config-router.ts";
-import { shiftsRouter } from "./user-data/shifts-router.ts";
-import { workDaysRouter } from "./user-data/work-days-router.ts";
+import { guestImportRouter } from "./routes/guest-import-router.ts";
+import { monthlyConfigRouter } from "./routes/monthly-config-router.ts";
+import { shiftsRouter } from "./routes/shifts-router.ts";
+import { workDaysRouter } from "./routes/work-days-router.ts";
 import type { UserDataAccess } from "./user-data/user-scope.ts";
 
 export type AppDeps = {

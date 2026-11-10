@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { z } from "zod";
-import { RulesPipelineError, type RulesPipelineErrorCode } from "./errors.ts";
+import {
+  RulesPipelineError,
+  type RulesPipelineErrorCode,
+} from "../shared/errors.ts";
 
 const yearSchema = z.coerce.number().int().min(2000).max(2100);
 
