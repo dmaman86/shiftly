@@ -48,11 +48,7 @@ describe("profile history loading", () => {
     expect(services.config).toHaveBeenCalledWith("user-1", 2026, 2);
     expect(services.days).toHaveBeenCalledTimes(6);
     expect(services.shifts).toHaveBeenCalledTimes(6);
-    expect(services.days).toHaveBeenCalledWith(
-      "user-1",
-      "2026-03-01",
-      "2026-04-01",
-    );
+    expect(services.days).toHaveBeenCalledWith("user-1", 2026, 3);
     expect(calendar).not.toHaveBeenCalled();
     expect(result.every((month) => month.breakdown === null)).toBe(true);
   });

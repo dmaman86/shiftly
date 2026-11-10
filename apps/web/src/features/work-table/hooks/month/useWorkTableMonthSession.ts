@@ -113,13 +113,9 @@ export const useWorkTableMonthSession = ({
     retry: false,
     queryFn: async (): Promise<PersistedWorkTableRecords> => {
       if (!userId) throw new Error("An authenticated user is required");
-      const { startDate, endDate } = domain.services.dateService.getDatesRange(
-        year,
-        month,
-      );
       const [daysResult, shiftsResult] = await Promise.all([
-        workDayService().fetchForMonth(userId, startDate, endDate).call(),
-        shiftService().fetchForMonth(userId, startDate, endDate).call(),
+        workDayService().fetchForMonth(userId, year, month).call(),
+        shiftService().fetchForMonth(userId, year, month).call(),
       ]);
       if (daysResult.error) throw new Error(daysResult.error);
       if (shiftsResult.error) throw new Error(shiftsResult.error);

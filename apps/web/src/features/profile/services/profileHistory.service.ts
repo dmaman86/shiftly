@@ -48,11 +48,13 @@ export const loadProfileHistory = async (
     signal?.throwIfAborted();
     const batchSnapshots = await Promise.all(
       batch.map(async (period, index) => {
-        const { startDate, endDate } =
-          domain.services.dateService.getDatesRange(period.year, period.month);
         const [daysResult, shiftsResult] = await Promise.all([
-          workDayService().fetchForMonth(userId, startDate, endDate).call(),
-          shiftService().fetchForMonth(userId, startDate, endDate).call(),
+          workDayService()
+            .fetchForMonth(userId, period.year, period.month)
+            .call(),
+          shiftService()
+            .fetchForMonth(userId, period.year, period.month)
+            .call(),
         ]);
         signal?.throwIfAborted();
         if (daysResult.error !== undefined) throw new Error(daysResult.error);

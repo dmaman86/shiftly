@@ -14,6 +14,8 @@ import { publishedTimelinesRouter } from "./reference-data/published-timelines-r
 import { yearRulesRouter } from "./shared/rules-router.ts";
 import { handleUserDataErrors } from "./user-data/errors.ts";
 import { monthlyConfigRouter } from "./user-data/monthly-config-router.ts";
+import { shiftsRouter } from "./user-data/shifts-router.ts";
+import { workDaysRouter } from "./user-data/work-days-router.ts";
 import type { UserDataAccess } from "./user-data/user-scope.ts";
 
 export type AppDeps = {
@@ -86,6 +88,8 @@ export function createApp(deps: AppDeps): express.Express {
     },
     requireAuth(verifier),
     monthlyConfigRouter(deps.userData),
+    workDaysRouter(deps.userData),
+    shiftsRouter(deps.userData),
   );
 
   // Admin only. Extraction and research read public sources, call a paid

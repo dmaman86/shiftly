@@ -25,8 +25,6 @@ const SUPABASE_AUTH_FILES = [
 // Each entry is removed as its data moves to apps/api; never add one.
 const LEGACY_SUPABASE_DATA_FILES = [
   "apps/web/src/services/supabase/supabase.crud.ts",
-  "apps/web/src/services/workDay/workDay.service.ts",
-  "apps/web/src/services/shift/shift.service.ts",
   "apps/web/src/services/guestDraft/guestDraft.service.ts",
   "apps/web/src/services/account/account.service.ts",
 ];

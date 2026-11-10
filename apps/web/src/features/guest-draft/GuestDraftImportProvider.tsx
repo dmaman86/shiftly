@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import {
-  useAppSnackbar,
-  useAuth,
-  useDomain,
-  useFetch,
-  useGlobalState,
-} from "@/hooks";
+import { useAppSnackbar, useAuth, useFetch, useGlobalState } from "@/hooks";
 import {
   analyticsService,
   guestDraftService,
@@ -65,7 +59,6 @@ export const GuestDraftImportProvider = ({
 }: GuestDraftImportProviderProps) => {
   const { t } = useTranslation();
   const { user, isLoading: isAuthLoading } = useAuth();
-  const { services } = useDomain();
   const { selectMonth } = useGlobalState();
   const { callEndPoint } = useFetch();
   const snackbar = useAppSnackbar();
@@ -120,14 +113,12 @@ export const GuestDraftImportProvider = ({
       dialog: GuestDraftDialogMode | null = null,
     ) => {
       setState({ status: "checking", draft, dialog });
-      const { startDate, endDate } = services.dateService.getDatesRange(
-        draft.year,
-        draft.month,
-      );
       const [shiftsResult, daysResult] = await Promise.all([
-        callEndPoint(shiftService().fetchForMonth(ownerId, startDate, endDate)),
         callEndPoint(
-          workDayService().fetchForMonth(ownerId, startDate, endDate),
+          shiftService().fetchForMonth(ownerId, draft.year, draft.month),
+        ),
+        callEndPoint(
+          workDayService().fetchForMonth(ownerId, draft.year, draft.month),
         ),
       ]);
       const error = shiftsResult.error ?? daysResult.error;
@@ -148,7 +139,7 @@ export const GuestDraftImportProvider = ({
 
       setState({ status: "confirming", draft, savedShiftCount });
     },
-    [callEndPoint, fail, runImport, services],
+    [callEndPoint, fail, runImport],
   );
 
   const pendingDraft = state.status === "pending" ? state.draft : null;

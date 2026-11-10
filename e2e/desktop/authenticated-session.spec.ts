@@ -19,6 +19,16 @@ test("a signed-in user's month loads from their saved data", async ({
         unusedShabbatCreditHours: 0,
       },
     ],
+    workDays: [{ date: "2026-09-02", status: "sick" }],
+    shifts: [
+      {
+        id: "00000000-0000-4000-8000-0000000000f1",
+        date: "2026-09-01",
+        startTime: "2026-09-01T05:00:00+00:00",
+        endTime: "2026-09-01T13:00:00+00:00",
+        isDuty: false,
+      },
+    ],
   });
 
   await page.goto("en/daily");
@@ -26,11 +36,17 @@ test("a signed-in user's month loads from their saved data", async ({
   await expect(page.getByRole("button", { name: "Sign out" })).toBeVisible();
   await expect(page.locator('input[name="baseRate"]')).toHaveValue("57.5");
 
-  // The saved month came from apps/api; Supabase is reached only through
-  // paths still being migrated.
-  expect(userData.all()).toContain("GET /me/months/2026/9/config");
-  expect(supabaseData.all()).not.toContain("GET /rest/v1/monthly_configs");
-  expect(supabaseData.unexpected()).toEqual([]);
+  // The saved month came from apps/api; Supabase is never asked for it.
+  await expect
+    .poll(() => userData.all())
+    .toEqual(
+      expect.arrayContaining([
+        "GET /me/months/2026/9/config",
+        "GET /me/months/2026/9/work-days",
+        "GET /me/months/2026/9/shifts",
+      ]),
+    );
+  expect(supabaseData.all()).toEqual([]);
 });
 
 test("a guest never asks Supabase for application data", async ({ page }) => {

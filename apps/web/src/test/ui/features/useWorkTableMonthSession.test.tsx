@@ -228,8 +228,8 @@ describe("useWorkTableMonthSession", () => {
 
     expect(workDayServiceMock.fetchForMonth).toHaveBeenCalledWith(
       "user-1",
-      "2026-08-01",
-      "2026-09-01",
+      2026,
+      8,
     );
     expect(await screen.findByText("2026-08-10:sick:1")).toBeInTheDocument();
   });
@@ -350,8 +350,8 @@ describe("useWorkTableMonthSession", () => {
     expect(await screen.findByText("2026-08-10:normal:0")).toBeInTheDocument();
     expect(workDayServiceMock.fetchForMonth).toHaveBeenLastCalledWith(
       "user-2",
-      "2026-08-01",
-      "2026-09-01",
+      2026,
+      8,
     );
   });
 

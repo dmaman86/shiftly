@@ -67,8 +67,6 @@ const SUPABASE_DATA_PATH = /\/(rest|functions|storage|graphql)\/v1\//;
  * to apps/api, and the list must end empty.
  */
 const LEGACY_SUPABASE_DATA = [
-  "/rest/v1/work_days",
-  "/rest/v1/shifts",
   "/rest/v1/rpc/import_guest_month",
   "/functions/v1/delete-account",
 ];
@@ -132,21 +130,73 @@ export type MonthlyConfig = {
   unusedShabbatCreditHours: number;
 };
 
+/** A marked day as apps/api returns it. */
+export type WorkDay = { date: string; status: "vacation" | "sick" };
+
+/** A shift as apps/api returns it. */
+export type Shift = {
+  id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  isDuty: boolean;
+};
+
 /** The build may embed the production API URL (VITE_API_URL): match any host. */
-const MONTH_DATA_ROUTE = /\/me\/months\/(\d+)\/(\d+)\/(config|shabbat-credit)$/;
+const USER_DATA_ROUTE = /\/me\/(months|work-days|shifts)\//;
+const MONTH_READ = /\/me\/months\/(\d+)\/(\d+)\/(config|work-days|shifts)$/;
+
+const inMonth = (date: string, year: number, month: number) =>
+  date.startsWith(`${year}-${String(month).padStart(2, "0")}-`);
 
 /**
  * Answers the signed-in user's data endpoints of apps/api: reads from the
- * given months, writes accepted and dropped. A request without the E2E
+ * given rows, writes accepted and dropped. A request without the E2E
  * session's token gets the API's 401, as it would in production.
  */
 export const serveUserData = async (
   page: Page,
-  { monthlyConfigs = [] }: { monthlyConfigs?: MonthlyConfig[] } = {},
+  {
+    monthlyConfigs = [],
+    workDays = [],
+    shifts = [],
+  }: {
+    monthlyConfigs?: MonthlyConfig[];
+    workDays?: WorkDay[];
+    shifts?: Shift[];
+  } = {},
 ) => {
   const requests: string[] = [];
 
-  await page.route(MONTH_DATA_ROUTE, (route) => {
+  const readMonth = (pathname: string) => {
+    const [, rawYear, rawMonth, resource] = MONTH_READ.exec(pathname) ?? [];
+    const year = Number(rawYear);
+    const month = Number(rawMonth);
+    if (resource === "work-days") {
+      return {
+        workDays: workDays.filter((day) => inMonth(day.date, year, month)),
+      };
+    }
+    if (resource === "shifts") {
+      return {
+        shifts: shifts.filter((shift) => inMonth(shift.date, year, month)),
+      };
+    }
+    const saved = monthlyConfigs.find(
+      (config) => config.year === year && config.month === month,
+    );
+    return {
+      config: saved
+        ? {
+            standardHours: saved.standardHours,
+            baseRate: saved.baseRate,
+            unusedShabbatCreditHours: saved.unusedShabbatCreditHours,
+          }
+        : null,
+    };
+  };
+
+  await page.route(USER_DATA_ROUTE, (route) => {
     const request = route.request();
     const { pathname } = new URL(request.url());
     requests.push(`${request.method()} ${pathname}`);
@@ -160,24 +210,10 @@ export const serveUserData = async (
       });
     }
     if (request.method() !== "GET") return route.fulfill({ status: 204 });
-
-    const [, year, month] = MONTH_DATA_ROUTE.exec(pathname) ?? [];
-    const saved = monthlyConfigs.find(
-      (config) =>
-        config.year === Number(year) && config.month === Number(month),
-    );
     return route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({
-        config: saved
-          ? {
-              standardHours: saved.standardHours,
-              baseRate: saved.baseRate,
-              unusedShabbatCreditHours: saved.unusedShabbatCreditHours,
-            }
-          : null,
-      }),
+      body: JSON.stringify(readMonth(pathname)),
     });
   });
 
