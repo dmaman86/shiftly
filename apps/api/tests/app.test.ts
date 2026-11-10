@@ -7,6 +7,7 @@ import {
   ADMIN_TOKEN,
   FakeRoles,
   FakeVerifier,
+  NO_ACCOUNTS,
   NO_USER_DATA,
 } from "./auth/fakes.ts";
 
@@ -30,6 +31,7 @@ async function start(
     },
     auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
     userData: NO_USER_DATA,
+    accounts: NO_ACCOUNTS,
     extractIncomeTaxRules: extract as AppDeps["extractIncomeTaxRules"],
     researchIncomeTax: research as AppDeps["researchIncomeTax"],
   });

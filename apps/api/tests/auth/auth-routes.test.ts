@@ -7,6 +7,7 @@ import {
   ADMIN_TOKEN,
   FakeRoles,
   FakeVerifier,
+  NO_ACCOUNTS,
   NO_USER_DATA,
   USER_ID,
   USER_TOKEN,
@@ -38,6 +39,7 @@ async function start() {
     },
     auth: { verifier, roles },
     userData: NO_USER_DATA,
+    accounts: NO_ACCOUNTS,
     extractIncomeTaxRules: pipeline,
     researchIncomeTax: pipeline,
   } as Parameters<typeof createApp>[0]);

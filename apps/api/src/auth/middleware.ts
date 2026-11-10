@@ -75,6 +75,27 @@ export function requireAdmin(
   };
 }
 
+/**
+ * For irreversible actions, after requireAuth: revalidates the user and
+ * session with the Auth server, so a token that was signed out, or whose user
+ * was deleted, fails even before it expires. Rejected → 401; cannot decide →
+ * 503, and the action does not run.
+ */
+export const requireFreshSession =
+  (verifier: AuthVerifier): RequestHandler =>
+  async (_req, res, next) => {
+    try {
+      const session = await verifier.revalidate(authOf(res));
+      if (session.status === "rejected") {
+        unauthenticated(res, session.reason);
+        return;
+      }
+      next();
+    } catch (error) {
+      unavailableOrThrow(res, error, "authentication_unavailable");
+    }
+  };
+
 /** GET /me: the caller's effective roles, for UI visibility only. */
 export function meHandler(roles: RoleRepository): RequestHandler {
   return async (_req, res) => {

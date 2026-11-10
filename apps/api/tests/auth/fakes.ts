@@ -61,3 +61,10 @@ export const NO_USER_DATA: AppDeps["userData"] = {
     throw new Error("this test does not expect user-data access");
   },
 };
+
+/** For apps whose tests never delete an account: any use fails loudly. */
+export const NO_ACCOUNTS: AppDeps["accounts"] = {
+  deleteUser: () => {
+    throw new Error("this test does not expect an account deletion");
+  },
+};

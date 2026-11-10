@@ -3,7 +3,12 @@ import type { Server } from "node:http";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createApp, type AppDeps } from "../../src/app.ts";
 import { SupabaseReadinessCheck } from "../../src/http/readiness.ts";
-import { FakeRoles, FakeVerifier, NO_USER_DATA } from "../auth/fakes.ts";
+import {
+  FakeRoles,
+  FakeVerifier,
+  NO_ACCOUNTS,
+  NO_USER_DATA,
+} from "../auth/fakes.ts";
 
 const WEB_ORIGIN = "https://web.example";
 
@@ -23,6 +28,7 @@ async function start(ready = true) {
     },
     auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
     userData: NO_USER_DATA,
+    accounts: NO_ACCOUNTS,
     extractIncomeTaxRules: unused as AppDeps["extractIncomeTaxRules"],
     researchIncomeTax: unused as AppDeps["researchIncomeTax"],
   });
