@@ -24,11 +24,11 @@ export type KindCoverage =
       readonly reason: string;
     };
 
-export async function yearCoverage(
+export const yearCoverage = async (
   repository: RevisionRepository | null,
   kinds: readonly ReferenceKind[],
   year: number,
-): Promise<KindCoverage[]> {
+): Promise<KindCoverage[]> => {
   if (repository === null) {
     return kinds.map((kind) => ({
       kind,
@@ -58,15 +58,15 @@ export async function yearCoverage(
       }
     }),
   );
-}
+};
 
 /** Kinds that still need research for the year. */
-export function uncoveredKinds(
+export const uncoveredKinds = (
   coverage: readonly KindCoverage[],
-): Set<ReferenceKind> {
+): Set<ReferenceKind> => {
   return new Set(
     coverage
       .filter((entry) => entry.status !== "covered")
       .map((entry) => entry.kind),
   );
-}
+};

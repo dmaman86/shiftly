@@ -3,7 +3,7 @@
  * skipped. A row may put its cells on one line ("| a || b") or one per line
  * ("| a" then "| b"); both forms produce the same cells.
  */
-export function wikitextTableRows(text: string): string[][] {
+export const wikitextTableRows = (text: string): string[][] => {
   const rows: string[][] = [];
   let current: string[] = [];
   const flush = () => {
@@ -26,14 +26,14 @@ export function wikitextTableRows(text: string): string[][] {
   }
   flush();
   return rows;
-}
+};
 
 /**
  * Rewrites one-cell-per-line rows as one row per line ("| a || b"), which is
  * equivalent wikitext. With a cell per line the model loses track of which row
  * a value belongs to (seen live: the 31% row came back as 14%).
  */
-export function joinRowCells(text: string): string {
+export const joinRowCells = (text: string): string => {
   const lines: string[] = [];
   let cells: string[] = [];
   const flush = () => {
@@ -61,26 +61,26 @@ export function joinRowCells(text: string): string {
   }
   flush();
   return lines.join("\n");
-}
+};
 
 /** Drops the parts of a template page that are not transcluded. */
-export function stripNoinclude(wikitext: string): string {
+export const stripNoinclude = (wikitext: string): string => {
   return wikitext.replace(/<noinclude>[\s\S]*?<\/noinclude>/g, "");
-}
+};
 
 /**
  * The level-2 section ("== … ==") whose heading satisfies `matches`, up to the
  * next level-2 heading; deeper headings stay inside it. Null when no heading
  * matches.
  */
-export function wikitextSection(
+export const wikitextSection = (
   wikitext: string,
   matches: (heading: string) => boolean,
-): string | null {
+): string | null => {
   const lines = wikitext.split("\n");
   const isLevel2 = (line: string) => /^==[^=]/.test(line);
   const start = lines.findIndex((line) => isLevel2(line) && matches(line));
   if (start === -1) return null;
   const next = lines.findIndex((line, i) => i > start && isLevel2(line));
   return lines.slice(start, next === -1 ? undefined : next).join("\n");
-}
+};

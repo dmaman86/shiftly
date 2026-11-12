@@ -45,31 +45,31 @@ export type CreditPointRow = z.infer<
  * structure, internal consistency, and that every value is literally present
  * in the table row and cell it was supposed to come from.
  */
-export function validateBracketExtraction(
+export const validateBracketExtraction = (
   raw: unknown,
   sourceText: string,
-): MonthlyTaxBracket[] {
+): MonthlyTaxBracket[] => {
   const { monthlyBrackets } = parseComplete(bracketExtractionSchema, raw);
   failOn([
     ...consistencyProblems(monthlyBrackets),
     ...bracketGroundingProblems(monthlyBrackets, sourceText),
   ]);
   return monthlyBrackets;
-}
+};
 
-export function validateCreditPointExtraction(
+export const validateCreditPointExtraction = (
   raw: unknown,
   sourceText: string,
-): CreditPointRow[] {
+): CreditPointRow[] => {
   const { rows } = parseComplete(creditPointExtractionSchema, raw);
   failOn(creditPointGroundingProblems(rows, sourceText));
   return rows;
-}
+};
 
 /** Brackets are contiguous from 0, open-ended only at the top, with rising rates. */
-export function consistencyProblems(
+export const consistencyProblems = (
   brackets: readonly MonthlyTaxBracket[],
-): string[] {
+): string[] => {
   const problems: string[] = [];
   if (brackets[0].minIncome !== 0)
     problems.push("first bracket must start at 0");
@@ -99,7 +99,7 @@ export function consistencyProblems(
     }
   });
   return problems;
-}
+};
 
 /**
  * Row-level grounding: bracket i must come from data row i of the table, its
@@ -107,10 +107,10 @@ export function consistencyProblems(
  * values one by one is not enough: a merged or skipped row still uses only
  * numbers that exist somewhere in the table.
  */
-function bracketGroundingProblems(
+const bracketGroundingProblems = (
   brackets: readonly MonthlyTaxBracket[],
   sourceText: string,
-): string[] {
+): string[] => {
   const rows = wikitextTableRows(sourceText).filter((cells) =>
     /\d%/.test(cells[0] ?? ""),
   );
@@ -142,13 +142,13 @@ function bracketGroundingProblems(
     }
   });
   return problems;
-}
+};
 
 /** Row i must hold year i in its first cell and the monthly value in its second. */
-function creditPointGroundingProblems(
+const creditPointGroundingProblems = (
   rows: readonly CreditPointRow[],
   sourceText: string,
-): string[] {
+): string[] => {
   const tableRows = wikitextTableRows(sourceText).filter((cells) =>
     /^'*\d{4}'*$/.test(cells[0] ?? ""),
   );
@@ -171,4 +171,4 @@ function creditPointGroundingProblems(
     }
   });
   return problems;
-}
+};

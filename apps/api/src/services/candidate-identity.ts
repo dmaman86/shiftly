@@ -14,9 +14,9 @@ const SUBJECT_FORMATS: Partial<Record<ReferenceKind, RegExp>> = {
 };
 
 /** Why the candidate's subjectKey does not fit its kind; null when it does. */
-export function candidateIdentityProblem(
+export const candidateIdentityProblem = (
   candidate: Pick<NewCandidate, "kind" | "subjectKey">,
-): string | null {
+): string | null => {
   const format = SUBJECT_FORMATS[candidate.kind];
   if (format === undefined) {
     return candidate.subjectKey === null
@@ -29,4 +29,4 @@ export function candidateIdentityProblem(
   return format.test(candidate.subjectKey)
     ? null
     : `${candidate.kind} subjectKey ${candidate.subjectKey} does not match ${format}`;
-}
+};

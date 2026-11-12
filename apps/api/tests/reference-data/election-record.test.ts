@@ -35,10 +35,10 @@ const PLANNED_26: ActiveRevision = {
   trust: "legacy_seed",
 };
 
-function document(
+const document = (
   accessibility: Accessibility,
   overrides: Partial<FetchedDocument> = {},
-): FetchedDocument {
+): FetchedDocument => {
   const accessible = accessibility === "accessible";
   return {
     requestedUrl: OFFICIAL,
@@ -56,16 +56,16 @@ function document(
     bytes: null,
     ...overrides,
   };
-}
+};
 
-function plan(
+const plan = (
   request: Partial<ElectionRecordRequest>,
   options: {
     fetched?: FetchedDocument;
     active?: ActiveRevision | null;
     today?: string;
   } = {},
-) {
+) => {
   const fetch = vi.fn(async () => options.fetched ?? document("accessible"));
   const findActiveSubject = vi.fn(async () => options.active ?? null);
   const result = planElectionRecord(
@@ -77,7 +77,7 @@ function plan(
     },
   );
   return { result, fetch, findActiveSubject };
-}
+};
 
 describe("planElectionRecord", () => {
   describe("with an official source that confirms it", () => {

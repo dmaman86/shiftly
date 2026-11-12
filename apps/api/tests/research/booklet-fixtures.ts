@@ -69,9 +69,9 @@ export const ANSWER_2026 = {
   },
 };
 
-export function fetchedDocument(
+export const fetchedDocument = (
   overrides: Partial<FetchedDocument> = {},
-): FetchedDocument {
+): FetchedDocument => {
   return {
     requestedUrl: BOOKLET_URL,
     finalUrl: BOOKLET_URL,
@@ -88,4 +88,4 @@ export function fetchedDocument(
     bytes: null,
     ...overrides,
   };
-}
+};

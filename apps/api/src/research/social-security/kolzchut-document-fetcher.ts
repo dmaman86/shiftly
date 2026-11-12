@@ -84,14 +84,14 @@ export class KolZchutDocumentFetcher implements DocumentFetcher {
   }
 }
 
-function accessibilityOf(
+const accessibilityOf = (
   error: RulesPipelineError,
   status: unknown,
-): Accessibility {
+): Accessibility => {
   if (typeof status === "number" && BLOCKED_STATUSES.has(status)) {
     return "blocked";
   }
   if (error.code === "year_not_covered") return "not_found";
   if (error.code === "source_format_changed") return "unsupported_content";
   return "error";
-}
+};

@@ -5,10 +5,10 @@ import { RulesPipelineError } from "./errors.ts";
 export const extractionStatus = z.enum(["complete", "unclear"]);
 
 /** Parses a model answer and stops unless the model reported it as complete. */
-export function parseComplete<T extends { status: "complete" | "unclear" }>(
+export const parseComplete = <T extends { status: "complete" | "unclear" }>(
   schema: z.ZodType<T>,
   raw: unknown,
-): T {
+): T => {
   const parsed = schema.safeParse(raw);
   if (!parsed.success) {
     throw new RulesPipelineError(
@@ -24,9 +24,9 @@ export function parseComplete<T extends { status: "complete" | "unclear" }>(
     );
   }
   return parsed.data;
-}
+};
 
-export function failOn(problems: readonly string[]): void {
+export const failOn = (problems: readonly string[]): void => {
   if (problems.length > 0) {
     throw new RulesPipelineError(
       "invalid_extraction",
@@ -34,4 +34,4 @@ export function failOn(problems: readonly string[]): void {
       { problems },
     );
   }
-}
+};

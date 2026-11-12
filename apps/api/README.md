@@ -11,7 +11,8 @@ src/
 ├── app.ts          HTTP composition: middleware order and route mounting
 ├── config/         Environment parsing
 ├── middleware/     CORS, JSON body, request log, authentication
-├── routes/         Express routers: parse the request, call a service or repository, answer
+├── routes/         Express routers: path, method and middleware → controller handler
+├── controllers/    Request handlers: validate the request, call a service or repository, answer
 ├── services/       Business rules: month periods, election and timeline activation, published data
 ├── ports/          Interfaces the services depend on (auth, reference-data revisions)
 ├── repositories/   Supabase adapters: UserScope, user-data tables, revisions, Auth admin
@@ -25,7 +26,7 @@ src/
 Arrows point from the caller to what it may import:
 
 ```
-cli, server ──▶ app ──▶ middleware, routes ──▶ services ──▶ ports ◀── repositories
+cli, server ──▶ app ──▶ middleware, routes ──▶ controllers ──▶ services ──▶ ports ◀── repositories
 ```
 
 - `services/` and `ports/` never import Express or the Supabase SDK.
@@ -33,8 +34,11 @@ cli, server ──▶ app ──▶ middleware, routes ──▶ services ──
 - User-owned tables (`monthly_configs`, `work_days`, `shifts`) and `api_*`
   functions are reached only through `repositories/user-scope.ts`, which pins
   every query to the verified caller. ESLint enforces it.
-- Route handlers stay thin. A `controllers/` layer is not used: handlers are a
-  few lines each, so a separate layer would only add indirection.
+- Routers only map a path, a method and its middleware to a handler, so each
+  one reads as an index of its routes. Handlers live in `controllers/`.
+- A controller is a factory that receives its dependencies
+  (`shiftsController(access)`) and returns its handlers. Handlers never import
+  a singleton, so `createApp(deps)` and the tests keep injecting fakes.
 
 ## Commands
 

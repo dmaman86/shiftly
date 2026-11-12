@@ -98,9 +98,9 @@ const parseEnv = <T>(schema: z.ZodType<T>, source: NodeJS.ProcessEnv): T => {
 };
 
 /** The server's settings. Fails fast at boot. */
-export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
+export const loadEnv = (source: NodeJS.ProcessEnv = process.env): Env => {
   return parseEnv(envSchema, source);
-}
+};
 
 /** The admin commands' settings: only what they use, nothing the server needs. */
 export const loadAdminEnv = (

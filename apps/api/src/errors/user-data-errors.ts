@@ -72,7 +72,7 @@ const UNAVAILABLE_STATUSES = new Set([0, 502, 503, 504]);
  * the secret key sees every row and only the repository knows that a row
  * missing from the caller's scope is "not yours or not there".
  */
-export function userDataErrorFrom(failure: PostgrestFailure): UserDataError {
+export const userDataErrorFrom = (failure: PostgrestFailure): UserDataError => {
   const { status, error } = failure;
   const sourceCode = error.code || undefined;
   const as = (code: UserDataErrorCode) =>
@@ -92,7 +92,7 @@ export function userDataErrorFrom(failure: PostgrestFailure): UserDataError {
     return as("data_unavailable");
   }
   return as("internal_error");
-}
+};
 
 /** Answers a UserDataError thrown by a user-data route; anything else goes on. */
 export const handleUserDataErrors: ErrorRequestHandler = (

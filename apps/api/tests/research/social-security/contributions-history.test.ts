@@ -80,7 +80,7 @@ describe("thresholds change-point table", () => {
   });
 
   it("reports a page without the table as unclear", () => {
-    expect(() => read("דף אחר")).toThrowError(
+    expect(() => read("דף אחר")).toThrow(
       expect.objectContaining({ code: "extraction_unclear" }) as Error,
     );
   });

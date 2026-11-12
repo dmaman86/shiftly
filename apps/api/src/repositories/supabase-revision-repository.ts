@@ -136,7 +136,7 @@ export class SupabaseRevisionRepository
       .gte("valid_from", from)
       .lt("valid_from", until)
       .order("valid_from")
-      .returns<CurrentRevisionRow[]>();
+      .overrideTypes<CurrentRevisionRow[], { merge: false }>();
     if (error) {
       throw new ReferenceDataPersistenceError(
         `reading current ${kind} revisions failed: ${error.message}`,

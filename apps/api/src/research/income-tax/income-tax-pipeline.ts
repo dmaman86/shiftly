@@ -42,10 +42,10 @@ export type IncomeTaxRulesResult = {
  * that year (or the latest earlier one). Each step either succeeds or stops
  * the run with a RulesPipelineError.
  */
-export async function extractIncomeTaxRules(
+export const extractIncomeTaxRules = async (
   year: number,
   deps: IncomeTaxPipelineDeps,
-): Promise<IncomeTaxRulesResult> {
+): Promise<IncomeTaxRulesResult> => {
   const index = await deps.source.bracketTableIndex();
   const table = resolveForYear(
     index.entries.map((entry) => ({ ...entry, value: entry.title })),
@@ -125,4 +125,4 @@ export async function extractIncomeTaxRules(
     await artifacts.write("result.json", JSON.stringify(result, null, 2));
     return result;
   });
-}
+};

@@ -198,7 +198,7 @@ export default defineConfig(
                 "Services and ports stay framework-free: depend on a port and implement it in src/repositories.",
             },
             {
-              regex: "(^|/)(repositories|routes|middleware|cli)/",
+              regex: "(^|/)(repositories|controllers|routes|middleware|cli)/",
               message:
                 "Services and ports cannot import adapters or HTTP code; the dependency points the other way.",
             },

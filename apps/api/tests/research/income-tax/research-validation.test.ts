@@ -44,7 +44,7 @@ describe("validateIncomeTaxResearch", () => {
   });
 
   it("stops when the extractor reports the document as unclear", () => {
-    expect(() => validate({ ...ANSWER_2026, status: "unclear" })).toThrowError(
+    expect(() => validate({ ...ANSWER_2026, status: "unclear" })).toThrow(
       expect.objectContaining({ code: "extraction_unclear" }),
     );
   });
@@ -52,21 +52,19 @@ describe("validateIncomeTaxResearch", () => {
   it("rejects a quote that is not in the fetched content", () => {
     expect(() =>
       validate(withCreditPoint({ quote: "נקודת זיכוי 33 א 249 לחודש" })),
-    ).toThrowError(
+    ).toThrow(
       problems("monthlyCreditPoint: the quote is not in the fetched content"),
     );
   });
 
   it("rejects a quote too short to prove anything", () => {
-    expect(() =>
-      validate(withCreditPoint({ quote: "242 לחודש" })),
-    ).toThrowError(
+    expect(() => validate(withCreditPoint({ quote: "242 לחודש" }))).toThrow(
       problems("monthlyCreditPoint: the quote is not in the fetched content"),
     );
   });
 
   it("rejects a value that is not in its quote", () => {
-    expect(() => validate(withCreditPoint({ value: 235 }))).toThrowError(
+    expect(() => validate(withCreditPoint({ value: 235 }))).toThrow(
       problems("monthlyCreditPoint: 235 is not in its quote"),
     );
   });
@@ -74,7 +72,7 @@ describe("validateIncomeTaxResearch", () => {
   it("rejects a source reference to another page", () => {
     expect(() =>
       validate(withCreditPoint({ sourceReference: "page 11" })),
-    ).toThrowError(
+    ).toThrow(
       problems(
         'monthlyCreditPoint: sourceReference "page 11" but the quote is on page 12',
       ),
@@ -87,7 +85,7 @@ describe("validateIncomeTaxResearch", () => {
       { minIncome: 10061, maxIncome: 25100, taxRate: 0.31 },
       ...BRACKETS_2026.slice(4),
     ];
-    expect(() => validate(withBrackets({ brackets: merged }))).toThrowError(
+    expect(() => validate(withBrackets({ brackets: merged }))).toThrow(
       problems(
         "bracket 2 (10061–25100 at 0.31) is not a row of its quote, in order",
       ),
@@ -100,9 +98,7 @@ describe("validateIncomeTaxResearch", () => {
       { minIncome: 25101, maxIncome: 46690, taxRate: 0.35 },
       { minIncome: 46691, maxIncome: null, taxRate: 0.47 },
     ];
-    expect(() =>
-      validate(withBrackets({ brackets: nonExertion })),
-    ).toThrowError(
+    expect(() => validate(withBrackets({ brackets: nonExertion }))).toThrow(
       problems("3 brackets is implausible", "first rate 0.31 is implausible"),
     );
   });
@@ -110,7 +106,7 @@ describe("validateIncomeTaxResearch", () => {
   it("rejects an effective date outside the requested year", () => {
     expect(() =>
       validate(withBrackets({ effectiveFrom: "2025-01-01" })),
-    ).toThrowError(
+    ).toThrow(
       problems("monthlyBrackets: effectiveFrom 2025-01-01 is not in 2026"),
     );
   });
@@ -118,7 +114,7 @@ describe("validateIncomeTaxResearch", () => {
   it("rejects an effective date that does not exist", () => {
     expect(() =>
       validate(withCreditPoint({ effectiveFrom: "2026-02-30" })),
-    ).toThrowError(
+    ).toThrow(
       problems("monthlyCreditPoint: effectiveFrom 2026-02-30 is not a date"),
     );
   });
@@ -127,13 +123,13 @@ describe("validateIncomeTaxResearch", () => {
     const document = fetchedDocument({
       text: fetchedDocument().text.replace("לשנת 2026", "לשנת המס"),
     });
-    expect(() => validate(ANSWER_2026, document)).toThrowError(
+    expect(() => validate(ANSWER_2026, document)).toThrow(
       problems("the document never mentions 2026"),
     );
   });
 
   it("rejects fields the schema does not define", () => {
-    expect(() => validate({ ...ANSWER_2026, surtaxRate: 0.03 })).toThrowError(
+    expect(() => validate({ ...ANSWER_2026, surtaxRate: 0.03 })).toThrow(
       expect.objectContaining({ code: "invalid_extraction" }),
     );
   });

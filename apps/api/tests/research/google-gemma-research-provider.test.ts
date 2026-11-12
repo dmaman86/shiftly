@@ -18,7 +18,7 @@ const answer = (patch: Partial<SearchAnswer> = {}): SearchAnswer => ({
 const providerError = (status: number, message = `HTTP ${status}`) =>
   Object.assign(new Error(message), { status });
 
-function providerWith(...outcomes: (SearchAnswer | Error)[]) {
+const providerWith = (...outcomes: (SearchAnswer | Error)[]) => {
   const generate = vi.fn(async () => {
     const next = outcomes.shift()!;
     if (next instanceof Error) throw next;
@@ -36,7 +36,7 @@ function providerWith(...outcomes: (SearchAnswer | Error)[]) {
     sleep,
   });
   return { provider, generate, resolveRedirect, sleep };
-}
+};
 
 describe("GoogleGemmaResearchProvider", () => {
   it("takes URLs from the search metadata and resolves search redirects", async () => {

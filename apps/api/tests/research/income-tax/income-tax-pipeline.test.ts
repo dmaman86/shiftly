@@ -42,7 +42,7 @@ const traceFor = (
 
 const SOURCE_KEY = "42998646-41634061";
 
-function setup(extract?: Extractor["extract"]) {
+const setup = (extract?: Extractor["extract"]) => {
   const written = new Map<string, string>();
   const artifacts: DebugArtifactStore = {
     forDocument: async (year, sourceKey) => ({
@@ -62,7 +62,7 @@ function setup(extract?: Extractor["extract"]) {
   };
   const deps = { source: fakeSource(), extractor, artifacts };
   return { deps, written, extractor };
-}
+};
 
 const citation = (title: string, revisionId: number) => ({
   url: `https://he.wikipedia.org/w/index.php?oldid=${revisionId}`,

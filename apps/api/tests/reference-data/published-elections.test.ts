@@ -95,7 +95,7 @@ describe("SupabasePublishedElectionsReader", () => {
       headers: { "content-type": "application/json" },
     });
 
-  function readerWith(response: Response) {
+  const readerWith = (response: Response) => {
     const fetch = vi.fn<typeof globalThis.fetch>(async () => response.clone());
     const reader = new SupabasePublishedElectionsReader({
       url: "https://project.supabase.co",
@@ -110,7 +110,7 @@ describe("SupabasePublishedElectionsReader", () => {
       };
     };
     return { reader, sent };
-  }
+  };
 
   it("reads only active elections starting in the year, period and value only", async () => {
     const { reader, sent } = readerWith(
@@ -143,7 +143,7 @@ describe("SupabasePublishedElectionsReader", () => {
 });
 
 describe("CachedPublishedElectionsReader", () => {
-  function setup() {
+  const setup = () => {
     let now = 0;
     const inner = { electionsIn: vi.fn(async () => [ELECTION_26]) };
     const cached = new CachedPublishedElectionsReader(inner, {
@@ -151,7 +151,7 @@ describe("CachedPublishedElectionsReader", () => {
       now: () => now,
     });
     return { inner, cached, advance: (ms: number) => (now += ms) };
-  }
+  };
 
   it("serves a year from memory until it expires", async () => {
     const { inner, cached, advance } = setup();
@@ -198,7 +198,7 @@ describe("GET /reference/elections", () => {
     vi.restoreAllMocks();
   });
 
-  async function start(reader: PublishedElectionsReader) {
+  const start = async (reader: PublishedElectionsReader) => {
     const app = express();
     app.use(
       "/reference",
@@ -208,7 +208,7 @@ describe("GET /reference/elections", () => {
     await new Promise((resolve) => server!.once("listening", resolve));
     const { port } = server.address() as AddressInfo;
     return (path: string) => fetch(`http://127.0.0.1:${port}${path}`);
-  }
+  };
 
   it("publishes the year's elections without a token, cacheable for five minutes", async () => {
     const request = await start({ electionsIn: async () => [ELECTION_26] });

@@ -145,11 +145,11 @@ const TRUST_BY_TIER = {
  * proposes URLs and the same steps run on them, best tier first. Every source
  * is fetched by the backend, and only fetched text reaches the model.
  */
-export async function researchReferenceData<T>(
+export const researchReferenceData = async <T>(
   year: number,
   spec: ResearchSpec<T>,
   deps: ResearchDeps,
-): Promise<ResearchResult<T>> {
+): Promise<ResearchResult<T>> => {
   const artifacts = await deps.artifacts.forDocument(year, "research");
   const run = new ResearchRun(year, spec, deps, artifacts);
 
@@ -208,7 +208,7 @@ export async function researchReferenceData<T>(
   };
   await artifacts.write("result.json", JSON.stringify(result, null, 2));
   return result;
-}
+};
 
 class ResearchRun<T> {
   readonly attempts: SourceAttempt[] = [];
@@ -388,15 +388,15 @@ class ResearchRun<T> {
 }
 
 /** PDF text narrowed to the relevant pages; other formats as they are. */
-function extractionText(
+const extractionText = (
   document: FetchedDocument,
   keywords: readonly string[],
-): string | null {
+): string | null => {
   if (document.format !== "pdf-text") return document.text;
   return pagesMentioning(document.text, keywords);
-}
+};
 
-function outcomeOf(error: RulesPipelineError): AttemptOutcome {
+const outcomeOf = (error: RulesPipelineError): AttemptOutcome => {
   switch (error.code) {
     case "extraction_unclear":
       return "extraction_unclear";
@@ -405,14 +405,14 @@ function outcomeOf(error: RulesPipelineError): AttemptOutcome {
     default:
       return "extraction_failed";
   }
-}
+};
 
-function problemsOf(error: RulesPipelineError): string[] {
+const problemsOf = (error: RulesPipelineError): string[] => {
   const details = error.details as { problems?: unknown } | undefined;
   return Array.isArray(details?.problems)
     ? details.problems.map(String)
     : [error.message];
-}
+};
 
 /**
  * An official source counts as found when any tier 1 URL was tried. The
@@ -426,13 +426,13 @@ const REJECTED = new Set<AttemptOutcome>([
   "document_too_large",
 ]);
 
-function officialProvenance(
+const officialProvenance = (
   attempts: readonly SourceAttempt[],
   resultTier: SourceTier | null,
 ): Pick<
   ResearchResult<unknown>["provenance"],
   "officialSourceFound" | "officialSourceAccessible" | "fallbackReason"
-> {
+> => {
   const official = attempts.filter(
     (attempt) => attempt.tier === 1 && attempt.outcome !== "not_found",
   );
@@ -454,4 +454,4 @@ function officialProvenance(
     else fallbackReason = "official_source_rejected";
   }
   return { officialSourceFound, officialSourceAccessible, fallbackReason };
-}
+};

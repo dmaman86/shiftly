@@ -89,7 +89,7 @@ export class WikipediaIncomeTaxSource implements IncomeTaxSourceProvider {
  * Pairs each tab label ("|שם2={{משמאל לימין|2024-2025}}") with its content
  * ("|תוכן2={{מדרגות מס 2024}}"). A label may name one year or a range.
  */
-export function parseBracketIndex(wikitext: string): BracketTableEntry[] {
+export const parseBracketIndex = (wikitext: string): BracketTableEntry[] => {
   const labels = new Map<string, string>();
   const contents = new Map<string, string>();
   for (const line of wikitext.split("\n")) {
@@ -113,14 +113,14 @@ export function parseBracketIndex(wikitext: string): BracketTableEntry[] {
     });
   }
   return entries.sort((a, b) => a.fromYear - b.fromYear);
-}
+};
 
 /** The whole "{| … |}" table that contains `marker`, or null. Tables do not nest here. */
-function tableContaining(wikitext: string, marker: string): string | null {
+const tableContaining = (wikitext: string, marker: string): string | null => {
   const at = wikitext.indexOf(marker);
   if (at === -1) return null;
   const start = wikitext.lastIndexOf("{|", at);
   const end = wikitext.indexOf("\n|}", at);
   if (start === -1 || end === -1) return null;
   return wikitext.slice(start, end + "\n|}".length);
-}
+};

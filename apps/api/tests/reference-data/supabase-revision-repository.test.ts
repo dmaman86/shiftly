@@ -27,7 +27,7 @@ const json = (body: unknown, status = 200) =>
     headers: { "content-type": "application/json" },
   });
 
-function repositoryWith(response: Response) {
+const repositoryWith = (response: Response) => {
   const fetch = vi.fn<typeof globalThis.fetch>(async () => response.clone());
   const repository = new SupabaseRevisionRepository({
     url: URL_,
@@ -44,7 +44,7 @@ function repositoryWith(response: Response) {
     };
   };
   return { repository, fetch, request };
-}
+};
 
 describe("SupabaseRevisionRepository", () => {
   it("stores a candidate through the atomic RPC with the secret key", async () => {

@@ -1,0 +1,60 @@
+import type { Request, Response } from "express";
+import { ReferenceDataPersistenceError } from "../ports/reference-data.ts";
+import {
+  supportedYears,
+  type PublishedElectionsReader,
+} from "../services/published-elections.ts";
+
+/**
+ * Fresh for five minutes, then served stale while revalidating for up to an
+ * hour: planned and confirmed elections can still be rescheduled.
+ */
+const PUBLIC_CACHE = "public, max-age=300, stale-while-revalidate=3600";
+
+/** Public: no token, published data only. */
+export const publishedElectionsController = (
+  reader: PublishedElectionsReader,
+  now: () => Date,
+) => {
+  /** GET /elections?year=YYYY → { year, elections } */
+  const listInYear = async (req: Request, res: Response) => {
+    const { first, last } = supportedYears(now());
+    const raw = req.query.year;
+    const year =
+      typeof raw === "string" && /^\d{4}$/.test(raw) ? Number(raw) : NaN;
+    if (!(year >= first && year <= last)) {
+      res.status(400).json({
+        error: {
+          code: "invalid_year",
+          message: `Year must be ${first}–${last}`,
+        },
+      });
+      return;
+    }
+
+    try {
+      const elections = await reader.electionsIn(year);
+      res.set("Cache-Control", PUBLIC_CACHE).json({ year, elections });
+    } catch (error) {
+      if (!(error instanceof ReferenceDataPersistenceError)) throw error;
+      console.error(
+        JSON.stringify({
+          severity: "ERROR",
+          event: "reference_data_unavailable",
+          message: error.message,
+        }),
+      );
+      res
+        .status(503)
+        .set("Cache-Control", "no-store")
+        .json({
+          error: {
+            code: "reference_data_unavailable",
+            message: "Reference data is temporarily unavailable",
+          },
+        });
+    }
+  };
+
+  return { listInYear };
+};

@@ -12,7 +12,7 @@ const EVIDENCE_PROPERTIES = {
 const EVIDENCE_FIELDS = Object.keys(EVIDENCE_PROPERTIES);
 
 /** Reads brackets and the credit point from any fetched document (PDF or web page). */
-export function incomeTaxResearchTask(year: number): ExtractionTask {
+export const incomeTaxResearchTask = (year: number): ExtractionTask => {
   return {
     name: "income_tax_research",
     systemInstruction: `You read one document that a backend downloaded. It is text converted from a PDF or a web page: PDF text has "[page N]" markers and one table row per line; web page tables have one row per line with cells separated by "|".
@@ -74,4 +74,4 @@ status "complete" only if the document clearly states both for tax year ${year};
       required: ["status", "monthlyBrackets", "monthlyCreditPoint"],
     },
   };
-}
+};

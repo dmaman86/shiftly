@@ -86,11 +86,11 @@ const extracted = (raw: unknown = ANSWER_2026): ExtractionResult => ({
   },
 });
 
-function setup(options: {
+const setup = (options: {
   documents: Record<string, FetchedDocument>;
   discovery?: ResearchDiscoveryResult;
   extract?: (document: FetchedDocument) => Promise<ExtractionResult>;
-}) {
+}) => {
   const written = new Map<string, string | Uint8Array>();
   const artifacts: DebugArtifactStore = {
     forDocument: async (year, key) => ({
@@ -117,7 +117,7 @@ function setup(options: {
       artifacts,
     });
   return { run, discover, fetch, extract, written };
-}
+};
 
 describe("researchReferenceData (income tax)", () => {
   it("validates the official booklet without searching", async () => {

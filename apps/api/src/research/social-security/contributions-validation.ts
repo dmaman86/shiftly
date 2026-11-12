@@ -20,7 +20,7 @@ import {
 const monthStart = z.string().regex(/^\d{4}-\d{2}-01$/);
 
 const claimSchema = z.strictObject({
-  value: z.number().positive().finite(),
+  value: z.number().positive(),
   statedFrom: monthStart.nullable(),
   statedUntil: monthStart.nullable(),
   statedFromText: z.string().min(1).nullable(),
@@ -63,10 +63,10 @@ const PARTS = {
  * range, internal consistency, and that every value, quote and date is
  * literally in the text that was read.
  */
-export function validateContributionsExtraction(
+export const validateContributionsExtraction = (
   raw: unknown,
   sourceText: string,
-): ContributionClaims {
+): ContributionClaims => {
   const parsed = extractionSchema.safeParse(raw);
   if (!parsed.success) {
     throw new RulesPipelineError(
@@ -149,13 +149,13 @@ export function validateContributionsExtraction(
     ) as Record<ContributionParameter, ContributionClaim>,
     annualMaxUpdate: annualMaxUpdate === null ? null : flatten(annualMaxUpdate),
   };
-}
+};
 
-function claimProblems(
+const claimProblems = (
   parameter: ContributionParameter,
   claim: RawClaim,
   inText: (quote: string) => boolean,
-): string[] {
+): string[] => {
   const problems: string[] = [];
   try {
     contributionValue(parameter, claim.value);
@@ -190,4 +190,4 @@ function claimProblems(
     problems.push(`${parameter}: end date ${statedUntil} is not in the source`);
   }
   return problems;
-}
+};

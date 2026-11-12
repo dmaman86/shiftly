@@ -17,20 +17,20 @@ export type Resolved<T> = YearResolution<T> & {
   readonly includes: readonly SourceRef[];
 };
 
-export function resolvedFrom<T>(
+export const resolvedFrom = <T>(
   resolution: YearResolution<T>,
   document: SourceDocument,
-): Resolved<T> {
+): Resolved<T> => {
   return { ...resolution, source: document.ref, includes: document.includes };
-}
+};
 
 /** Saves every model attempt to llm-<task>.json, whether the extraction succeeds or not. */
-export async function extractWithTrace(
+export const extractWithTrace = async (
   extractor: Extractor,
   artifacts: DebugArtifactWriter,
   task: ExtractionTask,
   document: SourceDocument,
-): Promise<ExtractionResult> {
+): Promise<ExtractionResult> => {
   const writeTrace = (trace: LlmTrace) =>
     artifacts.write(`llm-${task.name}.json`, JSON.stringify(trace, null, 2));
   try {
@@ -43,13 +43,13 @@ export async function extractWithTrace(
     }
     throw error;
   }
-}
+};
 
 /** Runs `run`; a pipeline error is saved as error.json before it propagates. */
-export async function recordingErrors<T>(
+export const recordingErrors = async <T>(
   artifacts: DebugArtifactWriter,
   run: () => Promise<T>,
-): Promise<T> {
+): Promise<T> => {
   try {
     return await run();
   } catch (error) {
@@ -65,4 +65,4 @@ export async function recordingErrors<T>(
     }
     throw error;
   }
-}
+};

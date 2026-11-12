@@ -26,7 +26,7 @@ let warn: ReturnType<typeof vi.spyOn>;
 type ErrorBody = { error: { code: string } };
 let error: ReturnType<typeof vi.spyOn>;
 
-async function start() {
+const start = async () => {
   const app = createApp({
     allowedOrigins: [],
     readiness: { isReady: async () => true },
@@ -48,7 +48,7 @@ async function start() {
   const { port } = server.address() as AddressInfo;
   return (path: string, init: RequestInit = {}) =>
     fetch(`http://127.0.0.1:${port}${path}`, init);
-}
+};
 
 const bearer = (token: string, init: RequestInit = {}): RequestInit => ({
   ...init,

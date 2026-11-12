@@ -28,7 +28,7 @@ export const workDaysRepository = (scope: UserScope) => ({
         .gte("date", start)
         .lt("date", end)
         .order("date")
-        .returns<WorkDay[]>(),
+        .overrideTypes<WorkDay[], { merge: false }>(),
     );
     return rows ?? [];
   },

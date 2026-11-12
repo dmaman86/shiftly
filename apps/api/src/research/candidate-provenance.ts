@@ -38,9 +38,9 @@ const FALLBACK_REASONS: Record<FallbackReason, RevisionFallbackReason> = {
  * and the rest (blocked official pages included) as 'consulted'. Sources that
  * were never requested (tier 4) are left out.
  */
-export function candidateProvenance(
+export const candidateProvenance = (
   result: ResearchResult<unknown>,
-): CandidateProvenance | null {
+): CandidateProvenance | null => {
   if (result.candidate === null) return null;
   const queries = result.provenance.discovery.searchQueries;
 
@@ -103,4 +103,4 @@ export function candidateProvenance(
       ? FALLBACK_REASONS[reason]
       : "official_source_insufficient",
   };
-}
+};

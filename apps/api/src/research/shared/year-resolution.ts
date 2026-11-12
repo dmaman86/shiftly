@@ -19,10 +19,10 @@ export type YearResolution<T> = {
  * says so; this is decided here, never by the model. Returns null when the
  * source has nothing for `year` or any earlier year.
  */
-export function resolveForYear<T>(
+export const resolveForYear = <T>(
   values: readonly YearlyValue<T>[],
   year: number,
-): YearResolution<T> | null {
+): YearResolution<T> | null => {
   const covering = values.find(
     (entry) => entry.fromYear <= year && year <= entry.toYear,
   );
@@ -43,4 +43,4 @@ export function resolveForYear<T>(
     effectiveYear: earlier.toYear,
     carriedForward: true,
   };
-}
+};

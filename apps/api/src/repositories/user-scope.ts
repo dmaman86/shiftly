@@ -84,12 +84,12 @@ export interface UserDataAccess {
  * privilege on these tables. It keeps no session, so one client serves every
  * request; ownership comes from the UserScope of each one.
  */
-export function supabaseUserDataAccess(options: {
+export const supabaseUserDataAccess = (options: {
   url: string;
   secretKey: string;
   /** Test seam: the HTTP client. */
   fetch?: typeof fetch;
-}): UserDataAccess {
+}): UserDataAccess => {
   const client = createClient(options.url, options.secretKey, {
     auth: {
       persistSession: false,
@@ -99,7 +99,7 @@ export function supabaseUserDataAccess(options: {
     ...(options.fetch ? { global: { fetch: options.fetch } } : {}),
   });
   return { scopeFor: (user) => new UserScope(client, user) };
-}
+};
 
 type PostgrestResult<T> = {
   data: T | null;
@@ -108,10 +108,10 @@ type PostgrestResult<T> = {
 };
 
 /** Awaits a query and returns its data, or throws the mapped UserDataError. */
-export async function dataOrThrow<T>(
+export const dataOrThrow = async <T>(
   query: PromiseLike<PostgrestResult<T>>,
-): Promise<T | null> {
+): Promise<T | null> => {
   const { data, error, status } = await query;
   if (error) throw userDataErrorFrom({ status, error });
   return data;
-}
+};

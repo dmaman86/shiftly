@@ -52,7 +52,7 @@ const unclearSchema = z.strictObject({
   problems: z.array(z.string()),
 });
 
-function parsed<T>(schema: z.ZodType<T>, raw: unknown): T {
+const parsed = <T>(schema: z.ZodType<T>, raw: unknown): T => {
   const result = schema.safeParse(raw);
   if (!result.success) {
     throw new RulesPipelineError(
@@ -62,9 +62,9 @@ function parsed<T>(schema: z.ZodType<T>, raw: unknown): T {
     );
   }
   return result.data;
-}
+};
 
-function rejectUnclear(raw: unknown): void {
+const rejectUnclear = (raw: unknown): void => {
   const result = unclearSchema.safeParse(raw);
   if (result.success) {
     throw new RulesPipelineError(
@@ -73,7 +73,7 @@ function rejectUnclear(raw: unknown): void {
       { problems: result.data.problems },
     );
   }
-}
+};
 
 const SHEKELS = /^[\d,]+(?:\.\d+)?$/;
 const PERCENT = /^\d+(?:\.\d+)?$/;
@@ -83,7 +83,7 @@ const isoFromRow = (day: string, month: string, year: string) =>
   `${year}-${month}-${day}`;
 
 // A row starts with its date; its cells run to the next row's date.
-function tableRows(section: string, cells: number) {
+const tableRows = (section: string, cells: number) => {
   const rows: { date: string; cells: string[]; quote: string }[] = [];
   const row = new RegExp(
     String.raw`${ROW_DATE}\s*((?:\|[^|]*){${cells}})\|`,
@@ -100,7 +100,7 @@ function tableRows(section: string, cells: number) {
     });
   }
   return rows;
-}
+};
 
 // ---------------------------------------------------------------------------
 // Thresholds: date | minimum wage | reduced-rate boundary | maximum
@@ -121,7 +121,7 @@ export type ThresholdHistory = { readonly rows: readonly ThresholdRow[] };
 const shekels = (cell: string) =>
   SHEKELS.test(cell) ? Number(cell.replace(/,/g, "")) : null;
 
-export function parseThresholdHistory(text: string): unknown {
+export const parseThresholdHistory = (text: string): unknown => {
   const flat = flatten(text);
   const start = flat.indexOf("החל ביום | שכר חודשי מזערי");
   if (start === -1) return unclear("the employee thresholds table is missing");
@@ -138,7 +138,7 @@ export function parseThresholdHistory(text: string): unknown {
   }));
   if (rows.length === 0) return unclear("the thresholds table has no rows");
   return { status: "complete", rows };
-}
+};
 
 const thresholdSchema = z.strictObject({
   status: z.literal("complete"),
@@ -154,10 +154,10 @@ const thresholdSchema = z.strictObject({
     .min(1),
 });
 
-export function validateThresholdHistory(
+export const validateThresholdHistory = (
   raw: unknown,
   sourceText: string,
-): ThresholdHistory {
+): ThresholdHistory => {
   rejectUnclear(raw);
   const { rows } = parsed(thresholdSchema, raw);
   const text = flatten(sourceText);
@@ -187,7 +187,7 @@ export function validateThresholdHistory(
   });
   failOn(problems);
   return { rows };
-}
+};
 
 export const THRESHOLD_HISTORY_EXTRACTION = providerOf(parseThresholdHistory);
 
@@ -210,7 +210,7 @@ export type EmployeeTotalHistory = {
 const fraction = (cell: string) =>
   PERCENT.test(cell) ? Math.round(Number(cell) * 10_000) / 1_000_000 : null;
 
-export function parseEmployeeTotalHistory(text: string): unknown {
+export const parseEmployeeTotalHistory = (text: string): unknown => {
   const flat = flatten(text);
   const start = flat.indexOf("החל ביום | שיעור מופחת | שיעור מלא");
   if (start === -1) return unclear("the employee rates table is missing");
@@ -227,7 +227,7 @@ export function parseEmployeeTotalHistory(text: string): unknown {
   }));
   if (rows.length === 0) return unclear("the employee rates table has no rows");
   return { status: "complete", rows };
-}
+};
 
 const rate = z.number().gt(0).lt(1).nullable();
 
@@ -245,10 +245,10 @@ const totalSchema = z.strictObject({
     .min(1),
 });
 
-export function validateEmployeeTotalHistory(
+export const validateEmployeeTotalHistory = (
   raw: unknown,
   sourceText: string,
-): EmployeeTotalHistory {
+): EmployeeTotalHistory => {
   rejectUnclear(raw);
   const { rows } = parsed(totalSchema, raw);
   const text = flatten(sourceText);
@@ -271,7 +271,7 @@ export function validateEmployeeTotalHistory(
   });
   failOn(problems);
   return { rows };
-}
+};
 
 export const EMPLOYEE_TOTAL_HISTORY_EXTRACTION = providerOf(
   parseEmployeeTotalHistory,
@@ -301,7 +301,7 @@ export type AnnualReportRates = {
 
 const TWO_DECIMALS = /\d+\.\d{2}/g;
 
-export function parseAnnualReportRates(text: string): unknown {
+export const parseAnnualReportRates = (text: string): unknown => {
   const lines = text.split("\n").map(flatten);
   for (const [index, header] of lines.entries()) {
     const standardAt = header.indexOf("שיעור רגיל");
@@ -359,7 +359,7 @@ export function parseAnnualReportRates(text: string): unknown {
     };
   }
   return unclear("the employee table by branch is missing");
-}
+};
 
 const pairSchema = z.strictObject({
   reduced: z.number().positive(),
@@ -381,11 +381,11 @@ const reportSchema = z.strictObject({
 // Two decimals each, so a sum agrees to 0.01 points.
 const POINTS_TOLERANCE = 0.005;
 
-export function validateAnnualReportRates(
+export const validateAnnualReportRates = (
   raw: unknown,
   sourceText: string,
   year: number,
-): AnnualReportRates {
+): AnnualReportRates => {
   rejectUnclear(raw);
   const report = parsed(reportSchema, raw);
   const text = flatten(sourceText);
@@ -454,6 +454,6 @@ export function validateAnnualReportRates(
     healthStandard: report.healthStandard as number,
     quote: report.quote,
   };
-}
+};
 
 export const ANNUAL_REPORT_EXTRACTION = providerOf(parseAnnualReportRates);

@@ -10,7 +10,7 @@ import {
   type PublishedTimelinesReader,
 } from "../services/published-timelines.ts";
 
-const rate = z.number().finite().nonnegative();
+const rate = z.number().nonnegative();
 
 const VALUE_SCHEMAS = {
   "per_diem.point_rate": z.object({ amount: rate }),
@@ -70,7 +70,7 @@ export class SupabasePublishedTimelinesReader implements PublishedTimelinesReade
  * malformed value, an overlap or a value that does not start on the first of
  * a month fails the whole read: nothing is guessed or repaired.
  */
-export function toPublishedTimelines(rows: unknown): PublishedTimelines {
+export const toPublishedTimelines = (rows: unknown): PublishedTimelines => {
   const parsed = z.array(rowSchema).safeParse(rows);
   if (!parsed.success) {
     throw new InvalidPublishedTimelineError(
@@ -107,4 +107,4 @@ export function toPublishedTimelines(rows: unknown): PublishedTimelines {
     }
   }
   return byKind;
-}
+};

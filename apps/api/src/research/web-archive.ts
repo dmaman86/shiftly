@@ -72,9 +72,9 @@ const capturedOnOf = (timestamp: string) =>
   `${timestamp.slice(0, 4)}-${timestamp.slice(4, 6)}-${timestamp.slice(6, 8)}`;
 
 /** The capture day of a Wayback URL (after redirects), or null for other URLs. */
-export function waybackCaptureDay(url: string): string | null {
+export const waybackCaptureDay = (url: string): string | null => {
   const match = /^https:\/\/web\.archive\.org\/web\/(\d{14})[a-z_]*\//.exec(
     url,
   );
   return match ? capturedOnOf(match[1]) : null;
-}
+};

@@ -13,7 +13,7 @@ export type DocumentText = {
  * "[page N]" marker before each page. Separating items keeps adjacent table
  * cells apart: without it "7,010" and "10%" read as "7,01010%".
  */
-export async function pdfToText(bytes: Uint8Array): Promise<DocumentText> {
+export const pdfToText = async (bytes: Uint8Array): Promise<DocumentText> => {
   // pdf.js takes ownership of the buffer it reads, so it gets a copy.
   const pdf = await getDocumentProxy(new Uint8Array(bytes), { verbosity: 0 });
   try {
@@ -37,18 +37,18 @@ export async function pdfToText(bytes: Uint8Array): Promise<DocumentText> {
   } finally {
     await pdf.loadingTask.destroy();
   }
-}
+};
 
 /** The "[page N]" pages that contain any keyword, markers kept; null if none. */
-export function pagesMentioning(
+export const pagesMentioning = (
   text: string,
   keywords: readonly string[],
-): string | null {
+): string | null => {
   const pages = text
     .split(/(?=^\[page \d+\]$)/m)
     .filter((page) => keywords.some((keyword) => page.includes(keyword)));
   return pages.length > 0 ? pages.join("\n").replace(/\n{2,}/g, "\n") : null;
-}
+};
 
 const SKIPPED_ELEMENTS = new Set([
   "script",
@@ -90,7 +90,7 @@ const BLOCK_ELEMENTS = new Set([
 ]);
 
 /** Visible text, one line per block and per table row, cells separated by " | ". */
-export function htmlToText(html: string): DocumentText {
+export const htmlToText = (html: string): DocumentText => {
   const document = parse(html);
   const parts: string[] = [];
   let title: string | null = null;
@@ -114,17 +114,17 @@ export function htmlToText(html: string): DocumentText {
 
   walk(document);
   return { text: tidy(parts.join("")), title };
-}
+};
 
-function textOf(node: Node): string {
+const textOf = (node: Node): string => {
   if (node.nodeName === "#text" && "value" in node) return node.value;
   return "childNodes" in node ? node.childNodes.map(textOf).join("") : "";
-}
+};
 
-function tidy(text: string): string {
+const tidy = (text: string): string => {
   return text
     .replace(/[ \t\u00a0]+/g, " ")
     .replace(/ *\n */g, "\n")
     .replace(/\n{2,}/g, "\n")
     .trim();
-}
+};
