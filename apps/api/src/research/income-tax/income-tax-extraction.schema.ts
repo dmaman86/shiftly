@@ -7,6 +7,15 @@ import {
 } from "../shared/validation.ts";
 import { wikitextTableRows } from "../shared/wikitext.ts";
 
+/** Conservative admission bounds inherited from the POC, not evidence of legal correctness. */
+export const INCOME_TAX_PLAUSIBILITY = {
+  bracketCount: { min: 5, max: 9 },
+  firstRate: { min: 0.05, max: 0.15 },
+  topRate: { min: 0.4, max: 0.6 },
+  maxMonthlyLimit: 200_000,
+  creditPoint: { min: 150, max: 400 },
+} as const;
+
 export const monthlyTaxBracketSchema = z.strictObject({
   minIncome: z.number().int().nonnegative(),
   /** null only for the open-ended top bracket. */

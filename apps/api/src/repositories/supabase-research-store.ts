@@ -168,11 +168,15 @@ export class SupabaseResearchStore implements ResearchStore {
     }
     for (let offset = 0; ; offset += 500) {
       if (offset >= 50_000) throw new ResearchError("research_unavailable");
-      const { data, error } = await this.client
+      let query = this.client
         .from("reference_research_attempts")
         .select("id,task,state,lease_until,next_eligible_at,finished_at,result")
-        .eq("domain", request.domain)
-        .eq("scope", researchScope(request))
+        .eq("domain", request.domain);
+      // Monthly cadence can outlive a calendar boundary; planning still scopes
+      // leases, cooldowns and missing-coverage attempts to their exact month.
+      if (request.requestUnit === "subject")
+        query = query.eq("scope", researchScope(request));
+      const { data, error } = await query
         .order("id")
         .range(offset, offset + 499);
       if (error) throw new ResearchError("research_unavailable");

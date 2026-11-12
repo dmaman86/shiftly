@@ -165,7 +165,38 @@ export const planResearchTask = (
       // Historical coverage is separate from the cadence of current/future verification.
       if (window.until <= `${base.asOfDate.slice(0, 7)}-01`) return false;
     }
-    const lastCheck = attempts
+    // A successful check of then-current rules can satisfy cadence in a later covered
+    // month. Historical backfills and future announcements must not refresh today's rules.
+    // Cooldowns/leases above remain strictly scoped to the exact requested month.
+    const freshnessAttempts = snapshot.attempts.filter((attempt) => {
+      if (
+        !attempt.finishedAt ||
+        attempt.task.specId !== spec.id ||
+        attempt.task.specVersion !== spec.version ||
+        attempt.task.request.domain !== request.domain ||
+        !attempt.task.request.parameters.includes(kind)
+      )
+        return false;
+      if (sameScope(attempt.task.request, request)) return true;
+      if (
+        request.requestUnit !== "calendar_month" ||
+        attempt.task.request.requestUnit !== "calendar_month" ||
+        monthInterval(request.year, request.month).from !==
+          `${base.asOfDate.slice(0, 7)}-01` ||
+        !Number.isFinite(Date.parse(attempt.finishedAt))
+      )
+        return false;
+      const checkedMonth = monthInterval(
+        attempt.task.request.year,
+        attempt.task.request.month,
+      ).from;
+      const currentMonthAtCheck = `${israelDate(new Date(attempt.finishedAt)).slice(0, 7)}-01`;
+      return (
+        checkedMonth === currentMonthAtCheck &&
+        checkedMonth < monthInterval(request.year, request.month).from
+      );
+    });
+    const lastCheck = freshnessAttempts
       .filter(
         (a) => a.resolvedParameters.includes(kind) && a.finishedAt !== null,
       )

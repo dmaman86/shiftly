@@ -29,7 +29,24 @@ describe("Supabase research boundary", () => {
       "reference_evidence",
     );
     const attemptsUrl = new URL(String(fetch.mock.calls[1][0]));
-    expect(attemptsUrl.searchParams.get("scope")).toBe("eq.month:2026-02-01");
+    expect(attemptsUrl.searchParams.has("scope")).toBe(false);
+    expect(attemptsUrl.searchParams.get("domain")).toBe("eq.income-tax");
+  });
+  it("keeps election attempts scoped to their subject", async () => {
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => json([]));
+    const store = new SupabaseResearchStore({
+      url: "https://project.supabase.co",
+      secretKey: "synthetic",
+      fetch,
+    });
+    await store.read({
+      requestUnit: "subject",
+      domain: "elections",
+      subjectKey: "knesset:26",
+      parameters: ["calendar.knesset_election"],
+    });
+    const attemptsUrl = new URL(String(fetch.mock.calls[1][0]));
+    expect(attemptsUrl.searchParams.get("scope")).toBe("eq.knesset:26");
   });
   it("does not infer sufficient evidence from an official trust label alone", async () => {
     const fetch = vi.fn<typeof globalThis.fetch>(async (input) =>
