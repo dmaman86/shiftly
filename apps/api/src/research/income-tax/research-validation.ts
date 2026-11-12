@@ -9,23 +9,10 @@ import {
 } from "../shared/validation.ts";
 import {
   consistencyProblems,
+  INCOME_TAX_PLAUSIBILITY as SANITY,
   monthlyTaxBracketSchema,
   type MonthlyTaxBracket,
 } from "./income-tax-extraction.schema.ts";
-
-/**
- * Plausibility bounds, not truth: values outside them are almost certainly a
- * misread table (annual, daily, non-exertion) rather than a policy change.
- * Israel has had 6–7 monthly brackets, a 10% first rate and a 47–50% top rate
- * since 2012, and a credit point of roughly 210–250 ILS a month.
- */
-const SANITY = {
-  bracketCount: { min: 5, max: 9 },
-  firstRate: { min: 0.05, max: 0.15 },
-  topRate: { min: 0.4, max: 0.6 },
-  maxMonthlyLimit: 200_000,
-  creditPoint: { min: 150, max: 400 },
-} as const;
 
 const evidence = {
   effectiveFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),

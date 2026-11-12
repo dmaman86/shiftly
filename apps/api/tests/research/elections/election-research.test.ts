@@ -63,10 +63,10 @@ describe("Knesset research specification", () => {
       ).length,
     ).toBeGreaterThan(0);
   });
-  it("registers elections without enabling tax domains or replacing their planning contracts", () => {
+  it("registers elections without enabling contributions or replacing their planning contracts", () => {
     expect(selectResearchSpec("elections")).toBe(SPEC);
     expect(planningSpec("elections")).toBe(SPEC);
-    expect(() => selectResearchSpec("income-tax")).toThrow(
+    expect(() => selectResearchSpec("contributions")).toThrow(
       "research_unavailable",
     );
     expect(SPEC.sourcePriority[0]).toBe("Central Elections Committee");

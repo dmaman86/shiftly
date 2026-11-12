@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { INCOME_TAX_RESEARCH } from "../../src/research/income-tax/income-tax-research.ts";
+import { INCOME_TAX_RESEARCH } from "./legacy-income-tax-spec.ts";
 import type {
   DiscoveredSource,
   FetchedDocument,

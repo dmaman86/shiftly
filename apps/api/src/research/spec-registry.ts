@@ -4,9 +4,13 @@ import {
   type ResearchSpec,
 } from "./contracts.ts";
 import { ELECTION_RESEARCH_SPEC } from "./elections/election-spec.ts";
+import { INCOME_TAX_RESEARCH_SPEC } from "./income-tax/income-tax-spec.ts";
 
 /** Registration does not enable execution: the explicit environment opt-in remains required. */
-export const researchSpecs: readonly ResearchSpec[] = [ELECTION_RESEARCH_SPEC];
+export const researchSpecs: readonly ResearchSpec[] = [
+  ELECTION_RESEARCH_SPEC,
+  INCOME_TAX_RESEARCH_SPEC,
+];
 
 export const selectResearchSpec = (
   domain: ResearchDomain,

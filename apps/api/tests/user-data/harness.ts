@@ -52,7 +52,6 @@ export const startUserDataApp = async (
     );
   });
 
-  const unused = vi.fn();
   const app = createApp({
     allowedOrigins: [],
     readiness: { isReady: async () => true },
@@ -70,8 +69,6 @@ export const startUserDataApp = async (
       fetch,
     }),
     accounts,
-    extractIncomeTaxRules: unused as AppDeps["extractIncomeTaxRules"],
-    researchIncomeTax: unused as AppDeps["researchIncomeTax"],
   });
 
   const server: Server = app.listen(0, "127.0.0.1");

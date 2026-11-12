@@ -5,13 +5,10 @@ import { corsAllowlist } from "./middleware/cors.ts";
 import { handleBodyErrors, jsonBody } from "./middleware/json-body.ts";
 import type { ReadinessCheck } from "./repositories/supabase-readiness.ts";
 import { requestLog } from "./middleware/request-log.ts";
-import type { IncomeTaxRulesResult } from "./research/income-tax/income-tax-pipeline.ts";
-import type { IncomeTaxResearchResponse } from "./research/income-tax/income-tax-research.ts";
 import type { PublishedElectionsReader } from "./services/published-elections.ts";
 import { publishedElectionsRouter } from "./routes/published-elections-router.ts";
 import type { PublishedTimelinesReader } from "./services/published-timelines.ts";
 import { publishedTimelinesRouter } from "./routes/published-timelines-router.ts";
-import { yearRulesRouter } from "./routes/rules-router.ts";
 import { handleUserDataErrors } from "./errors/user-data-errors.ts";
 import type { AccountDeleter } from "./repositories/account-deleter.ts";
 import { accountRouter } from "./routes/account-router.ts";
@@ -40,13 +37,6 @@ export type AppDeps = {
   readonly userData: UserDataAccess;
   /** Deletes the verified caller's account; never anyone else's. */
   readonly accounts: AccountDeleter;
-  readonly extractIncomeTaxRules: (
-    year: number,
-  ) => Promise<IncomeTaxRulesResult>;
-  /** Search-assisted research; stores validated values as pending review, never activates them. */
-  readonly researchIncomeTax: (
-    year: number,
-  ) => Promise<IncomeTaxResearchResponse>;
 };
 
 export const createApp = (deps: AppDeps): express.Express => {
@@ -99,15 +89,23 @@ export const createApp = (deps: AppDeps): express.Express => {
     accountRouter(deps.auth.verifier, deps.accounts),
   );
 
-  // Admin only. Extraction and research read public sources, call a paid
-  // model and write reference data, so every /admin route needs a verified
-  // admin whose role and session are checked on each request.
-  app.use(
-    "/admin",
-    requireAuth(verifier),
-    requireAdmin(verifier, roles),
-    yearRulesRouter("/income-tax", deps.extractIncomeTaxRules),
-    yearRulesRouter("/income-tax", deps.researchIncomeTax, "research"),
+  // Retired year-only research must not trigger model calls inside HTTP requests.
+  // Preserve authentication and role/session checks before revealing retirement.
+  app.use("/admin", requireAuth(verifier), requireAdmin(verifier, roles));
+  app.post(
+    ["/admin/income-tax/:year/rules", "/admin/income-tax/:year/research"],
+    (_req, res) => {
+      res
+        .set("Cache-Control", "no-store")
+        .status(410)
+        .json({
+          error: {
+            code: "research_route_retired",
+            message:
+              "Use the reference:research administrative CLI with explicit --year, --month and --parameters",
+          },
+        });
+    },
   );
 
   app.use((_req, res) => {

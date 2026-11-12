@@ -8,15 +8,12 @@ import { SupabasePublishedElectionsReader } from "./repositories/supabase-publis
 import { CachedPublishedTimelinesReader } from "./repositories/cached-published-timelines-reader.ts";
 import { SupabasePublishedTimelinesReader } from "./repositories/supabase-published-timelines-reader.ts";
 import { SupabaseReadinessCheck } from "./repositories/supabase-readiness.ts";
-import { legacyResearch } from "./research/legacy-research.ts";
 import { supabaseUserDataAccess } from "./repositories/user-scope.ts";
 import { supabaseAccountDeleter } from "./repositories/account-deleter.ts";
 
 loadLocalEnvFiles();
 
 const env = loadEnv();
-
-const research = legacyResearch(env);
 
 const app = createApp({
   allowedOrigins: env.CORS_ALLOWED_ORIGINS,
@@ -55,7 +52,6 @@ const app = createApp({
     url: env.SUPABASE_URL,
     secretKey: env.SUPABASE_USER_DATA_SECRET_KEY ?? env.SUPABASE_SECRET_KEY,
   }),
-  ...research,
 });
 
 const server = app.listen(env.PORT, env.HOST, () => {
@@ -66,7 +62,7 @@ const server = app.listen(env.PORT, env.HOST, () => {
       host: env.HOST,
       port: env.PORT,
       allowedOrigins: env.CORS_ALLOWED_ORIGINS,
-      researchConfiguration: "loaded_on_request",
+      researchConfiguration: "administrative_cli_only",
       // Which key user data uses, never its value.
       userDataKey: env.SUPABASE_USER_DATA_SECRET_KEY ? "dedicated" : "shared",
     }),

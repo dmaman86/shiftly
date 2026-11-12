@@ -2,7 +2,7 @@ import type { AddressInfo } from "node:net";
 import { brotliCompressSync, gzipSync } from "node:zlib";
 import type { Server } from "node:http";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createApp, type AppDeps } from "../../src/app.ts";
+import { createApp } from "../../src/app.ts";
 import { SupabaseReadinessCheck } from "../../src/repositories/supabase-readiness.ts";
 import {
   FakeRoles,
@@ -16,7 +16,6 @@ const WEB_ORIGIN = "https://web.example";
 let server: Server | undefined;
 
 const start = async (ready = true) => {
-  const unused = vi.fn();
   const app = createApp({
     allowedOrigins: [WEB_ORIGIN],
     readiness: { isReady: async () => ready },
@@ -30,8 +29,6 @@ const start = async (ready = true) => {
     auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
     userData: NO_USER_DATA,
     accounts: NO_ACCOUNTS,
-    extractIncomeTaxRules: unused as AppDeps["extractIncomeTaxRules"],
-    researchIncomeTax: unused as AppDeps["researchIncomeTax"],
   });
   server = app.listen(0, "127.0.0.1");
   await new Promise((resolve) => server!.once("listening", resolve));

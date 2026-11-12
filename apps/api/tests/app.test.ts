@@ -1,8 +1,7 @@
 import type { AddressInfo } from "node:net";
 import type { Server } from "node:http";
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { createApp, type AppDeps } from "../src/app.ts";
-import { RulesPipelineError } from "../src/research/shared/errors.ts";
+import { afterEach, describe, expect, it } from "vitest";
+import { createApp } from "../src/app.ts";
 import {
   ADMIN_TOKEN,
   FakeRoles,
@@ -13,11 +12,8 @@ import {
 
 let server: Server | undefined;
 
-// The HTTP layer only forwards the pipeline result, so tests use minimal stand-ins.
-const start = async (
-  extract: (year: number) => Promise<unknown>,
-  research: (year: number) => Promise<unknown> = extract,
-) => {
+// HTTP composition deliberately has no research dependency.
+const start = async () => {
   // Auth is covered in tests/auth; here every admin call is a verified admin.
   const app = createApp({
     allowedOrigins: [],
@@ -32,8 +28,6 @@ const start = async (
     auth: { verifier: new FakeVerifier(), roles: new FakeRoles() },
     userData: NO_USER_DATA,
     accounts: NO_ACCOUNTS,
-    extractIncomeTaxRules: extract as AppDeps["extractIncomeTaxRules"],
-    researchIncomeTax: research as AppDeps["researchIncomeTax"],
   });
   server = app.listen(0, "127.0.0.1");
   await new Promise((resolve) => server!.once("listening", resolve));
@@ -54,62 +48,25 @@ afterEach(() => {
 
 describe("api", () => {
   it("serves a health check", async () => {
-    const request = await start(async () => ({}));
+    const request = await start();
     const response = await request("/health");
     expect(await response.json()).toEqual({ status: "ok" });
   });
 
-  it("validates the year before running the pipeline", async () => {
-    const extract = vi.fn(async () => ({}));
-    const request = await start(extract);
-    const response = await request("/admin/income-tax/20x0/rules", post);
-    expect(response.status).toBe(400);
-    expect(extract).not.toHaveBeenCalled();
-  });
-
-  it("returns the extraction result", async () => {
-    const request = await start(async (year) => ({
-      year,
-      monthlyBrackets: [],
-    }));
-    const response = await request("/admin/income-tax/2020/rules", post);
-    expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ year: 2020, monthlyBrackets: [] });
-  });
-
-  it("maps pipeline errors to a stable error contract without internal details", async () => {
-    const request = await start(async () => {
-      throw new RulesPipelineError(
-        "year_not_covered",
-        "No bracket table for 2020 or any earlier year",
-        { secret: "internal" },
-      );
-    });
-    const response = await request("/admin/income-tax/2020/rules", post);
-    expect(response.status).toBe(404);
-    expect(await response.json()).toEqual({
-      error: {
-        code: "year_not_covered",
-        message: "No bracket table for 2020 or any earlier year",
-      },
-    });
-  });
-
-  it("no longer serves the social-security rules route", async () => {
-    const extract = vi.fn(async () => ({ pipeline: "income-tax" }));
-    const request = await start(extract);
-    const response = await request("/admin/social-security/2026/rules", post);
-    expect(response.status).toBe(404);
-    expect(extract).not.toHaveBeenCalled();
-  });
-
-  it("serves income-tax research next to the existing rules route", async () => {
-    const rules = vi.fn(async () => ({ pipeline: "rules" }));
-    const research = vi.fn(async () => ({ pipeline: "research" }));
-    const request = await start(rules, research);
-    const response = await request("/admin/income-tax/2026/research", post);
-    expect(await response.json()).toEqual({ pipeline: "research" });
-    expect(research).toHaveBeenCalledWith(2026);
-    expect(rules).not.toHaveBeenCalled();
-  });
+  it.each(["2026/rules", "2026/research", "20x0/rules"])(
+    "retires year-only income tax endpoint %s without running a pipeline",
+    async (path) => {
+      const request = await start();
+      const response = await request(`/admin/income-tax/${path}`, post);
+      expect(response.status).toBe(410);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(await response.json()).toEqual({
+        error: {
+          code: "research_route_retired",
+          message:
+            "Use the reference:research administrative CLI with explicit --year, --month and --parameters",
+        },
+      });
+    },
+  );
 });

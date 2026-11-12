@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { loadEnv, loadResearchEnv } from "../../../src/config/env.ts";
-import { legacyResearch } from "../../../src/research/legacy-research.ts";
 
 const CORE = {
   SUPABASE_URL: "https://project.supabase.co",
@@ -27,13 +26,8 @@ describe("research configuration isolation", () => {
       REFERENCE_DATA_PERSISTENCE_ENABLED: false,
     });
   });
-  it("constructs the HTTP composition without a research key and fails only when research is requested", async () => {
-    const research = legacyResearch(loadEnv(CORE), {});
-    await expect(research.researchIncomeTax(2026)).rejects.toMatchObject({
-      code: "source_unavailable",
-    });
-    await expect(research.extractIncomeTaxRules(2026)).rejects.toMatchObject({
-      code: "source_unavailable",
-    });
+  it("requires credentials only in the isolated research configuration", () => {
+    expect(() => loadEnv(CORE)).not.toThrow();
+    expect(() => loadResearchEnv({})).toThrow();
   });
 });

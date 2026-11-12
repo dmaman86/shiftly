@@ -21,7 +21,6 @@ const ADMIN_ROUTES = [
 let server: Server | undefined;
 let verifier: FakeVerifier;
 let roles: FakeRoles;
-let pipeline: ReturnType<typeof vi.fn>;
 let warn: ReturnType<typeof vi.spyOn>;
 type ErrorBody = { error: { code: string } };
 let error: ReturnType<typeof vi.spyOn>;
@@ -40,9 +39,7 @@ const start = async () => {
     auth: { verifier, roles },
     userData: NO_USER_DATA,
     accounts: NO_ACCOUNTS,
-    extractIncomeTaxRules: pipeline,
-    researchIncomeTax: pipeline,
-  } as Parameters<typeof createApp>[0]);
+  });
   server = app.listen(0, "127.0.0.1");
   await new Promise((resolve) => server!.once("listening", resolve));
   const { port } = server.address() as AddressInfo;
@@ -62,7 +59,6 @@ const post = (token?: string, init: RequestInit = {}) =>
 beforeEach(() => {
   verifier = new FakeVerifier();
   roles = new FakeRoles();
-  pipeline = vi.fn(async () => ({ ran: true }));
   warn = vi.spyOn(console, "warn").mockImplementation(() => {});
   error = vi.spyOn(console, "error").mockImplementation(() => {});
 });
@@ -97,7 +93,6 @@ describe("authentication (401)", () => {
         error: { code: "unauthenticated", message: "Authentication required" },
       });
     }
-    expect(pipeline).not.toHaveBeenCalled();
   });
 
   it("keeps /health public", async () => {
@@ -158,17 +153,18 @@ describe("admin routes", () => {
       expect(await response.json()).toEqual({
         error: { code: "forbidden", message: "Admin role required" },
       });
-      expect(pipeline).not.toHaveBeenCalled();
     },
   );
 
-  it.each(ADMIN_ROUTES)("lets a verified admin run %s", async (path) => {
-    const request = await start();
-    const response = await request(path, post(ADMIN_TOKEN));
-    expect(response.status).toBe(200);
-    expect(pipeline).toHaveBeenCalledWith(2026);
-    expect(verifier.revalidateCalls).toBe(1);
-  });
+  it.each(ADMIN_ROUTES)(
+    "reports retirement to a verified admin on %s",
+    async (path) => {
+      const request = await start();
+      const response = await request(path, post(ADMIN_TOKEN));
+      expect(response.status).toBe(410);
+      expect(verifier.revalidateCalls).toBe(1);
+    },
+  );
 
   it("ignores roles claimed by the client in headers or body", async () => {
     const request = await start();
@@ -184,13 +180,12 @@ describe("admin routes", () => {
       }),
     );
     expect(response.status).toBe(403);
-    expect(pipeline).not.toHaveBeenCalled();
   });
 
   it("applies a revoked role on the very next request", async () => {
     const request = await start();
     expect((await request(ADMIN_ROUTES[1], post(ADMIN_TOKEN))).status).toBe(
-      200,
+      410,
     );
 
     roles.roles.delete(ADMIN_ID);
@@ -198,7 +193,6 @@ describe("admin routes", () => {
     expect((await request(ADMIN_ROUTES[1], post(ADMIN_TOKEN))).status).toBe(
       403,
     );
-    expect(pipeline).toHaveBeenCalledOnce();
   });
 
   it("rejects an admin whose session the Auth server no longer accepts", async () => {
@@ -206,7 +200,6 @@ describe("admin routes", () => {
     const request = await start();
     const response = await request(ADMIN_ROUTES[1], post(ADMIN_TOKEN));
     expect(response.status).toBe(401);
-    expect(pipeline).not.toHaveBeenCalled();
   });
 
   it("fails closed with 503 when roles cannot be read", async () => {
@@ -217,7 +210,6 @@ describe("admin routes", () => {
     expect(((await response.json()) as ErrorBody).error.code).toBe(
       "authorization_unavailable",
     );
-    expect(pipeline).not.toHaveBeenCalled();
   });
 
   it("fails closed with 503 when the session cannot be revalidated", async () => {
@@ -225,7 +217,6 @@ describe("admin routes", () => {
     const request = await start();
     const response = await request(ADMIN_ROUTES[1], post(ADMIN_TOKEN));
     expect(response.status).toBe(503);
-    expect(pipeline).not.toHaveBeenCalled();
   });
 
   it("does not reveal which admin paths exist to unauthenticated callers", async () => {
