@@ -3,9 +3,10 @@ import {
   type ResearchDomain,
   type ResearchSpec,
 } from "./contracts.ts";
+import { ELECTION_RESEARCH_SPEC } from "./elections/election-spec.ts";
 
-/** PR B/C/D register domain-validated specs here. No domain is operational in PR A. */
-export const researchSpecs: readonly ResearchSpec[] = [];
+/** Registration does not enable execution: the explicit environment opt-in remains required. */
+export const researchSpecs: readonly ResearchSpec[] = [ELECTION_RESEARCH_SPEC];
 
 export const selectResearchSpec = (
   domain: ResearchDomain,
@@ -17,17 +18,18 @@ export const selectResearchSpec = (
 };
 
 /** Plan-only defaults, not an executable domain spec or an approved refresh scheduler. */
-export const planningSpec = (domain: ResearchDomain): ResearchSpec => ({
-  id: `reference:${domain}`,
-  version: 1,
-  domain,
-  population: "Domain spec not registered",
-  sourcePriority: [],
-  researchInstructions: "Not enabled",
-  refreshPolicy: {
-    intervalDays:
-      domain === "elections" ? 7 : domain === "income-tax" ? 90 : 30,
-    unresolvedDays: 30,
-  },
-  validateFinding: () => ["Domain spec not registered"],
-});
+export const planningSpec = (domain: ResearchDomain): ResearchSpec =>
+  researchSpecs.find((spec) => spec.domain === domain) ?? {
+    id: `reference:${domain}`,
+    version: 1,
+    domain,
+    population: "Domain spec not registered",
+    sourcePriority: [],
+    researchInstructions: "Not enabled",
+    refreshPolicy: {
+      intervalDays:
+        domain === "elections" ? 7 : domain === "income-tax" ? 90 : 30,
+      unresolvedDays: 30,
+    },
+    validateFinding: () => ["Domain spec not registered"],
+  };

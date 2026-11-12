@@ -4,14 +4,18 @@ import { SupabaseResearchStore } from "../repositories/supabase-research-store.t
 import { GoogleGroundedResearchProvider } from "../research/google-grounded-research-provider.ts";
 import { executeResearch } from "../research/execute-research.ts";
 import { planResearchTask } from "../research/planner.ts";
-import { planningSpec, selectResearchSpec } from "../research/spec-registry.ts";
+import {
+  planningSpec,
+  selectResearchSpec,
+  researchSpecs,
+} from "../research/spec-registry.ts";
 import { ResearchError } from "../research/contracts.ts";
 import { parseResearchCommand } from "./reference-research-command.ts";
 
 loadLocalEnvFiles();
 try {
   const command = parseResearchCommand(process.argv.slice(2));
-  // Execution is unavailable until a real domain spec is registered in PR B/C/D.
+  // Domain registration and explicit execution opt-in are separate controls.
   const spec =
     command.mode === "execute"
       ? selectResearchSpec(command.request.domain)
@@ -27,7 +31,11 @@ try {
       JSON.stringify(
         {
           executable: false,
-          reason: "domain_spec_not_registered",
+          reason: researchSpecs.some(
+            (item) => item.domain === command.request.domain,
+          )
+            ? "plan_only"
+            : "domain_spec_not_registered",
           task: planResearchTask(command.request, spec, snapshot, new Date()),
         },
         null,

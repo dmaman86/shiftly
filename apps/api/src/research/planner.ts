@@ -132,12 +132,14 @@ export const planResearchTask = (
         revisions.some(
           (r) =>
             r.status === "active" &&
-            r.sufficientEvidence &&
-            typeof r.value === "object" &&
-            r.value !== null &&
-            "electionStatus" in r.value &&
-            (r.value.electionStatus === "occurred" ||
-              r.value.electionStatus === "cancelled"),
+            (spec.isFinalRevision
+              ? spec.isFinalRevision(r, base.asOfDate)
+              : r.sufficientEvidence &&
+                typeof r.value === "object" &&
+                r.value !== null &&
+                "electionStatus" in r.value &&
+                (r.value.electionStatus === "occurred" ||
+                  r.value.electionStatus === "cancelled")),
         )
       )
         return false;

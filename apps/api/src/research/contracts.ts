@@ -99,6 +99,10 @@ export type ResearchSpec = {
     readonly intervalDays: number;
     readonly unresolvedDays: number;
   };
+  readonly isFinalRevision?: (
+    revision: ResearchRevision,
+    asOfDate: string,
+  ) => boolean;
   /** Domain specs supply real value/date/population rules; the generic runner cannot invent them. */
   readonly validateFinding: (
     finding: ResearchFinding,
