@@ -1,23 +1,14 @@
-import { join } from "node:path";
 import { createApp } from "./app.ts";
 import { SupabaseAuthVerifier } from "./repositories/supabase-auth-verifier.ts";
 import { SupabaseRoleRepository } from "./repositories/supabase-role-repository.ts";
 import { loadEnv } from "./config/env.ts";
 import { loadLocalEnvFiles } from "./config/local-env.ts";
-import { extractIncomeTaxRules } from "./research/income-tax/income-tax-pipeline.ts";
-import { researchAndStoreIncomeTax } from "./research/income-tax/income-tax-research.ts";
 import { CachedPublishedElectionsReader } from "./repositories/cached-published-elections-reader.ts";
 import { SupabasePublishedElectionsReader } from "./repositories/supabase-published-elections-reader.ts";
 import { CachedPublishedTimelinesReader } from "./repositories/cached-published-timelines-reader.ts";
 import { SupabasePublishedTimelinesReader } from "./repositories/supabase-published-timelines-reader.ts";
-import { SupabaseRevisionRepository } from "./repositories/supabase-revision-repository.ts";
-import { WikipediaIncomeTaxSource } from "./research/income-tax/wikipedia-source.ts";
-import { GoogleGemmaExtractionProvider } from "./research/google-gemma-extraction-provider.ts";
-import { GoogleGemmaResearchProvider } from "./research/google-gemma-research-provider.ts";
 import { SupabaseReadinessCheck } from "./repositories/supabase-readiness.ts";
-import { HttpDocumentFetcher } from "./research/http-document-fetcher.ts";
-import { FileDebugArtifactStore } from "./research/shared/debug-artifacts.ts";
-import { GemmaExtractor } from "./research/shared/gemma-extractor.ts";
+import { legacyResearch } from "./research/legacy-research.ts";
 import { supabaseUserDataAccess } from "./repositories/user-scope.ts";
 import { supabaseAccountDeleter } from "./repositories/account-deleter.ts";
 
@@ -25,34 +16,7 @@ loadLocalEnvFiles();
 
 const env = loadEnv();
 
-const extractor = new GemmaExtractor({
-  apiKey: env.GEMINI_API_KEY,
-  model: env.GEMINI_MODEL,
-});
-
-const incomeTaxDeps = {
-  source: new WikipediaIncomeTaxSource(),
-  extractor,
-  artifacts: new FileDebugArtifactStore(join(env.ARTIFACTS_DIR, "income-tax")),
-};
-
-const researchDeps = {
-  research: new GoogleGemmaResearchProvider({
-    apiKey: env.GEMINI_API_KEY,
-    model: env.GEMINI_MODEL,
-  }),
-  fetcher: new HttpDocumentFetcher(),
-  extraction: new GoogleGemmaExtractionProvider(extractor),
-  artifacts: new FileDebugArtifactStore(
-    join(env.ARTIFACTS_DIR, "income-tax-research"),
-  ),
-  revisions: env.REFERENCE_DATA_PERSISTENCE_ENABLED
-    ? new SupabaseRevisionRepository({
-        url: env.SUPABASE_URL,
-        secretKey: env.SUPABASE_SECRET_KEY,
-      })
-    : null,
-};
+const research = legacyResearch(env);
 
 const app = createApp({
   allowedOrigins: env.CORS_ALLOWED_ORIGINS,
@@ -91,8 +55,7 @@ const app = createApp({
     url: env.SUPABASE_URL,
     secretKey: env.SUPABASE_USER_DATA_SECRET_KEY ?? env.SUPABASE_SECRET_KEY,
   }),
-  extractIncomeTaxRules: (year) => extractIncomeTaxRules(year, incomeTaxDeps),
-  researchIncomeTax: (year) => researchAndStoreIncomeTax(year, researchDeps),
+  ...research,
 });
 
 const server = app.listen(env.PORT, env.HOST, () => {
@@ -103,7 +66,7 @@ const server = app.listen(env.PORT, env.HOST, () => {
       host: env.HOST,
       port: env.PORT,
       allowedOrigins: env.CORS_ALLOWED_ORIGINS,
-      referenceDataPersistence: env.REFERENCE_DATA_PERSISTENCE_ENABLED,
+      researchConfiguration: "loaded_on_request",
       // Which key user data uses, never its value.
       userDataKey: env.SUPABASE_USER_DATA_SECRET_KEY ? "dedicated" : "shared",
     }),

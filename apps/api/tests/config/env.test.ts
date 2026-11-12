@@ -4,6 +4,7 @@ import {
   loadAdminEnv,
   loadArtifactsDir,
   loadEnv,
+  loadResearchEnv,
 } from "../../src/config/env.ts";
 import { LOCAL_ENV_FILES } from "../../src/config/local-env.ts";
 
@@ -18,7 +19,9 @@ const BASE = {
 
 describe("loadEnv", () => {
   it("keeps reference-data persistence off by default", () => {
-    expect(loadEnv(BASE).REFERENCE_DATA_PERSISTENCE_ENABLED).toBe(false);
+    expect(loadResearchEnv(BASE).REFERENCE_DATA_PERSISTENCE_ENABLED).toBe(
+      false,
+    );
   });
 
   it("fails fast at startup without the Supabase settings authentication needs", () => {
@@ -42,7 +45,7 @@ describe("loadEnv", () => {
   });
 
   it("accepts persistence with the Supabase settings", () => {
-    const env = loadEnv({
+    const env = loadResearchEnv({
       ...BASE,
       REFERENCE_DATA_PERSISTENCE_ENABLED: "true",
     });

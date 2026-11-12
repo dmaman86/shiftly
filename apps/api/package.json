@@ -13,6 +13,7 @@
     "election:activate": "node src/cli/activate-election.ts",
     "reference:activate": "node src/cli/activate-reference.ts",
     "reference:research:contributions": "node src/cli/research-contributions.ts",
+    "reference:research": "node src/cli/reference-research.ts",
     "typecheck": "tsc -p tsconfig.json --pretty false",
     "test": "vitest run --config ../../vitest.config.ts --project api"
   },
