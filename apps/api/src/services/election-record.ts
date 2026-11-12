@@ -90,7 +90,7 @@ const ACCESS_STATUS: Record<Accessibility, CandidateSource["accessStatus"]> = {
  * The quote proves the page says it, not what it means: the person who
  * activates the revision still reads the matched passage.
  */
-export async function planElectionRecord(
+export const planElectionRecord = async (
   request: ElectionRecordRequest,
   deps: {
     readonly fetcher: DocumentFetcher;
@@ -98,7 +98,7 @@ export async function planElectionRecord(
     /** Today in Israel, YYYY-MM-DD. */
     readonly today: string;
   },
-): Promise<ElectionRecordPlan> {
+): Promise<ElectionRecordPlan> => {
   const problem = requestProblem(request, deps.today);
   if (problem !== null)
     return { status: "rejected", reason: problem, source: null };
@@ -155,12 +155,12 @@ export async function planElectionRecord(
     return { status: "unchanged", active, source };
   }
   return { status: "ready", candidate, active, source };
-}
+};
 
-function requestProblem(
+const requestProblem = (
   request: ElectionRecordRequest,
   today: string,
-): string | null {
+): string | null => {
   if (!Number.isInteger(request.knessetNumber) || request.knessetNumber < 1) {
     return `invalid Knesset number ${request.knessetNumber}`;
   }
@@ -173,9 +173,12 @@ function requestProblem(
     return "a manual note cannot be empty";
   }
   return null;
-}
+};
 
-function unverifiedReason(source: SourceCheck, quote: string | null): string {
+const unverifiedReason = (
+  source: SourceCheck,
+  quote: string | null,
+): string => {
   if (source.accessibility === null) {
     return `${source.url} is general web (tier ${source.tier}) and was not fetched`;
   }
@@ -186,14 +189,14 @@ function unverifiedReason(source: SourceCheck, quote: string | null): string {
     return `the source is not official (tier ${source.tier})`;
   if (quote === null) return "no quote was given";
   return "the quote was not found in the source";
-}
+};
 
-function sourceCheck(
+const sourceCheck = (
   url: string,
   tier: SourceTier,
   document: FetchedDocument | null,
   match: QuoteMatch | null,
-): SourceCheck {
+): SourceCheck => {
   return {
     url,
     finalUrl: document?.finalUrl ?? null,
@@ -203,14 +206,14 @@ function sourceCheck(
     problem: document?.problem ?? null,
     matchedQuote: match?.span ?? null,
   };
-}
+};
 
-function candidateSource(
+const candidateSource = (
   url: string,
   tier: SourceTier,
   document: FetchedDocument | null,
   supporting: boolean,
-): CandidateSource {
+): CandidateSource => {
   const fetched = document?.accessibility === "accessible";
   return {
     url,
@@ -229,15 +232,15 @@ function candidateSource(
     fetchAttemptedAt: document?.retrievedAt ?? null,
     role: supporting ? "supporting" : "consulted",
   };
-}
+};
 
-function evidence(
+const evidence = (
   evidenceType: "fetched_verified" | "manual",
   effectiveFrom: string,
   fields: Partial<
     Pick<CandidateEvidence, "source" | "quote" | "page" | "note">
   >,
-): CandidateEvidence {
+): CandidateEvidence => {
   return {
     evidenceType,
     source: null,
@@ -251,36 +254,39 @@ function evidence(
     note: null,
     ...fields,
   };
-}
+};
 
-function sameRecord(active: ActiveRevision, candidate: NewCandidate): boolean {
+const sameRecord = (
+  active: ActiveRevision,
+  candidate: NewCandidate,
+): boolean => {
   return (
     active.validFrom === candidate.validFrom &&
     active.validTo === candidate.validTo &&
     active.trust === candidate.trust &&
     isDeepStrictEqual(active.value, candidate.value)
   );
-}
+};
 
-function isCalendarDate(date: string): boolean {
+const isCalendarDate = (date: string): boolean => {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
   const time = Date.parse(`${date}T00:00:00Z`);
   // Rejects dates that do not exist, such as 2026-02-30.
   return !Number.isNaN(time) && new Date(time).toISOString().startsWith(date);
-}
+};
 
-function nextDay(date: string): string {
+const nextDay = (date: string): string => {
   return new Date(Date.parse(`${date}T00:00:00Z`) + DAY_MS)
     .toISOString()
     .slice(0, 10);
-}
+};
 
 /** The calendar date in Israel at an instant, YYYY-MM-DD. */
-export function israelDate(now: Date): string {
+export const israelDate = (now: Date): string => {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Jerusalem",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   }).format(now);
-}
+};

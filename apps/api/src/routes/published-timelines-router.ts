@@ -14,9 +14,9 @@ const PUBLIC_CACHE = "public, max-age=300, stale-while-revalidate=3600";
  * GET /timelines?kinds=a,b. Public: guests calculate with the same rates.
  * Returns the full published history of each requested kind.
  */
-export function publishedTimelinesRouter(
+export const publishedTimelinesRouter = (
   reader: PublishedTimelinesReader,
-): Router {
+): Router => {
   const router = Router();
 
   router.get("/timelines", async (req, res) => {
@@ -70,4 +70,4 @@ export function publishedTimelinesRouter(
   });
 
   return router;
-}
+};

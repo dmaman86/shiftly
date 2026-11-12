@@ -10,16 +10,16 @@ const CALCULATION =
   /\{\{\s*חשב ועצב\s*\|([^{}|]+?)(?:\|\s*עיגול\s*=\s*(\d+)\s*)?\}\}/g;
 
 /** Names of the data pages a text uses, without the "נתון:" prefix. */
-export function dataTemplateNames(text: string): string[] {
+export const dataTemplateNames = (text: string): string[] => {
   return [...new Set([...text.matchAll(DATA_TEMPLATE)].map((m) => m[1]))];
-}
+};
 
 /**
  * The transcluded value of a data page: what is inside <onlyinclude>, or the
  * page without its notes in older revisions. Invisible direction and
  * zero-width marks are dropped (seen in the 2025 revisions).
  */
-export function dataPageValue(wikitext: string): string {
+export const dataPageValue = (wikitext: string): string => {
   const only = /<onlyinclude>([\s\S]*?)<\/onlyinclude>/.exec(wikitext);
   const value = only
     ? only[1]
@@ -28,17 +28,17 @@ export function dataPageValue(wikitext: string): string {
         .replace(/<!--[\s\S]*?-->/g, "")
         .replace(/\[\[קטגוריה:[^\]]*\]\]/g, "");
   return value.replace(/[\u200b-\u200f\u202a-\u202e\u2066-\u2069]/g, "").trim();
-}
+};
 
 /**
  * Replaces every data template with its value and evaluates every
  * calculation. Returns null when something is left unresolved, so a text
  * with a missing value never reaches the model.
  */
-export function renderKolZchutTemplates(
+export const renderKolZchutTemplates = (
   text: string,
   values: ReadonlyMap<string, string>,
-): string | null {
+): string | null => {
   const withValues = text
     .replace(/<!--[\s\S]*?-->/g, "")
     .replace(DATA_TEMPLATE, (match, name: string) => values.get(name) ?? match);
@@ -54,13 +54,13 @@ export function renderKolZchutTemplates(
   );
   // Not DATA_TEMPLATE: test() on a /g regex is stateful.
   return /\{\{\s*(?:נתון:|חשב ועצב)/.test(rendered) ? null : rendered;
-}
+};
 
 /**
  * Evaluates + - * / and parentheses over decimal numbers. Anything else
  * returns null; nothing is passed to eval.
  */
-export function evaluateArithmetic(expression: string): number | null {
+export const evaluateArithmetic = (expression: string): number | null => {
   const tokens = expression.match(/\d+(?:\.\d+)?|[-+*/()]|\S/g) ?? [];
   let position = 0;
 
@@ -106,4 +106,4 @@ export function evaluateArithmetic(expression: string): number | null {
   return value !== null && position === tokens.length && Number.isFinite(value)
     ? value
     : null;
-}
+};

@@ -15,56 +15,10 @@ import {
 import { CONTRIBUTION_PARAMETERS } from "../research/social-security/employee-contributions.ts";
 import { KolZchutSocialSecuritySource } from "../research/social-security/kolzchut-source.ts";
 
-/**
- * Researches the employee National Insurance and health insurance parameters
- * from November 2015 to today and prints the coverage of each one. Without
- * --store it is a dry run that writes nothing to the store; with --store the
- * candidates are kept as pending review. Activating them is a separate,
- * human step (reference:activate).
- *
- *   bun run --cwd apps/api reference:research:contributions [--store]
- */
-const { values } = parseArgs({
-  options: { store: { type: "boolean", default: false } },
-  strict: true,
-});
-
-// Before reading ARTIFACTS_DIR: the env files may set it.
-loadLocalEnvFiles();
-const artifactsDir = loadArtifactsDir();
-const report = await researchEmployeeContributions({
-  fetcher: new HttpDocumentFetcher(),
-  archive: new WaybackArchiveIndex(),
-  kolZchut: new KolZchutSocialSecuritySource(),
-  artifacts: new FileDebugArtifactStore(
-    join(artifactsDir, "employee-contributions"),
-  ),
-});
-
-const reportDir = join(artifactsDir, "employee-contributions");
-await mkdir(reportDir, { recursive: true });
-const reportFile = join(
-  reportDir,
-  `report-${report.researchedAt.replace(/:/g, "-")}.json`,
-);
-await writeFile(reportFile, JSON.stringify(report, null, 2), "utf8");
-console.log(formatReport(report));
-console.log(`\nFull report: ${reportFile}`);
-
-if (!values.store) {
-  console.log(
-    `Dry run: nothing was stored. Add --store to keep the ${report.candidates.length} candidates for review.`,
-  );
-} else {
-  const outcome = await storeCandidates(adminRepository(), report.candidates);
-  console.log(JSON.stringify(outcome, null, 2));
-  if (outcome.status === "failed") process.exit(1);
-}
-
-function readingsOf(
+const readingsOf = (
   report: ContributionsResearchReport,
   evidence: readonly number[],
-): string {
+): string => {
   const readings = new Set(
     evidence.flatMap((index) =>
       report.evidence[index].quotes.map(({ reading }) => reading),
@@ -74,9 +28,9 @@ function readingsOf(
     .sort((a, b) => a - b)
     .map((reading) => `#${reading}`)
     .join(" ");
-}
+};
 
-function formatReport(report: ContributionsResearchReport): string {
+const formatReport = (report: ContributionsResearchReport): string => {
   const lines: string[] = [
     `Window: ${report.timelines.window.from} → ${report.timelines.window.until} (exclusive)`,
     `Archive index: ${report.archive.status === "read" ? `${report.archive.captures} captures` : `unavailable (${report.archive.problem})`}`,
@@ -125,4 +79,50 @@ function formatReport(report: ContributionsResearchReport): string {
     }
   }
   return lines.join("\n");
+};
+
+/**
+ * Researches the employee National Insurance and health insurance parameters
+ * from November 2015 to today and prints the coverage of each one. Without
+ * --store it is a dry run that writes nothing to the store; with --store the
+ * candidates are kept as pending review. Activating them is a separate,
+ * human step (reference:activate).
+ *
+ *   bun run --cwd apps/api reference:research:contributions [--store]
+ */
+const { values } = parseArgs({
+  options: { store: { type: "boolean", default: false } },
+  strict: true,
+});
+
+// Before reading ARTIFACTS_DIR: the env files may set it.
+loadLocalEnvFiles();
+const artifactsDir = loadArtifactsDir();
+const report = await researchEmployeeContributions({
+  fetcher: new HttpDocumentFetcher(),
+  archive: new WaybackArchiveIndex(),
+  kolZchut: new KolZchutSocialSecuritySource(),
+  artifacts: new FileDebugArtifactStore(
+    join(artifactsDir, "employee-contributions"),
+  ),
+});
+
+const reportDir = join(artifactsDir, "employee-contributions");
+await mkdir(reportDir, { recursive: true });
+const reportFile = join(
+  reportDir,
+  `report-${report.researchedAt.replace(/:/g, "-")}.json`,
+);
+await writeFile(reportFile, JSON.stringify(report, null, 2), "utf8");
+console.log(formatReport(report));
+console.log(`\nFull report: ${reportFile}`);
+
+if (!values.store) {
+  console.log(
+    `Dry run: nothing was stored. Add --store to keep the ${report.candidates.length} candidates for review.`,
+  );
+} else {
+  const outcome = await storeCandidates(adminRepository(), report.candidates);
+  console.log(JSON.stringify(outcome, null, 2));
+  if (outcome.status === "failed") process.exit(1);
 }

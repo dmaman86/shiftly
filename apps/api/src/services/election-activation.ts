@@ -9,12 +9,12 @@ export type ActivatableElection = RevisionDetails & {
  * Knesset elections that are still pending review, so it can never touch
  * income tax or bring back a superseded value.
  */
-export function checkElectionActivation(
+export const checkElectionActivation = (
   id: string,
   revision: RevisionDetails | null,
 ):
   | { readonly ok: true; readonly revision: ActivatableElection }
-  | { readonly ok: false; readonly problem: string } {
+  | { readonly ok: false; readonly problem: string } => {
   if (revision === null) {
     return { ok: false, problem: `revision ${id} not found` };
   }
@@ -35,4 +35,4 @@ export function checkElectionActivation(
     return { ok: false, problem: `revision ${id} has no subject` };
   }
   return { ok: true, revision: { ...revision, subjectKey } };
-}
+};

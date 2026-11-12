@@ -8,16 +8,16 @@ import {
 const NOW = new Date("2026-10-20T12:00:00.000Z");
 const URL_ = "https://www.kolzchut.org.il/he/page";
 
-function respond(
+const respond = (
   body: ConstructorParameters<typeof Response>[0],
   init: ResponseInit & { url?: string } = {},
-) {
+) => {
   const response = new Response(body, init);
   if (init.url) Object.defineProperty(response, "url", { value: init.url });
   return response;
-}
+};
 
-function fetcherWith(response: Response | Error) {
+const fetcherWith = (response: Response | Error) => {
   const fetch = vi.fn(async () => {
     if (response instanceof Error) throw response;
     return response;
@@ -26,7 +26,7 @@ function fetcherWith(response: Response | Error) {
     fetcher: new HttpDocumentFetcher({ fetch, now: () => NOW }),
     fetch,
   };
-}
+};
 
 describe("HttpDocumentFetcher", () => {
   it("reads an HTML page and records what was downloaded", async () => {

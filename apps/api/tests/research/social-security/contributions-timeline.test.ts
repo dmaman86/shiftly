@@ -54,7 +54,7 @@ const source = (url: string): CandidateSource => ({
 });
 
 /** Collects readings and their evidence as the research does. */
-function research() {
+const research = () => {
   const readings: ContributionReading[] = [];
   const evidence: ContributionEvidence[] = [];
   const reading = (
@@ -103,7 +103,7 @@ function research() {
     );
   };
   return { readings, evidence, reading, observe };
-}
+};
 
 const WINDOW = { from: "2025-01-01", until: "2025-07-01" };
 

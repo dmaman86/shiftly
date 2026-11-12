@@ -68,12 +68,12 @@ const discovered = (...urls: string[]): ResearchDiscoveryResult => ({
   rawText: null,
 });
 
-function setup(options: {
+const setup = (options: {
   documents: Record<string, FetchedDocument>;
   discovery?: ResearchDiscoveryResult;
   repository?: RevisionRepository | null;
   current?: Partial<Record<ReferenceKind, CurrentRevision[]>>;
-}) {
+}) => {
   const stored: NewCandidate[] = [];
   const extract = vi.fn(async () => ({
     raw: ANSWER_2026,
@@ -105,7 +105,7 @@ function setup(options: {
       revisions: options.repository === null ? null : repository,
     });
   return { run, stored, extract };
-}
+};
 
 describe("researchAndStoreIncomeTax", () => {
   it("stores brackets and credit point as separate official candidates", async () => {

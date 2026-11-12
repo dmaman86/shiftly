@@ -6,7 +6,7 @@ import { SupabaseRevisionRepository } from "../repositories/supabase-revision-re
  * The reference-data store for local administrator commands, with the backend
  * secret key. Exits when the environment is incomplete.
  */
-export function adminRepository(): SupabaseRevisionRepository {
+export const adminRepository = (): SupabaseRevisionRepository => {
   loadLocalEnvFiles();
   try {
     const env = loadAdminEnv();
@@ -19,4 +19,4 @@ export function adminRepository(): SupabaseRevisionRepository {
     console.error((error as Error).message);
     process.exit(1);
   }
-}
+};

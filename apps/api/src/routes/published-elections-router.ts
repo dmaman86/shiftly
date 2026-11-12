@@ -12,10 +12,10 @@ import {
 const PUBLIC_CACHE = "public, max-age=300, stale-while-revalidate=3600";
 
 /** GET /elections?year=YYYY. Public: no token, published data only. */
-export function publishedElectionsRouter(
+export const publishedElectionsRouter = (
   reader: PublishedElectionsReader,
   now: () => Date = () => new Date(),
-): Router {
+): Router => {
   const router = Router();
 
   router.get("/elections", async (req, res) => {
@@ -58,4 +58,4 @@ export function publishedElectionsRouter(
   });
 
   return router;
-}
+};

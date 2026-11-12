@@ -30,9 +30,11 @@ export const FIRST_SUPPORTED_YEAR = 2015;
  * Years the web app can ask for: it offers months up to the current one, and
  * a December range ends on January 1 of the next year.
  */
-export function supportedYears(now: Date): {
+export const supportedYears = (
+  now: Date,
+): {
   readonly first: number;
   readonly last: number;
-} {
+} => {
   return { first: FIRST_SUPPORTED_YEAR, last: now.getUTCFullYear() + 1 };
-}
+};

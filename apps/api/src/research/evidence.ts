@@ -20,30 +20,33 @@ export type QuoteMatch = {
  * has no reliable spacing) and dashes or quote marks may be swapped; every
  * other character must match in order.
  */
-export function locateQuote(content: string, quote: string): QuoteMatch | null {
+export const locateQuote = (
+  content: string,
+  quote: string,
+): QuoteMatch | null => {
   const characters = [...quote.replace(/\s+/g, "")];
   if (characters.length < MIN_QUOTE_CHARACTERS) return null;
   const pattern = characters.map(characterPattern).join("\\s*");
   const match = new RegExp(pattern, "u").exec(content);
   if (match === null) return null;
   return { span: match[0], page: pageAt(content, match.index) };
-}
+};
 
-function characterPattern(character: string): string {
+const characterPattern = (character: string): string => {
   for (const [matches, pattern] of EQUIVALENTS) {
     if (matches.test(character)) return pattern;
   }
   return character.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
+};
 
-function pageAt(content: string, index: number): number | null {
+const pageAt = (content: string, index: number): number | null => {
   const markers = [...content.slice(0, index).matchAll(/\[page (\d+)\]/g)];
   const last = markers.at(-1);
   return last ? Number(last[1]) : null;
-}
+};
 
 /** The page a source reference names ("page 10", "p. 10", "עמוד 10"). */
-export function referencedPage(sourceReference: string): number | null {
+export const referencedPage = (sourceReference: string): number | null => {
   const match = /(?:page|p\.|עמוד|עמ')\s*(\d+)/i.exec(sourceReference);
   return match ? Number(match[1]) : null;
-}
+};

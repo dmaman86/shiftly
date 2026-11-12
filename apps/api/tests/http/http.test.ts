@@ -15,7 +15,7 @@ const WEB_ORIGIN = "https://web.example";
 
 let server: Server | undefined;
 
-async function start(ready = true) {
+const start = async (ready = true) => {
   const unused = vi.fn();
   const app = createApp({
     allowedOrigins: [WEB_ORIGIN],
@@ -38,7 +38,7 @@ async function start(ready = true) {
   const { port } = server.address() as AddressInfo;
   return (path: string, init: RequestInit = {}) =>
     fetch(`http://127.0.0.1:${port}${path}`, init);
-}
+};
 
 const preflight = (origin: string): RequestInit => ({
   method: "OPTIONS",

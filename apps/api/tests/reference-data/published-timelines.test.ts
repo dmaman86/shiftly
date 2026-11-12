@@ -131,7 +131,7 @@ describe("SupabasePublishedTimelinesReader", () => {
       headers: { "content-type": "application/json" },
     });
 
-  function readerWith(response: Response) {
+  const readerWith = (response: Response) => {
     const fetch = vi.fn<typeof globalThis.fetch>(async () => response.clone());
     const reader = new SupabasePublishedTimelinesReader({
       url: "https://project.supabase.co",
@@ -146,7 +146,7 @@ describe("SupabasePublishedTimelinesReader", () => {
       };
     };
     return { reader, sent };
-  }
+  };
 
   it("reads active revisions without subject, period and value only", async () => {
     const { reader, sent } = readerWith(json(ROWS));
@@ -177,7 +177,7 @@ describe("SupabasePublishedTimelinesReader", () => {
 });
 
 describe("CachedPublishedTimelinesReader", () => {
-  function setup() {
+  const setup = () => {
     let now = 0;
     const inner = { timelines: vi.fn(async () => PUBLISHED) };
     const cached = new CachedPublishedTimelinesReader(inner, {
@@ -185,7 +185,7 @@ describe("CachedPublishedTimelinesReader", () => {
       now: () => now,
     });
     return { inner, cached, advance: (ms: number) => (now += ms) };
-  }
+  };
 
   it("serves the timelines from memory until they expire", async () => {
     const { inner, cached, advance } = setup();
@@ -225,14 +225,14 @@ describe("GET /reference/timelines", () => {
     vi.restoreAllMocks();
   });
 
-  async function start(reader: PublishedTimelinesReader) {
+  const start = async (reader: PublishedTimelinesReader) => {
     const app = express();
     app.use("/reference", publishedTimelinesRouter(reader));
     server = app.listen(0, "127.0.0.1");
     await new Promise((resolve) => server!.once("listening", resolve));
     const { port } = server.address() as AddressInfo;
     return (path: string) => fetch(`http://127.0.0.1:${port}${path}`);
-  }
+  };
 
   it("publishes the requested timelines without a token, cacheable for five minutes", async () => {
     const request = await start({ timelines: async () => PUBLISHED });

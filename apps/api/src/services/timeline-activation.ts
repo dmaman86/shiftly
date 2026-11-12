@@ -6,12 +6,12 @@ import type { RevisionDetails } from "../ports/reference-data.ts";
  * references such as elections have their own command, and a superseded or
  * rejected revision is never brought back.
  */
-export function checkTimelineActivation(
+export const checkTimelineActivation = (
   id: string,
   revision: RevisionDetails | null,
 ):
   | { readonly ok: true; readonly revision: RevisionDetails }
-  | { readonly ok: false; readonly problem: string } {
+  | { readonly ok: false; readonly problem: string } => {
   if (revision === null) {
     return { ok: false, problem: `revision ${id} not found` };
   }
@@ -28,4 +28,4 @@ export function checkTimelineActivation(
     };
   }
   return { ok: true, revision };
-}
+};

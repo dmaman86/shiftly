@@ -149,10 +149,10 @@ export class HttpDocumentFetcher implements DocumentFetcher {
   }
 }
 
-function formatOf(
+const formatOf = (
   contentType: string | null,
   bytes: Uint8Array,
-): FetchedDocument["format"] {
+): FetchedDocument["format"] => {
   const type = contentType?.split(";")[0].trim().toLowerCase() ?? "";
   const pdfMagic = new TextDecoder().decode(bytes.subarray(0, 5)) === "%PDF-";
   if (type === "application/pdf" || pdfMagic) return "pdf-text";
@@ -161,19 +161,19 @@ function formatOf(
   }
   if (type === "text/plain") return "plain-text";
   return null;
-}
+};
 
-function toText(
+const toText = (
   format: NonNullable<FetchedDocument["format"]>,
   bytes: Uint8Array,
-): Promise<DocumentText> | DocumentText {
+): Promise<DocumentText> | DocumentText => {
   if (format === "pdf-text") return pdfToText(bytes);
   const decoded = new TextDecoder().decode(bytes);
   return format === "html-text"
     ? htmlToText(decoded)
     : { text: decoded.trim(), title: null };
-}
+};
 
-function messageOf(cause: unknown): string {
+const messageOf = (cause: unknown): string => {
   return (cause instanceof Error ? cause.message : String(cause)).slice(0, 300);
-}
+};

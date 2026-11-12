@@ -14,10 +14,10 @@ import {
 let server: Server | undefined;
 
 // The HTTP layer only forwards the pipeline result, so tests use minimal stand-ins.
-async function start(
+const start = async (
   extract: (year: number) => Promise<unknown>,
   research: (year: number) => Promise<unknown> = extract,
-) {
+) => {
   // Auth is covered in tests/auth; here every admin call is a verified admin.
   const app = createApp({
     allowedOrigins: [],
@@ -40,7 +40,7 @@ async function start(
   const { port } = server.address() as AddressInfo;
   return (path: string, init: RequestInit = {}) =>
     fetch(`http://127.0.0.1:${port}${path}`, init);
-}
+};
 
 const post = {
   method: "POST",

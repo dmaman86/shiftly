@@ -17,7 +17,10 @@ const CLAIMS = {
   is_anonymous: false,
 };
 
-function verifierWith(responses: { getClaims?: unknown; getUser?: unknown }) {
+const verifierWith = (responses: {
+  getClaims?: unknown;
+  getUser?: unknown;
+}) => {
   const auth = {
     getClaims: vi.fn(async () => responses.getClaims),
     getUser: vi.fn(async () => responses.getUser),
@@ -30,7 +33,7 @@ function verifierWith(responses: { getClaims?: unknown; getUser?: unknown }) {
     >[0]["auth"],
   });
   return { verifier, auth };
-}
+};
 
 const claims = (overrides: Record<string, unknown>) => ({
   data: { claims: { ...CLAIMS, ...overrides }, header: {}, signature: [] },

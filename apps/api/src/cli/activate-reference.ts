@@ -17,7 +17,7 @@ const Args = z.object({
   reviewer: z.string().trim().min(1),
 });
 
-function readArgs(): Record<string, unknown> {
+const readArgs = (): Record<string, unknown> => {
   try {
     return parseArgs({
       options: {
@@ -32,7 +32,7 @@ function readArgs(): Record<string, unknown> {
     console.error(USAGE);
     process.exit(2);
   }
-}
+};
 
 const parsed = Args.safeParse(readArgs());
 if (!parsed.success) {

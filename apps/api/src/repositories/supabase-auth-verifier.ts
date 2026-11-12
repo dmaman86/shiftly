@@ -86,11 +86,11 @@ export class SupabaseAuthVerifier implements AuthVerifier {
  * problem (401). A network failure or a server error is ours: we cannot tell
  * whether the token is valid, so the request must not proceed (503).
  */
-function rejectedOrThrow(error: AuthError): Verification {
+const rejectedOrThrow = (error: AuthError): Verification => {
   if (isAuthRetryableFetchError(error) || (error.status ?? 0) >= 500) {
     throw new AuthUnavailableError(
       `Supabase Auth unavailable: ${error.message}`,
     );
   }
   return { status: "rejected", reason: error.message };
-}
+};

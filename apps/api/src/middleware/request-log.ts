@@ -7,7 +7,7 @@ const UNLOGGED_PATHS = new Set(["/health"]);
  * One JSON line per request with a severity Cloud Logging understands. Logs
  * the path only: never the query string, headers, tokens or bodies.
  */
-export function requestLog(): RequestHandler {
+export const requestLog = (): RequestHandler => {
   return (req, res, next) => {
     const requestId = randomUUID();
     const startedAt = process.hrtime.bigint();
@@ -30,4 +30,4 @@ export function requestLog(): RequestHandler {
     });
     next();
   };
-}
+};

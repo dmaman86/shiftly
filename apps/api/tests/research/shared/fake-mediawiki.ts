@@ -12,7 +12,7 @@ export type FakeWiki = Readonly<Record<string, readonly FakeRevision[]>>;
  * the latest revision, or the latest one at or before rvstart. A title not in
  * `wiki` is missing; a title whose revisions all come later has none.
  */
-export function fakeMediaWikiFetch(wiki: FakeWiki): typeof fetch {
+export const fakeMediaWikiFetch = (wiki: FakeWiki): typeof fetch => {
   return (async (input: string | URL | Request) => {
     const url = new URL(String(input));
     const title = url.searchParams.get("titles") ?? "";
@@ -44,4 +44,4 @@ export function fakeMediaWikiFetch(wiki: FakeWiki): typeof fetch {
       headers: { "content-type": "application/json" },
     });
   }) as typeof fetch;
-}
+};

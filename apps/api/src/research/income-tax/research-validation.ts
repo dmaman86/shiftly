@@ -69,11 +69,11 @@ export type IncomeTaxResearchValues = {
  * effective date, that each quote is in the fetched content, and that each
  * value is written in its quote (brackets row by row, in table order).
  */
-export function validateIncomeTaxResearch(
+export const validateIncomeTaxResearch = (
   raw: unknown,
   document: FetchedDocument,
   year: number,
-): IncomeTaxResearchValues {
+): IncomeTaxResearchValues => {
   const extracted = parseComplete(incomeTaxResearchSchema, raw);
   const { brackets } = extracted.monthlyBrackets;
   const creditPoint = extracted.monthlyCreditPoint.value;
@@ -106,13 +106,13 @@ export function validateIncomeTaxResearch(
       ...evidenceOf(extracted.monthlyCreditPoint, creditQuote.match!),
     },
   };
-}
+};
 
-function locate(
+const locate = (
   field: "monthlyBrackets" | "monthlyCreditPoint",
   extracted: Extracted,
   document: FetchedDocument,
-): { match: QuoteMatch | null; problems: string[] } {
+): { match: QuoteMatch | null; problems: string[] } => {
   const { quote, sourceReference } = extracted[field];
   const match = locateQuote(document.text, quote);
   if (match === null) {
@@ -131,12 +131,12 @@ function locate(
     };
   }
   return { match, problems: [] };
-}
+};
 
-function sanityProblems(
+const sanityProblems = (
   brackets: readonly MonthlyTaxBracket[],
   creditPoint: number,
-): string[] {
+): string[] => {
   const problems: string[] = [];
   const { bracketCount, firstRate, topRate, creditPoint: credit } = SANITY;
   if (
@@ -166,14 +166,14 @@ function sanityProblems(
     problems.push(`credit point ${creditPoint} is implausible`);
   }
   return problems;
-}
+};
 
 /** effectiveFrom must be a real date in the requested year, a year the document names. */
-function effectiveDateProblems(
+const effectiveDateProblems = (
   extracted: Extracted,
   document: FetchedDocument,
   year: number,
-): string[] {
+): string[] => {
   const problems: string[] = [];
   for (const field of ["monthlyBrackets", "monthlyCreditPoint"] as const) {
     const { effectiveFrom } = extracted[field];
@@ -189,7 +189,7 @@ function effectiveDateProblems(
     problems.push(`the document never mentions ${year}`);
   }
   return problems;
-}
+};
 
 /**
  * Bracket i must come from a line of its quote, below the line of bracket
@@ -197,10 +197,10 @@ function effectiveDateProblems(
  * and, for middle rows, its lower limit. A skipped or merged row then fails
  * even though each number exists somewhere in the table.
  */
-function bracketRowProblems(
+const bracketRowProblems = (
   brackets: readonly MonthlyTaxBracket[],
   span: string,
-): string[] {
+): string[] => {
   const lines = span.split("\n");
   let next = 0;
   for (const [index, bracket] of brackets.entries()) {
@@ -215,9 +215,9 @@ function bracketRowProblems(
     next = found + 1;
   }
   return [];
-}
+};
 
-function rowMatches(line: string, bracket: MonthlyTaxBracket): boolean {
+const rowMatches = (line: string, bracket: MonthlyTaxBracket): boolean => {
   const has = appearsIn(line);
   const upper =
     bracket.maxIncome === null
@@ -230,12 +230,12 @@ function rowMatches(line: string, bracket: MonthlyTaxBracket): boolean {
     bracket.maxIncome === null ||
     has(String(bracket.minIncome));
   return upper && lower && percentAppearsIn(line)(bracket.taxRate);
-}
+};
 
-function evidenceOf(
+const evidenceOf = (
   extracted: Extracted["monthlyBrackets" | "monthlyCreditPoint"],
   match: QuoteMatch,
-): Evidence {
+): Evidence => {
   return {
     effectiveFrom: extracted.effectiveFrom,
     quote: match.span,
@@ -243,11 +243,11 @@ function evidenceOf(
     sourceReference: extracted.sourceReference,
     page: match.page,
   };
-}
+};
 
-function isRealDate(value: string): boolean {
+const isRealDate = (value: string): boolean => {
   const date = new Date(`${value}T00:00:00Z`);
   return (
     !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
   );
-}
+};

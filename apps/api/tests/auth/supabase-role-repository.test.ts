@@ -11,7 +11,7 @@ const json = (body: unknown, status = 200) =>
     headers: { "content-type": "application/json" },
   });
 
-function repositoryWith(response: Response) {
+const repositoryWith = (response: Response) => {
   const fetch = vi.fn<typeof globalThis.fetch>(async () => response.clone());
   const repository = new SupabaseRoleRepository({
     url: "https://project.supabase.co",
@@ -23,7 +23,7 @@ function repositoryWith(response: Response) {
     return { url: new URL(String(input)), headers: new Headers(init?.headers) };
   };
   return { repository, request };
-}
+};
 
 describe("SupabaseRoleRepository", () => {
   it("reads the user's roles from app_user_roles with the secret key", async () => {

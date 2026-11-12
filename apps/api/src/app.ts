@@ -49,7 +49,7 @@ export type AppDeps = {
   ) => Promise<IncomeTaxResearchResponse>;
 };
 
-export function createApp(deps: AppDeps): express.Express {
+export const createApp = (deps: AppDeps): express.Express => {
   const app = express();
   app.disable("x-powered-by");
   // Behind exactly one proxy (the platform's load balancer), so req.ip and
@@ -117,7 +117,7 @@ export function createApp(deps: AppDeps): express.Express {
   });
   app.use(handleBodyErrors, handleUserDataErrors, handleUnexpectedError);
   return app;
-}
+};
 
 const handleUnexpectedError: ErrorRequestHandler = (
   error,

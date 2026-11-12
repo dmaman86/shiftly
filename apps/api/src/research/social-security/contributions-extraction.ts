@@ -95,7 +95,7 @@ const DOTTED = String.raw`(\d{2})\.(\d{2})\.(\d{4})`;
  * (the first of that month) or "נכון ל-2026" (January 1 of that year).
  * null when the text states no real date.
  */
-export function dateFromStatement(text: string): string | null {
+export const dateFromStatement = (text: string): string | null => {
   const dotted = new RegExp(DOTTED).exec(text);
   if (dotted) return isoDate(+dotted[3], +dotted[2], +dotted[1]);
   const named = new RegExp(String.raw`(?:מ|ב)?(${MONTH_NAMES})\s+(\d{4})`).exec(
@@ -105,9 +105,9 @@ export function dateFromStatement(text: string): string | null {
   const year = /נכון ל-\s*(\d{4})/.exec(text);
   if (year) return isoDate(+year[1], 1, 1);
   return null;
-}
+};
 
-function isoDate(year: number, month: number, day: number): string | null {
+const isoDate = (year: number, month: number, day: number): string | null => {
   const date = new Date(Date.UTC(year, month - 1, day));
   if (
     date.getUTCFullYear() !== year ||
@@ -117,13 +117,13 @@ function isoDate(year: number, month: number, day: number): string | null {
     return null;
   }
   return date.toISOString().slice(0, 10);
-}
+};
 
 /** "נכון ל-2020" holds for 2020 only: the end of that year; null for other statements. */
-export function yearLimitOfStatement(text: string): string | null {
+export const yearLimitOfStatement = (text: string): string | null => {
   const year = /^נכון ל-\s*(\d{4})$/.exec(text.trim());
   return year ? `${Number(year[1]) + 1}-01-01` : null;
-}
+};
 
 const unclear = (...problems: string[]): RawContributionsExtraction => ({
   status: "unclear",
@@ -148,9 +148,9 @@ const CELL = new RegExp(
 
 type TableDate = { readonly text: string; readonly quote: string } | null;
 
-export function parseBtlEmployeeRates(
+export const parseBtlEmployeeRates = (
   text: string,
-): RawContributionsExtraction {
+): RawContributionsExtraction => {
   const flat = flatten(text);
   const start = flat.indexOf("באחוזים מהשכר");
   if (start === -1) return unclear("the employee rates table is missing");
@@ -236,7 +236,7 @@ export function parseBtlEmployeeRates(
     totals: { reduced: optionalRate(1), standard: optionalRate(4) },
     annualMaxUpdate: annual?.[0] ?? null,
   };
-}
+};
 
 type Row = {
   readonly at: number;
@@ -245,7 +245,7 @@ type Row = {
 };
 
 /** The six cells after a row label, searched from `from` on. */
-function row(section: string, label: string, from: number): Row | null {
+const row = (section: string, label: string, from: number): Row | null => {
   const at = section.indexOf(`${label} |`, from);
   if (at === -1) return null;
   const parts = section.slice(at + label.length).split("|");
@@ -253,15 +253,15 @@ function row(section: string, label: string, from: number): Row | null {
   if (cells.length < 6) return null;
   const quote = `${label} |${parts.slice(1, 7).join("|")}|`.trim();
   return { at, cells, quote };
-}
+};
 
 /** A cell's own date wins; otherwise the table heading's, when there is one. */
-function claim(
+const claim = (
   value: number,
   quote: string,
   ownDate: string | undefined,
   table: TableDate,
-): RawClaim {
+): RawClaim => {
   const statedFromText = ownDate ?? table?.text ?? null;
   return {
     value,
@@ -273,7 +273,7 @@ function claim(
     quote,
     statedFromQuote: ownDate ? quote : (table?.quote ?? null),
   };
-}
+};
 
 // ---------------------------------------------------------------------------
 // Kol Zchut, "דמי ביטוח לאומי לעובד שכיר", section "לנכות משכר העובד" as
@@ -286,9 +286,9 @@ const KZ_STARTED = new RegExp(
 const KZ_AMOUNT = /([\d,]{4,})\s*(?:₪|ש"ח)/;
 const KZ_YEAR = /נכון ל-\s*\d{4}/;
 
-export function parseKolZchutDeductions(
+export const parseKolZchutDeductions = (
   text: string,
-): RawContributionsExtraction {
+): RawContributionsExtraction => {
   const lines = text
     .split("\n")
     .map(flatten)
@@ -366,13 +366,13 @@ export function parseKolZchutDeductions(
     totals: { reduced: total(reduced), standard: total(standard) },
     annualMaxUpdate: null,
   };
-}
+};
 
 /** The top-level bullet that matches, with its sub-bullets. */
-function bulletBlock(
+const bulletBlock = (
   lines: readonly string[],
   heading: RegExp,
-): string[] | null {
+): string[] | null => {
   const start = lines.findIndex((line) => heading.test(line));
   if (start === -1) return null;
   const block = [lines[start]];
@@ -381,13 +381,13 @@ function bulletBlock(
     block.push(line);
   }
   return block;
-}
+};
 
-function datedClaim(
+const datedClaim = (
   value: number,
   line: string,
   stated: string | undefined,
-): RawClaim {
+): RawClaim => {
   return {
     value,
     statedFrom: stated === undefined ? null : dateFromStatement(stated),
@@ -396,4 +396,4 @@ function datedClaim(
     quote: line,
     statedFromQuote: stated === undefined ? null : line,
   };
-}
+};

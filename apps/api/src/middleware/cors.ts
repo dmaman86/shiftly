@@ -10,9 +10,9 @@ const PREFLIGHT_MAX_AGE_SECONDS = "600";
  * Requests without an Origin (curl, server to server) are not affected; CORS
  * only tells browsers which pages may read responses, it is not access control.
  */
-export function corsAllowlist(
+export const corsAllowlist = (
   allowedOrigins: readonly string[],
-): RequestHandler {
+): RequestHandler => {
   const allowed = new Set(allowedOrigins);
   return (req, res, next) => {
     res.vary("Origin");
@@ -38,4 +38,4 @@ export function corsAllowlist(
       .status(204)
       .end();
   };
-}
+};

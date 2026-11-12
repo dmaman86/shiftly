@@ -139,9 +139,9 @@ type Source<T> = {
  * Zchut as it read at the end of each remaining stretch. Builds the timelines
  * and the pending revisions they support; stores and activates nothing.
  */
-export async function researchEmployeeContributions(
+export const researchEmployeeContributions = async (
   deps: ContributionsResearchDeps,
-): Promise<ContributionsResearchReport> {
+): Promise<ContributionsResearchReport> => {
   const clock = deps.now ?? (() => new Date());
   const now = clock();
   const today = now.toISOString().slice(0, 10);
@@ -153,12 +153,12 @@ export async function researchEmployeeContributions(
   const evidence: ContributionEvidence[] = [];
   const totals: EmployeeTotalSpan[] = [];
 
-  async function read<T>(
+  const read = async <T>(
     source: Source<T>,
     trust: ContributionReading["trust"],
     observedOn: (result: ResearchResult<T>) => string,
     fallbackReason: RevisionFallbackReason | null = null,
-  ): Promise<{ values: T; reading: number } | null> {
+  ): Promise<{ values: T; reading: number } | null> => {
     const pipeline: ResearchDeps = {
       research: NO_DISCOVERY,
       fetcher: source.fetcher ?? deps.fetcher,
@@ -191,7 +191,7 @@ export async function researchEmployeeContributions(
       },
     });
     return { values: result.candidate.values, reading: readings.length - 1 };
-  }
+  };
   const retrievedOn = (result: ResearchResult<unknown>) =>
     waybackCaptureDay(result.candidate!.source.finalUrl) ??
     result.candidate!.source.retrievedAt.slice(0, 10);
@@ -370,15 +370,15 @@ export async function researchEmployeeContributions(
     timelines,
     candidates: contributionCandidates(timelines, evidence, readings),
   };
-}
+};
 
 /**
  * Months without any evidence for at least one parameter, as stretches that
  * never cross a year, so each is read as of its own year's end.
  */
-function gapStretches(
+const gapStretches = (
   timelines: ContributionTimelines,
-): { year: number; lastMonth: string }[] {
+): { year: number; lastMonth: string }[] => {
   const months = new Set<string>();
   for (const gap of timelines.missing) {
     if (gap.reason !== "no_evidence") continue;
@@ -401,7 +401,7 @@ function gapStretches(
     }
   }
   return stretches;
-}
+};
 
 const lastDayOf = (month: string) => {
   const next = new Date(`${addMonths(month, 1)}T00:00:00Z`);

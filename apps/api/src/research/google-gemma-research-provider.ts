@@ -142,16 +142,16 @@ export class GoogleGemmaResearchProvider implements ResearchProvider {
   }
 }
 
-function isGroundingRedirect(uri: string): boolean {
+const isGroundingRedirect = (uri: string): boolean => {
   try {
     return new URL(uri).hostname === GROUNDING_REDIRECT_HOST;
   } catch {
     return false;
   }
-}
+};
 
 /** Reads the Location header; the target itself is fetched later, by the fetcher. */
-async function locationOf(uri: string): Promise<string | null> {
+const locationOf = async (uri: string): Promise<string | null> => {
   try {
     const response = await fetch(uri, {
       redirect: "manual",
@@ -163,24 +163,26 @@ async function locationOf(uri: string): Promise<string | null> {
   } catch {
     return null;
   }
-}
+};
 
-export function urlsInText(text: string): string[] {
+export const urlsInText = (text: string): string[] => {
   return (text.match(/https?:\/\/[^\s<>"'`)\]]+/g) ?? []).map((url) =>
     url.replace(/[.,;:*]+$/, ""),
   );
-}
+};
 
-function uniqueByUrl(sources: readonly DiscoveredSource[]): DiscoveredSource[] {
+const uniqueByUrl = (
+  sources: readonly DiscoveredSource[],
+): DiscoveredSource[] => {
   const seen = new Set<string>();
   return sources.filter((source) => {
     if (seen.has(source.url)) return false;
     seen.add(source.url);
     return true;
   });
-}
+};
 
-function geminiSearch(apiKey: string): SearchGenerate {
+const geminiSearch = (apiKey: string): SearchGenerate => {
   const client = new GoogleGenAI({
     apiKey,
     httpOptions: { timeout: CALL_TIMEOUT_MS },
@@ -207,23 +209,23 @@ function geminiSearch(apiKey: string): SearchGenerate {
       queries: metadata?.webSearchQueries ?? [],
     };
   };
-}
+};
 
-function statusOf(cause: unknown): number | null {
+const statusOf = (cause: unknown): number | null => {
   const status = (cause as { status?: unknown } | null)?.status;
   return typeof status === "number" ? status : null;
-}
+};
 
 /** The provider's "retryDelay" hint (a quota reset, seen at ~36 s), within a cap. */
-function retryDelayMs(cause: unknown): number {
+const retryDelayMs = (cause: unknown): number => {
   const message = cause instanceof Error ? cause.message : String(cause);
   const hinted =
     /"retryDelay":\s*"(\d+(?:\.\d+)?)s"/.exec(message) ??
     /retry in (\d+(?:\.\d+)?)s/.exec(message);
   const ms = hinted ? Number(hinted[1]) * 1000 : DEFAULT_RETRY_MS;
   return Math.min(ms, MAX_RETRY_MS);
-}
+};
 
-function messageOf(cause: unknown): string {
+const messageOf = (cause: unknown): string => {
   return (cause instanceof Error ? cause.message : String(cause)).slice(0, 500);
-}
+};

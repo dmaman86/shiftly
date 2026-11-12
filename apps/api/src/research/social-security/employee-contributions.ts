@@ -46,14 +46,14 @@ export type ContributionValue =
   z.infer<typeof amountValueSchema> | z.infer<typeof rateValueSchema>;
 
 /** The stored value of a parameter; throws when it is out of range. */
-export function contributionValue(
+export const contributionValue = (
   parameter: ContributionParameter,
   value: number,
-): ContributionValue {
+): ContributionValue => {
   return isAmountParameter(parameter)
     ? amountValueSchema.parse({ amount: value })
     : rateValueSchema.parse({ rate: value });
-}
+};
 
 /** One parameter as one source states it. */
 export type ContributionClaim = {

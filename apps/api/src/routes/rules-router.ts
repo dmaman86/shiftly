@@ -20,11 +20,11 @@ const STATUS_BY_CODE: Record<RulesPipelineErrorCode, number> = {
  * POST <prefix>/:year/<action> runs one pipeline for that year. Every
  * pipeline shares the year check and the error contract.
  */
-export function yearRulesRouter(
+export const yearRulesRouter = (
   prefix: string,
   extract: (year: number) => Promise<unknown>,
   action = "rules",
-): Router {
+): Router => {
   const router = Router();
 
   router.post(`${prefix}/:year/${action}`, async (req, res) => {
@@ -56,4 +56,4 @@ export function yearRulesRouter(
   });
 
   return router;
-}
+};

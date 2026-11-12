@@ -25,7 +25,7 @@ const DOCUMENT: SourceDocument = {
 const providerError = (status: number, message = `HTTP ${status}`) =>
   Object.assign(new Error(message), { status });
 
-function extractorWith(...outcomes: (string | Error)[]) {
+const extractorWith = (...outcomes: (string | Error)[]) => {
   const generateText = vi.fn(async () => {
     const next = outcomes.shift();
     if (next instanceof Error) throw next;
@@ -40,16 +40,16 @@ function extractorWith(...outcomes: (string | Error)[]) {
   });
   const extract = () => extractor.extract(CREDIT_POINT_TASK, DOCUMENT);
   return { extract, generateText, sleep };
-}
+};
 
-async function failure(promise: Promise<unknown>) {
+const failure = async (promise: Promise<unknown>) => {
   const error = await promise.then(
     () => null,
     (e: unknown) => e,
   );
   expect(error).toBeInstanceOf(RulesPipelineError);
   return error as RulesPipelineError;
-}
+};
 
 describe("GemmaExtractor", () => {
   it("returns the parsed answer with a one-attempt trace", async () => {

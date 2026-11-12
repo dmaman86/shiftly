@@ -40,14 +40,14 @@ export interface Extractor {
   ): Promise<ExtractionResult>;
 }
 
-export function isLlmTrace(value: unknown): value is LlmTrace {
+export const isLlmTrace = (value: unknown): value is LlmTrace => {
   return (
     typeof value === "object" &&
     value !== null &&
     "attempts" in value &&
     "model" in value
   );
-}
+};
 
 export const MAX_ATTEMPTS = 3;
 // Only provider-side failures are retried; a bad answer is never retried into a good one.
@@ -169,14 +169,14 @@ export class GemmaExtractor implements Extractor {
  * even in JSON mode (seen live). Removing the fence changes no value; the
  * trace keeps the answer verbatim and the validator still checks every value.
  */
-function stripCodeFence(rawText: string): string {
+const stripCodeFence = (rawText: string): string => {
   return rawText
     .trim()
     .replace(/^```(?:json)?\s*/i, "")
     .replace(/\s*```$/, "");
-}
+};
 
-function geminiGenerateText(apiKey: string): GenerateText {
+const geminiGenerateText = (apiKey: string): GenerateText => {
   const client = new GoogleGenAI({
     apiKey,
     httpOptions: { timeout: ATTEMPT_TIMEOUT_MS },
@@ -195,15 +195,15 @@ function geminiGenerateText(apiKey: string): GenerateText {
     });
     return response.text;
   };
-}
+};
 
-function record(
+const record = (
   attempt: number,
   started: number,
   outcome: LlmAttempt["outcome"],
   httpStatus: number | null,
   error: string | null,
-): LlmAttempt {
+): LlmAttempt => {
   return {
     attempt,
     startedAt: new Date(started).toISOString(),
@@ -212,23 +212,23 @@ function record(
     httpStatus,
     error,
   };
-}
+};
 
-function statusOf(cause: unknown): number | null {
+const statusOf = (cause: unknown): number | null => {
   const status = (cause as { status?: unknown } | null)?.status;
   return typeof status === "number" ? status : null;
-}
+};
 
-function messageOf(cause: unknown): string {
+const messageOf = (cause: unknown): string => {
   return (cause instanceof Error ? cause.message : String(cause)).slice(0, 500);
-}
+};
 
 /** Uses the provider's "retryDelay" hint when present, within a fixed cap. */
-function backoffMs(attempt: number, cause: unknown): number {
+const backoffMs = (attempt: number, cause: unknown): number => {
   const hinted = /"retryDelay":\s*"(\d+(?:\.\d+)?)s"/.exec(messageOf(cause));
   const providerMs = hinted ? Number(hinted[1]) * 1000 : 0;
   return Math.min(
     Math.max(BACKOFF_MS[attempt - 1] ?? BACKOFF_MS.at(-1)!, providerMs),
     MAX_PROVIDER_DELAY_MS,
   );
-}
+};

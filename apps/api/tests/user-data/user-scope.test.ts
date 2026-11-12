@@ -15,7 +15,9 @@ const json = (body: unknown, status = 200) =>
     headers: { "content-type": "application/json" },
   });
 
-function accessWith(respond: () => Promise<Response> = async () => json([])) {
+const accessWith = (
+  respond: () => Promise<Response> = async () => json([]),
+) => {
   const fetch = vi.fn<typeof globalThis.fetch>(respond);
   const access = supabaseUserDataAccess({
     url: "https://project.supabase.co",
@@ -32,7 +34,7 @@ function accessWith(respond: () => Promise<Response> = async () => json([])) {
     };
   };
   return { access, fetch, request };
-}
+};
 
 const user = { userId: USER_ID, accessToken: USER_TOKEN };
 const otherUser = { userId: ADMIN_ID, accessToken: ADMIN_TOKEN };

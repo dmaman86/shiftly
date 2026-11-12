@@ -60,7 +60,7 @@ export class SupabasePublishedElectionsReader implements PublishedElectionsReade
  * Maps rows straight to the public DTO. A malformed active revision fails the
  * whole read rather than publishing a guess.
  */
-export function toPublishedElections(rows: unknown): PublishedElection[] {
+export const toPublishedElections = (rows: unknown): PublishedElection[] => {
   const parsed = z.array(electionRowSchema).safeParse(rows);
   if (!parsed.success) {
     throw new ReferenceDataPersistenceError(
@@ -78,4 +78,4 @@ export function toPublishedElections(rows: unknown): PublishedElection[] {
           },
         ],
   );
-}
+};

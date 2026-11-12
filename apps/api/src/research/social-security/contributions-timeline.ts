@@ -81,10 +81,10 @@ export type ContributionObservation = {
  * ל-2020") covers no later than that; a page that says the maximum changes
  * only in January covers the maximum to the end of that year.
  */
-export function observationEvidence(
+export const observationEvidence = (
   observation: ContributionObservation,
   reading: number,
-): ContributionEvidence[] {
+): ContributionEvidence[] => {
   const observedMonth = monthOf(observation.observedOn);
   return CONTRIBUTION_PARAMETERS.map((parameter) => {
     const claim = observation.claims.claims[parameter];
@@ -121,26 +121,26 @@ export function observationEvidence(
       ],
     };
   }).filter((evidence) => evidence.from < evidence.until);
-}
+};
 
 /**
  * A change-point table: each row holds from its date until the next row's.
  * The newest row has no next row, and the table may not list later changes,
  * so it covers only its own month.
  */
-function changePoints<T extends { readonly from: string }>(
+const changePoints = <T extends { readonly from: string }>(
   rows: readonly T[],
-): { row: T; until: string }[] {
+): { row: T; until: string }[] => {
   return rows.map((row, index) => ({
     row,
     until: index === 0 ? addMonths(row.from, 1) : rows[index - 1].from,
   }));
-}
+};
 
-export function thresholdEvidence(
+export const thresholdEvidence = (
   history: ThresholdHistory,
   reading: number,
-): ContributionEvidence[] {
+): ContributionEvidence[] => {
   const evidence: ContributionEvidence[] = [];
   for (const { row, until } of changePoints(history.rows)) {
     for (const parameter of [
@@ -169,7 +169,7 @@ export function thresholdEvidence(
     }
   }
   return evidence;
-}
+};
 
 /** The employee total (National Insurance and health) of one part for [from, until). */
 export type EmployeeTotalSpan = {
@@ -180,10 +180,10 @@ export type EmployeeTotalSpan = {
   readonly quote: EvidenceQuote;
 };
 
-export function employeeTotalSpans(
+export const employeeTotalSpans = (
   history: EmployeeTotalHistory,
   reading: number,
-): EmployeeTotalSpan[] {
+): EmployeeTotalSpan[] => {
   return changePoints(history.rows).flatMap(({ row, until }) =>
     (["reduced", "standard"] as const).flatMap((part) => {
       const value = row[part];
@@ -206,16 +206,16 @@ export function employeeTotalSpans(
           ];
     }),
   );
-}
+};
 
 /**
  * A yearly report covers its year, from the date its table states, or from
  * an earlier year it says the rates stayed the same as.
  */
-export function reportEvidence(
+export const reportEvidence = (
   report: AnnualReportRates,
   reading: number,
-): ContributionEvidence[] {
+): ContributionEvidence[] => {
   const starts = [
     report.statedFrom,
     report.sameAsYear === null ? null : `${report.sameAsYear}-01-01`,
@@ -248,7 +248,7 @@ export function reportEvidence(
       },
     ],
   }));
-}
+};
 
 const PARTS = {
   reduced: ["nationalInsuranceReducedRate", "healthInsuranceReducedRate"],
@@ -262,10 +262,10 @@ const ratio = (value: number) => Math.round(value * 1_000_000) / 1_000_000;
  * rate, where official evidence states both for the same months. Only
  * official evidence is used, never another derived value.
  */
-export function deriveEvidence(
+export const deriveEvidence = (
   evidence: readonly ContributionEvidence[],
   totals: readonly EmployeeTotalSpan[],
-): ContributionEvidence[] {
+): ContributionEvidence[] => {
   const derived: ContributionEvidence[] = [];
   for (const total of totals) {
     const [nationalInsurance, health] = PARTS[total.part];
@@ -292,7 +292,7 @@ export function deriveEvidence(
     }
   }
   return derived;
-}
+};
 
 export type CoveredPeriod = {
   readonly parameter: ContributionParameter;
@@ -344,10 +344,10 @@ const TRUST_BY_RANK = {
  * between two periods of the same value; months where evidence of the
  * deciding rank disagrees are missing too.
  */
-export function buildContributionTimelines(
+export const buildContributionTimelines = (
   evidence: readonly ContributionEvidence[],
   window: { readonly from: string; readonly until: string },
-): ContributionTimelines {
+): ContributionTimelines => {
   const periods: CoveredPeriod[] = [];
   const missing: MissingPeriod[] = [];
   const conflicts: EvidenceConflict[] = [];
@@ -450,13 +450,13 @@ export function buildContributionTimelines(
     }
   }
   return { window, periods, missing, conflicts };
-}
+};
 
 /** Consecutive entries with the same key; a null key separates runs. */
-function runs<T>(
+const runs = <T>(
   entries: readonly T[],
   key: (entry: T) => string | null,
-): T[][] {
+): T[][] => {
   const result: T[][] = [];
   let previous: string | null = null;
   for (const entry of entries) {
@@ -469,23 +469,23 @@ function runs<T>(
     previous = current;
   }
   return result;
-}
+};
 
 export const monthOf = (day: string) => `${day.slice(0, 7)}-01`;
 
-export function addMonths(month: string, count: number): string {
+export const addMonths = (month: string, count: number): string => {
   const date = new Date(`${month}T00:00:00Z`);
   date.setUTCMonth(date.getUTCMonth() + count);
   return date.toISOString().slice(0, 10);
-}
+};
 
-function monthsIn(from: string, until: string): string[] {
+const monthsIn = (from: string, until: string): string[] => {
   const months: string[] = [];
   for (let month = monthOf(from); month < until; month = addMonths(month, 1)) {
     months.push(month);
   }
   return months;
-}
+};
 
 /**
  * One pending revision per verified period, backed by every passage that
@@ -493,11 +493,11 @@ function monthsIn(from: string, until: string): string[] {
  * Derived periods produce nothing either: the store has no trust level for a
  * value computed from two official ones, so they are only reported.
  */
-export function contributionCandidates(
+export const contributionCandidates = (
   timelines: ContributionTimelines,
   evidence: readonly ContributionEvidence[],
   readings: readonly ContributionReading[],
-): NewCandidate[] {
+): NewCandidate[] => {
   return timelines.periods.flatMap((period) => {
     if (period.trust === "official_derived") return [];
     const sources: CandidateSource[] = [];
@@ -562,4 +562,4 @@ export function contributionCandidates(
       },
     ];
   });
-}
+};

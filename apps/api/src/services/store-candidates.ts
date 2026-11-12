@@ -27,10 +27,10 @@ export type PersistenceOutcome =
  * never thrown: the research result is still returned, and storing again is
  * safe because the store returns the existing revision for the same value.
  */
-export async function storeCandidates(
+export const storeCandidates = async (
   repository: RevisionRepository | null,
   candidates: readonly NewCandidate[],
-): Promise<PersistenceOutcome> {
+): Promise<PersistenceOutcome> => {
   if (repository === null) return { status: "disabled" };
   if (candidates.length === 0) return { status: "nothing_to_store" };
 
@@ -67,4 +67,4 @@ export async function storeCandidates(
     }
   }
   return { status: "stored", revisions };
-}
+};

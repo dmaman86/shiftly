@@ -66,10 +66,10 @@ export type IncomeTaxResearchResponse = {
  * then stores the validated values of the uncovered kinds as pending
  * revisions. One booklet states both kinds, so research is all or nothing.
  */
-export async function researchAndStoreIncomeTax(
+export const researchAndStoreIncomeTax = async (
   year: number,
   deps: ResearchDeps & { readonly revisions: RevisionRepository | null },
-): Promise<IncomeTaxResearchResponse> {
+): Promise<IncomeTaxResearchResponse> => {
   const coverage = await yearCoverage(deps.revisions, INCOME_TAX_KINDS, year);
   const uncovered = uncoveredKinds(coverage);
   if (uncovered.size === 0) {
@@ -87,12 +87,12 @@ export async function researchAndStoreIncomeTax(
     incomeTaxCandidates(research).filter(({ kind }) => uncovered.has(kind)),
   );
   return { year, coverage, research, persistence };
-}
+};
 
 /** One candidate per kind, both backed by the passage they were read from. */
-export function incomeTaxCandidates(
+export const incomeTaxCandidates = (
   result: ResearchResult<IncomeTaxResearchValues>,
-): NewCandidate[] {
+): NewCandidate[] => {
   const provenance = candidateProvenance(result);
   if (result.candidate === null || provenance === null) return [];
   const { monthlyBrackets, monthlyCreditPoint } = result.candidate.values;
@@ -138,4 +138,4 @@ export function incomeTaxCandidates(
       monthlyCreditPoint,
     ),
   ];
-}
+};
