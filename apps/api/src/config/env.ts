@@ -40,13 +40,8 @@ const envSchema = z
      * production; never a wildcard.
      */
     CORS_ALLOWED_ORIGINS: originList,
-    /** Google AI Studio (Gemini API) key. Backend only: never prefix it with VITE_. */
-    GEMINI_API_KEY: z.string().min(1),
-    GEMINI_MODEL: z.string().min(1).default("gemma-4-31b-it"),
     /** Each rules pipeline writes to its own subfolder. */
     ARTIFACTS_DIR: artifactsDir,
-    /** Off by default: research results are only returned, not stored. */
-    REFERENCE_DATA_PERSISTENCE_ENABLED: z.stringbool().default(false),
     /**
      * Required: verifies Supabase Auth tokens and reads and writes data.
      * Same project URL as the frontend's VITE_SUPABASE_URL.
@@ -85,6 +80,14 @@ const adminEnvSchema = z.object({
 export type Env = z.infer<typeof envSchema>;
 export type AdminEnv = z.infer<typeof adminEnvSchema>;
 
+const researchEnvSchema = z.object({
+  GEMINI_API_KEY: z.string().trim().min(1),
+  GEMINI_MODEL: z.string().trim().min(1).default("gemma-4-31b-it"),
+  REFERENCE_DATA_PERSISTENCE_ENABLED: z.stringbool().default(false),
+  REFERENCE_RESEARCH_ENABLED: z.stringbool().default(false),
+});
+export type ResearchEnv = z.infer<typeof researchEnvSchema>;
+
 /** The error lists variable names, never their values. */
 const parseEnv = <T>(schema: z.ZodType<T>, source: NodeJS.ProcessEnv): T => {
   const parsed = schema.safeParse(source);
@@ -106,6 +109,11 @@ export const loadEnv = (source: NodeJS.ProcessEnv = process.env): Env => {
 export const loadAdminEnv = (
   source: NodeJS.ProcessEnv = process.env,
 ): AdminEnv => parseEnv(adminEnvSchema, source);
+
+/** Called only by explicit research operations, never by core API startup. */
+export const loadResearchEnv = (
+  source: NodeJS.ProcessEnv = process.env,
+): ResearchEnv => parseEnv(researchEnvSchema, source);
 
 /** Where debug artifacts go; the same default the server uses. */
 export const loadArtifactsDir = (
