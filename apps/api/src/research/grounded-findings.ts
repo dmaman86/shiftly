@@ -99,7 +99,8 @@ export const validateGroundedFindings = (
       (support.text === null || support.text === segment)
     );
   });
-  const candidates: NewCandidate[] = [];
+  let candidates: NewCandidate[] = [];
+  const admittedFindings: ResearchFinding[] = [];
   const unresolved: string[] = [...output.conflicts];
   for (const [i, finding] of output.findings.entries()) {
     if (
@@ -177,7 +178,16 @@ export const validateGroundedFindings = (
         answer.queries,
       ),
     );
+    admittedFindings.push(finding);
   }
+  candidates = candidates.filter((_candidate, index) => {
+    const finding = admittedFindings[index];
+    const problems =
+      spec.validateRelatedFinding?.(finding, admittedFindings, task) ?? [];
+    if (problems.length === 0) return true;
+    unresolved.push(`${finding.kind}: inconsistent related findings`);
+    return false;
+  });
   const resolvedParameters = request.parameters.filter((kind) => {
     if (
       output.conflicts.length > 0 ||

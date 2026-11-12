@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import type { FetchedDocument } from "../../../src/research/ports.ts";
 import { waybackCaptureUrl } from "../../../src/research/web-archive.ts";
-import { BTL_EMPLOYEE_RATES_URL } from "../../../src/research/social-security/contributions-research.ts";
+import { BTL_EMPLOYEE_RATES_URL } from "./legacy-contributions-sources.ts";
 
 const fixture = (name: string) =>
   readFileSync(
