@@ -43,9 +43,7 @@ describe("validateContributionsExtraction", () => {
         { status: "unclear", problems: ["no table"] },
         BTL_LIVE,
       ),
-    ).toThrowError(
-      expect.objectContaining({ code: "extraction_unclear" }) as Error,
-    );
+    ).toThrow(expect.objectContaining({ code: "extraction_unclear" }) as Error);
   });
 
   it("rejects a value that is not in its quote", () => {

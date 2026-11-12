@@ -5,8 +5,8 @@ import { monthlyConfigRepository } from "../repositories/monthly-config-reposito
 import { parseMonthPeriod, parseOrThrow } from "../services/month-period.ts";
 import type { UserDataAccess } from "../repositories/user-scope.ts";
 
-/** Non-negative like the app's number inputs; finite so NaN never reaches SQL. */
-const amount = z.number().finite().nonnegative();
+/** Non-negative like the app's number inputs; z.number() rejects NaN and Infinity, so they never reach SQL. */
+const amount = z.number().nonnegative();
 
 /** Strict: a body with anything else, a user id included, is rejected. */
 const settingsBody = z.strictObject({

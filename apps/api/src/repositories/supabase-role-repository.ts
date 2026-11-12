@@ -36,7 +36,7 @@ export class SupabaseRoleRepository implements RoleRepository {
       .from("app_user_roles")
       .select("role")
       .eq("user_id", userId)
-      .returns<{ role: string }[]>();
+      .overrideTypes<{ role: string }[], { merge: false }>();
     if (error) {
       throw new AuthUnavailableError(`reading roles failed: ${error.message}`);
     }

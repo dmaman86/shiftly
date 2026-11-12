@@ -31,7 +31,7 @@ describe("validateBracketExtraction", () => {
   });
 
   it("stops when the extractor reports the table as unclear", () => {
-    expect(() => validateBrackets(brackets2026, "unclear")).toThrowError(
+    expect(() => validateBrackets(brackets2026, "unclear")).toThrow(
       expect.objectContaining({ code: "extraction_unclear" }),
     );
   });
@@ -42,7 +42,7 @@ describe("validateBracketExtraction", () => {
     ["fractional limit", withRow(brackets2026, 0, { maxIncome: 7010.5 })],
     ["a single bracket", [brackets2026[0]]],
   ])("rejects %s", (_label, rows) => {
-    expect(() => validateBrackets(rows)).toThrowError(invalid);
+    expect(() => validateBrackets(rows)).toThrow(invalid);
   });
 
   it.each([
@@ -57,12 +57,12 @@ describe("validateBracketExtraction", () => {
       withRow(brackets2026, 2, { maxIncome: null }),
     ],
   ])("rejects %s", (_label, rows) => {
-    expect(() => validateBrackets(rows)).toThrowError(invalid);
+    expect(() => validateBrackets(rows)).toThrow(invalid);
   });
 
   it("rejects a limit taken from the annual column", () => {
     const annual = withRow(brackets2026, 0, { maxIncome: 84120 });
-    expect(() => validateBrackets(annual)).toThrowError(invalid);
+    expect(() => validateBrackets(annual)).toThrow(invalid);
   });
 
   it("rejects a dropped row even when every remaining value exists in the table", () => {
@@ -71,7 +71,7 @@ describe("validateBracketExtraction", () => {
       { ...brackets2026[3], minIncome: 10061 },
       ...brackets2026.slice(4),
     ];
-    expect(() => validateBrackets(dropped)).toThrowError(
+    expect(() => validateBrackets(dropped)).toThrow(
       expect.objectContaining({
         details: {
           problems: ["6 brackets extracted but the table has 7 rows"],
@@ -88,12 +88,12 @@ describe("validateCreditPointExtraction", () => {
 
   it("rejects an added year that is not in the table", () => {
     const invented = [...creditPointRows, { year: 2026, monthlyValue: 242 }];
-    expect(() => validateCreditPoint(invented)).toThrowError(invalid);
+    expect(() => validateCreditPoint(invented)).toThrow(invalid);
   });
 
   it("rejects the annual value in place of the monthly one", () => {
     const annual = withRow(creditPointRows, 25, { monthlyValue: 2904 });
-    expect(() => validateCreditPoint(annual)).toThrowError(
+    expect(() => validateCreditPoint(annual)).toThrow(
       expect.objectContaining({
         details: {
           problems: ["row 25: monthly value 2904 is not in column 2"],
@@ -108,11 +108,11 @@ describe("validateCreditPointExtraction", () => {
       1,
       creditPointRows[0],
     );
-    expect(() => validateCreditPoint(swapped)).toThrowError(invalid);
+    expect(() => validateCreditPoint(swapped)).toThrow(invalid);
   });
 
   it("stops when the extractor reports the table as unclear", () => {
-    expect(() => validateCreditPoint(creditPointRows, "unclear")).toThrowError(
+    expect(() => validateCreditPoint(creditPointRows, "unclear")).toThrow(
       expect.objectContaining({ code: "extraction_unclear" }),
     );
   });

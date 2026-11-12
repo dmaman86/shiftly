@@ -15,7 +15,7 @@ import type { UserDataAccess } from "../repositories/user-scope.ts";
 const MAX_DAYS = 31;
 const MAX_SHIFTS = 200;
 
-const amount = z.number().finite().nonnegative();
+const amount = z.number().nonnegative();
 const instant = z.iso.datetime({ offset: true });
 
 const guestDay = z.strictObject({
