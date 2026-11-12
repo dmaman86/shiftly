@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { byTier, sourceTier } from "../../src/research/source-policy.ts";
+import { sourceTier } from "../../src/research/source-policy.ts";
 
 describe("sourceTier", () => {
   it.each([
@@ -20,20 +20,5 @@ describe("sourceTier", () => {
     ["not a url", 4],
   ])("%s is tier %i", (url, tier) => {
     expect(sourceTier(url)).toBe(tier);
-  });
-
-  it("orders by tier and keeps discovery order within a tier", () => {
-    const sources = [
-      { url: "a", tier: 3 as const },
-      { url: "b", tier: 1 as const },
-      { url: "c", tier: 3 as const },
-      { url: "d", tier: 1 as const },
-    ];
-    expect(byTier(sources).map((source) => source.url)).toEqual([
-      "b",
-      "d",
-      "a",
-      "c",
-    ]);
   });
 });

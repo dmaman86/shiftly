@@ -1,20 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
-  CONTRIBUTIONS_EXTRACTION,
-  CONTRIBUTIONS_PARSER,
-  CONTRIBUTIONS_TASK,
   dateFromStatement,
   parseBtlEmployeeRates,
   parseKolZchutDeductions,
-} from "../../../src/research/social-security/contributions-extraction.ts";
-import { validateContributionsExtraction } from "../../../src/research/social-security/contributions-validation.ts";
-import {
-  BTL_2015,
-  BTL_2025_FEBRUARY,
-  BTL_LIVE,
-  btlDocument,
-} from "./btl-fixtures.ts";
-import { fakeKolZchutSource } from "./kolzchut-fixtures.ts";
+} from "../offline/social-security/contributions-extraction.ts";
+import { validateContributionsExtraction } from "../offline/social-security/contributions-validation.ts";
+import { BTL_2015, BTL_2025_FEBRUARY, BTL_LIVE } from "./btl-fixtures.ts";
+import { kolZchutSection } from "./kolzchut-fixtures.ts";
 
 /** Each parameter as [value, statedFrom, statedUntil]. */
 const read = (text: string, parse = parseBtlEmployeeRates) =>
@@ -95,11 +87,8 @@ describe("parseBtlEmployeeRates", () => {
 });
 
 describe("parseKolZchutDeductions", () => {
-  const section = async (at: string) =>
-    (await fakeKolZchutSource().employeeContributionsAt(new Date(at))).text;
-
-  it("reads the 2020 section; a 'correct for 2020' amount holds for 2020 only", async () => {
-    expect(read(await section("2020-06-30"), parseKolZchutDeductions)).toEqual({
+  it("reads the 2020 section; a 'correct for 2020' amount holds for 2020 only", () => {
+    expect(read(kolZchutSection(2020), parseKolZchutDeductions)).toEqual({
       reducedRateBoundary: [6331, "2020-01-01", "2021-01-01"],
       maxInsurableIncome: [44020, "2020-01-01", "2021-01-01"],
       nationalInsuranceReducedRate: [0.004, "2006-01-01", null],
@@ -109,8 +98,8 @@ describe("parseKolZchutDeductions", () => {
     });
   });
 
-  it("reads the 2026 section, leaving undated values undated", async () => {
-    expect(read(await section("2026-06-30"), parseKolZchutDeductions)).toEqual({
+  it("reads the 2026 section, leaving undated values undated", () => {
+    expect(read(kolZchutSection(2026), parseKolZchutDeductions)).toEqual({
       reducedRateBoundary: [7703, "2026-01-01", "2027-01-01"],
       maxInsurableIncome: [51910, null, null],
       nationalInsuranceReducedRate: [0.0104, null, null],
@@ -118,20 +107,5 @@ describe("parseKolZchutDeductions", () => {
       healthInsuranceReducedRate: [0.0323, null, null],
       healthInsuranceStandardRate: [0.0517, "2025-02-01", null],
     });
-  });
-});
-
-describe("CONTRIBUTIONS_EXTRACTION", () => {
-  it("parses by publisher and records the parser, not a model", async () => {
-    const result = await CONTRIBUTIONS_EXTRACTION.extract(
-      CONTRIBUTIONS_TASK,
-      btlDocument("https://www.btl.gov.il/rates", BTL_LIVE),
-    );
-    expect(result.trace).toMatchObject({
-      model: CONTRIBUTIONS_PARSER,
-      task: "employee_contributions",
-      attempts: [],
-    });
-    expect(result.raw).toMatchObject({ status: "complete" });
   });
 });

@@ -6,11 +6,7 @@ export type RulesPipelineErrorCode =
   | "extraction_unclear"
   | "invalid_extraction";
 
-/**
- * Every failure of a rules pipeline is explicit. The only fallback is the
- * documented one in year-resolution.ts: a year missing from the source reuses
- * the latest earlier value and is flagged as carried forward.
- */
+/** Error contract retained only for offline historical validator regressions. */
 export class RulesPipelineError extends Error {
   readonly code: RulesPipelineErrorCode;
   readonly details: unknown;

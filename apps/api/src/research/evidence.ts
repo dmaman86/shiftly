@@ -16,7 +16,7 @@ export type QuoteMatch = {
 };
 
 /**
- * Finds a model quote in the fetched content. Whitespace may differ (PDF text
+ * Finds a supplied quotation in fetched content. Whitespace may differ (PDF text
  * has no reliable spacing) and dashes or quote marks may be swapped; every
  * other character must match in order.
  */

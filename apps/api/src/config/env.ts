@@ -1,8 +1,4 @@
-import { fileURLToPath } from "node:url";
 import { z } from "zod";
-
-const apiRoot = (path: string) =>
-  fileURLToPath(new URL(`../../${path}`, import.meta.url));
 
 /** Exact browser origins (scheme, host and port only), comma separated. */
 const originList = z
@@ -27,8 +23,6 @@ const originList = z
     ),
   );
 
-const artifactsDir = z.string().default(apiRoot(".artifacts"));
-
 const envSchema = z
   .object({
     NODE_ENV: z.string().default("development"),
@@ -40,8 +34,6 @@ const envSchema = z
      * production; never a wildcard.
      */
     CORS_ALLOWED_ORIGINS: originList,
-    /** Each rules pipeline writes to its own subfolder. */
-    ARTIFACTS_DIR: artifactsDir,
     /**
      * Required: verifies Supabase Auth tokens and reads and writes data.
      * Same project URL as the frontend's VITE_SUPABASE_URL.
@@ -83,7 +75,6 @@ export type AdminEnv = z.infer<typeof adminEnvSchema>;
 const researchEnvSchema = z.object({
   GEMINI_API_KEY: z.string().trim().min(1),
   GEMINI_MODEL: z.string().trim().min(1).default("gemma-4-31b-it"),
-  REFERENCE_DATA_PERSISTENCE_ENABLED: z.stringbool().default(false),
   REFERENCE_RESEARCH_ENABLED: z.stringbool().default(false),
 });
 export type ResearchEnv = z.infer<typeof researchEnvSchema>;
@@ -114,8 +105,3 @@ export const loadAdminEnv = (
 export const loadResearchEnv = (
   source: NodeJS.ProcessEnv = process.env,
 ): ResearchEnv => parseEnv(researchEnvSchema, source);
-
-/** Where debug artifacts go; the same default the server uses. */
-export const loadArtifactsDir = (
-  source: NodeJS.ProcessEnv = process.env,
-): string => artifactsDir.parse(source.ARTIFACTS_DIR);

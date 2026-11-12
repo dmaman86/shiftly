@@ -2,7 +2,6 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   loadAdminEnv,
-  loadArtifactsDir,
   loadEnv,
   loadResearchEnv,
 } from "../../src/config/env.ts";
@@ -18,10 +17,8 @@ const BASE = {
 };
 
 describe("loadEnv", () => {
-  it("keeps reference-data persistence off by default", () => {
-    expect(loadResearchEnv(BASE).REFERENCE_DATA_PERSISTENCE_ENABLED).toBe(
-      false,
-    );
+  it("keeps explicit research execution off by default", () => {
+    expect(loadResearchEnv(BASE).REFERENCE_RESEARCH_ENABLED).toBe(false);
   });
 
   it("fails fast at startup without the Supabase settings authentication needs", () => {
@@ -44,12 +41,16 @@ describe("loadEnv", () => {
     ).toThrow("SUPABASE_USER_DATA_SECRET_KEY");
   });
 
-  it("accepts persistence with the Supabase settings", () => {
-    const env = loadResearchEnv({
+  it("ignores retired settings instead of exposing a nonfunctional persistence switch", () => {
+    const research = loadResearchEnv({
       ...BASE,
       REFERENCE_DATA_PERSISTENCE_ENABLED: "true",
     });
-    expect(env.REFERENCE_DATA_PERSISTENCE_ENABLED).toBe(true);
+    expect(research).not.toHaveProperty("REFERENCE_DATA_PERSISTENCE_ENABLED");
+    expect(research.REFERENCE_RESEARCH_ENABLED).toBe(false);
+    expect(loadEnv({ ...BASE, ARTIFACTS_DIR: "/unused" })).not.toHaveProperty(
+      "ARTIFACTS_DIR",
+    );
   });
 
   it("never prints secret values in the error", () => {
@@ -123,19 +124,6 @@ describe("loadAdminEnv", () => {
       loadAdminEnv({ SUPABASE_URL: "sb_secret_do_not_print" }),
     ).toThrow(
       "Invalid or missing environment variables: SUPABASE_URL, SUPABASE_SECRET_KEY",
-    );
-  });
-});
-
-describe("loadArtifactsDir", () => {
-  it("defaults to apps/api/.artifacts, like the server", () => {
-    expect(loadArtifactsDir({})).toBe(join(API_ROOT, ".artifacts"));
-    expect(loadArtifactsDir({})).toBe(loadEnv(BASE).ARTIFACTS_DIR);
-  });
-
-  it("uses ARTIFACTS_DIR when set", () => {
-    expect(loadArtifactsDir({ ARTIFACTS_DIR: "/tmp/artifacts" })).toBe(
-      "/tmp/artifacts",
     );
   });
 });

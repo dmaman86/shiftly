@@ -1,49 +1,7 @@
-import type { ExtractionTask } from "./shared/extraction-task.ts";
-import type { ExtractionResult } from "./shared/gemma-extractor.ts";
-
-/**
- * The research boundary: the model decides what to investigate, the backend
- * decides what content exists, the model extracts from that content, and code
- * decides whether to trust it. A URL alone is never evidence.
- */
+/** Document/evidence ports for explicit manual source verification, not model research. */
 
 /** 1 official, 2 official mirror or cache, 3 trusted secondary, 4 general web. */
 export type SourceTier = 1 | 2 | 3 | 4;
-
-export type ResearchDiscoveryRequest = {
-  /** What to look for, in plain words; never asks the model for values. */
-  readonly subject: string;
-  readonly year: number;
-};
-
-export type DiscoveredSource = {
-  /** The real page address; search redirects are already resolved. */
-  readonly url: string;
-  readonly title: string | null;
-  /** Where the URL came from: search metadata, or the answer text as a fallback. */
-  readonly origin: "grounding_metadata" | "response_text";
-};
-
-export type ModelCall = {
-  readonly model: string;
-  readonly startedAt: string;
-  readonly durationMs: number;
-  readonly outcome: "response" | "provider_error";
-  readonly httpStatus: number | null;
-  readonly error: string | null;
-};
-
-export type ResearchDiscoveryResult = {
-  readonly sources: readonly DiscoveredSource[];
-  readonly searchQueries: readonly string[];
-  readonly call: ModelCall;
-  /** The answer text, kept for the trace only; its values are never used. */
-  readonly rawText: string | null;
-};
-
-export interface ResearchProvider {
-  discover(request: ResearchDiscoveryRequest): Promise<ResearchDiscoveryResult>;
-}
 
 export type Accessibility =
   /** 2xx with content the backend can read. */
@@ -74,17 +32,10 @@ export type FetchedDocument = {
   readonly format: "pdf-text" | "html-text" | "plain-text" | null;
   /** Normalized text; empty unless accessible. PDFs carry "[page N]" markers. */
   readonly text: string;
-  /** Downloaded bytes, for the debug artifacts only. */
+  /** Downloaded source bytes, when available. */
   readonly bytes: Uint8Array | null;
 };
 
 export interface DocumentFetcher {
   fetch(url: string): Promise<FetchedDocument>;
-}
-
-export interface ExtractionProvider {
-  extract(
-    task: ExtractionTask,
-    document: FetchedDocument,
-  ): Promise<ExtractionResult>;
 }

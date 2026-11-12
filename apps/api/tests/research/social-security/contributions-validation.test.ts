@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { RulesPipelineError } from "../../../src/research/shared/errors.ts";
-import { parseBtlEmployeeRates } from "../../../src/research/social-security/contributions-extraction.ts";
-import { validateContributionsExtraction } from "../../../src/research/social-security/contributions-validation.ts";
+import { RulesPipelineError } from "../offline/shared/errors.ts";
+import { parseBtlEmployeeRates } from "../offline/social-security/contributions-extraction.ts";
+import { validateContributionsExtraction } from "../offline/social-security/contributions-validation.ts";
 import { BTL_2025_FEBRUARY, BTL_LIVE } from "./btl-fixtures.ts";
 
 const complete = (text = BTL_LIVE) => {

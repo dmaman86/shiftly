@@ -1,3 +1,4 @@
+import type { ContributionClaim } from "../offline/social-security/claims.ts";
 import { describe, expect, it } from "vitest";
 import type { CandidateSource } from "../../../src/ports/reference-data.ts";
 import {
@@ -10,11 +11,8 @@ import {
   type ContributionEvidence,
   type ContributionReading,
   type EmployeeTotalSpan,
-} from "../../../src/research/social-security/contributions-timeline.ts";
-import type {
-  ContributionClaim,
-  ContributionParameter,
-} from "../../../src/research/social-security/employee-contributions.ts";
+} from "../offline/social-security/contributions-timeline.ts";
+import type { ContributionParameter } from "../../../src/research/social-security/employee-contributions.ts";
 
 const claim = (
   value: number,

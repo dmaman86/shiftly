@@ -1,6 +1,4 @@
-import type { ExtractionTask } from "../shared/extraction-task.ts";
-import type { ExtractionProvider } from "../ports.ts";
-import type { ContributionParameter } from "./employee-contributions.ts";
+import type { ContributionParameter } from "../../../../src/research/social-security/employee-contributions.ts";
 
 /**
  * Reads the six parameters from the two layouts the research uses: the
@@ -33,37 +31,6 @@ export type RawContributionsExtraction =
       readonly annualMaxUpdate: string | null;
     }
   | { readonly status: "unclear"; readonly problems: readonly string[] };
-
-/** Names the parsing in the trace; never sent to a model. */
-export const CONTRIBUTIONS_TASK: ExtractionTask = {
-  name: "employee_contributions",
-  systemInstruction:
-    "Parsed by code, not by a model: the employee National Insurance and health insurance rates table.",
-  responseSchema: {},
-};
-
-export const CONTRIBUTIONS_PARSER = "deterministic-contributions-parser";
-
-/** Picks the parser by publisher; the generic pipeline treats it as any extractor. */
-export const CONTRIBUTIONS_EXTRACTION: ExtractionProvider = {
-  async extract(task, document) {
-    const raw = isKolZchut(document.publisher)
-      ? parseKolZchutDeductions(document.text)
-      : parseBtlEmployeeRates(document.text);
-    return {
-      raw,
-      trace: {
-        model: CONTRIBUTIONS_PARSER,
-        task: task.name,
-        attempts: [],
-        rawText: JSON.stringify(raw),
-      },
-    };
-  },
-};
-
-const isKolZchut = (publisher: string) =>
-  publisher === "kolzchut.org.il" || publisher.endsWith(".kolzchut.org.il");
 
 const INVISIBLE = /[\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/g;
 

@@ -1,5 +1,9 @@
+import type { ContributionClaim, ContributionClaims } from "./claims.ts";
 import { z } from "zod";
-import { appearsIn, percentNumberAppearsIn } from "../shared/grounding.ts";
+import {
+  appearsIn,
+  percentNumberAppearsIn,
+} from "../../../../src/research/shared/grounding.ts";
 import { RulesPipelineError } from "../shared/errors.ts";
 import { failOn } from "../shared/validation.ts";
 import {
@@ -11,10 +15,8 @@ import {
   CONTRIBUTION_PARAMETERS,
   contributionValue,
   isAmountParameter,
-  type ContributionClaim,
-  type ContributionClaims,
   type ContributionParameter,
-} from "./employee-contributions.ts";
+} from "../../../../src/research/social-security/employee-contributions.ts";
 
 // Timelines change on the first of a month; any other date cannot be stored.
 const monthStart = z.string().regex(/^\d{4}-\d{2}-01$/);
