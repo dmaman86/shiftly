@@ -2,17 +2,13 @@ import { describe, expect, it } from "vitest";
 import {
   validateBracketExtraction,
   validateCreditPointExtraction,
-} from "../../../src/research/income-tax/income-tax-extraction.schema.ts";
+} from "../offline/income-tax/table-validation.ts";
 import {
-  BRACKETS_2026_TITLE,
+  bracketText,
+  creditPointText,
   brackets2026,
   creditPointRows,
-  fakeSource,
 } from "./wikipedia-fixtures.ts";
-
-const source = fakeSource();
-const bracketText = (await source.bracketTable(BRACKETS_2026_TITLE)).text;
-const creditPointText = (await source.creditPointTable()).text;
 
 const validateBrackets = (monthlyBrackets: unknown, status = "complete") =>
   validateBracketExtraction({ status, monthlyBrackets }, bracketText);
@@ -26,7 +22,7 @@ const withRow = <T extends object>(rows: T[], index: number, patch: object) =>
 const invalid = expect.objectContaining({ code: "invalid_extraction" });
 
 describe("validateBracketExtraction", () => {
-  it("accepts the 2026 brackets, with the surtax as the 50% row", () => {
+  it("preserves the old fixture's 50% row without defining the current research contract", () => {
     expect(validateBrackets(brackets2026)).toEqual(brackets2026);
   });
 

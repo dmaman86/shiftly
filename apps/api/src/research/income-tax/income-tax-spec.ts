@@ -8,7 +8,7 @@ import {
   consistencyProblems,
   INCOME_TAX_PLAUSIBILITY as SANITY,
   monthlyTaxBracketSchema,
-} from "./income-tax-extraction.schema.ts";
+} from "./income-tax-values.ts";
 
 export const monthlyBracketsValueSchema = z.strictObject({
   brackets: z

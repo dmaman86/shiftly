@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { RulesPipelineError } from "../../../src/research/shared/errors.ts";
+import { RulesPipelineError } from "../offline/shared/errors.ts";
 import {
   parseAnnualReportRates,
   parseEmployeeTotalHistory,
@@ -7,7 +7,7 @@ import {
   validateAnnualReportRates,
   validateEmployeeTotalHistory,
   validateThresholdHistory,
-} from "../../../src/research/social-security/contributions-history.ts";
+} from "../offline/social-security/contributions-history.ts";
 import {
   EMPLOYEE_TOTAL_HISTORY,
   REPORT_2018,

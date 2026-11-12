@@ -1,7 +1,14 @@
 import { z } from "zod";
-import type { FetchedDocument } from "../ports.ts";
-import { locateQuote, referencedPage, type QuoteMatch } from "../evidence.ts";
-import { appearsIn, percentAppearsIn } from "../shared/grounding.ts";
+import type { FetchedDocument } from "../../../../src/research/ports.ts";
+import {
+  locateQuote,
+  referencedPage,
+  type QuoteMatch,
+} from "../../../../src/research/evidence.ts";
+import {
+  appearsIn,
+  percentAppearsIn,
+} from "../../../../src/research/shared/grounding.ts";
 import {
   extractionStatus as status,
   failOn,
@@ -12,7 +19,7 @@ import {
   INCOME_TAX_PLAUSIBILITY as SANITY,
   monthlyTaxBracketSchema,
   type MonthlyTaxBracket,
-} from "./income-tax-extraction.schema.ts";
+} from "../../../../src/research/income-tax/income-tax-values.ts";
 
 const evidence = {
   effectiveFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),

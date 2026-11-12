@@ -4,7 +4,7 @@ import {
   dataTemplateNames,
   evaluateArithmetic,
   renderKolZchutTemplates,
-} from "../../../src/research/social-security/kolzchut-templates.ts";
+} from "../offline/social-security/kolzchut-templates.ts";
 
 describe("Kol Zchut templates", () => {
   it("lists each data page a text uses once", () => {

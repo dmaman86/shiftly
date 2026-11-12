@@ -19,11 +19,10 @@ describe("research configuration isolation", () => {
       }),
     ).not.toThrow();
   });
-  it("keeps unified execution and persistence disabled by default", () => {
+  it("keeps unified execution disabled by default", () => {
     expect(loadResearchEnv({ GEMINI_API_KEY: "synthetic" })).toMatchObject({
       GEMINI_MODEL: "gemma-4-31b-it",
       REFERENCE_RESEARCH_ENABLED: false,
-      REFERENCE_DATA_PERSISTENCE_ENABLED: false,
     });
   });
   it("requires credentials only in the isolated research configuration", () => {

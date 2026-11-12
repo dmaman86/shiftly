@@ -1,9 +1,10 @@
+import type { ContributionClaims } from "./claims.ts";
 import type {
   CandidateEvidence,
   CandidateSource,
   NewCandidate,
   RevisionFallbackReason,
-} from "../../ports/reference-data.ts";
+} from "../../../../src/ports/reference-data.ts";
 import type {
   AnnualReportRates,
   EmployeeTotalHistory,
@@ -13,9 +14,8 @@ import {
   CONTRIBUTION_KINDS,
   CONTRIBUTION_PARAMETERS,
   contributionValue,
-  type ContributionClaims,
   type ContributionParameter,
-} from "./employee-contributions.ts";
+} from "../../../../src/research/social-security/employee-contributions.ts";
 
 /** Where a reading's values were read, for the revision's provenance. */
 export type ObservationProvenance = {

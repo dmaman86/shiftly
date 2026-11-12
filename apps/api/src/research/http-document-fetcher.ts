@@ -19,7 +19,7 @@ const NOT_FOUND_STATUSES = new Set([404, 410]);
 type Fetch = typeof fetch;
 
 /**
- * Downloads one URL and turns it into text the extractor can read. A blocked
+ * Downloads one administrator-supplied URL for manual evidence verification. A blocked
  * or challenged response is reported as "blocked" and left alone: no retries
  * with other clients, no challenge solving.
  */

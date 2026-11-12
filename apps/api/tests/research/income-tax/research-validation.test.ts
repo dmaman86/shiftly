@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateIncomeTaxResearch } from "../../../src/research/income-tax/research-validation.ts";
+import { validateIncomeTaxResearch } from "../offline/income-tax/booklet-validation.ts";
 import {
   ANSWER_2026,
   BRACKET_ROWS,

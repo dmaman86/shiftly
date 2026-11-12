@@ -1,62 +1,27 @@
 import { readFileSync } from "node:fs";
-import {
-  BRACKET_HEADER_TITLE,
-  BRACKET_INDEX_TITLE,
-  CREDIT_POINT_TITLE,
-  HEBREW_WIKIPEDIA,
-  WikipediaIncomeTaxSource,
-} from "../../../src/research/income-tax/wikipedia-source.ts";
-import { MediaWikiClient } from "../../../src/research/shared/mediawiki-client.ts";
-import { fakeMediaWikiFetch, type FakeWiki } from "../shared/fake-mediawiki.ts";
+import { joinRowCells, stripNoinclude } from "../offline/shared/wikitext.ts";
 
-export const fixture = (name: string) =>
+/** Recorded fixture bytes only; no MediaWiki client, URL fetching or year fallback. */
+const fixture = (name: string) =>
   readFileSync(
     new URL(`../../fixtures/income-tax/wikipedia/${name}`, import.meta.url),
     "utf8",
   );
 
-export const BRACKETS_2026_TITLE = "תבנית:מדרגות מס 2026";
-
-type FakePage = { readonly revid: number; readonly wikitext: string };
-
-/** Revisions recorded in tests/fixtures/income-tax/wikipedia/SOURCES.md. */
-export const PAGES: Readonly<Record<string, FakePage>> = {
-  [BRACKET_INDEX_TITLE]: {
-    revid: 42998677,
-    wikitext: fixture("brackets-index.wikitext"),
-  },
-  [BRACKET_HEADER_TITLE]: {
-    revid: 21493632,
-    wikitext: fixture("brackets-header.wikitext"),
-  },
-  [BRACKETS_2026_TITLE]: {
-    revid: 42998646,
-    wikitext: fixture("brackets-2026.wikitext"),
-  },
-  [CREDIT_POINT_TITLE]: {
-    revid: 41634061,
-    wikitext: fixture("credit-point-article.wikitext"),
-  },
-};
-
-export const NOW = new Date("2026-10-17T12:00:00.000Z");
-
-/** Each page as a single current revision; a page set to undefined is missing. */
-export const fakeSource = (
-  pages: Readonly<Record<string, FakePage | undefined>> = PAGES,
-) => {
-  const wiki: FakeWiki = Object.fromEntries(
-    Object.entries(pages).flatMap(([title, page]) =>
-      page ? [[title, [{ ...page, timestamp: "2026-01-01T00:00:00Z" }]]] : [],
-    ),
-  );
-  return new WikipediaIncomeTaxSource(
-    new MediaWikiClient(HEBREW_WIKIPEDIA, {
-      fetch: fakeMediaWikiFetch(wiki),
-      now: () => NOW,
-    }),
-  );
-};
+export const bracketText = joinRowCells(
+  stripNoinclude(fixture("brackets-2026.wikitext"))
+    .replace(
+      "{{מדרגות מס בישראל/פתיח}}",
+      stripNoinclude(fixture("brackets-header.wikitext")).trim(),
+    )
+    .trim(),
+);
+const creditTable = fixture("credit-point-article.wikitext")
+  .match(/\{\|[\s\S]*?\|\}/g)
+  ?.find((table) => table.includes("ערך חודשי"));
+if (!creditTable)
+  throw new Error("Historical credit-point fixture table is missing");
+export const creditPointText = creditTable;
 
 export const brackets2026 = [
   { minIncome: 0, maxIncome: 7010, taxRate: 0.1 },

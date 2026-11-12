@@ -17,7 +17,7 @@ src/
 ├── ports/          Interfaces the services depend on (auth, reference-data revisions)
 ├── repositories/   Supabase adapters: UserScope, user-data tables, revisions, Auth admin
 ├── errors/         Errors shared across layers (UserDataError and its HTTP mapping)
-├── research/       Reference-data research pipelines: income tax, social security, shared tooling
+├── research/       Unified grounded research specs/executor and manual document verification
 └── cli/            Admin commands run by hand (election:record, election:activate, ...)
 ```
 
@@ -69,10 +69,8 @@ never their values. Secrets are backend only: never give them a `VITE_` prefix.
 | `GEMINI_API_KEY`                     | Unified research execution |                       | Google AI Studio key; not required by the HTTP server                              |
 | `CORS_ALLOWED_ORIGINS`               | In production              | none                  | Browser origins, comma separated, no trailing slash                                |
 | `SUPABASE_USER_DATA_SECRET_KEY`      | No                         | `SUPABASE_SECRET_KEY` | Separate key for user-owned data, so it can be rotated alone                       |
-| `REFERENCE_DATA_PERSISTENCE_ENABLED` | No                         | `false`               | Retained compatibility setting; unified CLI ignores it and never stores candidates |
 | `REFERENCE_RESEARCH_ENABLED`         | No                         | `false`               | Explicit opt-in to unified model execution; not needed for planning                |
-| `GEMINI_MODEL`                       | No                         | `gemma-4-31b-it`      | Model used by the research pipelines                                               |
-| `ARTIFACTS_DIR`                      | No                         | `apps/api/.artifacts` | Debug artifacts of the research pipelines                                          |
+| `GEMINI_MODEL`                       | No                         | `gemma-4-31b-it`      | Model used by the unified research provider                                        |
 | `HOST`, `PORT`                       | No                         | `127.0.0.1`, `3000`   | Listen address; the container sets `0.0.0.0:8080`                                  |
 
 "Server" means `server.ts` requires it. Administrative reference commands need
@@ -174,6 +172,41 @@ change is approved; neither calculators nor activation validation are weakened h
 The administrative result includes `unresolved` validation/missing-period diagnostics
 when present. These may contain unverified provider explanations; they are not
 published evidence or stored as reference values.
+
+## Research cleanup boundaries
+
+The production research path has one grounded model adapter. Source-specific
+discovery/extraction pipelines, MediaWiki/Wayback clients, separate extraction
+prompts, model JSON-repair/retry machinery and document debug-artifact stores have
+been retired. No research command or HTTP route can select those old paths.
+
+The tax spec imports pure bracket schemas/continuity checks from
+`research/income-tax/income-tax-values.ts`; importing tax value validation no longer
+pulls in the old document extraction architecture. NI/Health keeps its existing
+stored value schemas and kind mapping in `employee-contributions.ts`.
+
+Useful historical table/quote/date/timeline regressions live under
+`tests/research/offline/`, with their captured source fixtures/attribution preserved.
+They have no model or network transports and cannot be imported by production.
+They are not an alternative research mechanism or an assertion that every old POC
+fixture matches the current tax policy. Architecture tests enforce these boundaries.
+
+`HttpDocumentFetcher`, HTML/PDF conversion and quotation verification remain because
+`election:record` explicitly verifies an administrator-supplied source. Consequently
+`parse5` and `unpdf` remain needed dependencies, not research-cleanup leftovers.
+
+`ARTIFACTS_DIR`, `loadArtifactsDir` and `REFERENCE_DATA_PERSISTENCE_ENABLED` have no
+remaining consumers and are removed from parsed configuration. Old shell/deployment
+variables with those names are ignored; this PR does not modify any environment
+file or production settings. Removing an unused switch does not enable persistence:
+the unified CLI still explicitly uses `persistCandidates: false`, and research
+execution still requires `REFERENCE_RESEARCH_ENABLED=true`.
+
+The old annual HTTP routes' authenticated `410` responses and the retired
+contributions CLI migration hint remain deliberate compatibility notices. Published
+readers, persistence/RPCs, activation commands, calculators and source/evidence trust
+classifications are unchanged. Scheduling, operational persistence and administrative
+HTTP endpoints remain separate work; none is enabled by cleanup.
 
 Unlike PR C/D, PR D2 includes a migration to extend the allowed attempt domains and
 the backend-only claim RPC. Apply it to the intended database after reviewing the

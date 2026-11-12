@@ -1,9 +1,11 @@
 import { z } from "zod";
-import type { ExtractionProvider } from "../ports.ts";
 import { RulesPipelineError } from "../shared/errors.ts";
-import { appearsIn, percentNumberAppearsIn } from "../shared/grounding.ts";
+import {
+  appearsIn,
+  percentNumberAppearsIn,
+} from "../../../../src/research/shared/grounding.ts";
 import { failOn } from "../shared/validation.ts";
-import { CONTRIBUTIONS_PARSER, flatten } from "./contributions-extraction.ts";
+import { flatten } from "./contributions-extraction.ts";
 
 /**
  * The National Insurance Institute's historical records, which cover the
@@ -19,28 +21,6 @@ import { CONTRIBUTIONS_PARSER, flatten } from "./contributions-extraction.ts";
  * Plain parsing, no model, as for the rates page; the validators check every
  * value and date against the text.
  */
-
-export const THRESHOLD_HISTORY_URL =
-  "https://www.btl.gov.il/Mediniyut/GeneralData/rates_1954_2007/Hachnasa/Pages/Sahir_Maasik.aspx";
-
-export const RATE_HISTORY_URL = `https://www.btl.gov.il/Mediniyut/GeneralData/rates_1954_2007/${encodeURIComponent("שיעור דמי הביטוח כאחוז מההכנסה")}/Pages/${encodeURIComponent("שכיר בגיל הביטוח")}.aspx`;
-
-export const annualReportUrl = (year: number) =>
-  `https://www.btl.gov.il/Publications/devwlopmends-hebrew/Documents/developments_${year}-H.pdf`;
-
-const traceOf = (task: string, raw: unknown) => ({
-  model: CONTRIBUTIONS_PARSER,
-  task,
-  attempts: [],
-  rawText: JSON.stringify(raw),
-});
-
-const providerOf = (parse: (text: string) => unknown): ExtractionProvider => ({
-  async extract(task, document) {
-    const raw = parse(document.text);
-    return { raw, trace: traceOf(task.name, raw) };
-  },
-});
 
 const unclear = (...problems: string[]) => ({
   status: "unclear" as const,
@@ -189,8 +169,6 @@ export const validateThresholdHistory = (
   return { rows };
 };
 
-export const THRESHOLD_HISTORY_EXTRACTION = providerOf(parseThresholdHistory);
-
 // ---------------------------------------------------------------------------
 // Employee totals: date | reduced total | employer | employee | standard
 // total | employer | employee. National Insurance and health together.
@@ -272,10 +250,6 @@ export const validateEmployeeTotalHistory = (
   failOn(problems);
   return { rows };
 };
-
-export const EMPLOYEE_TOTAL_HISTORY_EXTRACTION = providerOf(
-  parseEmployeeTotalHistory,
-);
 
 // ---------------------------------------------------------------------------
 // Yearly report: the table of rates by branch "collected from the employer
@@ -455,5 +429,3 @@ export const validateAnnualReportRates = (
     quote: report.quote,
   };
 };
-
-export const ANNUAL_REPORT_EXTRACTION = providerOf(parseAnnualReportRates);

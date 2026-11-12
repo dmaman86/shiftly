@@ -33,16 +33,6 @@ export const sourceTier = (url: string): SourceTier => {
   return 4;
 };
 
-/** Tiers 1–3 may be fetched and extracted; tier 4 is never trusted automatically. */
-export const isUsableTier = (tier: SourceTier) => tier <= 3;
-
-/** Lower tier first; the stable sort keeps discovery order within a tier. */
-export const byTier = <T extends { readonly tier: SourceTier }>(
-  sources: readonly T[],
-): T[] => {
-  return [...sources].sort((a, b) => a.tier - b.tier);
-};
-
 export const publisherOf = (url: string): string => {
   return safeUrl(url)?.hostname.toLowerCase() ?? "unknown";
 };
