@@ -45,23 +45,23 @@ export const shiftsRepository = (scope: UserScope) => ({
         .gte("date", start)
         .lt("date", end)
         .order("start_time")
-        .returns<ShiftRow[]>(),
+        .overrideTypes<ShiftRow[], { merge: false }>(),
     );
     return (rows ?? []).map(toShift);
   },
 
   /** Throws not_found when the id is another user's: same answer as a missing one. */
   save: async (shift: Shift): Promise<void> => {
-    const saved = await dataOrThrow(
-      scope
-        .rpc("api_upsert_shift", {
-          p_id: shift.id,
-          p_date: shift.date,
-          p_start_time: shift.startTime,
-          p_end_time: shift.endTime,
-          p_is_duty: shift.isDuty,
-        })
-        .returns<boolean>(),
+    // The client has no generated Database types, so the RPC result is
+    // untyped: keep it unknown and let the strict check below narrow it.
+    const saved: unknown = await dataOrThrow(
+      scope.rpc("api_upsert_shift", {
+        p_id: shift.id,
+        p_date: shift.date,
+        p_start_time: shift.startTime,
+        p_end_time: shift.endTime,
+        p_is_duty: shift.isDuty,
+      }),
     );
     if (saved !== true) throw new UserDataError("not_found", "Shift not found");
   },
