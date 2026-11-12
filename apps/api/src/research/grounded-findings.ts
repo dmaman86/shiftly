@@ -101,7 +101,12 @@ export const validateGroundedFindings = (
   });
   let candidates: NewCandidate[] = [];
   const admittedFindings: ResearchFinding[] = [];
-  const unresolved: string[] = [...output.conflicts];
+  const unresolved: string[] = [
+    ...output.conflicts,
+    ...output.missingPeriods.map(
+      (gap) => `${gap.kind}: missing ${gap.from}..${gap.until}: ${gap.reason}`,
+    ),
+  ];
   for (const [i, finding] of output.findings.entries()) {
     if (
       !request.parameters.includes(finding.kind) ||
@@ -134,7 +139,9 @@ export const validateGroundedFindings = (
       missingOverlap ||
       output.conflicts.length > 0
     ) {
-      unresolved.push(`${finding.kind}: conflicting or invalid finding`);
+      unresolved.push(
+        `${finding.kind}: ${problems.length ? problems.join("; ") : "conflicting or invalid finding"}`,
+      );
       continue;
     }
     const paths = leaves(finding, ["findings", i]).filter(

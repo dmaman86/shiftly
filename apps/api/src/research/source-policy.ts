@@ -1,10 +1,14 @@
 import type { SourceTier } from "./ports.ts";
 
 /**
- * Secondary sources the project already accepted with attribution (see the
- * Wikipedia and Kol Zchut decisions). Anything else is general web (tier 4).
+ * Secondary sources with attribution, including the identified payroll circular
+ * reproductions in VALIDATION.md. Host classification is not source verification.
  */
-const TRUSTED_SECONDARY_HOSTS = ["he.wikipedia.org", "kolzchut.org.il"];
+const TRUSTED_SECONDARY_HOSTS = [
+  "he.wikipedia.org",
+  "kolzchut.org.il",
+  "malam-payroll.com",
+];
 
 const isOfficialHost = (host: string) =>
   host === "gov.il" || host.endsWith(".gov.il");

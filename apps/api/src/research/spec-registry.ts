@@ -6,12 +6,14 @@ import {
 import { ELECTION_RESEARCH_SPEC } from "./elections/election-spec.ts";
 import { INCOME_TAX_RESEARCH_SPEC } from "./income-tax/income-tax-spec.ts";
 import { CONTRIBUTIONS_RESEARCH_SPEC } from "./social-security/contributions-spec.ts";
+import { ALLOWANCES_RESEARCH_SPEC } from "./allowances/allowances-spec.ts";
 
 /** Registration does not enable execution: the explicit environment opt-in remains required. */
 export const researchSpecs: readonly ResearchSpec[] = [
   ELECTION_RESEARCH_SPEC,
   INCOME_TAX_RESEARCH_SPEC,
   CONTRIBUTIONS_RESEARCH_SPEC,
+  ALLOWANCES_RESEARCH_SPEC,
 ];
 
 export const selectResearchSpec = (
@@ -34,7 +36,7 @@ export const planningSpec = (domain: ResearchDomain): ResearchSpec =>
     researchInstructions: "Not enabled",
     refreshPolicy: {
       intervalDays:
-        domain === "elections" ? 7 : domain === "income-tax" ? 90 : 30,
+        domain === "elections" ? 7 : domain === "contributions" ? 30 : 90,
       unresolvedDays: 30,
     },
     validateFinding: () => ["Domain spec not registered"],
