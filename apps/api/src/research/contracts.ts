@@ -16,6 +16,7 @@ export const RESEARCH_DOMAINS = {
     "health_insurance.employee_standard_rate",
   ],
   elections: ["calendar.knesset_election"],
+  allowances: ["per_diem.point_rate", "meal_allowance.rates"],
 } as const satisfies Record<string, readonly ReferenceKind[]>;
 
 export type ResearchDomain = keyof typeof RESEARCH_DOMAINS;
@@ -23,6 +24,7 @@ export const researchKindSchema = z.enum([
   ...RESEARCH_DOMAINS["income-tax"],
   ...RESEARCH_DOMAINS.contributions,
   ...RESEARCH_DOMAINS.elections,
+  ...RESEARCH_DOMAINS.allowances,
 ]);
 export type ResearchKind = z.infer<typeof researchKindSchema>;
 export const calendarDateSchema = z.iso.date();
@@ -39,7 +41,7 @@ export const researchRequestSchema = z
   .discriminatedUnion("requestUnit", [
     z.strictObject({
       requestUnit: z.literal("calendar_month"),
-      domain: z.enum(["income-tax", "contributions"]),
+      domain: z.enum(["income-tax", "contributions", "allowances"]),
       year: z.number().int().min(2015).max(2100),
       month: z.number().int().min(1).max(12),
       parameters: parametersSchema,

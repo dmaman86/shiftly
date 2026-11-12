@@ -36,7 +36,7 @@ export const parseResearchCommand = (
   )
     throw new ResearchError("invalid_task");
   const domain = z
-    .enum(["income-tax", "contributions", "elections"])
+    .enum(["income-tax", "contributions", "elections", "allowances"])
     .parse(values.domain);
   const parameters = values.parameters.split(",");
   if (

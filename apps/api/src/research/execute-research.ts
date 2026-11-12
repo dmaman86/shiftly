@@ -60,6 +60,8 @@ export const executeResearch = async (
   readonly candidateIds: readonly string[];
   readonly candidates?: readonly NewCandidate[];
   readonly attemptId?: string;
+  /** Validation/missing-period diagnostics for the administrative caller, never persisted as reference evidence. */
+  readonly unresolved?: readonly string[];
 }> => {
   // Read/plan/claim failures propagate as unavailability before any model request.
   const snapshot = await deps.store.read(request);
@@ -70,6 +72,7 @@ export const executeResearch = async (
     return { status: "skipped", candidateIds: [] };
   const candidateIds: string[] = [];
   let candidates: readonly NewCandidate[] = [];
+  let unresolved: readonly string[] = [];
   let completion: ResearchCompletion;
   let phase: "provider" | "validation" | "persistence" = "provider";
   const started = deps.now().getTime();
@@ -96,6 +99,7 @@ export const executeResearch = async (
       };
     phase = "validation";
     const validated = validateGroundedFindings(dispatchedTask, spec, answer);
+    unresolved = validated.unresolved;
     phase = "persistence";
     if (!(await deps.store.isOwner(claim)))
       return {
@@ -166,6 +170,7 @@ export const executeResearch = async (
       candidateIds,
       candidates,
       attemptId: claim.id,
+      ...(unresolved.length ? { unresolved } : {}),
     };
   }
   return {
@@ -173,5 +178,6 @@ export const executeResearch = async (
     candidateIds,
     candidates,
     attemptId: claim.id,
+    ...(unresolved.length ? { unresolved } : {}),
   };
 };

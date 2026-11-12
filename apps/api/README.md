@@ -141,3 +141,42 @@ The old `reference:research:contributions` command, including `--store`, exits w
 or Kol Zchut or writes candidates. Use unified `reference:research` with explicit
 `--year`, `--month`, `--parameters` and `--plan`/`--execute`. The execution opt-in and
 non-persistent candidate behavior described above also apply to this domain.
+
+## Monthly allowance research
+
+The `allowances` domain researches the existing `per_diem.point_rate` `{amount}`
+and `meal_allowance.rates` `{small,large}` kinds without changing web DTOs or domain
+calculators. The rate-family mapping comes from `VALIDATION.md`: civil-service duty
+category A for the per-diem point; third-shift category 26.284 for `small`; ordinary
+overtime category 26.282 for `large`. Payroll code 1700 alone is ambiguous because
+it also appears in the separate no-meal-agreement category. These reference rates
+do not establish that every employer or employee is entitled to the allowance.
+
+```sh
+bun run --cwd apps/api reference:research --domain allowances --year 2026 --month 2 --parameters per_diem.point_rate,meal_allowance.rates --plan
+```
+
+Requests are one exact month, with optional grouping of these two kinds, never
+multiple months. Current freshness is 90 days; unresolved attempts cool down for
+30 days. Historical coverage starts November 2015 and evidenced covered history
+is skipped; provisional baseline values are not evidence.
+
+Both meal amounts and their common effective interval must be supported in each
+finding. One supported member is insufficient; the other is never silently copied
+from stored data. A real change to one member produces one updated pair revision,
+not separate new kinds or monthly copies. Quotations must disambiguate source
+categories and amounts; flattened/ambiguous tables remain unresolved.
+
+**Compatibility limitation:** the existing published allowance timelines and
+calculators require first-of-month validity boundaries. Research must not round an
+actual intramonth change. Such findings remain unresolved until a separate consumer
+change is approved; neither calculators nor activation validation are weakened here.
+The administrative result includes `unresolved` validation/missing-period diagnostics
+when present. These may contain unverified provider explanations; they are not
+published evidence or stored as reference values.
+
+Unlike PR C/D, PR D2 includes a migration to extend the allowed attempt domains and
+the backend-only claim RPC. Apply it to the intended database after reviewing the
+normal migration workflow, before enabling execution. It does not modify active
+references or enable persistence. The unified CLI continues to return candidates
+without storing them, and activation remains a separate human action.
