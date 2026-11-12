@@ -108,6 +108,12 @@ export type ResearchSpec = {
     finding: ResearchFinding,
     task: ResearchTask,
   ) => readonly string[];
+  /** Compare only individually admitted, provider-attributed findings; never use unsupported peers. */
+  readonly validateRelatedFinding?: (
+    finding: ResearchFinding,
+    findings: readonly ResearchFinding[],
+    task: ResearchTask,
+  ) => readonly string[];
 };
 
 export const researchFindingSchema = z

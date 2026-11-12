@@ -51,7 +51,7 @@ cli, server ──▶ app ──▶ middleware, routes ──▶ controllers ─
 | `bun run election:activate`                | Publishes a recorded election                                 |
 | `bun run reference:activate`               | Publishes a reviewed reference-data revision                  |
 | `bun run reference:research`               | Plans or explicitly executes unified monthly/subject research |
-| `bun run reference:research:contributions` | Researches social-security contribution rates                 |
+| `bun run reference:research:contributions` | Retired; exits with a migration hint and performs no research |
 
 ## Environment
 
@@ -106,3 +106,38 @@ The old `POST /admin/income-tax/:year/rules` and `.../:year/research` endpoints
 return `410 research_route_retired` after the existing admin/session checks.
 Use the monthly CLI instead. Public election and rate timelines, authentication,
 CRUD and deterministic calculations do not depend on the research provider.
+
+## Monthly NI/Health research
+
+Use the same unified command, with one exact month and the required subset of
+these six existing kinds:
+
+- `social_security.reduced_rate_boundary`: `{amount}`
+- `social_security.max_insurable_income`: `{amount}`
+- `national_insurance.employee_reduced_rate`: `{rate}`
+- `national_insurance.employee_standard_rate`: `{rate}`
+- `health_insurance.employee_reduced_rate`: `{rate}`
+- `health_insurance.employee_standard_rate`: `{rate}`
+
+```sh
+bun run --cwd apps/api reference:research --domain contributions --year 2026 --month 2 --parameters health_insurance.employee_reduced_rate,health_insurance.employee_standard_rate --plan
+```
+
+The population is an Israeli resident ordinary salaried employee aged 18 to
+retirement age, not a controlling shareholder. Amounts are monthly whole ILS;
+rates are decimal fractions. Shared thresholds are not duplicated under the two
+insurance domains. Coverage begins November 2015, but already verified history is
+skipped. Missing periods are researched as explicit single-month tasks, never a
+full-history crawl or grouped annual snapshots.
+
+The recurring freshness policy is 30 days, independent of the monthly request
+unit; unsuccessful attempts have a 30-day cooldown. A mid-month Health change
+creates only that kind's changed interval, not copies of unchanged NI parameters.
+Derived totals-minus-parts values remain unresolved. Cross-parameter checks compare
+only provider-attributed findings whose real effective periods overlap.
+
+The old `reference:research:contributions` command, including `--store`, exits with
+`research_command_retired` and a migration hint. It no longer fetches BTL, Wayback
+or Kol Zchut or writes candidates. Use unified `reference:research` with explicit
+`--year`, `--month`, `--parameters` and `--plan`/`--execute`. The execution opt-in and
+non-persistent candidate behavior described above also apply to this domain.

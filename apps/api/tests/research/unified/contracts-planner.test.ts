@@ -219,7 +219,7 @@ describe("research tasks and monthly coverage", () => {
     expect(due.request).toEqual(REQUEST);
   });
   it("rejects absent/ambiguous executable specs rather than using a fallback", () => {
-    expect(() => selectResearchSpec("contributions")).toThrow(
+    expect(() => selectResearchSpec("contributions", [])).toThrow(
       "research_unavailable",
     );
     expect(selectResearchSpec("income-tax", [SPEC])).toBe(SPEC);

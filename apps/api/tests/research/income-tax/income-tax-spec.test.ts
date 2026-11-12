@@ -62,7 +62,7 @@ const grouped: typeof REQUEST = {
 };
 
 describe("monthly income tax specification", () => {
-  it("registers the real specification without enabling contributions or a provider fallback", () => {
+  it("registers the real specification without an execution opt-in or provider fallback", () => {
     expect(selectResearchSpec("income-tax")).toBe(SPEC);
     expect(planningSpec("income-tax")).toBe(SPEC);
     expect(SPEC.sourcePriority[0]).toBe("Israel Tax Authority");

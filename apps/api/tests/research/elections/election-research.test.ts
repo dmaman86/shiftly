@@ -63,12 +63,10 @@ describe("Knesset research specification", () => {
       ).length,
     ).toBeGreaterThan(0);
   });
-  it("registers elections without enabling contributions or replacing their planning contracts", () => {
+  it("keeps election planning registered alongside independent monthly domains", () => {
     expect(selectResearchSpec("elections")).toBe(SPEC);
     expect(planningSpec("elections")).toBe(SPEC);
-    expect(() => selectResearchSpec("contributions")).toThrow(
-      "research_unavailable",
-    );
+    expect(selectResearchSpec("contributions").domain).toBe("contributions");
     expect(SPEC.sourcePriority[0]).toBe("Central Elections Committee");
   });
   it("creates a bounded subject universe without dates or monthly grouping", () => {

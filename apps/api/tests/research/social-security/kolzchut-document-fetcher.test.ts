@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { RulesPipelineError } from "../../../src/research/shared/errors.ts";
 import { KolZchutDocumentFetcher } from "../../../src/research/social-security/kolzchut-document-fetcher.ts";
-import { KOL_ZCHUT_ARTICLE_URL } from "../../../src/research/social-security/contributions-research.ts";
+import { KOL_ZCHUT_ARTICLE_URL } from "./legacy-contributions-sources.ts";
 import { fakeKolZchutSource, NOW } from "./kolzchut-fixtures.ts";
 
 const failing = (error: RulesPipelineError) => ({
